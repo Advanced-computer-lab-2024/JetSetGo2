@@ -57,10 +57,6 @@ const deleteMuseum = async (req, res) => {
   }
 };
 
-// Define routes
-router.post("/add", createMuseum);
-router.get("/get", getMuseum);
-router.put("/update", updateMuseum);
-router.delete("/delete", deleteMuseum);
 
-module.exports = router;
+
+module.exports = {createMuseum,getMuseum,updateMuseum,deleteMuseum};

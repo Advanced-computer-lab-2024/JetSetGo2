@@ -57,10 +57,6 @@ const deleteHistoricalPlace = async (req, res) => {
   }
 };
 
-// Define routes
-router.post("/add", createHistoricalPlace);
-router.get("/get", getHistoricalPlace);
-router.put("/update", updateHistoricalPlace);
-router.delete("/delete", deleteHistoricalPlace);
 
-module.exports = router;
+
+module.exports = {createHistoricalPlace,getHistoricalPlace,updateHistoricalPlace,deleteHistoricalPlace};

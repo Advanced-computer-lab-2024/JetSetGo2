@@ -1,18 +1,24 @@
 // External variables
 require('dotenv').config();
 const express = require("express");
+const cors = require('cors');
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 
+
+
+
+
 // Importing route controllers
-const activityRoutes = require("./routes/ActivityCRUDcontroller");
-const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDcontroller");
-const museumRoutes = require("./routes/MuseumCRUDcontroller");
+const activityRoutes = require("./routes/ActivityCRUDroute");
+const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
+const museumRoutes = require("./routes/MuseumCRUDroute");
 
 const MongoURI = process.env.MONG_URI;
 
 // App variables
 const app = express();
+app.use(cors());
 const port = process.env.PORT || "8000";
 
 // Mongo DB connection
