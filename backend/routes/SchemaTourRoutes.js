@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/createtour", createGuide);
 router.get("/readTour", readGuide);
-router.get("/readTourId", readGuideID); // Add :id as a parameter
+router.get("/readTourId", readGuideID); 
 router.put("/updateTourId", updateGuide);
 router.delete("/deleteTour", deleteGuide);
 
