@@ -1,25 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React, { useState } from 'react';
+import TourForm from './components/TourForm';
+import TourList from './components/TourList';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [selectedTour, setSelectedTour] = useState(null);
+    const [refreshTours, setRefreshTours] = useState(false);
+
+    return (
+        <div>
+            <h1>Tour Guide Management</h1>
+            <TourForm refreshTours={() => setRefreshTours(!refreshTours)} />
+            <TourList setSelectedTour={setSelectedTour} refreshTours={refreshTours} />
+        </div>
+    );
+};
 
 export default App;
