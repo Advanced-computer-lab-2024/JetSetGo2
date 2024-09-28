@@ -1,34 +1,45 @@
+// External variables
 require('dotenv').config();
-
 const express = require("express");
 const cors = require('cors');
-
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
-const {createGuide,readGuide,readGuideID,updateGuide,deleteGuide} = require("./routes/SchemaTourRoutes")
-const MongoURI = 'mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb.net/' ;
 
 
 
-const itineraryRoutes = require("./routes/SchemaTourRoutes");
+
+
+// Importing route controllers
+const activityRoutes = require("./routes/ActivityCRUDroute");
+const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
+const museumRoutes = require("./routes/MuseumCRUDroute");
+
+const MongoURI = process.env.MONG_URI;
+
+// App variables
 const app = express();
 app.use(cors());
-const port = process.env.PORT || "9000";
+const port = process.env.PORT || "8000";
 
-      
+// Mongo DB connection
 mongoose.connect(MongoURI)
-.then(()=>{
-  console.log("MongoDB is now connected!")
-// Starting server
- app.listen(port, () => {
-    console.log(`Listening to requests on http://localhost:${port}`);
+  .then(() => {
+    console.log("MongoDB is now connected!");
+    app.listen(port, () => {
+      console.log(`Listening to requests on http://localhost:${port}`);
+    });
   })
-})
-.catch(err => console.log(err));
+  .catch(err => console.log(err));
 
-app.get("/home", (req, res) => {
-    res.status(200).send("You have everything installed!");
-  });
-
+// Middleware
 app.use(express.json());
-app.use('/itinerary',itineraryRoutes);
+
+// Base Route
+app.get("/home", (req, res) => {
+  res.status(200).send("You have everything installed!");
+});
+
+// Routes
+app.use('/activity', activityRoutes);
+app.use('/historicalPlace', historicalPlaceRoutes);
+app.use('/museum', museumRoutes);

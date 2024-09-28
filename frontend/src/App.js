@@ -1,15 +1,18 @@
-// src/App.js
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import React from 'react';
-import SchemaTourFront from './components/schemaTourFront'; 
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ActivityCRUD from './components/ActivityCRUD'; // Import ActivityCRUD component
+import HistoricalplaceCRUD from './components/HistoricalplaceCRUD';
+import MuseumCRUD from './components/MuseumCRUD';
 
-const App = () => {
+function App() {
   return (
     <Router>
       <div>
         <Routes>
-          {/* Removed the trailing space */}
-          <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
+          {/* Use element prop to render the component */}
+          <Route path="/activities" element={<ActivityCRUD />} />
+          <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
+          <Route path="/museums" element={<MuseumCRUD />} />
         </Routes>
       </div>
     </Router>
