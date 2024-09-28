@@ -21,7 +21,7 @@ const SchemaTourFront = () => {
 
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get('http://localhost:9000/itinerary/readTour');
+      const response = await axios.get('http://localhost:8000/itinerary/readTour');
       setItineraries(response.data);
     } catch (error) {
       console.error('Error fetching itineraries:', error);
@@ -42,10 +42,10 @@ const SchemaTourFront = () => {
     try {
       if (editId) {
         
-        await axios.put(`http://localhost:9000/itinerary/updateTourId`, { id: editId, ...formData });
+        await axios.put(`http://localhost:8000/itinerary/updateTourId`, { id: editId, ...formData });
       } else {
         
-        await axios.post('http://localhost:9000/itinerary/createtour', formData);
+        await axios.post('http://localhost:8000/itinerary/createtour', formData);
       }
       fetchItineraries();
       setFormData({
@@ -74,7 +74,7 @@ const SchemaTourFront = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete('http://localhost:9000/itinerary/deleteTour', { data: { id } });
+      await axios.delete('http://localhost:8000/itinerary/deleteTour', { data: { id } });
       fetchItineraries();
     } catch (error) {
       console.error('Error deleting itinerary:', error);

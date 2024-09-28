@@ -11,11 +11,11 @@ function App() {
       <div>
         <Routes>
           {/* Use element prop to render the component */}
-          <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
+          
           <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
-          
+          <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
         </Routes>
       </div>
     </Router>
