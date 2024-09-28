@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
     durationActivity : [{type : Number , required : true}],
     tourLanguage : [{type : String, required : true}],
     TourPrice : [{type : Number , required :true}],
-    availableDates : [{type :Date, required : true}],
+    availableDates : [{type :[Date], required : true}],
     accesibility : [{type : String,required : true}],
     pickUpLoc : [{type : String,required : true}],
     DropOffLoc : [{type : String,required : true}],

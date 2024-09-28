@@ -1,6 +1,8 @@
 require('dotenv').config();
 
 const express = require("express");
+const cors = require('cors');
+
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 const {createGuide,readGuide,readGuideID,updateGuide,deleteGuide} = require("./routes/SchemaTourRoutes")
@@ -10,7 +12,8 @@ const MongoURI = 'mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb
 
 const itineraryRoutes = require("./routes/SchemaTourRoutes");
 const app = express();
-const port = process.env.PORT || "8001";
+app.use(cors());
+const port = process.env.PORT || "9000";
 
 
 mongoose.connect(MongoURI)
@@ -22,6 +25,7 @@ mongoose.connect(MongoURI)
   })
 })
 .catch(err => console.log(err));
+
 app.get("/home", (req, res) => {
     res.status(200).send("You have everything installed!");
   });
