@@ -10,6 +10,7 @@ mongoose.set('strictQuery', false);
 
 
 // Importing route controllers
+const itineraryRoutes = require("./routes/SchemaTourRoutes");
 const activityRoutes = require("./routes/ActivityCRUDroute");
 const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
 const museumRoutes = require("./routes/MuseumCRUDroute");
@@ -43,3 +44,6 @@ app.get("/home", (req, res) => {
 app.use('/activity', activityRoutes);
 app.use('/historicalPlace', historicalPlaceRoutes);
 app.use('/museum', museumRoutes);
+app.use('/museum', museumRoutes);
+app.use('/itinerary',itineraryRoutes);
+
