@@ -25,88 +25,185 @@ const TouristSignup = () => {
         formData
       );
       console.log("Signup successful:", response.data);
-      // Optionally, handle successful signup (e.g., redirect to another page)
     } catch (error) {
       console.error("Error signing up:", error);
-      // Optionally, handle errors (e.g., show error message)
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Email:</label>
-        <input
-          type="email"
-          name="Email"
-          value={formData.Email}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>UserName:</label>
-        <input
-          type="text"
-          name="UserName"
-          value={formData.UserName}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Password:</label>
-        <input
-          type="password"
-          name="Password"
-          value={formData.Password}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Mobile Number:</label>
-        <input
-          type="number"
-          name="MobileNumber"
-          value={formData.MobileNumber}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Nationality:</label>
-        <input
-          type="text"
-          name="Nationality"
-          value={formData.Nationality}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Date of Birth:</label>
-        <input
-          type="date"
-          name="DateOfBirth"
-          value={formData.DateOfBirth}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Job:</label>
-        <input
-          type="text"
-          name="Job"
-          value={formData.Job}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+    <div style={styles.container}>
+      <h2 style={styles.header}>Tourist Signup</h2>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Email:</label>
+          <input
+            type="email"
+            name="Email"
+            value={formData.Email}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>UserName:</label>
+          <input
+            type="text"
+            name="UserName"
+            value={formData.UserName}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Password:</label>
+          <input
+            type="password"
+            name="Password"
+            value={formData.Password}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Mobile Number:</label>
+          <input
+            type="number"
+            name="MobileNumber"
+            value={formData.MobileNumber}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Nationality:</label>
+          <input
+            type="text"
+            name="Nationality"
+            value={formData.Nationality}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Date of Birth:</label>
+          <input
+            type="date"
+            name="DateOfBirth"
+            value={formData.DateOfBirth}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Job:</label>
+          <input
+            type="text"
+            name="Job"
+            value={formData.Job}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+        </div>
+        <button type="submit" style={styles.button}>
+          Sign Up
+        </button>
+      </form>
+    </div>
   );
 };
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    background: "linear-gradient(135deg, #74ebd5 0%, #9face6 100%)",
+    fontFamily: "'Poppins', sans-serif",
+  },
+  header: {
+    color: "#fff",
+    fontSize: "36px",
+    marginBottom: "20px",
+    textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+  },
+  form: {
+    background: "#fff",
+    padding: "40px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    width: "350px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  inputGroup: {
+    width: "100%",
+    marginBottom: "20px",
+  },
+  label: {
+    display: "block",
+    marginBottom: "5px",
+    fontSize: "16px",
+    fontWeight: "500",
+    color: "#333",
+  },
+  input: {
+    width: "100%",
+    padding: "12px",
+    fontSize: "16px",
+    borderRadius: "5px",
+    border: "1px solid #ddd",
+    outline: "none",
+    transition: "border-color 0.3s ease",
+  },
+  inputFocus: {
+    borderColor: "#74ebd5",
+  },
+  button: {
+    backgroundColor: "#9face6",
+    color: "#fff",
+    padding: "12px 25px",
+    borderRadius: "5px",
+    border: "none",
+    fontSize: "16px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    marginTop: "10px",
+    transition: "background-color 0.3s ease",
+  },
+  buttonHover: {
+    backgroundColor: "#74ebd5",
+  },
+};
+
+// Apply event listeners for hover and focus effects
+document.addEventListener("DOMContentLoaded", () => {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input) => {
+    input.addEventListener("focus", () => {
+      input.style.borderColor = styles.inputFocus.borderColor;
+    });
+    input.addEventListener("blur", () => {
+      input.style.borderColor = styles.input.borderColor;
+    });
+  });
+
+  const button = document.querySelector("button");
+  button.addEventListener("mouseover", () => {
+    button.style.backgroundColor = styles.buttonHover.backgroundColor;
+  });
+  button.addEventListener("mouseout", () => {
+    button.style.backgroundColor = styles.button.backgroundColor;
+  });
+});
 
 export default TouristSignup;
