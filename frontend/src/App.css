@@ -1,64 +1,96 @@
+/* Global Styles */
+body {
+  background-color: #f4f4f4; /* Light background for contrast */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+  line-height: 1.6; /* Improve readability */
+  margin: 0; /* Reset body margin */
+  padding: 20px; /* Add padding to the body */
+}
+
+/* Main App Container */
 .App {
-  font-family: Arial, sans-serif;
-  padding: 20px;
+  max-width: 600px; /* Decreased max-width for a more compact layout */
+  margin: 20px auto; /* Centered with reduced margin */
+  padding: 15px; /* Slightly less padding */
+  border-radius: 8px; /* Rounded corners for main container */
+  background-color: #ffffff; /* White background for contrast */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-h1, h2 {
-  color: #333;
-}
-
-form {
-  margin-bottom: 30px;
-  padding: 10px;
-  border: 1px solid #ddd;
+/* Form Sections */
+.form-section {
+  margin-bottom: 25px; /* Reduced margin between sections */
+  padding: 15px; /* Slightly less padding for form sections */
+  border: 1px solid #dcdcdc; /* Lighter border color */
+  border-radius: 8px; /* Match border radius with main container */
   background-color: #f9f9f9;
-  border-radius: 4px;
-  max-width: 400px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for form sections */
 }
 
+/* Form Elements */
 label {
   display: block;
-  margin: 10px 0;
+  margin: 8px 0 4px; /* Adjusted margins for labels */
+  font-weight: bold; /* Make labels more prominent */
 }
 
-input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+input[type="checkbox"] {
+  width: calc(100% - 20px); /* Adjusted width to account for padding */
+  padding: 10px; /* Slightly less padding for inputs */
+  margin-bottom: 10px; /* Less space below inputs */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px; /* Consistent font size */
+  box-sizing: border-box; /* Include padding in width */
 }
 
+/* Button Styles */
 button {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
+  padding: 8px 16px; /* Smaller padding for buttons */
   border: none;
   border-radius: 4px;
+  background-color: #3498db; /* Primary button color */
+  color: white;
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition */
+  font-size: 14px; /* Smaller font size for buttons */
+  margin-right: 10px; /* Space between buttons */
 }
 
 button:hover {
-  background-color: #0056b3;
-}
-
-.activity-list ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.activity-list li {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-}
-
-button {
-  margin-right: 10px;
+  background-color: #2980b9; /* Darker shade on hover */
 }
 
 .message {
-  color: green;
-  margin-bottom: 20px;
+  color: #27ae60; /* Green color for success messages */
+  margin: 15px 0;
+  font-weight: bold; /* Emphasize messages */
+}
+
+/* Activity List Styles */
+.activity-list {
+  margin-top: 15px; /* Reduced top margin */
+}
+
+.activity-item {
+  margin-bottom: 15px; /* Adjusted margin for activity items */
+  padding: 10px; /* Reduced padding for activity items */
+  border: 1px solid #dcdcdc; /* Light border for activity items */
+  border-radius: 4px;
+  background-color: #ffffff; /* White background for contrast */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.activity-actions {
+  margin-top: 10px;
+  display: flex; /* Align actions in a row */
+  justify-content: flex-end; /* Right-align action buttons */
+}
+
+.activity-actions button {
+  margin-left: 8px; /* Less space between action buttons */
 }
