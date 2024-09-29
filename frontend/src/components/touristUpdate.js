@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const TouristSignup = () => {
+const UpdateTouristPage = () => {
+  const { id } = useParams();
+  const [tourist, setTourist] = useState(null);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     Email: "",
     UserName: "",
@@ -13,8 +16,28 @@ const TouristSignup = () => {
     Job: "",
   });
 
-  const [error, setError] = useState(""); // State to hold error messages
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTourist = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/home/tourist/getTourist/${id}`
+        );
+        setTourist(response.data);
+        setFormData(response.data); // Populate form data with fetched tourist details
+      } catch (err) {
+        console.error("Failed to fetch tourist details:", err);
+        setError("Failed to load tourist details");
+      }
+    };
+
+    if (id) {
+      fetchTourist();
+    } else {
+      setError("Tourist ID is not provided");
+    }
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,25 +47,34 @@ const TouristSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/home/tourist/addTourist",
-        formData
+      const response = await axios.put(
+        `http://localhost:8000/home/tourist/updateTourist`,
+        {
+          id: id, // Include the ID in the request
+          ...formData,
+        }
       );
-      console.log("Signup successful:", response.data);
-      navigate(`/tourist-update/${response.data._id}`, {
-        state: { tourist: response.data },
-      }); // Redirecting to update page
+      console.log("Update successful:", response.data);
+      // navigate(`/tourist-detail/${id}`); // Redirect to the tourist detail page
     } catch (error) {
-      console.error("Error signing up:", error);
-      setError("An error occurred while signing up. Please try again."); // Setting error message
+      console.error("Error updating tourist:", error);
+      setError(
+        "An error occurred while updating tourist details. Please try again."
+      );
     }
   };
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!tourist) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div style={styles.container}>
-      <h2 style={styles.header}>Tourist Signup</h2>
-      {error && <p style={styles.error}>{error}</p>}{" "}
-      {/* Display error message */}
+      <h2 style={styles.header}>Edit Tourist</h2>
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Email:</label>
@@ -122,7 +154,7 @@ const TouristSignup = () => {
           />
         </div>
         <button type="submit" style={styles.button}>
-          Sign Up
+          Update Tourist
         </button>
       </form>
     </div>
@@ -187,13 +219,6 @@ const styles = {
     marginTop: "10px",
     transition: "background-color 0.3s ease",
   },
-  error: {
-    color: "red",
-    marginBottom: "15px",
-  },
 };
 
-// The event listeners for hover and focus effects can be simplified or removed in React
-// since they can be handled using state and inline styles.
-
-export default TouristSignup;
+export default UpdateTouristPage;

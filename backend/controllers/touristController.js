@@ -29,29 +29,24 @@ const createTourist = async (req, res) => {
 };
 
 const updateTourist = async (req, res) => {
-  const {
-    Email,
-    UserName,
-    Password,
-    MobileNumber,
-    Nationality,
-    DateOfBirth,
-    Job,
-  } = req.body;
+  const { id } = req.body;
+  const updateData = {};
+
+  if (req.body.Email) updateData.Email = req.body.Email;
+  if (req.body.UserName) updateData.UserName = req.body.UserName;
+  if (req.body.Password) updateData.Password = req.body.Password;
+  if (req.body.MobileNumber) updateData.MobileNumber = req.body.MobileNumber;
+  if (req.body.Nationality) updateData.Nationality = req.body.Nationality;
+  if (req.body.DateOfBirth) updateData.DateOfBirth = req.body.DateOfBirth;
+  if (req.body.Job) updateData.Job = req.body.Job;
   try {
-    const users = await touristModel.findOneAndUpdate(
-      { UserName: UserName },
-      {
-        Email: Email,
-        Password: Password,
-        MobileNumber: MobileNumber,
-        Nationality: Nationality,
-        DateOfBirth: DateOfBirth,
-        Job: Job,
-      },
-      { new: true }
-    );
-    res.status(200).json(users);
+    const updatetourist = await touristModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+    if (!updatetourist) {
+      res.status(404).json({ error: "Tourist not found" });
+    }
+    res.status(200).json(updatetourist);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -66,4 +61,14 @@ const getTourist = async (req, res) => {
   }
 };
 
-module.exports = { createTourist, updateTourist, getTourist };
+const getTouristById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const tourist = await touristModel.findById(id);
+    res.status(200).json(tourist);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { createTourist, updateTourist, getTourist, getTouristById };

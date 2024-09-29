@@ -4,6 +4,7 @@ const {
   createTourist,
   updateTourist,
   getTourist,
+  getTouristById,
 } = require("../controllers/touristController");
 
 router.get("/", (req, res) => {
@@ -13,5 +14,6 @@ router.get("/", (req, res) => {
 router.post("/addTourist", createTourist);
 router.put("/updateTourist", updateTourist);
 router.get("/getTourist", getTourist);
+router.get("/getTourist/:id", getTouristById);
 
 module.exports = router;
