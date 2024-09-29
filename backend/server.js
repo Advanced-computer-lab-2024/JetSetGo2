@@ -7,10 +7,17 @@ require("dotenv").config();
 
 const MongoURI = process.env.MONGO_URI;
 
+const activityRoutes = require("./routes/ActivityCRUDroute");
+const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
+const museumRoutes = require("./routes/MuseumCRUDroute");
+const itineraryRoutes = require("./routes/SchemaTourRoutes");
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 const port = process.env.PORT || "8000";
+
+
 
 mongoose
   .connect(MongoURI)
