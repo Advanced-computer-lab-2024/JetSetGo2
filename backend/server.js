@@ -1,6 +1,7 @@
 // External variables
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 
@@ -11,8 +12,9 @@ const MongoURI = 'mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb
 
 // App variables
 const app = express();
+app.use(cors());
 const port = process.env.PORT || "8004";
-const user = require('./models/TGuide.js');
+const user = require('./routes/tourismGovernerTags');
 
 // Mongo DB connection
 mongoose.connect(MongoURI)
@@ -37,4 +39,4 @@ app.use(express.json());
 /*
   End of your code
 */
-app.use('/TourGuide',TourGuideRoute);
+app.use('/TourismTags',user);
