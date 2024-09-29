@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -22,5 +23,11 @@ mongoose
   })
   .catch((err) => console.log(err));
 
+
+
+app.use('/activity', activityRoutes);
+app.use('/historicalPlace', historicalPlaceRoutes);
+app.use('/museum', museumRoutes);
+app.use('/itinerary',itineraryRoutes);
 app.use("/home/tourist", require("./routes/touristRoutes"));
 app.use("/home/other", require("./routes/otherRoutes"));
