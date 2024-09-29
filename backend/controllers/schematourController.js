@@ -17,23 +17,22 @@ const createGuide =  async (req, res) => {
 
     });
     try{
-        const Savedschema = await Schema.create({ name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc});
-        res.status(200).json(Savedschema);
+        const savedSchema = await newSchema.save();
+        res.status(200).json(savedSchema);
 ;
     }catch(err){
         res.status(400).json({ message: err.message });
     }
 };
-const readGuide =async (req, res) => {
-    try{
-       
-        const schemas = await Schema.find();
-        res.status(200).json(schemas)
-
-    }catch(err){
+const readGuide = async (req, res) => {
+    try {
+        const schemas = await Schema.find().populate('activities'); // Populate activity details
+        res.status(200).json(schemas);
+    } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
+
 const readGuideID = async (req, res) => {
     try{
         const schema = await Schema.findById(req.params.id);
