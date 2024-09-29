@@ -1,11 +1,12 @@
 // #Task route solution
 const express = require('express');
 const router = express.Router();
-const {createAdmin,deleteAdmin} = require('../controllers/adminControllers');
+const {createAdmin,deleteAdmin,getAdmin} = require('../controllers/adminControllers');
 
 // Define routes
-router.post("/addAdmin", createAdmin);
-router.delete("/deleteAdmin/:id", deleteAdmin);
+router.post("/add", createAdmin);
+router.delete("/delete/:id", deleteAdmin);
+router.get("/get",getAdmin );
 
 module.exports = router;
 

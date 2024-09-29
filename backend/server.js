@@ -1,6 +1,7 @@
 // External variables
 require('dotenv').config();
 const express = require("express");
+const cors = require('cors');
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 
@@ -12,6 +13,7 @@ const MongoURI = process.env.MONG_URI;
 
 // App variables
 const app = express();
+app.use(cors());
 const port = process.env.PORT || "8000";
 
 // MongoDB connection

@@ -53,6 +53,16 @@ const deleteAdmin = async (req, res) => {
     }
 };
 
+const getAdmin = async (req, res) => {
+    try {
+        // Use the correct model to find all admins
+        const admins = await adminModel.find();
+        res.status(200).json(admins);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 module.exports={
-    createAdmin,deleteAdmin
+    createAdmin,deleteAdmin,getAdmin
 };
