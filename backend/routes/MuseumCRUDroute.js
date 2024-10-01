@@ -7,7 +7,7 @@ const {createMuseum,getMuseum,updateMuseum,deleteMuseum} = require('../controlle
 // Define routes
 router.post("/add", createMuseum);
 router.get("/get", getMuseum);
-router.put("/update", updateMuseum);
-router.delete("/delete", deleteMuseum);
+router.put("/update/:id", updateMuseum);
+router.delete("/delete/:id", deleteMuseum);
 
 module.exports = router;

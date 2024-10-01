@@ -1,34 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css'
-import { getActivity, createActivity, updateActivity, deleteActivity } from '../services/ActivityService';
+import '../App.css';
+import { getActivity, createActivity, updateActivity, deleteActivity, getCategories } from '../services/ActivityService'; // Make sure to import the new getCategories function
 
 const ActivityCRUD = () => {
   const [activities, setActivities] = useState([]);
+  const [categories, setCategories] = useState([]); // State to hold categories
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     date: '',
     time: '',
     location: '',
     price: '',
-    category: '',
+    category: '', // Make sure to set the category to an ObjectId
     tags: '',
     specialDiscount: '',
     isBookingOpen: true
   });
   const [editData, setEditData] = useState(null);
 
-  // Fetch activities when the component mounts
+  // Fetch activities and categories when the component mounts
   useEffect(() => {
     fetchActivities();
+    fetchCategories(); // Fetch categories from backend
   }, []);
 
   // Fetch all activities
   const fetchActivities = async () => {
     try {
-      const data = await getActivity(); // Fetch activities from the backend
-      setActivities(data);              // Update state with fetched data
+      const data = await getActivity();
+      setActivities(data);
     } catch (error) {
       console.error("Error fetching activities", error);
+    }
+  };
+
+  // Fetch all categories
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories(); // Assume this function fetches categories
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories", error);
     }
   };
 
@@ -48,7 +60,7 @@ const ActivityCRUD = () => {
       await createActivity(formData);
       setMessage('Activity created successfully!');
       resetCreateForm();
-      fetchActivities(); // Fetch updated activities
+      fetchActivities();
     } catch (error) {
       const errorMessage = error.response ? error.response.data.message : 'Error occurred while creating the activity';
       setMessage(errorMessage);
@@ -59,14 +71,13 @@ const ActivityCRUD = () => {
   // Handle form submission for updating an existing activity
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (!editData) return; // Return if there's no editData
+    if (!editData) return;
 
     try {
-      // Send the current state of editData with the ID
       await updateActivity(editData._id, editData);
       setMessage('Activity updated successfully!');
       resetEditForm();
-      fetchActivities(); // Fetch updated activities
+      fetchActivities();
     } catch (error) {
       const errorMessage = error.response ? error.response.data.message : 'Error occurred while updating the activity.';
       setMessage(errorMessage);
@@ -79,7 +90,7 @@ const ActivityCRUD = () => {
     try {
       await deleteActivity(id);
       setMessage('Activity deleted successfully!');
-      fetchActivities(); // Fetch updated activities
+      fetchActivities();
     } catch (error) {
       setMessage('Error deleting activity.');
       console.error(error);
@@ -98,7 +109,7 @@ const ActivityCRUD = () => {
       time: '',
       location: '',
       price: '',
-      category: '',
+      category: '', // Reset to empty string
       tags: '',
       specialDiscount: '',
       isBookingOpen: true
@@ -114,7 +125,6 @@ const ActivityCRUD = () => {
     <div>
       <h1>Activity Management</h1>
 
-      {/* Display success/error message */}
       {message && <p className="message">{message}</p>}
 
       {/* Form for creating a new activity */}
@@ -134,7 +144,12 @@ const ActivityCRUD = () => {
             <input type="number" name="price" value={formData.price} onChange={(e) => handleChange(e, setFormData)} required />
           </label>
           <label>Category:
-            <input type="text" name="category" value={formData.category} onChange={(e) => handleChange(e, setFormData)} required />
+            <select name="category" value={formData.category} onChange={(e) => handleChange(e, setFormData)} required>
+              <option value="">Select Category</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>{category.name}</option>
+              ))}
+            </select>
           </label>
           <label>Tags:
             <input type="text" name="tags" value={formData.tags} onChange={(e) => handleChange(e, setFormData)} required />
@@ -167,7 +182,11 @@ const ActivityCRUD = () => {
               <input type="number" name="price" value={editData.price} onChange={(e) => handleChange(e, setEditData)} required />
             </label>
             <label>Category:
-              <input type="text" name="category" value={editData.category} onChange={(e) => handleChange(e, setEditData)} required />
+              <select name="category" value={editData.category} onChange={(e) => handleChange(e, setEditData)} required>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>{category.name}</option>
+                ))}
+              </select>
             </label>
             <label>Tags:
               <input type="text" name="tags" value={editData.tags} onChange={(e) => handleChange(e, setEditData)} required />
@@ -191,7 +210,7 @@ const ActivityCRUD = () => {
           <ul>
             {activities.map((activity) => (
               <li key={activity._id} className="activity-item">
-                <h3>{activity.category}</h3>
+                <h3>{activity.category.name}</h3> {/* Displaying category name */}
                 <p>Date: {new Date(activity.date).toLocaleDateString()}</p>
                 <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                 <p>Location: {activity.location}</p>
@@ -199,15 +218,13 @@ const ActivityCRUD = () => {
                 <p>Tags: {activity.tags}</p>
                 <p>Special Discount: {activity.specialDiscount}%</p>
                 <p>Booking Open: {activity.isBookingOpen ? 'Yes' : 'No'}</p>
-                <div className="activity-actions">
-                  <button onClick={() => handleEdit(activity)}>Edit</button>
-                  <button onClick={() => handleDelete(activity._id)}>Delete</button>
-                </div>
+                <button onClick={() => handleEdit(activity)}>Edit</button>
+                <button onClick={() => handleDelete(activity._id)}>Delete</button>
               </li>
             ))}
           </ul>
         ) : (
-          <p>No activities found.</p>
+          <p>No activities available.</p>
         )}
       </section>
     </div>
@@ -215,3 +232,4 @@ const ActivityCRUD = () => {
 };
 
 export default ActivityCRUD;
+

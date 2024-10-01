@@ -12,6 +12,7 @@ const museumRoutes = require("./routes/MuseumCRUDroute");
 const itineraryRoutes = require("./routes/SchemaTourRoutes");
 const tourist = require("./routes/touristRoutes");
 const other = require("./routes/otherRoutes");
+const categoryRoutes = require("./routes/CategoryCRUDroute");
 
 const app = express();
 app.use(express.json());
@@ -32,6 +33,7 @@ mongoose
 app.use("/activity", activityRoutes);
 app.use("/historicalPlace", historicalPlaceRoutes);
 app.use("/museum", museumRoutes);
+app.use("/category",categoryRoutes);
 app.use("/itinerary", itineraryRoutes);
 app.use("/home/tourist", tourist);
 app.use("/home/other", other);

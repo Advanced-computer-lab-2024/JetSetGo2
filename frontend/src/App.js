@@ -8,6 +8,7 @@ import HomePage from "./components/HomePage";
 import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
+import CategoryCRUD from "./components/CategoryCRUD";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
+          <Route path="/category" element={<CategoryCRUD />} />
         </Routes>
       </div>
     </Router>
