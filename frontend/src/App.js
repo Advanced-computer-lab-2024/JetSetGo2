@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ActivityCRUD from "./components/ActivityCRUD"; // Import ActivityCRUD component
@@ -8,6 +9,8 @@ import HomePage from "./components/HomePage";
 import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
+import AdvertiserForm from './components/Create'; 
+import  AdvertiserManagement from './components/listup'; 
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
@@ -29,6 +32,8 @@ function App() {
               <UpdateTouristPage selectedTouristId={selectedTouristId} />
             }
           />
+          <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
+        <Route path="/list" element={<AdvertiserManagement />} />
           <Route path="/other-signup" element={<OtherSignup />} />
           <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
@@ -36,8 +41,4 @@ function App() {
           <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
         </Routes>
       </div>
-    </Router>
-  );
-}
 
-export default App;

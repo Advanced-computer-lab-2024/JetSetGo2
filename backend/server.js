@@ -35,3 +35,5 @@ app.use("/museum", museumRoutes);
 app.use("/itinerary", itineraryRoutes);
 app.use("/home/tourist", tourist);
 app.use("/home/other", other);
+app.use("/home/adver",require("./routes/AdverRoutes.js"));
+
