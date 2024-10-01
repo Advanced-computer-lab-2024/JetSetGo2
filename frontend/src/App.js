@@ -1,36 +1,33 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import AddAdmin from './components/AddAdmin'; // Import the AddAdmin component
-import AddTourismGovernor from './components/AddTourismGovernor'; // Import the AddTourismGovernor component
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ActivityCRUD from './components/ActivityCRUD'; // Import ActivityCRUD component
+import HistoricalplaceCRUD from './components/HistoricalplaceCRUD';
+import MuseumCRUD from './components/MuseumCRUD';
+import SchemaTourFront from './components/schemaTourFront'; 
+import AddAdmin from './components/AddAdmin'; 
+import AddTourismGovernor from './components/AddTourismGovernor'; 
+import ViewMuseums from './components/ViewMuseums'; 
+import ViewHistoricalPlaces from './components/ViewHistoricalPlaces'; 
 
-// Home Component
-function Home() {
-    return (
-        <div>
-            <h1>Welcome to the Admin Dashboard</h1>
-        </div>
-    );
-}
-
-// Main App Component with Routing
 function App() {
-    return (
-        <Router>
-            <nav>
-                <ul>
-                    <li><Link to="/">Home</Link></li>
-                    <li><Link to="/add-admin">Add Admin</Link></li>
-                    <li><Link to="/add-tourism-governor">Add Tourism Governor</Link></li>
-                </ul>
-            </nav>
-
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/add-admin" element={<AddAdmin />} />
-                <Route path="/add-tourism-governor" element={<AddTourismGovernor />} />
-            </Routes>
-        </Router>
-    );
-}
+  return (
+    <Router>
+      <div>
+        <Routes>
+          {/* Use element prop to render the component */}
+          <Route path="/activities" element={<ActivityCRUD />} />
+          <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
+          <Route path="/museums" element={<MuseumCRUD />} />
+          <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
+          <Route path="/AddAdmin" element={<AddAdmin />} />
+          <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
+          <Route path="/ViewMuseums" element={<ViewMuseums />} />
+          <Route path="/ViewHistoricalPlaces" element={<ViewHistoricalPlaces />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+};
 
 export default App;
