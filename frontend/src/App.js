@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import CreateTourGuide from './components/CreateTourGuide';
@@ -11,10 +10,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<CreateTourGuide />} />
         <Route path="/tour-guide" element={<TourGuideDetails />} />
-        <Route path="/edit-tour-guide/:id" element={<EditTourGuide />} />
+        <Route path="/edit-tour-guide" element={<EditTourGuide />} /> {/* Remove :id from path */}
       </Routes>
     </Router>
   );
 };
 
-export default TourGuideDetails;
+export default App;

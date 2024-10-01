@@ -1,7 +1,6 @@
-// src/components/CreateTourGuide.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CreateTourGuide = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +12,8 @@ const CreateTourGuide = () => {
     YearsOfExperience: '',
     PreviousWork: '',
   });
-  const [createdId, setCreatedId] = useState(null); // New state for created tour guide ID
+  const [createdId, setCreatedId] = useState(null);
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,11 +21,17 @@ const CreateTourGuide = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Submitting:', formData);
     try {
-      const response = await axios.post('http://localhost:8004/TourGuide/get', formData);
-      setCreatedId(response.data._id); // Set created ID
+      const response = await axios.post('http://localhost:8004/TourGuide/add', formData);
+      console.log('Response:', response.data);
+      if (response.status === 200) {
+        setCreatedId(response.data._id);
+        navigate('/tour-guide', { state: { id: response.data._id } }); // Pass ID via state
+      }
     } catch (error) {
-      console.error("Error creating tour guide:", error);
+      console.error("Error creating tour guide:", error.response ? error.response.data : error.message);
+      alert("Error creating tour guide: " + (error.response ? error.response.data.error : error.message));
     }
   };
 
@@ -36,7 +42,13 @@ const CreateTourGuide = () => {
         {Object.keys(formData).map((key) => (
           <div key={key}>
             <label>{key}:</label>
-            <input type="text" name={key} value={formData[key]} onChange={handleChange} required />
+            <input 
+              type="text" 
+              name={key} 
+              value={formData[key]} 
+              onChange={handleChange} 
+              required 
+            />
           </div>
         ))}
         <button type="submit">Create</button>

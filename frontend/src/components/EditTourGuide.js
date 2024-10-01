@@ -1,17 +1,37 @@
-// src/components/EditTourGuide.js
 import React, { useEffect, useState } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
 
 const EditTourGuide = () => {
-  const { id } = useParams();
-  const [formData, setFormData] = useState({});
+  const location = useLocation();
+  const id = location.state?.id; // Safely retrieve ID from state
+
+  const [formData, setFormData] = useState({
+    Name: '',
+    Email: '',
+    Age: '',
+    LanguagesSpoken: '',
+    MobileNumber: '',
+    YearsOfExperience: '',
+    PreviousWork: ''
+  });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTourGuide = async () => {
-      const response = await axios.get(`http://localhost:8004/TourGuide/get/${id}`);
-      setFormData(response.data);
+      if (id) {
+        try {
+          const response = await axios.get(`http://localhost:8004/TourGuide/users/${id}`);
+          setFormData(response.data);
+        } catch (err) {
+          console.error("Error fetching tour guide:", err);
+          setError("Error fetching tour guide data.");
+        }
+      } else {
+        setError("No Tour Guide ID provided.");
+      }
     };
+
     fetchTourGuide();
   }, [id]);
 
@@ -22,12 +42,17 @@ const EditTourGuide = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('http://localhost:8004/TourGuide/update', { id, ...formData });
-      // You can add a success message or navigate here
+      await axios.put(`http://localhost:8004/TourGuide/update/${id}`, formData);
+      // Optionally navigate back or show a success message
     } catch (error) {
       console.error("Error updating tour guide:", error);
+      setError("Error updating tour guide.");
     }
   };
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -35,11 +60,17 @@ const EditTourGuide = () => {
       {Object.keys(formData).map((key) => (
         <div key={key}>
           <label>{key}:</label>
-          <input type="text" name={key} value={formData[key]} onChange={handleChange} required />
+          <input 
+            type="text" 
+            name={key} 
+            value={formData[key] || ''} // Ensure controlled input
+            onChange={handleChange} 
+            required 
+          />
         </div>
       ))}
       <button type="submit">Update</button>
-      <Link to={`/tour-guide/${id}`}>Cancel</Link>
+      <Link to={{ pathname: "/tour-guide", state: { id } }}>Cancel</Link> {/* Navigate back without showing ID */}
     </form>
   );
 };
