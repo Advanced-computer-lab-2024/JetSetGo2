@@ -1,5 +1,6 @@
 // External variables
 const express = require("express");
+const cors = require('cors');
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 require("dotenv").config();
@@ -7,9 +8,16 @@ const Sellerroute = require("./routes/SellerRoute");
 const MongoURI ='mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb.net/'  ;
 
 
+
 //App variables
 const app = express();
-const port = process.env.PORT || "8080";
+const corsOptions = {
+  origin: 'http://localhost:3000', // Allow only requests from this origin
+  credentials: true, // Allow credentials if needed
+};
+ 
+// Middleware
+app.use(cors(corsOptions));const port = process.env.PORT || "8080";
 app.use(express.json());
 const Seller = require('./models/Seller');
 // #Importing the userController

@@ -9,7 +9,7 @@ const {createSeller,readSeller,updateSeller} = require('../controllers/SellerCon
   
 
 router.post("/createSeller",createSeller)
-router.get("/readSeller", readSeller)
-router.put("/updateSeller",updateSeller)
+router.get("/readSeller/:id", readSeller)
+router.put("/updateSeller/:id",updateSeller)
 module.exports = router;
 
