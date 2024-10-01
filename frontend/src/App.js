@@ -9,11 +9,13 @@ import HomePage from "./components/HomePage";
 import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
+import CreateTag from "./components/CreateTag";
 import AdvertiserForm from './components/Create'; 
 import  AdvertiserManagement from './components/listup'; 
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
+
 
   return (
     <Router>
@@ -39,6 +41,11 @@ function App() {
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
+          <Route path="/CreateTag" element={<CreateTag />} />
         </Routes>
       </div>
+    </Router>
+  );
+};
 
+export default App;
