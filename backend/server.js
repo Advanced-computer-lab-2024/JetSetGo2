@@ -1,23 +1,26 @@
-// External variables
-require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
-const mongoose = require('mongoose');
-mongoose.set('strictQuery', false);
+const mongoose = require("mongoose");
+mongoose.set("strictQuery", false);
+require("dotenv").config();
 
-const TourGuideRoute = require("./routes/TGuideRoutes.js");
+const MongoURI = process.env.MONGO_URI;
 
-// Correct the connection string by removing the 'MONGO_URI =' part
-const MongoURI = 'mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb.net/';
+const activityRoutes = require("./routes/ActivityCRUDroute");
+const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
+const museumRoutes = require("./routes/MuseumCRUDroute");
+const itineraryRoutes = require("./routes/SchemaTourRoutes");
 
-// App variables
 const app = express();
+app.use(express.json());
 app.use(cors());
-const port = process.env.PORT || "8004";
-const user = require('./routes/tourismGovernerTags');
+const port = process.env.PORT || "8000";
 
-// Mongo DB connection
-mongoose.connect(MongoURI)
+
+
+mongoose
+  .connect(MongoURI)
   .then(() => {
     console.log("MongoDB is now connected!");
     // Starting server
@@ -25,18 +28,13 @@ mongoose.connect(MongoURI)
       console.log(`Listening to requests on http://localhost:${port}`);
     });
   })
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
-// API routes
-app.get("/home", (req, res) => {
-  res.status(200).send("You have everything installed!");
-});
 
-// Routing to userController here
-app.use(express.json());
-// Add ID parameter to updateUser route
 
-/*
-  End of your code
-*/
-app.use('/TourismTags',user);
+app.use('/activity', activityRoutes);
+app.use('/historicalPlace', historicalPlaceRoutes);
+app.use('/museum', museumRoutes);
+app.use('/itinerary',itineraryRoutes);
+app.use("/home/tourist", require("./routes/touristRoutes"));
+app.use("/home/other", require("./routes/otherRoutes"));
