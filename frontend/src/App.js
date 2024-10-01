@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ActivityCRUD from "./components/ActivityCRUD"; // Import ActivityCRUD component
 import HistoricalplaceCRUD from "./components/HistoricalplaceCRUD";
@@ -9,15 +10,32 @@ import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
 import CreateTag from "./components/CreateTag";
+import AdvertiserForm from './components/Create'; 
+import  AdvertiserManagement from './components/listup'; 
 
-function App  () {
+function App() {
+  const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
+
+
   return (
     <Router>
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/tourist-signup" element={<TouristSignup />} />
-          <Route path="/tourist-update/:id" element={<UpdateTouristPage />} />
+          <Route
+            path="/tourist-signup"
+            element={
+              <TouristSignup setSelectedTouristId={setSelectedTouristId} />
+            }
+          />
+          <Route
+            path="/tourist-update"
+            element={
+              <UpdateTouristPage selectedTouristId={selectedTouristId} />
+            }
+          />
+          <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
+        <Route path="/list" element={<AdvertiserManagement />} />
           <Route path="/other-signup" element={<OtherSignup />} />
           <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />

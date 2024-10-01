@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -11,12 +10,14 @@ const activityRoutes = require("./routes/ActivityCRUDroute");
 const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
 const museumRoutes = require("./routes/MuseumCRUDroute");
 const itineraryRoutes = require("./routes/SchemaTourRoutes");
+const tourist = require("./routes/touristRoutes");
+const other = require("./routes/otherRoutes");
+const user = require('./routes/tourismGovernerTags');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 const port = process.env.PORT || "8000";
-const user = require('./routes/tourismGovernerTags');
 
 
 mongoose
@@ -30,12 +31,12 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-
-
-app.use('/activity', activityRoutes);
-app.use('/historicalPlace', historicalPlaceRoutes);
-app.use('/museum', museumRoutes);
-app.use('/itinerary',itineraryRoutes);
-app.use("/home/tourist", require("./routes/touristRoutes"));
-app.use("/home/other", require("./routes/otherRoutes"));
+app.use("/activity", activityRoutes);
+app.use("/historicalPlace", historicalPlaceRoutes);
+app.use("/museum", museumRoutes);
+app.use("/itinerary", itineraryRoutes);
+app.use("/home/tourist", tourist);
+app.use("/home/other", other);
+app.use("/home/adver",require("./routes/AdverRoutes.js"));
 app.use('/TourismTags',user);
+

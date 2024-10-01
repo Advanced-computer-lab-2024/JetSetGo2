@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/addTourist", createTourist);
-router.put("/updateTourist", updateTourist);
+router.put("/updateTourist/:id", updateTourist);
 router.get("/getTourist", getTourist);
 router.get("/getTourist/:id", getTouristById);
 
