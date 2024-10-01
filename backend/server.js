@@ -13,6 +13,7 @@ mongoose.set('strictQuery', false);
 //const itineraryRoutes = require("./routes/SchemaTourRoutes");
 const activityRoutes = require("./routes/ActivityCRUDroute");
 const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
+
 const museumRoutes = require("./routes/MuseumCRUDroute");
 const itineraryRoutes = require("./routes/SchemaTourRoutes");
 
@@ -45,7 +46,7 @@ app.get("/home", (req, res) => {
 app.use('/activity', activityRoutes);
 app.use('/historicalPlace', historicalPlaceRoutes);
 app.use('/museum', museumRoutes);
-app.use('/itinerary',itineraryRoutes);
+app.use('/itinerary/',itineraryRoutes);
 
 
 
