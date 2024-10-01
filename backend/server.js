@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 const port = process.env.PORT || "8000";
-
+const user = require('./routes/tourismGovernerTags');
 
 
 mongoose
@@ -38,3 +38,4 @@ app.use('/museum', museumRoutes);
 app.use('/itinerary',itineraryRoutes);
 app.use("/home/tourist", require("./routes/touristRoutes"));
 app.use("/home/other", require("./routes/otherRoutes"));
+app.use('/TourismTags',user);
