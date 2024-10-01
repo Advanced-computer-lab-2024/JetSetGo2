@@ -52,7 +52,7 @@ const updateHistoricalPlace = async (req, res) => {
  
 
 const deleteHistoricalPlace = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   try {
     const deletedHistoricalPlace = await HistoricalPlace.findByIdAndDelete(id);
     if (!deletedHistoricalPlace) {

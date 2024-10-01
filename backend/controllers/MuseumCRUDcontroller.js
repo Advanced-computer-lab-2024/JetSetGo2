@@ -52,7 +52,7 @@ const updateMuseum = async (req, res) => {
  
 
 const deleteMuseum = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   try {
     const deletedMuseum = await Museum.findByIdAndDelete(id);
     if (!deletedMuseum) {
