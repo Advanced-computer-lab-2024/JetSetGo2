@@ -29,7 +29,7 @@ const createTourist = async (req, res) => {
 };
 
 const updateTourist = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   const updateData = {};
 
   if (req.body.Email) updateData.Email = req.body.Email;

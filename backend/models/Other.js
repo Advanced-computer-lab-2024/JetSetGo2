@@ -15,6 +15,11 @@ const OtherSchema = new Schema(
       type: String,
       required: true,
     },
+    AccountType: {
+      type: String,
+      enum: ["Advertiser", "Tour Guide", "Seller"], // Only these values are allowed
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ const OtherSignup = () => {
     Email: "",
     UserName: "",
     Password: "",
+    AccountType: "", // Added this field to match the enum
   });
 
   const handleChange = (e) => {
@@ -62,6 +63,21 @@ const OtherSignup = () => {
             style={styles.input}
             required
           />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Account Type:</label>
+          <select
+            name="AccountType"
+            value={formData.AccountType}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          >
+            <option value="">Select Account Type</option>
+            <option value="Advertiser">Advertiser</option>
+            <option value="Tour Guide">Tour Guide</option>
+            <option value="Seller">Seller</option>
+          </select>
         </div>
         <button type="submit" style={styles.button}>
           Sign Up
@@ -140,7 +156,7 @@ const styles = {
 
 // Add event listeners for hover and focus effects
 document.addEventListener("DOMContentLoaded", () => {
-  const inputs = document.querySelectorAll("input");
+  const inputs = document.querySelectorAll("input, select");
   inputs.forEach((input) => {
     input.addEventListener("focus", () => {
       input.style.borderColor = styles.inputFocus.borderColor;
