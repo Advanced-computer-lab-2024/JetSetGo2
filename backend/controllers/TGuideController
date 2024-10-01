@@ -15,6 +15,8 @@ const TourModel = require('../models/TGuide.js');
     }
  }
 
+
+ 
 // Method to get all tour guides or a specific one by ID
 const getuser = async (req, res) => {
    const { id } = req.params;  // Extract the tour guide ID from the URL if provided

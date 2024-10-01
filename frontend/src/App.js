@@ -1,19 +1,20 @@
 // src/App.js
-import React, { useState } from 'react';
-import TourForm from './components/TourForm';
-import TourList from './components/TourList';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import CreateTourGuide from './components/CreateTourGuide';
+import TourGuideDetails from './components/TourGuideDetails';
+import EditTourGuide from './components/EditTourGuide';
 
 const App = () => {
-    const [selectedTour, setSelectedTour] = useState(null);
-    const [refreshTours, setRefreshTours] = useState(false);
-
-    return (
-        <div>
-            <h1>Tour Guide Management</h1>
-            <TourForm refreshTours={() => setRefreshTours(!refreshTours)} />
-            <TourList setSelectedTour={setSelectedTour} refreshTours={refreshTours} />
-        </div>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<CreateTourGuide />} />
+        <Route path="/tour-guide" element={<TourGuideDetails />} />
+        <Route path="/edit-tour-guide/:id" element={<EditTourGuide />} />
+      </Routes>
+    </Router>
+  );
 };
 
-export default App;
+export default TourGuideDetails;

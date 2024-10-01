@@ -38,3 +38,5 @@ app.use(express.json());
   End of your code
 */
 app.use('/TourGuide',TourGuideRoute);
+const cors = require('cors');
+app.use(cors());
