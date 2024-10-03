@@ -14,6 +14,8 @@ const itineraryRoutes = require("./routes/SchemaTourRoutes");
 const tourist = require("./routes/touristRoutes");
 const other = require("./routes/otherRoutes");
 const preferanceTags = require("./routes/preferanceTagsRoutes");
+const TourGuideRoute = require("./routes/TGuideRoutes.js");
+
 
 const app = express();
 app.use(express.json());
@@ -38,3 +40,4 @@ app.use("/itinerary", itineraryRoutes);
 app.use("/home/tourist", tourist);
 app.use("/home/other", other);
 app.use("/prefTags",preferanceTags);
+app.use('/TourGuide', TourGuideRoute);
