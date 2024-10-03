@@ -16,12 +16,14 @@ const other = require("./routes/otherRoutes");
 const preferanceTags = require("./routes/preferanceTagsRoutes");
 const TourGuideRoute = require("./routes/TGuideRoutes.js");
 const categoryRoutes = require("./routes/CategoryCRUDroute");
+const user = require('./routes/tourismGovernerTags');
 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 const port = process.env.PORT || "8000";
+
 
 mongoose
   .connect(MongoURI)
@@ -43,3 +45,5 @@ app.use("/home/tourist", tourist);
 app.use("/home/other", other);
 app.use("/prefTags",preferanceTags);
 app.use('/TourGuide', TourGuideRoute);
+app.use("/home/adver",require("./routes/AdverRoutes.js"));
+app.use('/TourismTags',user);

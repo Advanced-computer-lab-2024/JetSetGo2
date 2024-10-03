@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const UpdateTouristPage = () => {
-  const { id } = useParams();
-  const [tourist, setTourist] = useState(null); // Holds tourist data for display
-  const [error, setError] = useState("");
+const UpdateTouristPage = ({ selectedTouristId }) => {
+  const [touristData, setTouristData] = useState({
+    Email: "",
+    UserName: "",
+    Password: "",
+    MobileNumber: "",
+    Nationality: "",
+    DateOfBirth: "",
+    Job: "",
+  });
   const [formData, setFormData] = useState({
     Email: "",
     UserName: "",
@@ -15,66 +20,51 @@ const UpdateTouristPage = () => {
     DateOfBirth: "",
     Job: "",
   });
-  const [dateLocked, setDateLocked] = useState(false); // State to control whether date field is editable
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
+  // Fetch tourist details on component mount
   useEffect(() => {
-    const fetchTourist = async () => {
+    const fetchTouristData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/home/tourist/getTourist/${id}`
+          `http://localhost:8000/home/tourist/getTourist/${selectedTouristId}`
         );
-        setTourist(response.data); // Set tourist data for display
-        setFormData(response.data); // Pre-fill the form with tourist data
-
-        if (response.data.DateOfBirth) {
-          setDateLocked(true); // Lock the date field if it's already set
-        }
-      } catch (err) {
-        console.error("Failed to fetch tourist details:", err);
-        setError("Failed to load tourist details");
+        setTouristData(response.data);
+        setFormData(response.data); // Pre-fill form with the current tourist data
+      } catch (error) {
+        console.error("Error fetching tourist data:", error);
+        setError(
+          "An error occurred while fetching tourist data. Please try again."
+        );
       }
     };
 
-    if (id) {
-      fetchTourist();
-    } else {
-      setError("Tourist ID is not provided");
+    if (selectedTouristId) {
+      fetchTouristData();
     }
-  }, [id]);
+  }, [selectedTouristId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: value }); // Update form input values only
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://localhost:8000/home/tourist/updateTourist`,
-        {
-          id: id, // Include the ID in the request
-          ...formData,
-        }
+        `http://localhost:8000/home/tourist/updateTourist/${selectedTouristId}`,
+        formData
       );
       console.log("Update successful:", response.data);
-      setTourist(response.data); // Update the displayed tourist data after successful submission
+      setTouristData(response.data); // Update the displayed tourist details after successful form submission
     } catch (error) {
-      console.error("Error updating tourist:", error);
+      console.error("Error updating tourist details:", error);
       setError(
         "An error occurred while updating tourist details. Please try again."
       );
     }
   };
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (!tourist) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div style={styles.container}>
@@ -84,29 +74,29 @@ const UpdateTouristPage = () => {
         <div style={styles.touristDetails}>
           <h3>Tourist Information</h3>
           <p>
-            <strong>Email:</strong> {tourist.Email}
+            <strong>Email:</strong> {touristData.Email}
           </p>
           <p>
-            <strong>UserName:</strong> {tourist.UserName}
+            <strong>UserName:</strong> {touristData.UserName}
           </p>
           <p>
-            <strong>Mobile Number:</strong> {tourist.MobileNumber}
+            <strong>Mobile Number:</strong> {touristData.MobileNumber}
           </p>
           <p>
-            <strong>Nationality:</strong> {tourist.Nationality}
+            <strong>Nationality:</strong> {touristData.Nationality}
           </p>
           <p>
             <strong>Date of Birth:</strong>{" "}
-            {new Date(tourist.DateOfBirth).toLocaleDateString()}
+            {new Date(touristData.DateOfBirth).toLocaleDateString()}
           </p>
           <p>
-            <strong>Job:</strong> {tourist.Job}
+            <strong>Job:</strong> {touristData.Job}
           </p>
         </div>
 
         {/* Update Form */}
         <div style={styles.formContainer}>
-          <form onSubmit={handleSubmit} style={styles.form}>
+          <form onSubmit={handleUpdate} style={styles.form}>
             <div style={styles.inputGroup}>
               <label style={styles.label}>Email:</label>
               <input
@@ -168,10 +158,8 @@ const UpdateTouristPage = () => {
                 type="date"
                 name="DateOfBirth"
                 value={formData.DateOfBirth}
-                onChange={handleChange}
                 style={styles.input}
-                required
-                disabled={dateLocked} // Disable the input if the date is already set
+                readOnly // This makes the Date of Birth field uneditable
               />
             </div>
             <div style={styles.inputGroup}>
@@ -189,6 +177,7 @@ const UpdateTouristPage = () => {
               Update Tourist
             </button>
           </form>
+          {error && <p style={styles.error}>{error}</p>}
         </div>
       </div>
     </div>
@@ -201,7 +190,7 @@ const styles = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100vh",
+    height: "100vh",
     background: "linear-gradient(135deg, #74ebd5 0%, #9face6 100%)",
     fontFamily: "'Poppins', sans-serif",
     padding: "20px",
@@ -215,32 +204,29 @@ const styles = {
   contentWrapper: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    width: "80%",
+    justifyContent: "space-around",
+    width: "100%",
+    maxWidth: "1200px",
+    padding: "20px",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+    borderRadius: "10px",
+    backgroundColor: "#fff",
   },
   touristDetails: {
-    backgroundColor: "#f5f5f5",
+    flex: 1,
     padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-    width: "45%",
+    borderRight: "1px solid #ddd",
   },
   formContainer: {
-    backgroundColor: "#fff",
-    padding: "40px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-    width: "45%",
+    flex: 1,
+    padding: "20px",
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
   },
   inputGroup: {
-    width: "100%",
-    marginBottom: "20px",
+    marginBottom: "15px",
   },
   label: {
     display: "block",
@@ -257,6 +243,7 @@ const styles = {
     border: "1px solid #ddd",
     outline: "none",
     transition: "border-color 0.3s ease",
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
   },
   button: {
     backgroundColor: "#9face6",
@@ -269,6 +256,15 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
     transition: "background-color 0.3s ease",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+  },
+  buttonHover: {
+    backgroundColor: "#79c1e0",
+  },
+  error: {
+    color: "red",
+    marginTop: "10px",
+    fontSize: "14px",
   },
 };
 
