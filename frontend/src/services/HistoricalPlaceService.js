@@ -27,7 +27,7 @@ export const createHistoricalPlace = async (activityData) => {
 // Update an existing activity
 export const updateHistoricalPlace = async (id, updateData) => {
    try {
-      const response = await axios.put(`${API_URL}/historicalPlace/update`, { id, ...updateData });
+      const response = await axios.put(`${API_URL}/historicalPlace/update/${id}`, updateData);
       return response.data;
    } catch (error) {
       console.error("Error updating historicalPlace:", error);
@@ -38,7 +38,7 @@ export const updateHistoricalPlace = async (id, updateData) => {
 // Delete an activity
 export const deleteHistoricalPlace = async (id) => {
    try {
-      const response = await axios.delete(`${API_URL}/historicalPlace/delete`, { data: { id } });
+      const response = await axios.delete(`${API_URL}/historicalPlace/delete/${id}`);
       return response.data;
    } catch (error) {
       console.error("Error deleting historicalPlace:", error);

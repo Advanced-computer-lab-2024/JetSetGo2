@@ -15,6 +15,7 @@ const tourist = require("./routes/touristRoutes");
 const other = require("./routes/otherRoutes");
 const preferanceTags = require("./routes/preferanceTagsRoutes");
 const TourGuideRoute = require("./routes/TGuideRoutes.js");
+const categoryRoutes = require("./routes/CategoryCRUDroute");
 
 
 const app = express();
@@ -36,6 +37,7 @@ mongoose
 app.use("/activity", activityRoutes);
 app.use("/historicalPlace", historicalPlaceRoutes);
 app.use("/museum", museumRoutes);
+app.use("/category",categoryRoutes);
 app.use("/itinerary", itineraryRoutes);
 app.use("/home/tourist", tourist);
 app.use("/home/other", other);

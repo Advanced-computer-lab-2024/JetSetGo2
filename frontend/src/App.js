@@ -12,6 +12,7 @@ import TagsManagement from './components/TagsManagement';
 import CreateTourGuide from './components/CreateTourGuide';
 import TourGuideDetails from './components/TourGuideDetails';
 import EditTourGuide from './components/EditTourGuide';
+import CategoryCRUD from "./components/CategoryCRUD";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
           <Route path="/TagsManagement" element={<TagsManagement />} />
+          <Route path="/category" element={<CategoryCRUD />} />
         
         </Routes>
       </div>
