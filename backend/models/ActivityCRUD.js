@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const activitySchema = new Schema({
   date: {
-    type: String,
+    type: Date,
     required: true,
   },
   time: {
