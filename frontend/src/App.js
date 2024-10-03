@@ -9,12 +9,18 @@ import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
 import TagsManagement from './components/TagsManagement';
+import CreateTourGuide from './components/CreateTourGuide';
+import TourGuideDetails from './components/TourGuideDetails';
+import EditTourGuide from './components/EditTourGuide';
+
 function App() {
   return (
     <Router>
       <div>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          {/* <Route path="/" element={<HomePage />} /> */}
+          <Route path="/" element={<CreateTourGuide />} />
+          <Route path="/tour-guide" element={<TourGuideDetails />} />
           <Route path="/tourist-signup" element={<TouristSignup />} />
           <Route path="/tourist-update/:id" element={<UpdateTouristPage />} />
           <Route path="/other-signup" element={<OtherSignup />} />
@@ -28,6 +34,6 @@ function App() {
       </div>
     </Router>
   );
-}
+};
 
 export default App;
