@@ -1,51 +1,51 @@
-// External variables
 const express = require("express");
-const cors = require('cors');
-const mongoose = require('mongoose');
-mongoose.set('strictQuery', false);
+const cors = require("cors");
+const mongoose = require("mongoose");
+mongoose.set("strictQuery", false);
 require("dotenv").config();
-const Sellerroute = require("./routes/SellerRoute");
-const MongoURI ='mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb.net/'  ;
+
+const MongoURI = process.env.MONGO_URI;
+
+const activityRoutes = require("./routes/ActivityCRUDroute");
+const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
+
+const museumRoutes = require("./routes/MuseumCRUDroute");
+const itineraryRoutes = require("./routes/SchemaTourRoutes");
+const tourist = require("./routes/touristRoutes");
+const other = require("./routes/otherRoutes");
+const preferanceTags = require("./routes/preferanceTagsRoutes");
+const TourGuideRoute = require("./routes/TGuideRoutes.js");
+const categoryRoutes = require("./routes/CategoryCRUDroute");
+const user = require('./routes/tourismGovernerTags');
+const seller = require('./routes/SellerRoute');
 
 
-
-//App variables
 const app = express();
-const corsOptions = {
-  origin: 'http://localhost:3000', // Allow only requests from this origin
-  credentials: true, // Allow credentials if needed
-};
- 
-// Middleware
-app.use(cors(corsOptions));const port = process.env.PORT || "8080";
 app.use(express.json());
-const Seller = require('./models/Seller');
-// #Importing the userController
+app.use(cors());
+const port = process.env.PORT || "8000";
 
 
-// configurations
-// Mongo DB
-mongoose.connect(MongoURI)
-.then(()=>{
-  console.log("MongoDB is now connected!")
-// Starting server
- app.listen(port, () => {
-    console.log(`Listening to requests on http://localhost:${port}`);
+mongoose
+  .connect(MongoURI)
+  .then(() => {
+    console.log("MongoDB is now connected!");
+    // Starting server
+    app.listen(port, () => {
+      console.log(`Listening to requests on http://localhost:${port}`);
+    });
   })
-})
-.catch(err => console.log(err));
-/*
-                                                    Start of your code
-*/
-app.get("/home", (req, res) => {
-    res.status(200).send("You have everything installed!");
-  });
+  .catch((err) => console.log(err));
 
-// #Routing to userController here
-
-app.use('/Seller',Sellerroute);
-
-/*
-                                                    End of your code
-*/
-
+app.use("/activity", activityRoutes);
+app.use("/historicalPlace", historicalPlaceRoutes);
+app.use("/museum", museumRoutes);
+app.use("/category",categoryRoutes);
+app.use("/itinerary", itineraryRoutes);
+app.use("/home/tourist", tourist);
+app.use("/home/other", other);
+app.use("/prefTags",preferanceTags);
+app.use('/TourGuide', TourGuideRoute);
+app.use("/home/adver",require("./routes/AdverRoutes.js"));
+app.use('/TourismTags',user);
+app.use('/Seller',seller);

@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-const CreateSeller = () => {
+const CreateAdvertiser = () => {
   const [formData, setFormData] = useState({
     Name: '',
-    Password: '',
-    Description: '',
-    Email: ''
-    
+    Link: '',
+    Hotline: '',
+    Mail: '',
+    Profile: '',
+    Loc: '',
+    CompanyDes: '',
+    Services: '',
   });
   const [createdId, setCreatedId] = useState(null);
   const navigate = useNavigate(); // Hook for navigation
@@ -21,22 +24,22 @@ const CreateSeller = () => {
     e.preventDefault();
     console.log('Submitting:', formData);
     try {
-      const response = await axios.post('http://localhost:8000/Seller/createSeller', formData);
+      const response = await axios.post('http://localhost:8000/home/adver/createadver', formData);
       console.log('Response:', response.data);
       if (response.status === 200) {
         setCreatedId(response.data._id);
-        navigate('/seller-details', { state: { id: response.data._id } }); // Pass ID via state
+        navigate('/list', { state: { id: response.data._id } }); // Pass ID via state
       }
     } catch (error) {
-      console.error("Error creating  seller:", error.response ? error.response.data : error.message);
-      alert("Error creating seller: " + (error.response ? error.response.data.error : error.message));
+      console.error("Error creating advertiser:", error.response ? error.response.data : error.message);
+      alert("Error creating advertiser: " + (error.response ? error.response.data.error : error.message));
     }
   };
 
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <h2>Create Seller</h2>
+        <h2>Create Advertiser</h2>
         {Object.keys(formData).map((key) => (
           <div key={key}>
             <label>{key}:</label>
@@ -53,12 +56,12 @@ const CreateSeller = () => {
       </form>
       {createdId && (
         <div>
-          <p>Seller created successfully!</p>
-          <Link to={`/seller-details/${createdId}`}>View Seller Details</Link>
+          <p>Advertiser created successfully!</p>
+          <Link to={`/advertiser/${createdId}`}>View Advertiser Details</Link>
         </div>
       )}
     </div>
   );
 };
 
-export default CreateSeller;
+export default CreateAdvertiser;

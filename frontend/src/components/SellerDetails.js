@@ -21,7 +21,7 @@ const SellerDetails = () => {
         const fetchSeller = async () => {
             try {
                 if (id) {
-                    const response = await axios.get(`http://localhost:8080/Seller/readSeller/${id}`);
+                    const response = await axios.get(`http://localhost:8000/Seller/readSeller/${id}`);
                     setSeller(response.data);
                     setFormData(response.data); // Set initial form data for editing
                 } else {
@@ -47,7 +47,7 @@ const SellerDetails = () => {
         const { _id, ...updatedData } = formData; // Assuming the ID is in formData
 
         try {
-            const response = await axios.put(`http://localhost:8080/Seller/updateSeller/${id}`, updatedData);
+            const response = await axios.put(`http://localhost:8000/Seller/updateSeller/${id}`, updatedData);
             console.log("Update response:", response.data);
             setSeller(response.data); // Update local state with response
             setIsEditing(false); // Exit edit mode
