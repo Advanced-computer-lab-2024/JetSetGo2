@@ -17,6 +17,8 @@ import CategoryCRUD from "./components/CategoryCRUD";
 import CreateTag from "./components/CreateTag";
 import AdvertiserForm from './components/Create'; 
 import  AdvertiserManagement from './components/listup'; 
+import CreateSeller from './components/CreateSeller';
+import SellerDetails from './components/SellerDetails';
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
@@ -54,6 +56,8 @@ function App() {
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
+          <Route path="/CreateSeller" element={<CreateSeller />} />
+          <Route path="/seller-details" element={<SellerDetails />} />
         
         </Routes>
       </div>

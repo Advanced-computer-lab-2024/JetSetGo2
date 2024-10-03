@@ -17,6 +17,7 @@ const preferanceTags = require("./routes/preferanceTagsRoutes");
 const TourGuideRoute = require("./routes/TGuideRoutes.js");
 const categoryRoutes = require("./routes/CategoryCRUDroute");
 const user = require('./routes/tourismGovernerTags');
+const seller = require('./routes/SellerRoute');
 
 
 const app = express();
@@ -47,3 +48,4 @@ app.use("/prefTags",preferanceTags);
 app.use('/TourGuide', TourGuideRoute);
 app.use("/home/adver",require("./routes/AdverRoutes.js"));
 app.use('/TourismTags',user);
+app.use('/Seller',seller);
