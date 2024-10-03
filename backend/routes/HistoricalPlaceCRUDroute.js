@@ -7,7 +7,7 @@ const {createHistoricalPlace,getHistoricalPlace,updateHistoricalPlace,deleteHist
 // Define routes
 router.post("/add", createHistoricalPlace);
 router.get("/get", getHistoricalPlace);
-router.put("/update", updateHistoricalPlace);
-router.delete("/delete", deleteHistoricalPlace);
+router.put("/update/:id", updateHistoricalPlace);
+router.delete("/delete/:id", deleteHistoricalPlace);
 
 module.exports = router;
