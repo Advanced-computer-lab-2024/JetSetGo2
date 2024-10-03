@@ -13,6 +13,7 @@ const itineraryRoutes = require("./routes/SchemaTourRoutes");
 const tourist = require("./routes/touristRoutes");
 const other = require("./routes/otherRoutes");
 const categoryRoutes = require("./routes/CategoryCRUDroute");
+const user = require('./routes/tourismGovernerTags');
 
 const app = express();
 app.use(express.json());
@@ -37,3 +38,4 @@ app.use("/category",categoryRoutes);
 app.use("/itinerary", itineraryRoutes);
 app.use("/home/tourist", tourist);
 app.use("/home/other", other);
+app.use('/TourismTags',user);

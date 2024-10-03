@@ -9,6 +9,7 @@ import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
 import CategoryCRUD from "./components/CategoryCRUD";
+import CreateTag from "./components/CreateTag";
 
 function App  () {
   return (
@@ -24,6 +25,7 @@ function App  () {
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
           <Route path="/category" element={<CategoryCRUD />} />
+          <Route path="/CreateTag" element={<CreateTag />} />
         </Routes>
       </div>
     </Router>
