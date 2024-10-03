@@ -111,7 +111,7 @@ const SchemaTourFront = () => {
           <option value="">Select an Activity</option> {/* Placeholder option */}
           {activities.map(activity => (
             <option key={activity._id} value={activity._id}>
-              {activity.date} - {activity.time} - {activity.location} - {activity.price} - {activity.category} - {activity.specialDiscount} - {activity.isBookingOpen ? "Booking Open" : "Booking Closed"}
+              {activity.date} - {activity.time} - {activity.location} - {activity.price} - {activity.category.name} - {activity.specialDiscount} - {activity.isBookingOpen ? "Booking Open" : "Booking Closed"}
             </option>
           ))}
         </select>
