@@ -10,7 +10,6 @@ const App = () => {
       <Routes>
         <Route path="/" element={<CreateTourGuide />} />
         <Route path="/tour-guide" element={<TourGuideDetails />} />
-        <Route path="/edit-tour-guide" element={<EditTourGuide />} /> {/* Remove :id from path */}
       </Routes>
     </Router>
   );
