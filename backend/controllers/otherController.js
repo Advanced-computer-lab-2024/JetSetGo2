@@ -3,12 +3,13 @@ const { default: mongoose } = require("mongoose");
 
 const createOther = async (req, res) => {
   // create a other after sign up
-  const { UserName, Email, Password } = req.body;
+  const { UserName, Email, Password, AccountType } = req.body;
   try {
     const other = await otherModel.create({
       UserName,
       Email,
       Password,
+      AccountType,
     });
     res.status(200).json(other);
   } catch (error) {

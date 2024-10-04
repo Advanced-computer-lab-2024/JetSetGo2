@@ -29,7 +29,7 @@ const createTourist = async (req, res) => {
 };
 
 const updateTourist = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   const updateData = {};
 
   if (req.body.Email) updateData.Email = req.body.Email;
@@ -71,4 +71,28 @@ const getTouristById = async (req, res) => {
   }
 };
 
-module.exports = { createTourist, updateTourist, getTourist, getTouristById };
+const deleteTourist = async (req, res) => {
+  console.log('Request to delete Tourist :', req.params.id);  // Log the ID
+  try {
+     const { id } = req.params;
+     const deletedTourist = await touristModel.findByIdAndDelete(id);
+
+     if (!deletedTourist) {
+        return res.status(404).json({
+           message: "User not found",
+        });
+     }
+
+     res.status(200).json({
+        message: "User deleted successfully",
+        user: deletedTourist,
+     });
+  } catch (error) {
+     console.error('Error deleting tourism governor:', error);
+     res.status(500).json({
+        message: "Error deleting user",
+        error,
+     });
+  }
+};
+module.exports = { createTourist, updateTourist, getTourist, getTouristById, deleteTourist };

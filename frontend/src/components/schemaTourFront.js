@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../App.css'
 
 const SchemaTourFront = () => {
   const [itineraries, setItineraries] = useState([]);
@@ -55,33 +56,33 @@ const SchemaTourFront = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        if (editId) {
-            await axios.put(`http://localhost:8000/itinerary/updateTourId`, { id: editId, ...formData });
-        } else {
-            await axios.post('http://localhost:8000/itinerary/createtour', {
-                ...formData,
-                activities: [formData.selectedActivity] // Ensure you're sending the selected activity ID in an array
-            });
-        }
-        fetchItineraries();
-        setFormData({
-            name: '',
-            selectedActivity: '',
-            locations: '',
-            timeline: '',
-            durationActivity: '',
-            tourLanguage: '',
-            TourPrice: '',
-            availableDates: '',
-            accessibility: '',
-            pickUpLoc: '',
-            DropOffLoc: '',
+      if (editId) {
+        await axios.put(`http://localhost:8000/itinerary/updateTourId/${editId}`, { ...formData });
+      } else {
+        await axios.post('http://localhost:8000/itinerary/createtour', {
+          ...formData,
+          activities: [formData.selectedActivity] // Ensure you're sending the selected activity ID in an array
         });
-        setEditId(null);
+      }
+      fetchItineraries();
+      setFormData({
+        name: '',
+        selectedActivity: '',
+        locations: '',
+        timeline: '',
+        durationActivity: '',
+        tourLanguage: '',
+        TourPrice: '',
+        availableDates: '',
+        accessibility: '',
+        pickUpLoc: '',
+        DropOffLoc: '',
+      });
+      setEditId(null);
     } catch (error) {
-        console.error('Error submitting form:', error);
+      console.error('Error submitting form:', error);
     }
-};
+  };
 
 
   const handleEdit = (itinerary) => {
@@ -91,7 +92,7 @@ const SchemaTourFront = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete('http://localhost:8000/itinerary/deleteTour', { data: { id } });
+      await axios.delete(`http://localhost:8000/itinerary/deleteTour/${id}`);
       fetchItineraries();
     } catch (error) {
       console.error('Error deleting itinerary:', error);
@@ -103,7 +104,7 @@ const SchemaTourFront = () => {
       <h1>Virtual Trip Planner</h1>
       <form onSubmit={handleSubmit}>
         <input name="name" value={formData.name} onChange={handleChange} placeholder="Tour Name" required />
-        
+
         {/* Single Activity Dropdown */}
         <label>Select Activity:</label>
         <select value={formData.selectedActivity} onChange={handleActivityChange} required>
@@ -129,29 +130,32 @@ const SchemaTourFront = () => {
 
       <h2>Itineraries</h2>
       <ul>
-    {itineraries.map((itinerary) => (
-        <li key={itinerary._id}>
+        {itineraries.map((itinerary) => (
+          <li key={itinerary._id}>
             <h3>{itinerary.name}</h3>
-            {/* Ensure you access the populated activity details correctly */}
-            <p>Activities: 
-                {itinerary.activities.map(activity => 
-                    `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category} - ${activity.specialDiscount}`
-                ).join(', ')}
+            <p>
+              Activities:
+              {itinerary.activities && itinerary.activities.length > 0 ?
+                itinerary.activities.map(activity =>
+                  `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category} - ${activity.specialDiscount}`
+                ).join(', ') : 'No activities'}
             </p>
-            <p>Locations: {itinerary.locations.join(', ')}</p>
-            <p>Timeline: {itinerary.timeline.join(', ')}</p>
-            <p>Duration: {itinerary.durationActivity.join(', ')} hours</p>
-            <p>Language: {itinerary.tourLanguage.join(', ')}</p>
-            <p>Price: {itinerary.TourPrice.join(', ')} </p>
-            <p>Date: {itinerary.availableDates.join(', ')}</p>
-            <p>Accessibility: {itinerary.accessibility.join(', ')}</p>
-            <p>Pick Up Location: {itinerary.pickUpLoc.join(', ')}</p>
-            <p>Drop Off Location: {itinerary.DropOffLoc.join(', ')}</p>
+            {/* Handle 'locations' field properly */}
+            <p>Locations: {Array.isArray(itinerary.locations) ? itinerary.locations.join(', ') : itinerary.locations}</p>
+            <p>Timeline: {Array.isArray(itinerary.timeline) ? itinerary.timeline.join(', ') : itinerary.timeline}</p>
+            <p>Duration: {itinerary.durationActivity} hours</p>
+            <p>Language: {itinerary.tourLanguage}</p>
+            <p>Price: {itinerary.TourPrice}</p>
+            <p>Date: {itinerary.availableDates}</p>
+            <p>Accessibility: {itinerary.accessibility}</p>
+            <p>Pick Up Location: {itinerary.pickUpLoc}</p>
+            <p>Drop Off Location: {itinerary.DropOffLoc}</p>
             <button onClick={() => handleEdit(itinerary)}>Edit</button>
             <button onClick={() => handleDelete(itinerary._id)}>Delete</button>
-        </li>
-    ))}
-</ul>
+          </li>
+        ))}
+      </ul>
+
 
     </div>
   );

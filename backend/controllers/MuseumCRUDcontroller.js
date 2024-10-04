@@ -22,30 +22,37 @@ const getMuseum = async (req, res) => {
 };
 
 const updateMuseum = async (req, res) => {
-    const { id } = req.body; // Extract id from the request body
-    const updateData = {}; // Initialize an empty object for updates
- 
-    // Only add fields to updateData if they exist in the request body
-    if (req.body.description) updateData.description = req.body.description;
-    if (req.body.pictures) updateData.pictures = req.body.pictures;
-    if (req.body.location) updateData.location = req.body.location;
-    if (req.body.openingHours) updateData.openingHours = req.body.openingHours;
-    if (req.body.ticketPrice) updateData.ticketPrice = req.body.ticketPrice;
- 
-    try {
-       const updatedMuseum = await Museum.findByIdAndUpdate(id, updateData, { new: true });
-       if (!updatedMuseum) {
+  const { id } = req.params; // Extract id from the request parameters
+  const updateData = {}; // Initialize an empty object for updates
+
+  // Only add fields to updateData if they exist in the request body
+  if (req.body.description) updateData.description = req.body.description;
+  if (req.body.pictures) updateData.pictures = req.body.pictures;
+  if (req.body.location) updateData.location = req.body.location;
+  if (req.body.openingHours) updateData.openingHours = req.body.openingHours;
+  if (req.body.ticketPrice) updateData.ticketPrice = req.body.ticketPrice;
+
+  try {
+      const updatedMuseum = await Museum.findByIdAndUpdate(
+          id,
+          updateData,
+          { new: true, runValidators: true } // Ensure validators run on updates
+      );
+
+      if (!updatedMuseum) {
           return res.status(404).json({ error: "Museum not found" });
-       }
-       res.status(200).json(updatedMuseum);
-    } catch (error) {
-       res.status(400).json({ error: error.message });
-    }
- };
+      }
+      
+      res.status(200).json(updatedMuseum); // Send updated museum as response
+  } catch (error) {
+      res.status(400).json({ error: error.message });
+  }
+};
+
  
 
 const deleteMuseum = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   try {
     const deletedMuseum = await Museum.findByIdAndDelete(id);
     if (!deletedMuseum) {
