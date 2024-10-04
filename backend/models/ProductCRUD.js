@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const museumSchema = new Schema({
+const productSchema = new Schema({
     description: {
         type: String,
         required: true,
@@ -10,24 +10,27 @@ const museumSchema = new Schema({
         type: String,
         required: true
       },
-      location: {
-        type: String,
-        required: true,
-      },
-      openingHours: {
-        type: String,
-        required: true,
-      },
-      ticketPrice: {
+      price: {
         type: Number,
         required: true,
       },
-      tourismGovernerTags:{
-        type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
-        ref: 'tourismGovernerTag',  // Reference to the Category model
+      seller: {
+        type: String,
         required: true,
-      }
+      },
+      rating: {
+        type: Number,
+        required: true,
+      },
+      reviews: {
+        type: String,
+        required: true,
+      },
+      availableQuantity: {
+        type: Number,
+        required: true,
+      },
 }, { timestamps: true });
 
-const Museum = mongoose.model('Museum', museumSchema);
-module.exports = Museum;
+const Product = mongoose.model('Product', productSchema);
+module.exports = Product;

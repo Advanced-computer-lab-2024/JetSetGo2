@@ -15,6 +15,8 @@ const TourModel = require('../models/TGuide.js');
     }
  }
 
+
+ 
 // Method to get all tour guides or a specific one by ID
 const getuser = async (req, res) => {
    const { id } = req.params;  // Extract the tour guide ID from the URL if provided
@@ -39,8 +41,18 @@ const getuser = async (req, res) => {
       res.status(400).json({ error: error.message });  // Handle any errors
    }
 };
+const getUserById = async (req, res) => {
+   const { id } = req.params;
+   try {
+     const tourist = await TourModel.findById(id);
+     res.status(200).json(tourist);
+   } catch (error) {
+     res.status(400).json({ error: error.message });
+   }
+ };
+
 const updateUser = async (req, res) => {
-    const { id } = req.body; // Extract id from the request body
+    const { id } = req.params; // Extract id from the request body
     const updateData = {}; // Initialize an empty object for updates
  
     // Only add fields to updateData if they exist in the request body
@@ -63,4 +75,4 @@ const updateUser = async (req, res) => {
     }
 };
 
-    module.exports ={getuser,updateUser,createUser};
+    module.exports ={getuser,updateUser,createUser,getUserById};
