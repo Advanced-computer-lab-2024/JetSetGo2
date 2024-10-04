@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../App.css'
 
 const SchemaTourFront = () => {
   const [itineraries, setItineraries] = useState([]);
@@ -57,7 +56,7 @@ const SchemaTourFront = () => {
     e.preventDefault();
     try {
         if (editId) {
-            await axios.put(`http://localhost:8000/itinerary/updateTourId/${editId}`, { ...formData });
+            await axios.put(`http://localhost:8000/itinerary/updateTourId`, { id: editId, ...formData });
         } else {
             await axios.post('http://localhost:8000/itinerary/createtour', {
                 ...formData,
@@ -92,7 +91,7 @@ const SchemaTourFront = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/itinerary/deleteTour/${id}`);
+      await axios.delete('http://localhost:8000/itinerary/deleteTour', { data: { id } });
       fetchItineraries();
     } catch (error) {
       console.error('Error deleting itinerary:', error);

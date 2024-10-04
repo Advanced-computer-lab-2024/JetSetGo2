@@ -44,7 +44,7 @@ const readGuideID = async (req, res) => {
 
 };
 const updateGuide = async (req, res) => {
-    const { id } = req.params; // Extract id from the request body
+    const { id } = req.body; // Extract id from the request body
     const updateData = {}; // Initialize an empty object for updates
  
     if (req.body.name) updateData.name = req.body.name;
@@ -70,7 +70,7 @@ const updateGuide = async (req, res) => {
     }
  };
 const deleteGuide= async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.body;
     try{
 
     

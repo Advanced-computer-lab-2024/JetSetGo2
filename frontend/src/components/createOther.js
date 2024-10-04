@@ -155,7 +155,6 @@ const styles = {
 };
 
 // Add event listeners for hover and focus effects
-/*
 document.addEventListener("DOMContentLoaded", () => {
   const inputs = document.querySelectorAll("input, select");
   inputs.forEach((input) => {
@@ -174,6 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
   button.addEventListener("mouseout", () => {
     button.style.backgroundColor = styles.button.backgroundColor;
   });
-});*/
+});
 
 export default OtherSignup;

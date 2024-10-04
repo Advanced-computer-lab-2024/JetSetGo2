@@ -21,13 +21,7 @@ const historicalPlaceSchema = new Schema({
   ticketPrice: {
     type: Number,
     required: true,
-  },
-  tourismGovernerTags:{
-    type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
-    ref: 'tourismGovernerTag',  // Reference to the Category model
-    required: true,
   }
-
  
 }, { timestamps: true });
 

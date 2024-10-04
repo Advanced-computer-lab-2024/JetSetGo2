@@ -1,10 +1,14 @@
+const express = require('express');
+const router = express.Router();
 const Activity = require('../models/ActivityCRUD');
 const Category = require('../models/CategoryCRUD');
 const Advertiser = require('../models/AdverMODEL'); // Assuming this is the model for advertiser
 
-// Create Activity
+
+// CRUD operations
 const createActivity = async (req, res) => {
   try {
+
     // Ensure the provided category ID is valid
     const category = await Category.findById(req.body.category);
     if (!category) {
@@ -24,11 +28,13 @@ const createActivity = async (req, res) => {
     };
 
     const activity = await Activity.create(activityData);
+
     res.status(201).json(activity);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Get All Activities with Category and Advertiser Populated
 const getActivity = async (req, res) => {
@@ -43,8 +49,8 @@ const getActivity = async (req, res) => {
   }
 };
 
-// Update Activity
 const updateActivity = async (req, res) => {
+
   const { id } = req.params; // Get the activity ID from the request params
   const updateData = {};
 
@@ -88,6 +94,9 @@ const updateActivity = async (req, res) => {
     if (!updatedActivity) {
       return res.status(404).json({ error: "Activity not found" });
     }
+ };
+ 
+
 
     res.status(200).json(updatedActivity); // Send updated activity as response
   } catch (error) {
@@ -97,7 +106,7 @@ const updateActivity = async (req, res) => {
 
 // Other methods remain unchanged
 const deleteActivity = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.body;
   try {
     const deletedActivity = await Activity.findByIdAndDelete(id);
     if (!deletedActivity) {
@@ -137,10 +146,5 @@ const upcomingactivity = async (req, res) => {
 };
 
 module.exports = {
-  createActivity,
-  getActivity,
-  updateActivity,
-  deleteActivity,
-  deleteAllActivities,
-  upcomingactivity
+    createActivity,getActivity,updateActivity,deleteActivity
 };
