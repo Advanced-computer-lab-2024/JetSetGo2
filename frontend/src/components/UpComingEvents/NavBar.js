@@ -8,6 +8,7 @@ const Navbar = () => {
       <a href="#itineraries">Itineraries</a>
       <a href="#places">Historical Places</a>
       <a href="#museums">Museums</a>
+      
     </nav>
   );
 };
