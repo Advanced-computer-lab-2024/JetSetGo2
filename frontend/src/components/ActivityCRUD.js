@@ -21,8 +21,17 @@ const predefinedLocations = [
     name: 'Alexandria, Egypt',
     coordinates: '29.9097,31.2156,29.9297,31.2356',
   },
+  {
+    name: 'German University in Cairo, Egypt',
+    coordinates: '31.4486,29.9869,31.4686,30.0069', // Sample bounding box
+  },
+  {
+    name: 'Cairo Festival City, Egypt',
+    coordinates: '31.4015,30.0254,31.4215,30.0454', // Sample bounding box
+  },
   // Add more locations as needed
 ];
+
 
 const ActivityCRUD = () => {
   const [activities, setActivities] = useState([]);
