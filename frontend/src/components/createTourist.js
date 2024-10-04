@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const TouristSignup = () => {
+const TouristSignup = ({ setSelectedTouristId }) => {
   const [formData, setFormData] = useState({
     Email: "",
     UserName: "",
@@ -29,9 +29,12 @@ const TouristSignup = () => {
         formData
       );
       console.log("Signup successful:", response.data);
-      navigate(`/tourist-update/${response.data._id}`, {
-        state: { tourist: response.data },
-      }); // Redirecting to update page
+
+      // Set the selected tourist ID in the parent component state
+      setSelectedTouristId(response.data._id);
+
+      // Redirect to the update page without the ID in the URL
+      navigate("/tourist-update");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("An error occurred while signing up. Please try again."); // Setting error message
@@ -192,8 +195,5 @@ const styles = {
     marginBottom: "15px",
   },
 };
-
-// The event listeners for hover and focus effects can be simplified or removed in React
-// since they can be handled using state and inline styles.
 
 export default TouristSignup;
