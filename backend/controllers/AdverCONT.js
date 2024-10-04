@@ -19,7 +19,18 @@ const createAdver = async(req,res) => {
     res.status(200).json(adver);
   } catch (error) {
     res.status(400).json({ error: error.message });
-  }
+  };
+}
+
+  const getAdvertiser = async (req, res) => {
+   try {
+     
+     const adver = await adverModel.find();
+     res.status(200).json(adver);
+   } catch (error) {
+     res.status(400).json({ error: error.message });
+   }
+ };
 
 
 
@@ -30,7 +41,7 @@ const createAdver = async(req,res) => {
    //  }catch(error){
    //     res.status(400).json({error:error.messege})
    //  }
-   }
+   
 
 
 
@@ -72,4 +83,4 @@ const createAdver = async(req,res) => {
 
 
 // Export the router
-module.exports = {createAdver, getAdver, updateAdver , getAdverById};
+module.exports = {createAdver, getAdver, updateAdver , getAdverById, getAdvertiser};
