@@ -1,6 +1,7 @@
 const Schema = require('../models/schematour.js');
+const { default: mongoose } = require('mongoose');
 const createGuide =  async (req, res) => {
-    const { name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc } = req.body;
+    const { name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc, tourGuide} = req.body;
 
     const newSchema = new Schema({
         name, 
@@ -13,7 +14,8 @@ const createGuide =  async (req, res) => {
         availableDates, 
         accessibility, 
         pickUpLoc, 
-        DropOffLoc
+        DropOffLoc,
+        tourGuide
 
     });
     try{
@@ -26,7 +28,8 @@ const createGuide =  async (req, res) => {
 };
 const readGuide = async (req, res) => {
     try {
-        const schemas = await Schema.find().populate('activities'); // Populate activity details
+        const userId = req.query.userId;
+        const schemas = await Schema.find({tourGuide: new mongoose.Types.ObjectId(userId)}).populate('activities'); 
         res.status(200).json(schemas);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -35,7 +38,7 @@ const readGuide = async (req, res) => {
 
 const readGuideID = async (req, res) => {
     try{
-        const schema = await Schema.findById(req.params.id);
+        const schema = await Schema.find();
         if (!schema) return res.status(404).json({ message: 'schema not found' });
         res.status(200).json(schema)
     }catch(err){

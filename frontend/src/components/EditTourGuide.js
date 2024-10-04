@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 
-const EditTourGuide = () => {
+const EditTourGuide = ({selectedTourGuideId}) => {
   const location = useLocation();
   const id = location.state?.id; // Safely retrieve ID from state
 
@@ -21,7 +21,7 @@ const EditTourGuide = () => {
     const fetchTourGuide = async () => {
       if (id) {
         try {
-          const response = await axios.get(`http://localhost:8000/TourGuide/users/${id}`);
+          const response = await axios.get(`http://localhost:8000/TourGuide/users/${selectedTourGuideId}`);
           setFormData(response.data);
         } catch (err) {
           console.error("Error fetching tour guide:", err);
@@ -33,7 +33,7 @@ const EditTourGuide = () => {
     };
 
     fetchTourGuide();
-  }, [id]);
+  }, [selectedTourGuideId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,7 +42,7 @@ const EditTourGuide = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:8000/TourGuide/update/${id}`, formData);
+      await axios.put(`http://localhost:8000/TourGuide/update/${selectedTourGuideId}`, formData);
       // Optionally navigate back or show a success message
     } catch (error) {
       console.error("Error updating tour guide:", error);

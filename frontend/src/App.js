@@ -22,7 +22,7 @@ import SellerDetails from './components/SellerDetails';
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
-
+  const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
 
   return (
     <Router>
@@ -43,16 +43,16 @@ function App() {
           />
           <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
         <Route path="/list" element={<AdvertiserManagement />} />
-          <Route path="/CreateTourGuide" element={<CreateTourGuide />} />
-          <Route path="/editTourGuide" element={<EditTourGuide />} />
-          <Route path="/tour-guide" element={<TourGuideDetails />} />
+          <Route path="/CreateTourGuide" element={<CreateTourGuide setselectedTourGuideId={setselectedTourGuideId} />} />
+          <Route path="/editTourGuide" element={<EditTourGuide selectedTourGuideId={selectedTourGuideId}/>} />
+          <Route path="/tour-guide" element={<TourGuideDetails  selectedTourGuideId={selectedTourGuideId}/>} />
           <Route path="/tourist-signup" element={<TouristSignup />} />
           <Route path="/tourist-update/:id" element={<UpdateTouristPage />} />
           <Route path="/other-signup" element={<OtherSignup />} />
           <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
-          <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
+          <Route path="/SchemaTourFront" element={<SchemaTourFront  selectedTourGuideId={selectedTourGuideId}/>} />
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />

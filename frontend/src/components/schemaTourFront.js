@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../App.css'
 
-const SchemaTourFront = () => {
+const SchemaTourFront = ({selectedTourGuideId}) => {
   const [itineraries, setItineraries] = useState([]);
   const [activities, setActivities] = useState([]); // State to hold activities
   const [formData, setFormData] = useState({
     name: '',
-    selectedActivity: '', // Changed to hold a single selected activity
-    locations: '',
+    selectedActivity: '', 
     timeline: '',
     durationActivity: '',
     tourLanguage: '',
@@ -17,12 +16,13 @@ const SchemaTourFront = () => {
     accessibility: '',
     pickUpLoc: '',
     DropOffLoc: '',
+    tourGuide: '',
   });
   const [editId, setEditId] = useState(null);
 
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/itinerary/readTour');
+      const response = await axios.get(`http://localhost:8000/itinerary/readTour?userId=${selectedTourGuideId}`);
       setItineraries(response.data);
     } catch (error) {
       console.error('Error fetching itineraries:', error);
@@ -55,14 +55,21 @@ const SchemaTourFront = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Selected Tour Guide ID:', selectedTourGuideId);
+    
+    const payload = {
+        ...formData,
+        activities: [formData.selectedActivity], // Ensure you're sending the selected activity ID in an array
+        tourGuide: selectedTourGuideId, // Include tourGuide in the payload
+    };
+
+    console.log('Payload:', payload); // Log the payload being sent
+
     try {
         if (editId) {
-            await axios.put(`http://localhost:8000/itinerary/updateTourId/${editId}`, { ...formData });
+            await axios.put(`http://localhost:8000/itinerary/updateTourId/${editId}`, payload);
         } else {
-            await axios.post('http://localhost:8000/itinerary/createtour', {
-                ...formData,
-                activities: [formData.selectedActivity] // Ensure you're sending the selected activity ID in an array
-            });
+            await axios.post('http://localhost:8000/itinerary/createtour', payload);
         }
         fetchItineraries();
         setFormData({
@@ -77,12 +84,14 @@ const SchemaTourFront = () => {
             accessibility: '',
             pickUpLoc: '',
             DropOffLoc: '',
+            tourGuide: selectedTourGuideId,
         });
         setEditId(null);
     } catch (error) {
         console.error('Error submitting form:', error);
     }
 };
+
 
 
   const handleEdit = (itinerary) => {
