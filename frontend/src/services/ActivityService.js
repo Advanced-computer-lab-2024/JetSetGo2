@@ -27,7 +27,7 @@ export const createActivity = async (activityData) => {
 // Update an existing activity
 export const updateActivity = async (id, updateData) => {
    try {
-      const response = await axios.put(`${API_URL}/activity/update/${id}`, updateData);
+      const response = await axios.put(`${API_URL}/activity/update`, { id, ...updateData });
       return response.data;
    } catch (error) {
       console.error("Error updating activity:", error);
@@ -38,21 +38,10 @@ export const updateActivity = async (id, updateData) => {
 // Delete an activity
 export const deleteActivity = async (id) => {
    try {
-      const response = await axios.delete(`${API_URL}/activity/delete/${id}`);
+      const response = await axios.delete(`${API_URL}/activity/delete`, { data: { id } });
       return response.data;
    } catch (error) {
       console.error("Error deleting activity:", error);
-      throw error;
-   }
-};
-
-// Get all categories
-export const getCategories = async () => {
-   try {
-      const response = await axios.get(`${API_URL}/category/get`); // Adjust this endpoint according to your backend
-      return response.data;
-   } catch (error) {
-      console.error("Error fetching categories:", error);
       throw error;
    }
 };

@@ -3,12 +3,12 @@ const Schema = mongoose.Schema;
 
 const activitySchema = new Schema({
   date: {
-    type: Date,
+    type: String,
     required: true,
   },
   time: {
     type: String,
-    required: true,
+    required: true
   },
   location: {
     type: String,
@@ -19,8 +19,7 @@ const activitySchema = new Schema({
     required: true,
   },
   category: {
-    type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
-    ref: 'Category',  // Reference to the Category model
+    type: String,
     required: true,
   },
   tags: {

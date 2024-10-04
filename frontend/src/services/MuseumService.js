@@ -27,7 +27,7 @@ export const createMuseum = async (activityData) => {
 // Update an existing activity
 export const updateMuseum = async (id, updateData) => {
    try {
-      const response = await axios.put(`${API_URL}/museum/update/${id}`, updateData);
+      const response = await axios.put(`${API_URL}/museum/update`, { id, ...updateData });
       return response.data;
    } catch (error) {
       console.error("Error updating Museum:", error);
@@ -38,7 +38,7 @@ export const updateMuseum = async (id, updateData) => {
 // Delete an activity
 export const deleteMuseum = async (id) => {
    try {
-      const response = await axios.delete(`${API_URL}/museum/delete/${id}`);
+      const response = await axios.delete(`${API_URL}/museum/delete`, { data: { id } });
       return response.data;
    } catch (error) {
       console.error("Error deleting Museum:", error);
