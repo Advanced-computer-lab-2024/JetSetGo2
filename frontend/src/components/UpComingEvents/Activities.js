@@ -6,7 +6,7 @@ import {
   updateActivity,
   deleteActivity,
   getCategories,
-} from 'C:/Users/Omart/Desktop/GUC/ProjectACL/JetSetGo2/frontend/src/services/ActivityService.js'; // Ensure to import the necessary services
+} from 'C:/ACL PROJECT/JetSetGo2/frontend/src/services/ActivityService.js'
 
 const predefinedLocations = [
   {
