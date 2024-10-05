@@ -46,8 +46,6 @@ function App() {
           <Route path="/CreateTourGuide" element={<CreateTourGuide setselectedTourGuideId={setselectedTourGuideId} />} />
           <Route path="/editTourGuide" element={<EditTourGuide selectedTourGuideId={selectedTourGuideId}/>} />
           <Route path="/tour-guide" element={<TourGuideDetails  selectedTourGuideId={selectedTourGuideId}/>} />
-          <Route path="/tourist-signup" element={<TouristSignup />} />
-          <Route path="/tourist-update/:id" element={<UpdateTouristPage />} />
           <Route path="/other-signup" element={<OtherSignup />} />
           <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />

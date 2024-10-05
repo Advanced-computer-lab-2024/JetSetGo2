@@ -1,7 +1,7 @@
 const Schema = require('../models/schematour.js');
 const { default: mongoose } = require('mongoose');
 const createGuide =  async (req, res) => {
-    const { name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc, tourGuide} = req.body;
+    const { name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc, tourGuide,Tags} = req.body;
 
     const newSchema = new Schema({
         name, 
@@ -15,7 +15,8 @@ const createGuide =  async (req, res) => {
         accessibility, 
         pickUpLoc, 
         DropOffLoc,
-        tourGuide
+        tourGuide,
+        Tags
 
     });
     try{
@@ -29,7 +30,9 @@ const createGuide =  async (req, res) => {
 const readGuide = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const schemas = await Schema.find({tourGuide: new mongoose.Types.ObjectId(userId)}).populate('activities'); 
+        const schemas = await Schema.find({tourGuide: new mongoose.Types.ObjectId(userId)})
+        .populate('activities')
+        .populate('Tags','name'); 
         res.status(200).json(schemas);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -61,6 +64,7 @@ const updateGuide = async (req, res) => {
     if (req.body.accesibility) updateData.accesibility = req.body.accesibility;
     if (req.body.pickUpLoc) updateData.pickUpLoc = req.body.pickUpLoc;
     if (req.body.DropOffLoc) updateData.DropOffLoc = req.body.DropOffLoc;
+    if (req.body.Tags) updateData.Tags = req.body.Tags;
  
     try {
        const updatedGuide = await Schema.findByIdAndUpdate(id, updateData, { new: true });
