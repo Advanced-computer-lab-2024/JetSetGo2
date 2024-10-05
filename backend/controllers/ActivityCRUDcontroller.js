@@ -118,29 +118,12 @@ const deleteAllActivities = async (req, res) => {
   }
 };
 
-const upcomingactivity = async (req, res) => {
-  try {
-    const now = new Date(); // Get the current date and time
-    const upcomingActivities = await Activity.find({ date: { $gt: now } })
-      .populate('category') // Optional: populate category details if needed
-      .populate('advertiser') // Populate advertiser details if needed
-      .sort({ date: 1 }); // Sort by date in ascending order
-
-    if (upcomingActivities.length === 0) {
-      return res.status(404).json({ message: 'No upcoming activities found.' });
-    }
-
-    res.json(upcomingActivities);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching upcoming activities.' });
-  }
-};
 
 module.exports = {
   createActivity,
   getActivity,
   updateActivity,
   deleteActivity,
-  deleteAllActivities,
-  upcomingactivity
+  deleteAllActivities
+  
 };

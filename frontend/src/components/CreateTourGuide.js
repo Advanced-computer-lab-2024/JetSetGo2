@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-const CreateTourGuide = () => {
+const CreateTourGuide = ({setselectedTourGuideId}) => {
   const [formData, setFormData] = useState({
     Name: '',
     Email: '',
@@ -25,6 +25,7 @@ const CreateTourGuide = () => {
     try {
       const response = await axios.post('http://localhost:8000/TourGuide/add', formData);
       console.log('Response:', response.data);
+      setselectedTourGuideId(response.data._id);
       if (response.status === 200) {
         setCreatedId(response.data._id);
         navigate('/tour-guide', { state: { id: response.data._id } }); // Pass ID via state

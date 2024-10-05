@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../App.css'
 
-const SchemaTourFront = () => {
+const SchemaTourFront = ({selectedTourGuideId}) => {
   const [itineraries, setItineraries] = useState([]);
-  const [activities, setActivities] = useState([]); // State to hold activities
+  const [activities, setActivities] = useState([]); 
+  const [Tags, setTags] = useState([]); 
   const [formData, setFormData] = useState({
     name: '',
-    selectedActivity: '', // Changed to hold a single selected activity
-    locations: '',
+    selectedActivity: '', 
     timeline: '',
     durationActivity: '',
     tourLanguage: '',
@@ -17,12 +17,14 @@ const SchemaTourFront = () => {
     accessibility: '',
     pickUpLoc: '',
     DropOffLoc: '',
+    tourGuide: '',
+    selectedTags:'',
   });
   const [editId, setEditId] = useState(null);
 
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/itinerary/readTour');
+      const response = await axios.get(`http://localhost:8000/itinerary/readTour?userId=${selectedTourGuideId}`);
       setItineraries(response.data);
     } catch (error) {
       console.error('Error fetching itineraries:', error);
@@ -37,10 +39,19 @@ const SchemaTourFront = () => {
       console.error('Error fetching activities:', error);
     }
   };
+  const fetchTags = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/prefTags/readtag'); // Adjust this path to your activities endpoint
+      setTags(response.data);
+    } catch (error) {
+      console.error('Error fetching Tags:', error);
+    }
+  };
 
   useEffect(() => {
     fetchItineraries();
-    fetchActivities(); // Fetch activities on component mount
+    fetchActivities();
+    fetchTags();
   }, []);
 
   const handleChange = (e) => {
@@ -52,17 +63,29 @@ const SchemaTourFront = () => {
     const { value } = e.target;
     setFormData((prev) => ({ ...prev, selectedActivity: value })); // Update selected activity
   };
+  const handleTagsChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, selectedTags: value })); // Update selected activity
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Selected Tour Guide ID:', selectedTourGuideId);
+    
+    const payload = {
+        ...formData,
+        activities: [formData.selectedActivity], // Ensure you're sending the selected activity ID in an array
+        Tags: [formData.selectedTags],
+        tourGuide: selectedTourGuideId, // Include tourGuide in the payload
+    };
+
+    console.log('Payload:', payload); // Log the payload being sent
+
     try {
         if (editId) {
-            await axios.put(`http://localhost:8000/itinerary/updateTourId/${editId}`, { ...formData });
+            await axios.put(`http://localhost:8000/itinerary/updateTourId/${editId}`, payload);
         } else {
-            await axios.post('http://localhost:8000/itinerary/createtour', {
-                ...formData,
-                activities: [formData.selectedActivity] // Ensure you're sending the selected activity ID in an array
-            });
+            await axios.post('http://localhost:8000/itinerary/createtour', payload);
         }
         fetchItineraries();
         setFormData({
@@ -77,12 +100,15 @@ const SchemaTourFront = () => {
             accessibility: '',
             pickUpLoc: '',
             DropOffLoc: '',
+            tourGuide: selectedTourGuideId,
+            selectedTags:'',
         });
         setEditId(null);
     } catch (error) {
         console.error('Error submitting form:', error);
     }
 };
+
 
 
   const handleEdit = (itinerary) => {
@@ -111,10 +137,21 @@ const SchemaTourFront = () => {
           <option value="">Select an Activity</option> {/* Placeholder option */}
           {activities.map(activity => (
             <option key={activity._id} value={activity._id}>
-              {activity.date} - {activity.time} - {activity.location} - {activity.price} - {activity.category} - {activity.specialDiscount} - {activity.isBookingOpen ? "Booking Open" : "Booking Closed"}
+              {activity.date} - {activity.time} - {activity.location} - {activity.price} - {activity.category.name} - {activity.specialDiscount} - {activity.isBookingOpen ? "Booking Open" : "Booking Closed"}
             </option>
           ))}
         </select>
+        <label>
+            Tags:
+            <select name="PreferenceTag" value={formData.PreferenceTag} onChange={handleTagsChange} required>
+              <option value="">Select Tag</option>
+              {Tags.map((tag) => (
+                <option key={tag._id} value={tag._id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
         <textarea name="locations" value={formData.locations} onChange={handleChange} placeholder="Locations" required />
         <input name="timeline" value={formData.timeline} onChange={handleChange} placeholder="Timeline" required />
@@ -139,6 +176,8 @@ const SchemaTourFront = () => {
                     `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category} - ${activity.specialDiscount}`
                 ).join(', ')}
             </p>
+            <p>Tags: {itinerary.PreferenceTag?.name || 'None'}</p>
+
             <p>Locations: {itinerary.locations.join(', ')}</p>
             <p>Timeline: {itinerary.timeline.join(', ')}</p>
             <p>Duration: {itinerary.durationActivity.join(', ')} hours</p>
