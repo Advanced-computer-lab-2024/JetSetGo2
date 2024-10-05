@@ -1,33 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 import {
   getActivity,
-  createActivity,
-  updateActivity,
-  deleteActivity,
   getCategories,
-} from 'C:/Users/Omart/Desktop/GUC/ProjectACL/JetSetGo2/frontend/src/services/ActivityService.js'; // Ensure to import the necessary services
+} from "/Users/mahmoudomran/Desktop/ACL Project/JetSetGo2/frontend/src/services/ActivityService.js"; // Ensure to import the necessary services
 
 const predefinedLocations = [
   {
-    name: 'Cairo, Egypt',
-    coordinates: '31.2357,30.0444,31.2557,30.0644',
+    name: "Cairo, Egypt",
+    coordinates: "31.2357,30.0444,31.2557,30.0644",
   },
   {
-    name: 'Giza Pyramids, Egypt',
-    coordinates: '31.1313,29.9765,31.1513,29.9965',
+    name: "Giza Pyramids, Egypt",
+    coordinates: "31.1313,29.9765,31.1513,29.9965",
   },
   {
-    name: 'Alexandria, Egypt',
-    coordinates: '29.9097,31.2156,29.9297,31.2356',
+    name: "Alexandria, Egypt",
+    coordinates: "29.9097,31.2156,29.9297,31.2356",
   },
   {
-    name: 'German University in Cairo, Egypt',
-    coordinates: '31.4486,29.9869,31.4686,30.0069', // Sample bounding box
+    name: "German University in Cairo, Egypt",
+    coordinates: "31.4486,29.9869,31.4686,30.0069", // Sample bounding box
   },
   {
-    name: 'Cairo Festival City, Egypt',
-    coordinates: '31.4015,30.0254,31.4215,30.0454', // Sample bounding box
+    name: "Cairo Festival City, Egypt",
+    coordinates: "31.4015,30.0254,31.4215,30.0454", // Sample bounding box
   },
   // Add more locations as needed
 ];
@@ -37,13 +34,13 @@ const Activities = () => {
   const [categories, setCategories] = useState([]); // State to hold categories
 
   const [formData, setFormData] = useState({
-    date: '',
-    time: '',
-    location: '',
-    price: '',
-    category: '',
-    tags: '',
-    specialDiscount: '',
+    date: "",
+    time: "",
+    location: "",
+    price: "",
+    category: "",
+    tags: "",
+    specialDiscount: "",
     isBookingOpen: true,
   });
   const [editData, setEditData] = useState(null);
@@ -64,7 +61,7 @@ const Activities = () => {
       });
       setActivities(upcomingActivities);
     } catch (error) {
-      console.error('Error fetching activities', error);
+      console.error("Error fetching activities", error);
     }
   };
 
@@ -73,12 +70,12 @@ const Activities = () => {
       const data = await getCategories();
       setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories', error);
+      console.error("Error fetching categories", error);
     }
   };
 
   const generateMapSrc = (coordinates) => {
-    const [long1, lat1, long2, lat2] = coordinates.split(',');
+    const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
 
@@ -105,14 +102,14 @@ const Activities = () => {
                   <p>Price: ${activity.price}</p>
                   <p>Tags: {activity.tags}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
-                  <p>Booking Open: {activity.isBookingOpen ? 'Yes' : 'No'}</p>
+                  <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
                   {mapSrc && (
                     <iframe
                       title={`Map for ${activity.location}`}
                       src={mapSrc}
                       width="300"
                       height="200"
-                      style={{ border: 'none' }}
+                      style={{ border: "none" }}
                     ></iframe>
                   )}
                 </li>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import ActivityCRUD from "./components/ActivityCRUD"; // Import ActivityCRUD component
@@ -9,34 +9,41 @@ import HomePage from "./components/HomePage";
 import TouristSignup from "./components/createTourist";
 import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
 import OtherSignup from "./components/createOther";
-import TagsManagement from './components/TagsManagement';
-import CreateTourGuide from './components/CreateTourGuide';
-import TourGuideDetails from './components/TourGuideDetails';
-import EditTourGuide from './components/EditTourGuide';
+import TagsManagement from "./components/TagsManagement";
+import CreateTourGuide from "./components/CreateTourGuide";
+import TourGuideDetails from "./components/TourGuideDetails";
+import EditTourGuide from "./components/EditTourGuide";
 import CategoryCRUD from "./components/CategoryCRUD";
 import ProductCRUD from "./components/ProductCRUD";
 import CreateTag from "./components/CreateTag";
-import AdvertiserForm from './components/Create'; 
-import  AdvertiserManagement from './components/listup'; 
-import CreateSeller from './components/CreateSeller';
-import SellerDetails from './components/SellerDetails';
-import UpcomingEvents from './components/UpComingEvents/upComingEvents';
-import Activities from './components/UpComingEvents/Activities';
+import AdvertiserForm from "./components/Create";
+import AdvertiserManagement from "./components/listup";
+import CreateSeller from "./components/CreateSeller";
+import SellerDetails from "./components/SellerDetails";
+import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
+import Activities from "./components/UpComingEvents/Activities";
+import TouristHome from "./components/touristHome";
+import Museums from "./components/UpComingEvents/Museums";
+import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
+import Itineraries from "./components/UpComingEvents/Itenaries";
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
-
 
   return (
     <Router>
       <div>
         <Routes>
-           <Route path="/" element={<HomePage />} /> 
-           <Route
+          <Route path="/" element={<HomePage />} />
+          <Route
             path="/tourist-signup"
             element={
               <TouristSignup setSelectedTouristId={setSelectedTouristId} />
             }
+          />
+          <Route
+            path="/tourist-home"
+            element={<TouristHome selectedTouristId={selectedTouristId} />}
           />
           <Route
             path="/tourist-update"
@@ -45,7 +52,7 @@ function App() {
             }
           />
           <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
-        <Route path="/list" element={<AdvertiserManagement />} />
+          <Route path="/list" element={<AdvertiserManagement />} />
           <Route path="/CreateTourGuide" element={<CreateTourGuide />} />
           <Route path="/editTourGuide" element={<EditTourGuide />} />
           <Route path="/tour-guide" element={<TourGuideDetails />} />
@@ -62,14 +69,15 @@ function App() {
           <Route path="/CreateTag" element={<CreateTag />} />
           <Route path="/CreateSeller" element={<CreateSeller />} />
           <Route path="/seller-details" element={<SellerDetails />} />
-
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
-        <Route path="/Upcoming-activities" element={<Activities />} />
+          <Route path="/Upcoming-activities" element={<Activities />} />
+          <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
+          <Route path="/all-museums" element={<Museums />} />
+          <Route path="/Upcoming-itineraries" element={<Itineraries />} />
         </Routes>
       </div>
     </Router>
   );
-};
-
+}
 
 export default App;
