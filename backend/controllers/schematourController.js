@@ -84,19 +84,20 @@ const deleteGuide= async (req, res) => {
         const deleted = await Schema.findByIdAndDelete(id, { new: true });
     if (!deleted) return res.status(404).json({ message: 'schema not found' });
     if (deleted.bookings > 0) {
-        return res.status(400).json({ message: 'Cannot delete schema with existing bookings' });
-      }
-      
-      res.status(200).json({ message: 'schema deleted successfully' });
-    }catch(err){
-        res.status(500).json({ message: err.message });
+      return res
+        .status(400)
+        .json({ message: "Cannot delete schema with existing bookings" });
     }
 
+    res.status(200).json({ message: "schema deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 module.exports = {
-    createGuide,
-    readGuide,
-    readGuideID,
-    updateGuide,
-    deleteGuide
+  createGuide,
+  readGuide,
+  readGuideID,
+  updateGuide,
+  deleteGuide,
 };
