@@ -1,26 +1,49 @@
 const express = require('express');
 const router = express.Router();
-const Museum = require('../models/MuseumCRUD');
+const Museum = require('../models/MuseumCRUD'); // Assuming you have Museum model like HistoricalPlaceCRUD
+const TourismGovernerTag = require('../models/tourismGovernerTags'); // Import the tourismGovernerTag model
 
 // CRUD operations
+
+// Create a Museum with tourismGovernerTags reference
 const createMuseum = async (req, res) => {
   try {
-    const museum = await Museum.create(req.body);
+    const { description, pictures, location, openingHours, ticketPrice, tourismGovernerTags } = req.body;
+
+    // Find the tourismGovernerTags (this ensures you're referencing valid tags)
+    const tag = await TourismGovernerTag.findById(tourismGovernerTags);
+    if (!tag) {
+      return res.status(400).json({ error: 'Invalid tourism governer tag' });
+    }
+
+    // Create the museum
+    const museum = await Museum.create({
+      description,
+      pictures,
+      location,
+      openingHours,
+      ticketPrice,
+      tourismGovernerTags: tag._id // Reference the tourismGovernerTags by _id
+    });
+
     res.status(201).json(museum);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
+// Fetch all Museums with populated tourismGovernerTags
 const getMuseum = async (req, res) => {
   try {
-    const museums = await Museum.find();
+    // Use .populate to fill the tourismGovernerTags field with actual data
+    const museums = await Museum.find().populate('tourismGovernerTags', 'name');
     res.status(200).json(museums);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
+// Update a Museum (including tourismGovernerTags if provided)
 const updateMuseum = async (req, res) => {
   const { id } = req.params; // Extract id from the request parameters
   const updateData = {}; // Initialize an empty object for updates
@@ -32,25 +55,33 @@ const updateMuseum = async (req, res) => {
   if (req.body.openingHours) updateData.openingHours = req.body.openingHours;
   if (req.body.ticketPrice) updateData.ticketPrice = req.body.ticketPrice;
 
-  try {
-      const updatedMuseum = await Museum.findByIdAndUpdate(
-          id,
-          updateData,
-          { new: true, runValidators: true } // Ensure validators run on updates
-      );
+  // Handle updating the tourismGovernerTags field
+  if (req.body.tourismGovernerTags) {
+    const tag = await TourismGovernerTag.findById(req.body.tourismGovernerTags);
+    if (!tag) {
+      return res.status(400).json({ error: 'Invalid tourism governer tag' });
+    }
+    updateData.tourismGovernerTags = tag._id;
+  }
 
-      if (!updatedMuseum) {
-          return res.status(404).json({ error: "Museum not found" });
-      }
-      
-      res.status(200).json(updatedMuseum); // Send updated museum as response
+  try {
+    const updatedMuseum = await Museum.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true } // Ensure validators run on updates
+    );
+
+    if (!updatedMuseum) {
+      return res.status(404).json({ error: "Museum not found" });
+    }
+
+    res.status(200).json(updatedMuseum); // Send updated museum as response
   } catch (error) {
-      res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
- 
-
+// Delete a Museum
 const deleteMuseum = async (req, res) => {
   const { id } = req.params;
   try {
@@ -64,6 +95,22 @@ const deleteMuseum = async (req, res) => {
   }
 };
 
+const deleteAllMuseums = async (req, res) => {
+  try {
+    console.log("Attempting to delete all Museums...");
+    await Museum.deleteMany({});
+    console.log("All Museums deleted successfully.");
+    res.status(200).json({ message: 'All Museums have been deleted' });
+  } catch (error) {
+    console.error("Error deleting Museums:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
-
-module.exports = {createMuseum,getMuseum,updateMuseum,deleteMuseum};
+module.exports = {
+  createMuseum,
+  getMuseum,
+  updateMuseum,
+  deleteMuseum,
+  deleteAllMuseums,
+};

@@ -56,3 +56,13 @@ export const getCategories = async () => {
       throw error;
    }
 };
+
+export const getAdvertiser = async () => {
+   try {
+      const response = await axios.get(`${API_URL}/home/adver/get`); // Adjust this endpoint according to your backend
+      return response.data;
+   } catch (error) {
+      console.error("Error fetching categories:", error);
+      throw error;
+   }
+};

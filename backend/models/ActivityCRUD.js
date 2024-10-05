@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const activitySchema = new Schema({
   date: {
-    type: String,
+    type: Date,
     required: true,
   },
   time: {
@@ -33,6 +33,11 @@ const activitySchema = new Schema({
   },
   isBookingOpen: {
     type: Boolean,
+    required: true,
+  },
+  advertiser: {
+    type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
+    ref: 'adver',  // Reference to the Category model
     required: true,
   }
 }, { timestamps: true });

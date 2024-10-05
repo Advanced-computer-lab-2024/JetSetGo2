@@ -16,6 +16,7 @@ const other = require("./routes/otherRoutes");
 const preferanceTags = require("./routes/preferanceTagsRoutes");
 const TourGuideRoute = require("./routes/TGuideRoutes.js");
 const categoryRoutes = require("./routes/CategoryCRUDroute");
+const productRoutes = require("./routes/ProductCRUDroute");
 const user = require('./routes/tourismGovernerTags');
 const seller = require('./routes/SellerRoute');
 
@@ -42,6 +43,7 @@ app.use("/historicalPlace", historicalPlaceRoutes);
 app.use("/museum", museumRoutes);
 app.use("/category",categoryRoutes);
 app.use("/itinerary", itineraryRoutes);
+app.use("/product", productRoutes);
 app.use("/home/tourist", tourist);
 app.use("/home/other", other);
 app.use("/prefTags",preferanceTags);

@@ -14,11 +14,14 @@ import CreateTourGuide from './components/CreateTourGuide';
 import TourGuideDetails from './components/TourGuideDetails';
 import EditTourGuide from './components/EditTourGuide';
 import CategoryCRUD from "./components/CategoryCRUD";
+import ProductCRUD from "./components/ProductCRUD";
 import CreateTag from "./components/CreateTag";
 import AdvertiserForm from './components/Create'; 
 import  AdvertiserManagement from './components/listup'; 
 import CreateSeller from './components/CreateSeller';
 import SellerDetails from './components/SellerDetails';
+import UpcomingEvents from './components/UpComingEvents/upComingEvents';
+import Activities from './components/UpComingEvents/Activities';
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
@@ -53,10 +56,13 @@ function App() {
           <Route path="/SchemaTourFront" element={<SchemaTourFront  selectedTourGuideId={selectedTourGuideId}/>} />
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/category" element={<CategoryCRUD />} />
+          <Route path="/product" element={<ProductCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
           <Route path="/CreateSeller" element={<CreateSeller />} />
           <Route path="/seller-details" element={<SellerDetails />} />
-        
+
+          <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
+        <Route path="/Upcoming-activities" element={<Activities />} />
         </Routes>
       </div>
     </Router>
