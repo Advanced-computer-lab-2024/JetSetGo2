@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getMuseum } from 'C:/ACL PROJECT/JetSetGo2/frontend/src/services/MuseumService'; // Update this path as needed
+import { getMuseum } from '../../services/MuseumService'; // Update this path as needed
 
 const predefinedLocations = [
   {

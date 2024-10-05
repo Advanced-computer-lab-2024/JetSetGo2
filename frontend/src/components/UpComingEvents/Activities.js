@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
   getActivity,
   getCategories,
-} from 'C:/ACL PROJECT/JetSetGo2/frontend/src/services/ActivityService.js' // Ensure to import the necessary services
+} from '../../services/ActivityService' // Ensure to import the necessary services
 
 const predefinedLocations = [
   {
