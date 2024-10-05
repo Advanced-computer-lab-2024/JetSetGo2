@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getActivity, getCategories } from "../../services/ActivityService"; // Ensure to import the necessary services
+import {
+  getActivity,
+  getCategories,
+  getTags,
+} from "../../services/ActivityService"; // Ensure to import the necessary services
 
 const predefinedLocations = [
   {
@@ -28,6 +32,7 @@ const predefinedLocations = [
 const Activities = () => {
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]); // State to hold categories
+  const [tags, setTags] = useState([]);
   const [sortOrder, setSortOrder] = useState("none"); // State for sorting order
 
   const [formData, setFormData] = useState({
@@ -46,6 +51,7 @@ const Activities = () => {
   useEffect(() => {
     fetchActivities();
     fetchCategories();
+    fetchTags();
   }, []);
 
   const fetchActivities = async () => {
@@ -66,6 +72,15 @@ const Activities = () => {
     try {
       const data = await getCategories();
       setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories", error);
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const data = await getTags();
+      setTags(data);
     } catch (error) {
       console.error("Error fetching categories", error);
     }
@@ -93,20 +108,7 @@ const Activities = () => {
   return (
     <div id="activities">
       <section className="activity-list">
-        <h2>Upcoming Activities</h2>
-
-        {/* Sorting Dropdown */}
-        <label htmlFor="sortOrder">Sort by Price:</label>
-        <select
-          id="sortOrder"
-          value={sortOrder}
-          onChange={handleSortOrderChange}
-        >
-          <option value="none">None</option>
-          <option value="lowToHigh">Price: Low to High</option>
-          <option value="highToLow">Price: High to Low</option>
-        </select>
-
+        <h2>Activity List</h2>
         {activities.length > 0 ? (
           <ul>
             {activities.map((activity) => {
@@ -120,12 +122,14 @@ const Activities = () => {
               return (
                 <li key={activity._id} className="activity-item">
                   <h3>{activity.category.name}</h3>
+                  <h3>{activity.advertiser.Name}</h3>
                   <p>Date: {new Date(activity.date).toLocaleDateString()}</p>
                   <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                   <p>Location: {activity.location}</p>
                   <p>Price: ${activity.price}</p>
-                  <p>Tags: {activity.tags}</p>
+                  <p>Tags: {activity.tags.name}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
+                  <p>Advertiser: {activity.advertiser.Name}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
                   {mapSrc && (
                     <iframe
@@ -141,7 +145,7 @@ const Activities = () => {
             })}
           </ul>
         ) : (
-          <p>No upcoming activities available.</p>
+          <p>No activities available.</p>
         )}
       </section>
     </div>
