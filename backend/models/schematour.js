@@ -13,6 +13,9 @@ const schema = new mongoose.Schema({
     pickUpLoc: [{ type: String, required: true }],
     DropOffLoc: [{ type: String, required: true }],
     bookings: { type: Number, default: 0 },
+    tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
+    Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true } 
+ 
 }, {
     timestamps: true
 });

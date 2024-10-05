@@ -6,7 +6,9 @@ import {
   updateActivity,
   deleteActivity,
   getCategories,
+  getAdvertiser
 } from '../services/ActivityService'; // Ensure to import the necessary services
+
 
 const predefinedLocations = [
   {
@@ -21,12 +23,22 @@ const predefinedLocations = [
     name: 'Alexandria, Egypt',
     coordinates: '29.9097,31.2156,29.9297,31.2356',
   },
+  {
+    name: 'German University in Cairo, Egypt',
+    coordinates: '31.4486,29.9869,31.4686,30.0069', // Sample bounding box
+  },
+  {
+    name: 'Cairo Festival City, Egypt',
+    coordinates: '31.4015,30.0254,31.4215,30.0454', // Sample bounding box
+  },
   // Add more locations as needed
 ];
+
 
 const ActivityCRUD = () => {
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]); // State to hold categories
+  const [advertisers,setAdvertisers] = useState([]);
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     date: '',
@@ -34,6 +46,7 @@ const ActivityCRUD = () => {
     location: '',
     price: '',
     category: '',
+    advertiser: '',
     tags: '',
     specialDiscount: '',
     isBookingOpen: true,
@@ -44,6 +57,7 @@ const ActivityCRUD = () => {
   useEffect(() => {
     fetchActivities();
     fetchCategories();
+    fetchAdvertisers();
   }, []);
 
   const fetchActivities = async () => {
@@ -61,6 +75,15 @@ const ActivityCRUD = () => {
       setCategories(data);
     } catch (error) {
       console.error('Error fetching categories', error);
+    }
+  };
+  const fetchAdvertisers = async () => {
+    try {
+      const data = await getAdvertiser();
+      setAdvertisers(data);
+      console.log(advertisers);
+    } catch (error) {
+      console.error('Error fetching advertisers', error);
     }
   };
 
@@ -137,6 +160,7 @@ const ActivityCRUD = () => {
       location: '',
       price: '',
       category: '',
+      advertiser: '',
       tags: '',
       specialDiscount: '',
       isBookingOpen: true,
@@ -151,6 +175,7 @@ const ActivityCRUD = () => {
       location: '',
       price: '',
       category: '',
+      advertiser: '',
       tags: '',
       specialDiscount: '',
       isBookingOpen: true,
@@ -234,6 +259,22 @@ const ActivityCRUD = () => {
             </select>
           </label>
           <label>
+            Advertiser:
+            <select
+              name="advertiser"
+              value={formData.advertiser}
+              onChange={(e) => handleChange(e, setFormData)}
+              required
+            >
+              <option value="">Select Advertiser</option>
+              {advertisers.map((advertiser) => (
+                <option key={advertiser._id} value={advertiser._id}>
+                  {advertiser.Name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
             Tags:
             <input
               type="text"
@@ -282,12 +323,14 @@ const ActivityCRUD = () => {
               return (
                 <li key={activity._id} className="activity-item">
                   <h3>{activity.category.name}</h3>
+                  <h3>{activity.advertiser.Name}</h3>
                   <p>Date: {new Date(activity.date).toLocaleDateString()}</p>
                   <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                   <p>Location: {activity.location}</p>
                   <p>Price: ${activity.price}</p>
                   <p>Tags: {activity.tags}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
+                  <p>Advertiser: {activity.advertiser.Name}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? 'Yes' : 'No'}</p>
                   {mapSrc && (
                     <iframe
@@ -372,6 +415,22 @@ const ActivityCRUD = () => {
                 {categories.map((category) => (
                   <option key={category._id} value={category._id}>
                     {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Advertiser:
+              <select
+                name="advertiser"
+                value={formData.advertiser}
+                onChange={(e) => handleChange(e, setFormData)}
+                required
+              >
+                <option value="">Select Advertiser</option>
+                {advertisers.map((advertiser) => (
+                  <option key={advertiser._id} value={advertiser._id}>
+                    {advertiser.Name}
                   </option>
                 ))}
               </select>

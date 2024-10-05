@@ -1,6 +1,7 @@
 const Schema = require('../models/schematour.js');
+const { default: mongoose } = require('mongoose');
 const createGuide =  async (req, res) => {
-    const { name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc } = req.body;
+    const { name, activities, locations, timeline, durationActivity, tourLanguage, TourPrice, availableDates, accessibility, pickUpLoc, DropOffLoc, tourGuide,Tags} = req.body;
 
     const newSchema = new Schema({
         name, 
@@ -13,7 +14,9 @@ const createGuide =  async (req, res) => {
         availableDates, 
         accessibility, 
         pickUpLoc, 
-        DropOffLoc
+        DropOffLoc,
+        tourGuide,
+        Tags
 
     });
     try{
@@ -26,7 +29,10 @@ const createGuide =  async (req, res) => {
 };
 const readGuide = async (req, res) => {
     try {
-        const schemas = await Schema.find().populate('activities'); // Populate activity details
+        const userId = req.query.userId;
+        const schemas = await Schema.find({tourGuide: new mongoose.Types.ObjectId(userId)})
+        .populate('activities')
+        .populate('Tags','name'); 
         res.status(200).json(schemas);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -35,7 +41,7 @@ const readGuide = async (req, res) => {
 
 const readGuideID = async (req, res) => {
     try{
-        const schema = await Schema.findById(req.params.id);
+        const schema = await Schema.find();
         if (!schema) return res.status(404).json({ message: 'schema not found' });
         res.status(200).json(schema)
     }catch(err){
@@ -44,7 +50,7 @@ const readGuideID = async (req, res) => {
 
 };
 const updateGuide = async (req, res) => {
-    const { id } = req.body; // Extract id from the request body
+    const { id } = req.params; // Extract id from the request body
     const updateData = {}; // Initialize an empty object for updates
  
     if (req.body.name) updateData.name = req.body.name;
@@ -58,6 +64,7 @@ const updateGuide = async (req, res) => {
     if (req.body.accesibility) updateData.accesibility = req.body.accesibility;
     if (req.body.pickUpLoc) updateData.pickUpLoc = req.body.pickUpLoc;
     if (req.body.DropOffLoc) updateData.DropOffLoc = req.body.DropOffLoc;
+    if (req.body.Tags) updateData.Tags = req.body.Tags;
  
     try {
        const updatedGuide = await Schema.findByIdAndUpdate(id, updateData, { new: true });
@@ -70,26 +77,27 @@ const updateGuide = async (req, res) => {
     }
  };
 const deleteGuide= async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     try{
 
     
         const deleted = await Schema.findByIdAndDelete(id, { new: true });
     if (!deleted) return res.status(404).json({ message: 'schema not found' });
     if (deleted.bookings > 0) {
-        return res.status(400).json({ message: 'Cannot delete schema with existing bookings' });
-      }
-      
-      res.status(200).json({ message: 'schema deleted successfully' });
-    }catch(err){
-        res.status(500).json({ message: err.message });
+      return res
+        .status(400)
+        .json({ message: "Cannot delete schema with existing bookings" });
     }
 
+    res.status(200).json({ message: "schema deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 module.exports = {
-    createGuide,
-    readGuide,
-    readGuideID,
-    updateGuide,
-    deleteGuide
+  createGuide,
+  readGuide,
+  readGuideID,
+  updateGuide,
+  deleteGuide,
 };
