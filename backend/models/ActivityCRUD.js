@@ -1,46 +1,50 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const activitySchema = new Schema({
-  date: {
-    type: Date,
-    required: true,
+const activitySchema = new Schema(
+  {
+    date: {
+      type: Date,
+      required: true,
+    },
+    time: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    category: {
+      type: Schema.Types.ObjectId, // Using ObjectId to reference the Category model
+      ref: "Category", // Reference to the Category model
+      required: true,
+    },
+    tags: {
+      type: Schema.Types.ObjectId,
+      ref: "PreferenceTag",
+      required: true,
+    },
+    specialDiscount: {
+      type: Number,
+      required: true,
+    },
+    isBookingOpen: {
+      type: Boolean,
+      required: true,
+    },
+    advertiser: {
+      type: Schema.Types.ObjectId, // Using ObjectId to reference the Category model
+      ref: "adver", // Reference to the Category model
+      required: true,
+    },
   },
-  time: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  category: {
-    type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
-    ref: 'Category',  // Reference to the Category model
-    required: true,
-  },
-  tags: {
-    type: String,
-    required: true,
-  },
-  specialDiscount: {
-    type: Number,
-    required: true,
-  },
-  isBookingOpen: {
-    type: Boolean,
-    required: true,
-  },
-  advertiser: {
-    type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
-    ref: 'adver',  // Reference to the Category model
-    required: true,
-  }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-const Activity = mongoose.model('Activity', activitySchema);
+const Activity = mongoose.model("Activity", activitySchema);
 module.exports = Activity;

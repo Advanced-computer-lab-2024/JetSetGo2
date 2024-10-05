@@ -17,6 +17,7 @@ const getItineraries = async () => {
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
   const [error, setError] = useState(null);
+  const [sortOrder, setSortOrder] = useState(""); // State to store the sorting order
 
   // Fetch itineraries when the component mounts
   useEffect(() => {
@@ -26,26 +27,44 @@ const Itineraries = () => {
   const fetchItineraries = async () => {
     try {
       const data = await getItineraries(); // Call the service method
-
-      // Filter for upcoming itineraries
-      const upcomingItineraries = data.filter((itinerary) => {
-        return itinerary.availableDates.some((date) => {
-          const itineraryDate = new Date(date);
-          const currentDate = new Date();
-          return itineraryDate >= currentDate; // Check if any date is in the future
-        });
-      });
-
-      setItineraries(upcomingItineraries);
+      setItineraries(data);
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Could not fetch itineraries. Please try again later.");
     }
   };
 
+  // Function to handle sorting based on price
+  const handleSortChange = (e) => {
+    const value = e.target.value;
+    setSortOrder(value);
+
+    // Sort itineraries based on price
+    let sortedItineraries = [...itineraries];
+    if (value === "asc") {
+      sortedItineraries.sort(
+        (a, b) => Math.min(...a.TourPrice) - Math.min(...b.TourPrice)
+      ); // Sort by lowest price
+    } else if (value === "desc") {
+      sortedItineraries.sort(
+        (a, b) => Math.max(...b.TourPrice) - Math.max(...a.TourPrice)
+      ); // Sort by highest price
+    }
+    setItineraries(sortedItineraries); // Update the state with sorted itineraries
+  };
+
   return (
     <div id="itineraries">
-      <h2>Upcoming Itineraries</h2>
+      <h2>Itineraries</h2>
+
+      {/* Dropdown for sorting itineraries by price */}
+      <label htmlFor="sort">Sort by Price:</label>
+      <select id="sort" value={sortOrder} onChange={handleSortChange}>
+        <option value="">Select</option>
+        <option value="asc">Lowest to Highest</option>
+        <option value="desc">Highest to Lowest</option>
+      </select>
+
       {error && <p className="error">{error}</p>}
       {itineraries.length > 0 ? (
         <ul>
@@ -66,7 +85,7 @@ const Itineraries = () => {
               <p>Activities:</p>
               <ul>
                 {itinerary.activities.map((activity) => (
-                  <li key={activity._id}>{activity.name}</li>
+                  <li key={activity._id}>{activity.name}</li> // Ensure 'name' exists in your Activity model
                 ))}
               </ul>
               <p>Locations: {itinerary.locations.join(", ")}</p>
@@ -74,12 +93,13 @@ const Itineraries = () => {
               <p>Pick Up Location: {itinerary.pickUpLoc.join(", ")}</p>
               <p>Drop Off Location: {itinerary.DropOffLoc.join(", ")}</p>
               <p>Bookings: {itinerary.bookings}</p>
-              {/* <p>Tour Guide: {itinerary.tourGuide.name}</p> */}
+              {/* <p>Tour Guide: {itinerary.tourGuide.name}</p>{" "} */}
+              {/* Ensure 'name' exists in your Tour model */}
             </li>
           ))}
         </ul>
       ) : (
-        <p>No upcoming itineraries available.</p>
+        <p>No itineraries available.</p>
       )}
     </div>
   );

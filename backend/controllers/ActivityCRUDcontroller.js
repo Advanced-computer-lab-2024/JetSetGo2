@@ -1,6 +1,7 @@
-const Activity = require('../models/ActivityCRUD');
-const Category = require('../models/CategoryCRUD');
-const Advertiser = require('../models/AdverMODEL'); // Assuming this is the model for advertiser
+const Activity = require("../models/ActivityCRUD");
+const Category = require("../models/CategoryCRUD");
+const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
+const PrefTag = require("../models/preferanceTagsCRUD");
 
 // Create Activity
 const createActivity = async (req, res) => {
@@ -8,19 +9,25 @@ const createActivity = async (req, res) => {
     // Ensure the provided category ID is valid
     const category = await Category.findById(req.body.category);
     if (!category) {
-      return res.status(400).json({ error: 'Invalid category' });
+      return res.status(400).json({ error: "Invalid category" });
     }
 
     // Ensure the provided advertiser ID is valid
     const advertiser = await Advertiser.findById(req.body.advertiser);
     if (!advertiser) {
-      return res.status(400).json({ error: 'Invalid advertiser' });
+      return res.status(400).json({ error: "Invalid advertiser" });
+    }
+
+    const tags = await PrefTag.findById(req.body.tags);
+    if (!tags) {
+      return res.status(400).json({ error: "Invalid tag" });
     }
 
     const activityData = {
       ...req.body,
       category: req.body.category,
       advertiser: req.body.advertiser, // Add advertiser to the activity
+      tags: req.body.tags,
     };
 
     const activity = await Activity.create(activityData);
@@ -34,8 +41,9 @@ const createActivity = async (req, res) => {
 const getActivity = async (req, res) => {
   try {
     const activities = await Activity.find()
-      .populate('category', 'name')  // Populate the 'category' field with the 'name'
-      .populate('advertiser', 'Name'); // Populate the 'advertiser' field with the 'name'
+      .populate("category", "name") // Populate the 'category' field with the 'name'
+      .populate("advertiser", "Name")
+      .populate("tags"); // Populate the 'advertiser' field with the 'name'
 
     res.status(200).json(activities);
   } catch (error) {
@@ -58,7 +66,7 @@ const updateActivity = async (req, res) => {
     // Ensure the category ID is valid
     const category = await Category.findById(req.body.category);
     if (!category) {
-      return res.status(400).json({ error: 'Invalid category' });
+      return res.status(400).json({ error: "Invalid category" });
     }
     updateData.category = req.body.category; // Set category ID
   }
@@ -67,14 +75,24 @@ const updateActivity = async (req, res) => {
     // Ensure the advertiser ID is valid
     const advertiser = await Advertiser.findById(req.body.advertiser);
     if (!advertiser) {
-      return res.status(400).json({ error: 'Invalid advertiser' });
+      return res.status(400).json({ error: "Invalid advertiser" });
     }
     updateData.advertiser = req.body.advertiser; // Set advertiser ID
   }
 
-  if (req.body.tags) updateData.tags = req.body.tags;
-  if (req.body.specialDiscount) updateData.specialDiscount = req.body.specialDiscount;
-  if (req.body.isBookingOpen !== undefined) updateData.isBookingOpen = req.body.isBookingOpen;
+  if (req.body.tags) {
+    // Ensure the tag ID is valid
+    const tag = await PrefTag.findById(req.body.tags);
+    if (!tag) {
+      return res.status(400).json({ error: "Invalid tag" });
+    }
+    updateData.tags = req.body.tags; // Set advertiser ID
+  }
+
+  if (req.body.specialDiscount)
+    updateData.specialDiscount = req.body.specialDiscount;
+  if (req.body.isBookingOpen !== undefined)
+    updateData.isBookingOpen = req.body.isBookingOpen;
 
   try {
     const updatedActivity = await Activity.findByIdAndUpdate(
@@ -82,8 +100,8 @@ const updateActivity = async (req, res) => {
       updateData,
       { new: true, runValidators: true } // Ensure validators run on updates
     )
-      .populate('category', 'name') // Populate category field
-      .populate('advertiser', 'Name'); // Populate advertiser field
+      .populate("category", "name") // Populate category field
+      .populate("advertiser", "Name"); // Populate advertiser field
 
     if (!updatedActivity) {
       return res.status(404).json({ error: "Activity not found" });
@@ -112,7 +130,7 @@ const deleteActivity = async (req, res) => {
 const deleteAllActivities = async (req, res) => {
   try {
     await Activity.deleteMany({});
-    res.status(200).json({ message: 'All activities have been deleted' });
+    res.status(200).json({ message: "All activities have been deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -122,17 +140,17 @@ const upcomingactivity = async (req, res) => {
   try {
     const now = new Date(); // Get the current date and time
     const upcomingActivities = await Activity.find({ date: { $gt: now } })
-      .populate('category') // Optional: populate category details if needed
-      .populate('advertiser') // Populate advertiser details if needed
+      .populate("category") // Optional: populate category details if needed
+      .populate("advertiser") // Populate advertiser details if needed
       .sort({ date: 1 }); // Sort by date in ascending order
 
     if (upcomingActivities.length === 0) {
-      return res.status(404).json({ message: 'No upcoming activities found.' });
+      return res.status(404).json({ message: "No upcoming activities found." });
     }
 
     res.json(upcomingActivities);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching upcoming activities.' });
+    res.status(500).json({ message: "Error fetching upcoming activities." });
   }
 };
 
@@ -142,5 +160,5 @@ module.exports = {
   updateActivity,
   deleteActivity,
   deleteAllActivities,
-  upcomingactivity
+  upcomingactivity,
 };

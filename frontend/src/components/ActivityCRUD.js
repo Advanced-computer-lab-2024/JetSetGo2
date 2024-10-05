@@ -1,63 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import '../App.css';
+import React, { useState, useEffect } from "react";
+import "../App.css";
 import {
   getActivity,
   createActivity,
   updateActivity,
   deleteActivity,
   getCategories,
-  getAdvertiser
-} from '../services/ActivityService'; // Ensure to import the necessary services
-
+  getAdvertiser,
+  getTags,
+} from "../services/ActivityService"; // Ensure to import the necessary services
 
 const predefinedLocations = [
   {
-    name: 'Cairo, Egypt',
-    coordinates: '31.2357,30.0444,31.2557,30.0644',
+    name: "Cairo, Egypt",
+    coordinates: "31.2357,30.0444,31.2557,30.0644",
   },
   {
-    name: 'Giza Pyramids, Egypt',
-    coordinates: '31.1313,29.9765,31.1513,29.9965',
+    name: "Giza Pyramids, Egypt",
+    coordinates: "31.1313,29.9765,31.1513,29.9965",
   },
   {
-    name: 'Alexandria, Egypt',
-    coordinates: '29.9097,31.2156,29.9297,31.2356',
+    name: "Alexandria, Egypt",
+    coordinates: "29.9097,31.2156,29.9297,31.2356",
   },
   {
-    name: 'German University in Cairo, Egypt',
-    coordinates: '31.4486,29.9869,31.4686,30.0069', // Sample bounding box
+    name: "German University in Cairo, Egypt",
+    coordinates: "31.4486,29.9869,31.4686,30.0069", // Sample bounding box
   },
   {
-    name: 'Cairo Festival City, Egypt',
-    coordinates: '31.4015,30.0254,31.4215,30.0454', // Sample bounding box
+    name: "Cairo Festival City, Egypt",
+    coordinates: "31.4015,30.0254,31.4215,30.0454", // Sample bounding box
   },
   // Add more locations as needed
 ];
 
-
 const ActivityCRUD = () => {
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]); // State to hold categories
-  const [advertisers,setAdvertisers] = useState([]);
-  const [message, setMessage] = useState('');
+  const [advertisers, setAdvertisers] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
-    date: '',
-    time: '',
-    location: '',
-    price: '',
-    category: '',
-    advertiser: '',
-    tags: '',
-    specialDiscount: '',
+    date: "",
+    time: "",
+    location: "",
+    price: "",
+    category: "",
+    advertiser: "",
+    tags: "",
+    specialDiscount: "",
     isBookingOpen: true,
   });
   const [editData, setEditData] = useState(null);
-  
+
   // Fetch activities and categories when the component mounts
   useEffect(() => {
     fetchActivities();
     fetchCategories();
     fetchAdvertisers();
+    fetchTags();
   }, []);
 
   const fetchActivities = async () => {
@@ -65,7 +66,16 @@ const ActivityCRUD = () => {
       const data = await getActivity();
       setActivities(data);
     } catch (error) {
-      console.error('Error fetching activities', error);
+      console.error("Error fetching activities", error);
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const data = await getTags();
+      setTags(data);
+    } catch (error) {
+      console.error("Error fetching tags", error);
     }
   };
 
@@ -74,7 +84,7 @@ const ActivityCRUD = () => {
       const data = await getCategories();
       setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories', error);
+      console.error("Error fetching categories", error);
     }
   };
   const fetchAdvertisers = async () => {
@@ -83,7 +93,7 @@ const ActivityCRUD = () => {
       setAdvertisers(data);
       console.log(advertisers);
     } catch (error) {
-      console.error('Error fetching advertisers', error);
+      console.error("Error fetching advertisers", error);
     }
   };
 
@@ -91,7 +101,7 @@ const ActivityCRUD = () => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -107,15 +117,15 @@ const ActivityCRUD = () => {
     e.preventDefault();
     try {
       await createActivity(formData);
-      setMessage('Activity created successfully!');
+      setMessage("Activity created successfully!");
       resetCreateForm();
       fetchActivities();
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message
-        : 'Error occurred while creating the activity';
+        : "Error occurred while creating the activity";
       setMessage(errorMessage);
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -125,13 +135,13 @@ const ActivityCRUD = () => {
 
     try {
       await updateActivity(editData._id, formData); // Send updated formData
-      setMessage('Activity updated successfully!');
+      setMessage("Activity updated successfully!");
       resetEditForm();
       fetchActivities();
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message
-        : 'Error occurred while updating the activity.';
+        : "Error occurred while updating the activity.";
       setMessage(errorMessage);
       console.error(error);
     }
@@ -140,10 +150,10 @@ const ActivityCRUD = () => {
   const handleDelete = async (id) => {
     try {
       await deleteActivity(id);
-      setMessage('Activity deleted successfully!');
+      setMessage("Activity deleted successfully!");
       fetchActivities();
     } catch (error) {
-      setMessage('Error deleting activity.');
+      setMessage("Error deleting activity.");
       console.error(error);
     }
   };
@@ -155,14 +165,14 @@ const ActivityCRUD = () => {
 
   const resetCreateForm = () => {
     setFormData({
-      date: '',
-      time: '',
-      location: '',
-      price: '',
-      category: '',
-      advertiser: '',
-      tags: '',
-      specialDiscount: '',
+      date: "",
+      time: "",
+      location: "",
+      price: "",
+      category: "",
+      advertiser: "",
+      tags: "",
+      specialDiscount: "",
       isBookingOpen: true,
     });
   };
@@ -170,20 +180,20 @@ const ActivityCRUD = () => {
   const resetEditForm = () => {
     setEditData(null);
     setFormData({
-      date: '',
-      time: '',
-      location: '',
-      price: '',
-      category: '',
-      advertiser: '',
-      tags: '',
-      specialDiscount: '',
+      date: "",
+      time: "",
+      location: "",
+      price: "",
+      category: "",
+      advertiser: "",
+      tags: "",
+      specialDiscount: "",
       isBookingOpen: true,
     }); // Reset formData on edit reset
   };
 
   const generateMapSrc = (coordinates) => {
-    const [long1, lat1, long2, lat2] = coordinates.split(',');
+    const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
 
@@ -276,13 +286,19 @@ const ActivityCRUD = () => {
           </label>
           <label>
             Tags:
-            <input
-              type="text"
+            <select
               name="tags"
               value={formData.tags}
               onChange={(e) => handleChange(e, setFormData)}
               required
-            />
+            >
+              <option value="">Select Tags</option>
+              {tags.map((tag) => (
+                <option key={tag._id} value={tag._id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Special Discount (%):
@@ -328,21 +344,23 @@ const ActivityCRUD = () => {
                   <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                   <p>Location: {activity.location}</p>
                   <p>Price: ${activity.price}</p>
-                  <p>Tags: {activity.tags}</p>
+                  <p>Tags: {activity.tags.name}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
                   <p>Advertiser: {activity.advertiser.Name}%</p>
-                  <p>Booking Open: {activity.isBookingOpen ? 'Yes' : 'No'}</p>
+                  <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
                   {mapSrc && (
                     <iframe
                       title={`Map for ${activity.location}`}
                       src={mapSrc}
                       width="300"
                       height="200"
-                      style={{ border: 'none' }}
+                      style={{ border: "none" }}
                     ></iframe>
                   )}
                   <button onClick={() => handleEdit(activity)}>Edit</button>
-                  <button onClick={() => handleDelete(activity._id)}>Delete</button>
+                  <button onClick={() => handleDelete(activity._id)}>
+                    Delete
+                  </button>
                 </li>
               );
             })}
@@ -437,13 +455,19 @@ const ActivityCRUD = () => {
             </label>
             <label>
               Tags:
-              <input
-                type="text"
+              <select
                 name="tags"
                 value={formData.tags}
                 onChange={(e) => handleChange(e, setFormData)}
                 required
-              />
+              >
+                <option value="">Select Tags</option>
+                {tags.map((tags) => (
+                  <option key={tags._id} value={tags._id}>
+                    {tags.name}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               Special Discount (%):
@@ -465,7 +489,9 @@ const ActivityCRUD = () => {
               />
             </label>
             <button type="submit">Update Activity</button>
-            <button type="button" onClick={resetEditForm}>Cancel</button>
+            <button type="button" onClick={resetEditForm}>
+              Cancel
+            </button>
           </form>
         </section>
       )}

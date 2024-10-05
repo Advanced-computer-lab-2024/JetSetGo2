@@ -53,15 +53,37 @@ function App() {
             }
           />
           <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
-        <Route path="/list" element={<AdvertiserManagement />} />
-          <Route path="/CreateTourGuide" element={<CreateTourGuide setselectedTourGuideId={setselectedTourGuideId} />} />
-          <Route path="/editTourGuide" element={<EditTourGuide selectedTourGuideId={selectedTourGuideId}/>} />
-          <Route path="/tour-guide" element={<TourGuideDetails  selectedTourGuideId={selectedTourGuideId}/>} />
+          <Route path="/list" element={<AdvertiserManagement />} />
+          <Route
+            path="/CreateTourGuide"
+            element={
+              <CreateTourGuide
+                setselectedTourGuideId={setselectedTourGuideId}
+              />
+            }
+          />
+          <Route
+            path="/editTourGuide"
+            element={
+              <EditTourGuide selectedTourGuideId={selectedTourGuideId} />
+            }
+          />
+          <Route
+            path="/tour-guide"
+            element={
+              <TourGuideDetails selectedTourGuideId={selectedTourGuideId} />
+            }
+          />
           <Route path="/other-signup" element={<OtherSignup />} />
           <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
-          <Route path="/SchemaTourFront" element={<SchemaTourFront  selectedTourGuideId={selectedTourGuideId}/>} />
+          <Route
+            path="/SchemaTourFront"
+            element={
+              <SchemaTourFront selectedTourGuideId={selectedTourGuideId} />
+            }
+          />
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/product" element={<ProductCRUD />} />

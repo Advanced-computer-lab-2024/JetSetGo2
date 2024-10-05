@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getHistoricalPlace } from 'C:/ACL PROJECT/JetSetGo2/frontend/src/services/HistoricalPlaceService.js'; // Update this path as needed
+import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
 
 const predefinedLocations = [
   {

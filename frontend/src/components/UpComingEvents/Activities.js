@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-
-import {
-  getActivity,
-  getCategories,
-} from 'C:/ACL PROJECT/JetSetGo2/frontend/src/services/ActivityService.js' // Ensure to import the necessary services
+import { getActivity, getCategories } from "../../services/ActivityService"; // Ensure to import the necessary services
 
 const predefinedLocations = [
   {
@@ -32,6 +28,7 @@ const predefinedLocations = [
 const Activities = () => {
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]); // State to hold categories
+  const [sortOrder, setSortOrder] = useState("none"); // State for sorting order
 
   const [formData, setFormData] = useState({
     date: "",
@@ -74,6 +71,20 @@ const Activities = () => {
     }
   };
 
+  const handleSortOrderChange = (event) => {
+    const selectedSortOrder = event.target.value;
+    setSortOrder(selectedSortOrder);
+
+    let sortedActivities = [...activities];
+    if (selectedSortOrder === "lowToHigh") {
+      sortedActivities = sortedActivities.sort((a, b) => a.price - b.price);
+    } else if (selectedSortOrder === "highToLow") {
+      sortedActivities = sortedActivities.sort((a, b) => b.price - a.price);
+    }
+
+    setActivities(sortedActivities); // Update the state with sorted activities
+  };
+
   const generateMapSrc = (coordinates) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
@@ -83,6 +94,19 @@ const Activities = () => {
     <div id="activities">
       <section className="activity-list">
         <h2>Upcoming Activities</h2>
+
+        {/* Sorting Dropdown */}
+        <label htmlFor="sortOrder">Sort by Price:</label>
+        <select
+          id="sortOrder"
+          value={sortOrder}
+          onChange={handleSortOrderChange}
+        >
+          <option value="none">None</option>
+          <option value="lowToHigh">Price: Low to High</option>
+          <option value="highToLow">Price: High to Low</option>
+        </select>
+
         {activities.length > 0 ? (
           <ul>
             {activities.map((activity) => {
