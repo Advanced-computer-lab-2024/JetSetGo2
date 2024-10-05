@@ -30,6 +30,11 @@ const productSchema = new Schema({
         type: Number,
         required: true,
       },
+      seller: {
+        type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
+        ref: 'Seller',  // Reference to the Category model
+        required: true,
+      },
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

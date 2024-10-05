@@ -20,11 +20,7 @@
       type: String,
       required: true,
       match: /.+\@.+\..+/
-    
-
     }
-  
-    
 
   }, { timestamps: true });
 
