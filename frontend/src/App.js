@@ -27,11 +27,15 @@ import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import ProductList from "./components/ProductList";
+import AddAdmin from './components/AddAdmin';
+import AddTourismGovernor from './components/AddTourismGovernor';
+import DeleteUsers from './components/DeleteUsers';
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
   const [selectedAdverId, setselectedAdverId] = useState(null);
+  
 
   return (
     <Router>
@@ -98,6 +102,9 @@ function App() {
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
           <Route path="/productList" element={<ProductList />} />
+          <Route path="/AddAdmin" element={<AddAdmin />} />
+          <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
+          <Route path="/DeleteUsers" element={<DeleteUsers />} />
         </Routes>
       </div>
     </Router>

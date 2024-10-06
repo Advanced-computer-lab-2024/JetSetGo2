@@ -74,5 +74,29 @@ const updateUser = async (req, res) => {
        res.status(400).json({ error: error.message });
     }
 };
+const deleteTGuide = async (req, res) => {
+   console.log('Request to delete tourism guide:', req.params.id);  // Log the ID
+   try {
+      const { id } = req.params;
+      const deletedTGuide = await TourModel.findByIdAndDelete(id);
 
-    module.exports ={getuser,updateUser,createUser,getUserById};
+      if (!deletedTGuide) {
+         return res.status(404).json({
+            message: "User not found",
+         });
+      }
+
+      res.status(200).json({
+         message: "User deleted successfully",
+         user: deletedTGuide,
+      });
+   } catch (error) {
+      console.error('Error deleting tourism governor:', error);
+      res.status(500).json({
+         message: "Error deleting user",
+         error,
+      });
+   }
+};
+
+    module.exports ={getuser,updateUser,createUser,getUserById,deleteTGuide};

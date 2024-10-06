@@ -19,6 +19,9 @@ const categoryRoutes = require("./routes/CategoryCRUDroute");
 const productRoutes = require("./routes/ProductCRUDroute");
 const user = require('./routes/tourismGovernerTags');
 const seller = require('./routes/SellerRoute');
+const tourismGovernorRoutes = require("./routes/tourismGovernorRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const AdvertiserRoutes = require('./routes/AdverRoutes.js');
 
 
 const app = express();
@@ -51,3 +54,7 @@ app.use('/TourGuide', TourGuideRoute);
 app.use("/home/adver",require("./routes/AdverRoutes.js"));
 app.use('/TourismTags',user);
 app.use('/Seller',seller);
+app.use('/tourism', tourismGovernorRoutes);
+app.use('/admin', adminRoutes);
+app.use('/Advertiser', AdvertiserRoutes);
+app.use("/Tourist", tourist);
