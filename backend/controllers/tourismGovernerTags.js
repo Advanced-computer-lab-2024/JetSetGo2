@@ -1,4 +1,4 @@
-const tourismGovernerTag = require('../models/tourismGovernerTags');
+    const tourismGovernerTag = require('../models/tourismGovernerTags');
 
 // CRUD operations
 const createTags= async(req,res) => {

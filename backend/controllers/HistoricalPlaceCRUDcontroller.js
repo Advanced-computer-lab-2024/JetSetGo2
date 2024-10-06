@@ -8,7 +8,7 @@ const TourismGovernerTag = require('../models/tourismGovernerTags'); // Import t
 // Create a Historical Place with tourismGovernerTags reference
 const createHistoricalPlace = async (req, res) => {
   try {
-    const { description, pictures, location, openingHours, ticketPrice, tourismGovernerTags } = req.body;
+    const { description, pictures, location, openingHours, foreignerTicketPrice, nativeTicketPrice, studentTicketPrice, tourismGovernerTags } = req.body;
 
     // Find the tourismGovernerTags (this ensures you're referencing valid tags)
     const tag = await TourismGovernerTag.findById(tourismGovernerTags);
@@ -22,7 +22,9 @@ const createHistoricalPlace = async (req, res) => {
       pictures,
       location,
       openingHours,
-      ticketPrice,
+      foreignerTicketPrice,
+      nativeTicketPrice,
+      studentTicketPrice,
       tourismGovernerTags: tag._id // Reference the tourismGovernerTags by _id
     });
 
@@ -36,7 +38,7 @@ const createHistoricalPlace = async (req, res) => {
 const getHistoricalPlace = async (req, res) => {
   try {
     // Use .populate to fill the tourismGovernerTags field with actual data
-    const historicalPlaces = await HistoricalPlace.find().populate('tourismGovernerTags','name').populate('tourismGovernerTags','type');
+    const historicalPlaces = await HistoricalPlace.find().populate('tourismGovernerTags','name type');
     res.status(200).json(historicalPlaces);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -53,7 +55,9 @@ const updateHistoricalPlace = async (req, res) => {
   if (req.body.pictures) updateData.pictures = req.body.pictures;
   if (req.body.location) updateData.location = req.body.location;
   if (req.body.openingHours) updateData.openingHours = req.body.openingHours;
-  if (req.body.ticketPrice) updateData.ticketPrice = req.body.ticketPrice;
+  if (req.body.foreignerTicketPrice) updateData.foreignerTicketPrice = req.body.foreignerTicketPrice;
+  if (req.body.nativeTicketPrice) updateData.nativeTicketPrice = req.body.nativeTicketPrice;
+  if (req.body.studentTicketPrice) updateData.studentTicketPrice = req.body.studentTicketPrice;
 
   // Handle updating the tourismGovernerTags field
   if (req.body.tourismGovernerTags) {

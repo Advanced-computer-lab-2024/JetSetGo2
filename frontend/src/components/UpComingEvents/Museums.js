@@ -40,7 +40,7 @@ const Museums = () => {
     if (selectedTag) {
       // Filter museums by the selected tag
       setFilteredMuseums(museums.filter((museum) => 
-        museum.tourismGovernerTags?.name === selectedTag
+        museum.tourismGovernerTags?.type === selectedTag
       ));
     } else {
       // If no tag is selected, show all museums
@@ -81,7 +81,7 @@ const Museums = () => {
         >
          <option value="">All Tags</option>
           {museums
-            .map((place) => place.tourismGovernerTags?.name)
+            .map((place) => place.tourismGovernerTags?.type)
             .filter((value, index, self) => value && self.indexOf(value) === index) // Remove duplicates
             .map((tag) => (
               <option key={tag} value={tag}>
@@ -103,8 +103,8 @@ const Museums = () => {
 
             return (
               <li key={place._id} className="historical-place-item">
-                <h3>{place.description}</h3>
-                <p>Location: {place.location}</p>
+  <h3>{place.tourismGovernerTags.name}</h3>
+  <p>Description: {place.description}</p>                <p>Location: {place.location}</p>
                 <p>Opening Hours: {place.openingHours}</p>
                 <p>Ticket Price: ${place.ticketPrice}</p>
                 <p>
