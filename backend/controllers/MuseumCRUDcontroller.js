@@ -36,7 +36,7 @@ const createMuseum = async (req, res) => {
 const getMuseum = async (req, res) => {
   try {
     // Use .populate to fill the tourismGovernerTags field with actual data
-    const museums = await Museum.find().populate('tourismGovernerTags', 'name');
+    const museums = await Museum.find().populate('tourismGovernerTags', 'name').populate('tourismGovernerTags','type');
     res.status(200).json(museums);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -26,6 +26,7 @@ import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
+import ProductList from "./components/ProductList";
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
@@ -95,6 +96,7 @@ function App() {
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
+          <Route path="/productList" element={<ProductList />} />
         </Routes>
       </div>
     </Router>

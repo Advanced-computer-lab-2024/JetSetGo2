@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../App.css'
@@ -18,7 +21,8 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
     pickUpLoc: '',
     DropOffLoc: '',
     tourGuide: '',
-    selectedTags:'',
+    Tags:'',
+    rating: 0,
   });
   const [editId, setEditId] = useState(null);
 
@@ -43,6 +47,8 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
     try {
       const response = await axios.get('http://localhost:8000/prefTags/readtag'); // Adjust this path to your activities endpoint
       setTags(response.data);
+      console.log('dataaa = ',response.data);
+      console.log('tagss= ',Tags);
     } catch (error) {
       console.error('Error fetching Tags:', error);
     }
@@ -58,6 +64,14 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  const handleRatingChange = (e) => {
+    const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
+    setFormData(prev => ({
+      ...prev,
+      rating: value
+    }));
+  };
+
 
   const handleActivityChange = (e) => {
     const { value } = e.target;
@@ -65,7 +79,7 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
   };
   const handleTagsChange = (e) => {
     const { value } = e.target;
-    setFormData((prev) => ({ ...prev, selectedTags: value })); // Update selected activity
+    setFormData((prev) => ({ ...prev, Tags: value })); // Update selected activity
   };
 
   const handleSubmit = async (e) => {
@@ -75,11 +89,12 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
     const payload = {
         ...formData,
         activities: [formData.selectedActivity], // Ensure you're sending the selected activity ID in an array
-        Tags: [formData.selectedTags],
+        Tags: [formData.Tags],
         tourGuide: selectedTourGuideId, // Include tourGuide in the payload
     };
 
     console.log('Payload:', payload); // Log the payload being sent
+    console.log('tags henaaaa: ', Tags);
 
     try {
         if (editId) {
@@ -101,7 +116,8 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
             pickUpLoc: '',
             DropOffLoc: '',
             tourGuide: selectedTourGuideId,
-            selectedTags:'',
+            Tags:'',
+            rating: 0,
         });
         setEditId(null);
     } catch (error) {
@@ -143,7 +159,7 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
         </select>
         <label>
             Tags:
-            <select name="PreferenceTag" value={formData.PreferenceTag} onChange={handleTagsChange} required>
+            <select name="Tags" value={formData.Tags} onChange={handleTagsChange} required>
               <option value="">Select Tag</option>
               {Tags.map((tag) => (
                 <option key={tag._id} value={tag._id}>
@@ -151,6 +167,10 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
                 </option>
               ))}
             </select>
+          </label>
+          <label>Rating:
+            <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
+            <span>{formData.rating.toFixed(1)}</span> {/* Display the current rating */}
           </label>
 
         <textarea name="locations" value={formData.locations} onChange={handleChange} placeholder="Locations" required />
@@ -176,21 +196,22 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
                     `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category} - ${activity.specialDiscount}`
                 ).join(', ')}
             </p>
-            <p>Tags: {itinerary.PreferenceTag?.name || 'None'}</p>
+            <p>Tags: {itinerary.Tags.name}</p>
 
-            <p>Locations: {itinerary.locations.join(', ')}</p>
-            <p>Timeline: {itinerary.timeline.join(', ')}</p>
-            <p>Duration: {itinerary.durationActivity.join(', ')} hours</p>
-            <p>Language: {itinerary.tourLanguage.join(', ')}</p>
-            <p>Price: {itinerary.TourPrice.join(', ')} </p>
-            <p>Date: {itinerary.availableDates.join(', ')}</p>
-            <p>Accessibility: {itinerary.accessibility.join(', ')}</p>
-            <p>Pick Up Location: {itinerary.pickUpLoc.join(', ')}</p>
-            <p>Drop Off Location: {itinerary.DropOffLoc.join(', ')}</p>
-            <button onClick={() => handleEdit(itinerary)}>Edit</button>
-            <button onClick={() => handleDelete(itinerary._id)}>Delete</button>
-        </li>
-    ))}
+        <p>Locations: {itinerary.locations.join(', ')}</p>
+        <p>Timeline: {itinerary.timeline.join(', ')}</p>
+        <p>Duration: {itinerary.durationActivity.join(', ')} hours</p>
+        <p>Language: {itinerary.tourLanguage.join(', ')}</p>
+        <p>Price: {itinerary.TourPrice.join(', ')} </p>
+        <p>Date: {itinerary.availableDates.join(', ')}</p>
+        <p>Accessibility: {itinerary.accessibility.join(', ')}</p>
+        <p>Pick Up Location: {itinerary.pickUpLoc.join(', ')}</p>
+        <p>Drop Off Location: {itinerary.DropOffLoc.join(', ')}</p>
+        <button onClick={() => handleEdit(itinerary)}>Edit</button>
+        <button onClick={() => handleDelete(itinerary._id)}>Delete</button>
+      </li>
+    )
+  )}
 </ul>
 
     </div>

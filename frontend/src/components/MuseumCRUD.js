@@ -273,8 +273,12 @@ const MuseumCRUD = () => {
             <p>Location: {place.location}</p>
             <p>Opening Hours: {place.openingHours}</p>
             <p>Ticket Price: {place.ticketPrice}</p>
-            <p>Tourism Governor Tags: {place.tourismGovernerTags?.name || 'None'}</p>
-            <iframe
+            <p>
+
+            Tourism Governor Tags: {
+    place.tourismGovernerTags.type
+  }
+</p>            <iframe
               title="Location Map"
               width="300"
               height="200"

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/ProductService'; // Ensure you have these service functions defined
+import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService'; // Ensure you have these service functions defined
 
 const ProductCRUD = () => {
   const [products, setProducts] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     description: '',
@@ -19,6 +20,7 @@ const ProductCRUD = () => {
   // Fetch products when the component mounts
   useEffect(() => {
     fetchProducts();
+    fetchSellers();
   }, []);
 
   // Fetch all products
@@ -28,6 +30,15 @@ const ProductCRUD = () => {
       setProducts(data);                // Update state with fetched data
     } catch (error) {
       console.error("Error fetching products", error);
+    }
+  };
+
+  const fetchSellers = async () => {
+    try {
+      const data = await getSellers(); // Fetch sellers from the backend
+      setSellers(data);                // Update state with fetched data
+    } catch (error) {
+      console.error("Error fetching sellers", error);
     }
   };
 
@@ -137,7 +148,12 @@ const ProductCRUD = () => {
             <input type="number" name="price" value={formData.price} onChange={(e) => handleChange(e, setFormData)} required />
           </label>
           <label>Seller:
-            <input type="text" name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required />
+            <select name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
+              <option value="">Select a Seller</option>
+              {sellers.map(seller => (
+                <option key={seller._id} value={seller._id}>{seller.Name}</option> 
+              ))}
+            </select>
           </label>
           <label>Rating:
             <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
@@ -168,7 +184,12 @@ const ProductCRUD = () => {
               <input type="number" name="price" value={editData.price} onChange={(e) => handleChange(e, setEditData)} required />
             </label>
             <label>Seller:
-              <input type="text" name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required />
+              <select name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
+                <option value="">Select a Seller</option>
+                {sellers.map(seller => (
+                  <option key={seller._id} value={seller._id}>{seller.Name}</option>
+                ))}
+              </select>
             </label>
             <label>Rating:
               <input type="range" min="0" max="5" step="0.1" value={editData.rating} onChange={handleRatingChange} />
@@ -187,7 +208,7 @@ const ProductCRUD = () => {
       )}
 
       {/* List of products */}
-<section className="product-list">
+      <section className="product-list">
   <h2>Product List</h2>
   {products.length > 0 ? (
     <ul>
@@ -196,7 +217,7 @@ const ProductCRUD = () => {
           <h3>{product.description}</h3>
           <img src={product.pictures} alt={product.description} style={{ width: '100px', height: 'auto' }} /> {/* Display the image */}
           <p>Price: ${product.price}</p>
-          <p>Seller: {product.seller}</p>
+          <p>Seller: {product.seller.Name}</p> {/* Access seller's Name */}
           <p>Rating: {product.rating}</p>
           <p>Available Quantity: {product.availableQuantity}</p>
           <div className="product-actions">

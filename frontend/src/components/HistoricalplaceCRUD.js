@@ -17,7 +17,7 @@ const HistoricalplaceCRUD = () => {
     location: '',
     openingHours: '',
     ticketPrice: '',
-    tourismGovernerTags: '',
+    tourismGovernerTags: '', // This should hold the ID of the selected tag
   });
   const [editData, setEditData] = useState(null);
   const [tourismTags, setTourismTags] = useState([]);
@@ -54,7 +54,9 @@ const HistoricalplaceCRUD = () => {
   const fetchTourismTags = async () => {
     try {
       const tags = await readGuide();
+      console.log('Fetched Tourism Tags:', tags); // Debugging: check if tags are fetched
       setTourismTags(tags);
+      console.log(tourismTags)
     } catch (error) {
       console.error('Error fetching tourism tags', error);
     }
@@ -78,19 +80,22 @@ const HistoricalplaceCRUD = () => {
 
   const handleTourismTagChange = (e) => {
     const selectedTagId = e.target.value;
+    console.log('Selected Tag ID:', selectedTagId); // Debugging: check the selected tag ID
     setFormData((prev) => ({
       ...prev,
-      tourismGovernerTags: selectedTagId,
+      tourismGovernerTags: selectedTagId, // Set the ID of the selected tag
     }));
   };
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form Data on Create Submit:', formData); // Debugging: check the formData being submitted
     try {
       await createHistoricalPlace(formData);
       setMessage('Historical Place created successfully!');
       resetCreateForm();
       fetchHistoricalPlaces();
+      
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message
@@ -104,11 +109,13 @@ const HistoricalplaceCRUD = () => {
     e.preventDefault();
     if (!editData) return;
 
+    console.log('Form Data on Edit Submit:', formData); // Debugging: check the formData being submitted
     try {
       await updateHistoricalPlace(editData._id, formData);
       setMessage('Historical Place updated successfully!');
       resetEditForm();
       fetchHistoricalPlaces();
+      console.log("aaaa ", historicalPlaces)
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message
@@ -137,7 +144,7 @@ const HistoricalplaceCRUD = () => {
       location: historicalPlace.location,
       openingHours: historicalPlace.openingHours,
       ticketPrice: historicalPlace.ticketPrice,
-      tourismGovernerTags: historicalPlace.tourismGovernerTags?._id || '',
+      tourismGovernerTags: historicalPlace.tourismGovernerTags?._id || '', // Set the ID of the tag
     });
   };
 
@@ -268,7 +275,13 @@ const HistoricalplaceCRUD = () => {
             <p>Location: {place.location}</p>
             <p>Opening Hours: {place.openingHours}</p>
             <p>Ticket Price: {place.ticketPrice}</p>
-            <p>Tourism Governor Tags: {place.tourismGovernerTags?.name || 'None'}</p>
+            <p>
+  Tourism Governor Tags: {
+    place.tourismGovernerTags.type
+  }
+</p>
+
+
             <iframe
               title="Location Map"
               width="300"

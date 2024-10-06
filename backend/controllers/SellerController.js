@@ -70,8 +70,18 @@ const updateSeller = async (req, res) => {
     }
 };
 
+const getSeller = async (req, res) => {
+    try {
+      const seller = await SellerModel.find();
+      res.status(200).json(seller);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+
 module.exports = {
     createSeller,
     readSeller,
-    updateSeller
+    updateSeller,
+    getSeller
 };

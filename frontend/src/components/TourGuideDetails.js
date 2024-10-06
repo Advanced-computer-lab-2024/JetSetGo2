@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const TourGuidePage = ({selectedTourGuideId}) => {
   const location = useLocation();
-  const id = location.state?.id; // Safely retrieve ID from state
+  const id = location.state?.id;
 
   const [tourGuide, setTourGuide] = useState(null);
   const [activities, setActivities] = useState([]);

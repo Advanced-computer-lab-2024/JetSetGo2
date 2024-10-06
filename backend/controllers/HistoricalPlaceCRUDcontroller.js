@@ -36,7 +36,7 @@ const createHistoricalPlace = async (req, res) => {
 const getHistoricalPlace = async (req, res) => {
   try {
     // Use .populate to fill the tourismGovernerTags field with actual data
-    const historicalPlaces = await HistoricalPlace.find().populate('tourismGovernerTags','name');
+    const historicalPlaces = await HistoricalPlace.find().populate('tourismGovernerTags','name').populate('tourismGovernerTags','type');
     res.status(200).json(historicalPlaces);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -1,11 +1,22 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/product'; // Adjust the base URL as needed
+const API_URL2 = 'http://localhost:8000/Seller';
 
 // Get all products
 export const getProducts = async () => {
    try {
       const response = await axios.get(`${API_URL}/get`);
+      return response.data;
+   } catch (error) {
+      console.error("Error fetching products:", error);
+      throw error;
+   }
+};
+
+export const getSellers = async () => {
+   try {
+      const response = await axios.get(`${API_URL2}/get`);
       return response.data;
    } catch (error) {
       console.error("Error fetching products:", error);

@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const SellerModel = require('../models/Seller.js');
 const { default: mongoose } = require('mongoose');
-const {createSeller,readSeller,updateSeller} = require('../controllers/SellerController.js');
+const {createSeller,readSeller,updateSeller, getSeller} = require('../controllers/SellerController.js');
 
 
   
@@ -11,5 +11,6 @@ const {createSeller,readSeller,updateSeller} = require('../controllers/SellerCon
 router.post("/createSeller",createSeller)
 router.get("/readSeller/:id", readSeller)
 router.put("/updateSeller/:id",updateSeller)
+router.get("/get",getSeller)
 module.exports = router;
 

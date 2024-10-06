@@ -1,12 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/ProductCRUD'); // Adjust the path if needed
-
-// CRUD operations
+const Seller = require('../models/Seller');
 
 // Create a new product
 const createProduct = async (req, res) => {
   try {
+    // Check if the provided seller ID is valid
+    const sellerExists = await Seller.findById(req.body.seller);
+    if (!sellerExists) {
+      return res.status(400).json({ error: "Invalid seller ID" });
+    }
+
     const product = await Product.create(req.body);
     res.status(201).json(product);
   } catch (error) {
@@ -14,10 +19,10 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Get all products
+// Get all products and populate seller information
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate('seller','Name'); // Populate seller info
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -26,14 +31,21 @@ const getProducts = async (req, res) => {
 
 // Update an existing product
 const updateProduct = async (req, res) => {
-  const { id } = req.params; // Extract id from the request parameters
-  const updateData = {}; // Initialize an empty object for updates
+  const { id } = req.params;
+  const updateData = {};
 
   // Only add fields to updateData if they exist in the request body
   if (req.body.description) updateData.description = req.body.description;
   if (req.body.pictures) updateData.pictures = req.body.pictures;
   if (req.body.price) updateData.price = req.body.price;
-  if (req.body.seller) updateData.seller = req.body.seller;
+  if (req.body.seller) {
+    // Check if the provided seller ID is valid before updating
+    const sellerExists = await Seller.findById(req.body.seller);
+    if (!sellerExists) {
+      return res.status(400).json({ error: "Invalid seller ID" });
+    }
+    updateData.seller = req.body.seller;
+  }
   if (req.body.rating) updateData.rating = req.body.rating;
   if (req.body.reviews) updateData.reviews = req.body.reviews;
   if (req.body.availableQuantity) updateData.availableQuantity = req.body.availableQuantity;
@@ -42,14 +54,14 @@ const updateProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       updateData,
-      { new: true, runValidators: true } // Ensure validators run on updates
+      { new: true, runValidators: true }
     );
 
     if (!updatedProduct) {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    res.status(200).json(updatedProduct); // Send updated product as response
+    res.status(200).json(updatedProduct);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
