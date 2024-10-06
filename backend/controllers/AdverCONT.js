@@ -13,14 +13,14 @@ const createAdver = async(req,res) => {
  }       
 
  const getAdver = async (req, res) => {
-   try {
-      // Use the correct model to find all admins
-      const adver = await adverModel.find();
-      res.status(200).json(adver);
-   } catch (error) {
-      res.status(400).json({ error: error.message });
-   }
-};
+   const { id } = req.params;
+  try {
+    const adver = await adverModel.findById(id);
+    res.status(200).json(adver);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  };
+}
 
   const getAdvertiser = async (req, res) => {
    try {

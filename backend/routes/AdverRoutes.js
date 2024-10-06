@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
 })
 
 router.post("/createadver", createAdver);
-router.get("/get", getAdver);
+router.get("/getadver/:id", getAdver);
 router.put("/updateadver/:id", updateAdver);
 router.get("/getTourist/:id" , getAdverById);
 router.get("/get", getAdvertiser);
