@@ -52,14 +52,14 @@ const ProductCRUD = () => {
   };
 
   // Handle rating change using a slider
-  const handleRatingChange = (e) => {
+  const handleRatingChange = (e, setData) => {
     const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
-    setFormData(prev => ({
+    setData(prev => ({
       ...prev,
-      rating: value
+      rating: isNaN(value) ? 0 : value  // Ensure it's never undefined
     }));
   };
-
+  
   // Handle form submission for creating a new product
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
@@ -156,9 +156,16 @@ const ProductCRUD = () => {
             </select>
           </label>
           <label>Rating:
-            <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
-            <span>{formData.rating.toFixed(1)}</span> {/* Display the current rating */}
-          </label>
+  <input
+    type="range"
+    min="0"
+    max="5"
+    step="0.1"
+    value={formData.rating}
+    onChange={(e) => handleRatingChange(e, setFormData)} // Pass setFormData here
+  />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
           <label>Reviews:
             <input type="text" name="reviews" value={formData.reviews} onChange={(e) => handleChange(e, setFormData)} required />
           </label>
@@ -192,9 +199,16 @@ const ProductCRUD = () => {
               </select>
             </label>
             <label>Rating:
-              <input type="range" min="0" max="5" step="0.1" value={editData.rating} onChange={handleRatingChange} />
-              <span>{editData.rating.toFixed(1)}</span> {/* Display the current rating */}
-            </label>
+  <input
+    type="range"
+    min="0"
+    max="5"
+    step="0.1"
+    value={editData.rating}
+    onChange={(e) => handleRatingChange(e, setEditData)} // Pass setEditData here
+  />
+  <span>{editData.rating.toFixed(1)}</span> {/* Display the current rating */}
+</label>
             <label>Reviews:
               <input type="text" name="reviews" value={editData.reviews} onChange={(e) => handleChange(e, setEditData)} required />
             </label>
