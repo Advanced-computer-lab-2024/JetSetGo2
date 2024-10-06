@@ -68,9 +68,10 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
     const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
     setFormData(prev => ({
       ...prev,
-      rating: value
+      rating: isNaN(value) ? 0 : value  // Ensure it's never undefined
     }));
   };
+  
 
 
   const handleActivityChange = (e) => {
@@ -169,9 +170,9 @@ const SchemaTourFront = ({selectedTourGuideId}) => {
             </select>
           </label>
           <label>Rating:
-            <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
-            <span>{formData.rating.toFixed(1)}</span> {/* Display the current rating */}
-          </label>
+  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
 
         <textarea name="locations" value={formData.locations} onChange={handleChange} placeholder="Locations" required />
         <input name="timeline" value={formData.timeline} onChange={handleChange} placeholder="Timeline" required />

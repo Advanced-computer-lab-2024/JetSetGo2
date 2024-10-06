@@ -1,3 +1,4 @@
+const {default: mongoose} = require('mongoose');
 const Activity = require("../models/ActivityCRUD");
 const Category = require("../models/CategoryCRUD");
 const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
@@ -135,6 +136,16 @@ const deleteAllActivities = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const readAdverActivites = async (req, res) => {
+  try {
+      const userId = req.query.userId;
+      const schemas = await Activity.find({advertiser: new mongoose.Types.ObjectId(userId)})
+      .populate('advertiser'); 
+      res.status(200).json(schemas);
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+};
 
 const upcomingactivity = async (req, res) => {
   try {
@@ -161,4 +172,5 @@ module.exports = {
   deleteActivity,
   deleteAllActivities,
   upcomingactivity,
+  readAdverActivites,
 };

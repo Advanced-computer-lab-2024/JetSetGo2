@@ -24,7 +24,8 @@ const activitySchema = new Schema({
     required: true,
   },
   tags: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref:"PreferenceTag",
     required: true,
   },
   specialDiscount: {

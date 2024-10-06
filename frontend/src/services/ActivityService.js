@@ -12,6 +12,16 @@ export const getActivity = async () => {
     throw error;
   }
 };
+export const getActivityById = async ({selectedAdverId}) => {
+  try {
+     console.log(selectedAdverId)
+     const response = await axios.get(`${API_URL}/activity/getAdverAct?userId=${selectedAdverId}`);
+     return response.data;
+  } catch (error) {
+     console.error("Error fetching activities:", error);
+     throw error;
+  }
+};
 
 // Create a new activity
 export const createActivity = async (activityData) => {

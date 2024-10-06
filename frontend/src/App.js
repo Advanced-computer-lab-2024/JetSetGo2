@@ -31,6 +31,7 @@ import ProductList from "./components/ProductList";
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
+  const [selectedAdverId, setselectedAdverId] = useState(null);
 
   return (
     <Router>
@@ -53,8 +54,8 @@ function App() {
               <UpdateTouristPage selectedTouristId={selectedTouristId} />
             }
           />
-          <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
-          <Route path="/list" element={<AdvertiserManagement />} />
+<Route path="/AdvirtiserMain" element={<AdvertiserForm setselectedAdverId={setselectedAdverId}/>} />
+<Route path="/list" element={<AdvertiserManagement selectedAdverId={selectedAdverId}/>} />
           <Route
             path="/CreateTourGuide"
             element={
@@ -76,7 +77,7 @@ function App() {
             }
           />
           <Route path="/other-signup" element={<OtherSignup />} />
-          <Route path="/activities" element={<ActivityCRUD />} />
+          <Route path="/activities" element={<ActivityCRUD selectedAdverId={selectedAdverId}/>} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route

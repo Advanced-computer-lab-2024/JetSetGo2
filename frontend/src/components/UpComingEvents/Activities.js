@@ -47,7 +47,7 @@ const Activities = () => {
   });
   const [editData, setEditData] = useState(null);
 
-  // Fetch activities and categories when the component mounts
+  // Fetch activities, categories, and tags when the component mounts
   useEffect(() => {
     fetchActivities();
     fetchCategories();
@@ -82,7 +82,7 @@ const Activities = () => {
       const data = await getTags();
       setTags(data);
     } catch (error) {
-      console.error("Error fetching categories", error);
+      console.error("Error fetching tags", error);
     }
   };
 
@@ -121,15 +121,14 @@ const Activities = () => {
 
               return (
                 <li key={activity._id} className="activity-item">
-                  <h3>{activity.category.name}</h3>
-                  <h3>{activity.advertiser.Name}</h3>
+                  <h3>{activity.category ? activity.category.name : "No Category"}</h3>
+                  <h3>{activity.advertiser ? activity.advertiser.Name : "No Advertiser"}</h3>
                   <p>Date: {new Date(activity.date).toLocaleDateString()}</p>
                   <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                   <p>Location: {activity.location}</p>
                   <p>Price: ${activity.price}</p>
-                  <p>Tags: {activity.tags.name}</p>
+                  <p>Tags: {activity.tags ? activity.tags.name : "No Tags"}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
-                  <p>Advertiser: {activity.advertiser.Name}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
                   {mapSrc && (
                     <iframe

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-const CreateAdvertiser = () => {
+const CreateAdvertiser = ({setselectedAdverId}) => {
   const [formData, setFormData] = useState({
     Name: '',
     Link: '',
@@ -26,9 +26,11 @@ const CreateAdvertiser = () => {
     try {
       const response = await axios.post('http://localhost:8000/home/adver/createadver', formData);
       console.log('Response:', response.data);
+      setselectedAdverId(response.data._id);
       if (response.status === 200) {
         setCreatedId(response.data._id);
-        navigate('/list', { state: { id: response.data._id } }); // Pass ID via state
+        navigate('/list', { state: { id: response.data._id } }); 
+        console.log(setselectedAdverId);
       }
     } catch (error) {
       console.error("Error creating advertiser:", error.response ? error.response.data : error.message);
