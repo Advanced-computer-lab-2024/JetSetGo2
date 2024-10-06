@@ -18,6 +18,9 @@ const HomePage = () => {
         <button style={styles.button} onClick={() => navigate("/other-signup")}>
           Other Signup
         </button>
+        <button style={styles.button} onClick={() => navigate("/adminCapabilities")}>
+          Admin
+        </button>
       </div>
     </div>
   );
