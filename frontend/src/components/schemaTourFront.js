@@ -1,6 +1,7 @@
   import React, { useState, useEffect } from 'react';
   import axios from 'axios';
   import '../App.css';
+  import { useNavigate } from 'react-router-dom'; 
 
   const styles = {
     sidebar: {
@@ -12,7 +13,18 @@
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-    }
+    },
+     backButton: { // Styling for the back button
+    marginTop: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#ff6348',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+  }
+
   }
 
   const SchemaTourFront = ({ selectedTourGuideId }) => {
@@ -36,6 +48,7 @@
       rating: 0,
     });
     const [editId, setEditId] = useState(null);
+    const navigate = useNavigate(); 
 
     const fetchItineraries = async () => {
       try {
@@ -92,6 +105,9 @@
         rating: isNaN(value) ? 0 : value
       }));
     };
+    const handleBackClick = () => {
+      navigate(-1); // Step 3: Navigate back
+    }
 
     const handleActivityChange = (e) => {
       const { value } = e.target;
@@ -161,6 +177,24 @@
       
       <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f7f8fa', padding: '20px' }}>
         {/* Main content */}
+        {/* Sidebar */}
+      <div style={styles.sidebar}>
+        <h2>Sidebar</h2>
+        {/* Step 4: Add Back button */}
+        <button onClick={handleBackClick} style={styles.backButton}>
+          Go Back
+        </button>
+      </div>
+
+      {/* Main content */}
+      <div style={{
+        flex: 1,
+        marginLeft: '30px',
+        padding: '20px',
+        backgroundColor: '#fff',
+        borderRadius: '10px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+      }}></div>
         <div style={{
           flex: 1,
           marginLeft: '30px',
