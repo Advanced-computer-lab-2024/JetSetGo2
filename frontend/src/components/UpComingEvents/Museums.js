@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const predefinedLocations = [
   {
@@ -39,17 +40,18 @@ const Museums = () => {
   useEffect(() => {
     if (selectedTag) {
       // Filter museums by the selected tag
-      setFilteredMuseums(museums.filter((museum) => 
-        museum.tourismGovernerTags?.type === selectedTag
-      ));
+      setFilteredMuseums(
+        museums.filter(
+          (museum) => museum.tourismGovernerTags?.type === selectedTag
+        )
+      );
     } else {
       // If no tag is selected, show all museums
       setFilteredMuseums(museums);
-
-
-      
     }
   }, [selectedTag, museums]); // Trigger filtering when selectedTag or museums change
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const fetchMuseums = async () => {
     try {
@@ -67,22 +69,79 @@ const Museums = () => {
   };
 
   return (
-    <div id="museums">
-      <h2>Museums</h2>
+    <div id="museums" style={styles.museumsContainer}>
+      <div className="back-button-container">
+        <button
+          className="back-button"
+          onClick={() => navigate("/tourist-home")}
+        >
+          Back
+        </button>
+      </div>
+      <style>{`
+        .museum-card {
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 15px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          width: 300px;
+          margin-bottom: 20px;
+        }
+        .museum-card h3 {
+          color: #333;
+        }
+        .museum-cards {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-around;
+          gap: 20px;
+        }
+        .museum-image img {
+          width: 100%;
+          height: auto;
+        }
+        .filter-container {
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        .filter-container select {
+          padding: 5px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+        }
+        .error {
+          color: red;
+          text-align: center;
+        }
+      `}</style>
+
+      <h2
+        style={{
+          color: "#FF4500",
+          fontSize: "24px",
+          textAlign: "center",
+          marginBottom: "20px",
+        }}
+      >
+        Museums
+      </h2>
       {error && <p className="error">{error}</p>}
 
       {/* Filter by Tag */}
-      <div>
+      <div className="filter-container">
         <label htmlFor="tagFilter">Filter by Tourism Governor Tag:</label>
         <select
           id="tagFilter"
           value={selectedTag}
           onChange={(e) => setSelectedTag(e.target.value)}
         >
-         <option value="">All Tags</option>
+          <option value="">All Tags</option>
           {museums
             .map((place) => place.tourismGovernerTags?.type)
-            .filter((value, index, self) => value && self.indexOf(value) === index) // Remove duplicates
+            .filter(
+              (value, index, self) => value && self.indexOf(value) === index
+            ) // Remove duplicates
             .map((tag) => (
               <option key={tag} value={tag}>
                 {tag}
@@ -92,7 +151,7 @@ const Museums = () => {
       </div>
 
       {filteredMuseums.length > 0 ? (
-        <ul>
+        <div className="museum-cards">
           {filteredMuseums.map((place) => {
             const locationData = predefinedLocations.find(
               (location) => location.name === place.location
@@ -102,22 +161,30 @@ const Museums = () => {
               : null;
 
             return (
-              <li key={place._id} className="historical-place-item">
-  <h3>{place.tourismGovernerTags.name}</h3>
-  <p>Description: {place.description}</p>                <p>Location: {place.location}</p>
-                <p>Opening Hours: {place.openingHours}</p>
-                <p>Ticket Price: ${place.ticketPrice}</p>
+              <div key={place._id} className="museum-card">
+                <h3>{place.tourismGovernerTags.name}</h3>
                 <p>
-                  Pictures:{" "}
+                  <strong>Description:</strong> {place.description}
+                </p>
+                <p>
+                  <strong>Location:</strong> {place.location}
+                </p>
+                <p>
+                  <strong>Opening Hours:</strong> {place.openingHours}
+                </p>
+                <p>
+                  <strong>Ticket Price:</strong> ${place.ticketPrice}
+                </p>
+                <div className="museum-image">
                   <img
                     src={place.pictures}
                     alt={`Picture of ${place.description}`}
-                    style={{ width: "100px", height: "auto" }}
                   />
+                </div>
+                <p>
+                  <strong>Tourism Governor Tags:</strong>{" "}
+                  {place.tourismGovernerTags.type}
                 </p>
-                <p>  Tourism Governor Tags: {
-    place.tourismGovernerTags.type
-  }</p>
                 {mapSrc && (
                   <iframe
                     title={`Map for ${place.location}`}
@@ -127,10 +194,10 @@ const Museums = () => {
                     style={{ border: "none" }}
                   ></iframe>
                 )}
-              </li>
+              </div>
             );
           })}
-        </ul>
+        </div>
       ) : (
         <p>No Museums available.</p>
       )}
@@ -138,6 +205,11 @@ const Museums = () => {
   );
 };
 
-;
+const styles = {
+  museumsContainer: {
+    padding: "20px",
+    backgroundColor: "#f5f5f5",
+  },
+};
 
 export default Museums;

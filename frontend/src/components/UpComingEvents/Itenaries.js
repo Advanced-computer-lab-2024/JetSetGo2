@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "axios";
 
 // Service method to fetch itineraries
@@ -17,44 +18,50 @@ const getItineraries = async () => {
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
   const [error, setError] = useState(null);
-  const [sortOrder, setSortOrder] = useState(""); 
+  const [sortOrder, setSortOrder] = useState("");
   const [Tags, setTags] = useState([]);
   const [activities, setActivities] = useState([]);
 
-  // Fetch itineraries when the component mounts
- 
-
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/itinerary/readTourId`);
+      const response = await axios.get(
+        `http://localhost:8000/itinerary/readTourId`
+      );
       setItineraries(response.data);
-      console.log('dataaaa= ' , response.data);
     } catch (error) {
-      console.error('Error fetching itineraries:', error);
+      console.error("Error fetching itineraries:", error);
+      setError("Failed to load itineraries.");
     }
   };
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
   const fetchActivities = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/activity/get');
+      const response = await axios.get("http://localhost:8000/activity/get");
       setActivities(response.data);
     } catch (error) {
-      console.error('Error fetching activities:', error);
+      console.error("Error fetching activities:", error);
     }
   };
 
   const fetchTags = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/prefTags/readtag');
+      const response = await axios.get(
+        "http://localhost:8000/prefTags/readtag"
+      );
       setTags(response.data);
     } catch (error) {
-      console.error('Error fetching Tags:', error);
+      console.error("Error fetching Tags:", error);
     }
   };
+
   useEffect(() => {
     fetchItineraries();
     fetchTags();
     fetchActivities();
   }, []);
+
   // Function to handle sorting based on price
   const handleSortChange = (e) => {
     const value = e.target.value;
@@ -65,65 +72,146 @@ const Itineraries = () => {
     if (value === "asc") {
       sortedItineraries.sort(
         (a, b) => Math.min(...a.TourPrice) - Math.min(...b.TourPrice)
-      ); // Sort by lowest price
+      );
     } else if (value === "desc") {
       sortedItineraries.sort(
         (a, b) => Math.max(...b.TourPrice) - Math.max(...a.TourPrice)
-      ); // Sort by highest price
+      );
     }
-    setItineraries(sortedItineraries); // Update the state with sorted itineraries
+    setItineraries(sortedItineraries);
   };
-  
 
   return (
     <div id="itineraries">
-      <h2>Itineraries</h2>
+      <div className="back-button-container">
+        <button
+          className="back-button"
+          onClick={() => navigate("/tourist-home")}
+        >
+          Back
+        </button>
+      </div>
+      <h2 className="title">Upcoming Itineraries</h2>
 
       {/* Dropdown for sorting itineraries by price */}
-      <label htmlFor="sort">Sort by Price:</label>
-      <select id="sort" value={sortOrder} onChange={handleSortChange}>
-        <option value="">Select</option>
-        <option value="asc">Lowest to Highest</option>
-        <option value="desc">Highest to Lowest</option>
-      </select>
+      <div className="sort-container">
+        <label htmlFor="sort">Sort by Price:</label>
+        <select id="sort" value={sortOrder} onChange={handleSortChange}>
+          <option value="">Select</option>
+          <option value="asc">Lowest to Highest</option>
+          <option value="desc">Highest to Lowest</option>
+        </select>
+      </div>
 
       {error && <p className="error">{error}</p>}
+
       {itineraries.length > 0 ? (
-        <ul>
+        <ul className="itinerary-list">
           {itineraries.map((itinerary) => (
             <li key={itinerary._id} className="itinerary-item">
               <h3>{itinerary.name}</h3>
-              <p>Tour Price: ${itinerary.TourPrice.join(", ")}</p>
               <p>
-                Duration of Activities: {itinerary.durationActivity.join(", ")}{" "}
-                hours
+                <strong>Tour Price:</strong> ${itinerary.TourPrice.join(", ")}
               </p>
               <p>
-                Available Dates:{" "}
+                <strong>Duration of Activities:</strong>{" "}
+                {itinerary.durationActivity.join(", ")} hours
+              </p>
+              <p>
+                <strong>Available Dates:</strong>{" "}
                 {itinerary.availableDates
                   .map((date) => new Date(date).toLocaleDateString())
                   .join(", ")}
               </p>
-              <p>Activities: 
-                  {itinerary.activities.map(activity => 
-                      `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category} - ${activity.specialDiscount}`
-                  ).join(', ')}
+              <p>
+                <strong>Activities:</strong>{" "}
+                {itinerary.activities
+                  .map(
+                    (activity) =>
+                      `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price}`
+                  )
+                  .join(", ")}
               </p>
-              <p>Tags: {Array.isArray(itinerary.Tags) ? itinerary.Tags.map(tag => tag.name).join(', ') : itinerary.Tags.name}</p>
-
-              <p>Locations: {itinerary.locations.join(", ")}</p>
-              <p>Accessibility: {itinerary.accessibility.join(", ")}</p>
-              <p>Pick Up Location: {itinerary.pickUpLoc.join(", ")}</p>
-              <p>Drop Off Location: {itinerary.DropOffLoc.join(", ")}</p>
-              <p>Bookings: {itinerary.bookings}</p>
-              {/* <p>Tour Guide: {itinerary.tourGuide.name}</p>{" "} */}
-              {/* Ensure 'name' exists in your Tour model */}
+              <p>
+                <strong>Tags:</strong>{" "}
+                {Array.isArray(itinerary.Tags)
+                  ? itinerary.Tags.map((tag) => tag.name).join(", ")
+                  : itinerary.Tags.name}
+              </p>
+              <p>
+                <strong>Locations:</strong> {itinerary.locations.join(", ")}
+              </p>
+              <p>
+                <strong>Accessibility:</strong>{" "}
+                {itinerary.accessibility.join(", ")}
+              </p>
+              <p>
+                <strong>Pick Up Location:</strong>{" "}
+                {itinerary.pickUpLoc.join(", ")}
+              </p>
+              <p>
+                <strong>Drop Off Location:</strong>{" "}
+                {itinerary.DropOffLoc.join(", ")}
+              </p>
+              <p>
+                <strong>Bookings:</strong> {itinerary.bookings}
+              </p>
             </li>
           ))}
         </ul>
       ) : (
         <p>No itineraries available.</p>
       )}
+
+      <style>
+        {`
+          #itineraries {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+          }
+          .title {
+            text-align: center;
+            color: #000;
+            margin-bottom: 20px;
+          }
+          .sort-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .sort-container label {
+            margin-right: 10px;
+          }
+          .itinerary-list {
+            list-style: none;
+            padding: 0;
+          }
+          .itinerary-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+          }
+          .itinerary-item:hover {
+            transform: translateY(-5px);
+          }
+          .itinerary-item h3 {
+            color: #ff5722;
+            margin-bottom: 10px;
+          }
+          .itinerary-item p {
+            margin: 5px 0;
+          }
+          .error {
+            color: red;
+            text-align: center;
+          }
+        `}
+      </style>
     </div>
   );
 };

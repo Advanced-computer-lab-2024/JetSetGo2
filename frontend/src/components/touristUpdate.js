@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UpdateTouristPage = ({ selectedTouristId }) => {
   const [touristData, setTouristData] = useState({
@@ -10,7 +11,7 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
     Nationality: "",
     DateOfBirth: "",
     Job: "",
-    wallet: 0, // Initialize wallet (still used for display)
+    wallet: 0,
   });
   const [formData, setFormData] = useState({
     Email: "",
@@ -20,8 +21,8 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
     Job: "",
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  // Fetch tourist details on component mount
   useEffect(() => {
     const fetchTouristData = async () => {
       try {
@@ -45,7 +46,7 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value }); // Update form input values only
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleUpdate = async (e) => {
@@ -56,7 +57,7 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
         formData
       );
       console.log("Update successful:", response.data);
-      setTouristData(response.data); // Update the displayed tourist details after successful form submission
+      setTouristData(response.data);
     } catch (error) {
       console.error("Error updating tourist details:", error);
       setError(
@@ -65,13 +66,17 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
     }
   };
 
+  const handleBack = () => {
+    navigate("/tourist-home"); // Navigate back to the tourist home page
+  };
+
   return (
     <div style={styles.container}>
-      <h2 style={styles.header}>Edit Tourist</h2>
+      <h2 style={styles.header}>Edit Tourist Profile</h2>
       <div style={styles.contentWrapper}>
         {/* Display Tourist Details */}
         <div style={styles.touristDetails}>
-          <h3>Tourist Information</h3>
+          <h3 style={styles.subHeader}>Tourist Information</h3>
           <p>
             <strong>Email:</strong> {touristData.Email}
           </p>
@@ -92,8 +97,7 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
             <strong>Job:</strong> {touristData.Job}
           </p>
           <p>
-            <strong>Wallet:</strong> ${touristData.wallet}{" "}
-            {/* Display wallet balance */}
+            <strong>Wallet:</strong> ${touristData.wallet}
           </p>
         </div>
 
@@ -160,6 +164,9 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
             </button>
           </form>
           {error && <p style={styles.error}>{error}</p>}
+          <button onClick={handleBack} style={styles.backButton}>
+            Back
+          </button>
         </div>
       </div>
     </div>
@@ -173,26 +180,31 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #74ebd5 0%, #9face6 100%)",
+    backgroundColor: "#e3f2fd",
     fontFamily: "'Poppins', sans-serif",
     padding: "20px",
   },
   header: {
-    color: "#fff",
+    color: "#0d47a1",
     fontSize: "36px",
     marginBottom: "20px",
     textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
   },
+  subHeader: {
+    color: "#0d47a1",
+    fontSize: "24px",
+    marginBottom: "10px",
+  },
   contentWrapper: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     width: "100%",
     maxWidth: "1200px",
     padding: "20px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
     borderRadius: "10px",
     backgroundColor: "#fff",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
   },
   touristDetails: {
     flex: 1,
@@ -215,7 +227,7 @@ const styles = {
     marginBottom: "5px",
     fontSize: "16px",
     fontWeight: "500",
-    color: "#333",
+    color: "#0d47a1",
   },
   input: {
     width: "100%",
@@ -228,7 +240,7 @@ const styles = {
     boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
   },
   button: {
-    backgroundColor: "#9face6",
+    backgroundColor: "#0d47a1",
     color: "#fff",
     padding: "12px 25px",
     borderRadius: "5px",
@@ -237,6 +249,19 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
     marginTop: "10px",
+    transition: "background-color 0.3s ease",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+  },
+  backButton: {
+    backgroundColor: "#0d47a1",
+    color: "#fff",
+    padding: "10px 20px",
+    borderRadius: "5px",
+    border: "none",
+    fontSize: "14px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    marginTop: "20px",
     transition: "background-color 0.3s ease",
     boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
   },

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getActivity, getCategories } from "../../services/ActivityService";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const predefinedLocations = [
   { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
@@ -31,6 +32,8 @@ const Activities = () => {
     maxPrice: "",
     rating: "",
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   useEffect(() => {
     fetchActivities();
@@ -118,6 +121,14 @@ const Activities = () => {
 
   return (
     <div id="activities">
+      <div className="back-button-container">
+        <button
+          className="back-button"
+          onClick={() => navigate("/tourist-home")}
+        >
+          Back
+        </button>
+      </div>
       <section className="filter-section">
         <h2>Filter Activities</h2>
         <div className="filter-inputs">
