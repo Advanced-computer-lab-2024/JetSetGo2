@@ -52,6 +52,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
     tags: "",
     specialDiscount: "",
     isBookingOpen: true,
+    rating: 0,
   });
   const [editData, setEditData] = useState(null);
   const navigate = useNavigate();
@@ -107,6 +108,13 @@ const ActivityCRUD = ({selectedAdverId}) => {
     setFormData((prev) => ({
       ...prev,
       location: selectedLocation,
+    }));
+  };
+  const handleRatingChange = (e) => {
+    const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
+    setFormData(prev => ({
+      ...prev,
+      rating: isNaN(value) ? 0 : value  // Ensure it's never undefined
     }));
   };
 
@@ -172,6 +180,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
       tags: "",
       specialDiscount: "",
       isBookingOpen: true,
+      rating: 0,
     });
   };
 
@@ -207,6 +216,10 @@ const ActivityCRUD = ({selectedAdverId}) => {
               required
             />
           </label>
+          <label>Rating:
+  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
           <label>
             Time:
             <input
@@ -321,6 +334,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
                   <p>Location: {activity.location}</p>
                   <p>Price: ${activity.price}</p>
                   <p>Tags: {activity.tags.name}</p>
+                  <p>Rating: {activity.rating}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
                   {mapSrc && (
@@ -370,6 +384,10 @@ const ActivityCRUD = ({selectedAdverId}) => {
                 required
               />
             </label>
+            <label>Rating:
+  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
             <label>
               Location:
               <select

@@ -40,6 +40,10 @@ const activitySchema = new Schema({
     type: Schema.Types.ObjectId,  // Using ObjectId to reference the Category model
     ref: 'adver',  // Reference to the Category model
     required: true,
+  },
+  rating: {
+    type: Number,
+    required: true,
   }
 }, { timestamps: true });
 
