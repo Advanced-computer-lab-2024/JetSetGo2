@@ -6,14 +6,20 @@
       type: String,
       required: true,
     },
-    
-    Password: {
+    PickUp_Location: {
       type: String,
       required: true,
-      minlength: 6,
     },
-    Description: {
+    Type_Of_Products: {
       type: String,
+      required: true,
+    },
+    Previous_Work: {
+      type: String,
+      required: true,
+    },
+    Age: {
+      type: Number,
       required: true,
     },
     Email: {

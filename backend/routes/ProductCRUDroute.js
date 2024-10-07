@@ -4,7 +4,8 @@ const {
   createProduct,
   getProducts,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  deleteAllProducts
 } = require('../controllers/ProductCRUDcontroller'); // Adjust the path if needed
 
 
@@ -13,5 +14,6 @@ router.post('/add', createProduct);
 router.get('/get', getProducts);
 router.put('/update/:id', updateProduct);
 router.delete('/delete/:id', deleteProduct);
+router.delete('/deleteall', deleteAllProducts);
 
 module.exports = router;
