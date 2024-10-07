@@ -1,28 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 const TouristHome = ({ selectedTouristId }) => {
+  const predefinedLocations = [
+    { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
+    {
+      name: "Giza Pyramids, Egypt",
+      coordinates: "31.1313,29.9765,31.1513,29.9965",
+    },
+    {
+      name: "Alexandria, Egypt",
+      coordinates: "29.9097,31.2156,29.9297,31.2356",
+    },
+    {
+      name: "German University in Cairo, Egypt",
+      coordinates: "31.4486,29.9869,31.4686,30.0069",
+    },
+    {
+      name: "Cairo Festival City, Egypt",
+      coordinates: "31.4015,30.0254,31.4215,30.0454",
+    },
+  ];
   const [touristData, setTouristData] = useState({
-    Email: "",
     UserName: "",
-    Password: "",
-    MobileNumber: "",
-    Nationality: "",
-    DateOfBirth: "",
-    Job: "",
+    wallet: 0,
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({
+    Museums: [],
+    HistoricalPlace: [],
+    activities: [],
+    itinaries: [],
+  });
+  const [searchMethod, setSearchMethod] = useState("name");
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Tourist ID:", selectedTouristId); // Log touristId to verify if it's passed
-
     const fetchTouristData = async () => {
       try {
         const response = await axios.get(
           `http://localhost:8000/home/tourist/getTourist/${selectedTouristId}`
         );
-        console.log("Tourist Data:", response.data); // Log the data fetched
         setTouristData(response.data);
       } catch (error) {
         console.error("Error fetching tourist data:", error);
@@ -31,13 +50,53 @@ const TouristHome = ({ selectedTouristId }) => {
 
     if (selectedTouristId) {
       fetchTouristData();
-    } else {
-      console.log("No touristId provided");
     }
   }, [selectedTouristId]);
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    // Debugging: Log search query and method
+    console.log("Searching for:", searchQuery, "Method:", searchMethod);
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/search?searchword=${encodeURIComponent(
+          searchQuery
+        )}&searchType=${searchMethod}`
+      );
+      console.log("Search Results:", response.data); // Log results for debugging
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setSearchResults({
+        Museums: [],
+        HistoricalPlace: [],
+        activities: [],
+        itinaries: [],
+      });
+    }
+  };
+
   const handleUpdateClick = () => {
     navigate("/tourist-update");
+  };
+
+  const handleSearchMethodChange = (e) => {
+    setSearchMethod(e.target.value);
+  };
+
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+  const generateMapSrc = (coordinates) => {
+    const [long1, lat1, long2, lat2] = coordinates.split(",");
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
+  };
+
+  const findLocationMap = (name) => {
+    const location = predefinedLocations.find((loc) => loc.name === name);
+    return location ? generateMapSrc(location.coordinates) : null;
   };
 
   if (!touristData) {
@@ -50,102 +109,273 @@ const TouristHome = ({ selectedTouristId }) => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.profileContainer}>
-        <div style={styles.profileHeader}>
+      {/* Tourist Profile Section */}
+      <div style={styles.sidebar}>
+        <div style={styles.profileContainer}>
           <img
-            src="https://via.placeholder.com/150"
+            src="https://via.placeholder.com/80"
             alt="Profile"
             style={styles.profileImage}
           />
-          <h1 style={styles.profileName}>{touristData.UserName}</h1>
-          <p style={styles.profileDetails}>{touristData.Email}</p>
+          <h2 style={styles.profileName}>{touristData.UserName}</h2>
+          <p style={styles.walletText}>Wallet: ${touristData.wallet}</p>
+          <button onClick={handleUpdateClick} style={styles.button}>
+            Update Profile
+          </button>
         </div>
-        <div style={styles.bio}>
-          <h2 style={styles.bioTitle}>About Me</h2>
-          <p style={styles.bioText}>
-            Nationality: {touristData.Nationality}
-            <br />
-            Job: {touristData.Job}
-            <br />
-            Date of Birth:{" "}
-            {new Date(touristData.DateOfBirth).toLocaleDateString()}
-          </p>
+      </div>
+
+      {/* Main Content */}
+      <div style={styles.mainContent}>
+        <h1 style={styles.header}>Welcome to Your Dashboard</h1>
+
+        {/* Search Bar Section */}
+        <div style={styles.searchSection}>
+          <select
+            onChange={handleSearchMethodChange}
+            value={searchMethod}
+            style={styles.dropdown}
+          >
+            <option value="name">Name</option>
+            <option value="category">Category</option>
+            <option value="tags">Tags</option>
+          </select>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleInputChange}
+            placeholder="Search..."
+            style={styles.searchInput}
+          />
+          <button onClick={handleSearch} style={styles.searchButton}>
+            Search
+          </button>
         </div>
-        <button onClick={handleUpdateClick} style={styles.button}>
-          Update Your Profile
-        </button>
+
+        {/* Navigation Links */}
+        <nav style={styles.navbar}>
+          <Link to="/Upcoming-activities" style={styles.navLink}>
+            Activities
+          </Link>
+          <Link to="/Upcoming-itineraries" style={styles.navLink}>
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" style={styles.navLink}>
+            Historical Places
+          </Link>
+          <Link to="/all-museums" style={styles.navLink}>
+            Museums
+          </Link>
+        </nav>
+
+        {/* Search Results Section */}
+        <div style={styles.resultsContainer}>
+          <h3 style={styles.resultsHeader}>Search Results:</h3>
+          {searchResults.Museums.length > 0 ||
+          searchResults.HistoricalPlace.length > 0 ||
+          searchResults.activities.length > 0 ||
+          searchResults.itinaries.length > 0 ? (
+            <ul style={styles.resultsList}>
+              {/* Museums */}
+              {searchResults.Museums.map((museum, index) => (
+                <li key={index} style={styles.resultItem}>
+                  <h4>Name: {museum.tourismGovernerTags.name}</h4>
+                  <p>Description: {museum.description}</p>
+                  <p>Location: {museum.location}</p>
+                  <p>Opening Hours: {museum.openingHours}</p>
+                  <p>foreignerTicketPrice: ${museum.foreignerTicketPrice}</p>
+                  <p>nativeTicketPrice: ${museum.nativeTicketPrice}</p>
+                  <p>studentTicketPrice: ${museum.studentTicketPrice}</p>
+                  {findLocationMap(museum.location) && (
+                    <iframe
+                      title="Map"
+                      src={findLocationMap(museum.location)}
+                      style={styles.map}
+                    ></iframe>
+                  )}
+                </li>
+              ))}
+              {/* Historical Places */}
+              {searchResults.HistoricalPlace.map((place, index) => (
+                <li key={index} style={styles.resultItem}>
+                  <h4>Name: {place.tourismGovernerTags.name}</h4>
+                  <p>Description: {place.description}</p>
+                  <p>Location: {place.location}</p>
+                  <p>Opening Hours: {place.openingHours}</p>
+                  <p>foreignerTicketPrice: ${place.foreignerTicketPrice}</p>
+                  <p>nativeTicketPrice: ${place.nativeTicketPrice}</p>
+                  <p>studentTicketPrice: ${place.studentTicketPrice}</p>
+                  {findLocationMap(place.location) && (
+                    <iframe
+                      title="Map"
+                      src={findLocationMap(place.location)}
+                      style={styles.map}
+                    ></iframe>
+                  )}
+                </li>
+              ))}
+              {/* Activities */}
+              {searchResults.activities.map((activity, index) => (
+                <li key={index} style={styles.resultItem}>
+                  <h4>{activity.name}</h4>
+                  <p>Date: {activity.date}</p>
+                  <p>Time: {activity.time}</p>
+                  <p>Location: {activity.location}</p>
+                  <p>Price: ${activity.price}</p>
+                  <p>Special Discount: ${activity.specialDiscount}</p>
+                  <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
+                  {findLocationMap(activity.location) && (
+                    <iframe
+                      title="Map"
+                      src={findLocationMap(activity.location)}
+                      style={styles.map}
+                    ></iframe>
+                  )}
+                </li>
+              ))}
+              {/* Itineraries */}
+              {searchResults.itinaries.map((itinerary, index) => (
+                <li key={index} style={styles.resultItem}>
+                  <h4>{itinerary.name}</h4>
+                  <p>{itinerary.description}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={styles.noResultsText}>No results found.</p>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
+// Improved styles for the modern look
 const styles = {
   container: {
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "linear-gradient(135deg, #c9ffbf 0%, #ffafbd 100%)",
-    fontFamily: "'Poppins', sans-serif",
+    minHeight: "100vh",
+    backgroundColor: "#f7f8fa",
+    padding: "20px",
+  },
+  sidebar: {
+    width: "250px",
+    backgroundColor: "#2d3e50",
+    padding: "20px",
+    borderRadius: "10px",
+    color: "#fff",
   },
   profileContainer: {
-    background: "#fff",
-    padding: "30px",
-    borderRadius: "15px",
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-    width: "500px",
     textAlign: "center",
   },
-  profileHeader: {
-    marginBottom: "20px",
-  },
   profileImage: {
-    width: "150px",
-    height: "150px",
+    width: "80px",
+    height: "80px",
     borderRadius: "50%",
-    objectFit: "cover",
     marginBottom: "15px",
+    border: "3px solid #fff",
   },
   profileName: {
-    fontSize: "32px",
+    fontSize: "22px",
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: "5px",
   },
-  profileDetails: {
+  walletText: {
     fontSize: "18px",
-    color: "#666",
-    marginBottom: "20px",
-  },
-  bio: {
-    textAlign: "left",
-    marginBottom: "30px",
-  },
-  bioTitle: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    marginBottom: "10px",
-  },
-  bioText: {
-    fontSize: "16px",
-    lineHeight: "1.5",
-    color: "#555",
+    margin: "10px 0",
   },
   button: {
-    backgroundColor: "#ff758c",
+    backgroundColor: "#ff6348",
     color: "#fff",
-    padding: "12px 30px",
-    borderRadius: "30px",
+    padding: "10px 15px",
+    borderRadius: "5px",
     border: "none",
-    fontSize: "18px",
-    fontWeight: "bold",
     cursor: "pointer",
-    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.2)",
-    transition: "background-color 0.3s ease",
+    marginTop: "10px",
   },
-  errorText: {
-    color: "#ff0000",
-    fontSize: "20px",
+  mainContent: {
+    flex: 1,
+    marginLeft: "30px",
+    backgroundColor: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+  },
+  header: {
+    fontSize: "28px",
+    marginBottom: "20px",
+    color: "#333",
+  },
+  searchSection: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "30px",
+  },
+  searchInput: {
+    flex: 1,
+    padding: "10px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    marginRight: "10px",
+  },
+  dropdown: {
+    padding: "10px",
+    borderRadius: "4px",
+    marginRight: "10px",
+  },
+  searchButton: {
+    padding: "10px 20px",
+    backgroundColor: "#2d3e50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  navbar: {
+    display: "flex",
+    justifyContent: "space-around",
+    backgroundColor: "#2d3e50",
+    padding: "10px",
+    borderRadius: "5px",
+    marginBottom: "20px",
+  },
+  navLink: {
+    color: "#fff",
+    textDecoration: "none",
+    padding: "10px 15px",
+    borderRadius: "4px",
+    backgroundColor: "#2d3e50",
+    fontWeight: "bold",
+    transition: "background-color 0.3s",
+  },
+  resultsContainer: {
+    marginTop: "20px",
+  },
+  resultsHeader: {
+    fontSize: "22px",
+    marginBottom: "15px",
+    color: "#333",
+  },
+  resultsList: {
+    listStyleType: "none",
+    paddingLeft: "0",
+  },
+  resultItem: {
+    padding: "15px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    marginBottom: "10px",
+    backgroundColor: "#f9f9f9",
+  },
+  map: {
+    width: "100%",
+    height: "250px",
+    border: "none",
+    borderRadius: "10px",
+    marginTop: "10px",
+  },
+  noResultsText: {
+    fontSize: "18px",
+    color: "#999",
   },
 };
 

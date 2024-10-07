@@ -39,6 +39,7 @@ const updateTourist = async (req, res) => {
   if (req.body.Nationality) updateData.Nationality = req.body.Nationality;
   if (req.body.DateOfBirth) updateData.DateOfBirth = req.body.DateOfBirth;
   if (req.body.Job) updateData.Job = req.body.Job;
+  if (req.body.Wallet) updateData.Wallet = req.body.Wallet;
   try {
     const updatetourist = await touristModel.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -71,28 +72,44 @@ const getTouristById = async (req, res) => {
   }
 };
 const deleteTourist = async (req, res) => {
-  console.log('Request to delete Tourist :', req.params.id);  // Log the ID
+  console.log("Request to delete Tourist :", req.params.id); // Log the ID
   try {
-     const { id } = req.params;
-     const deletedTourist = await touristModel.findByIdAndDelete(id);
+    const { id } = req.params;
+    const deletedTourist = await touristModel.findByIdAndDelete(id);
 
-     if (!deletedTourist) {
-        return res.status(404).json({
-           message: "User not found",
-        });
-     }
+    if (!deletedTourist) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
-     res.status(200).json({
-        message: "User deleted successfully",
-        user: deletedTourist,
-     });
+    res.status(200).json({
+      message: "User deleted successfully",
+      user: deletedTourist,
+    });
   } catch (error) {
-     console.error('Error deleting tourism governor:', error);
-     res.status(500).json({
-        message: "Error deleting user",
-        error,
-     });
+    console.error("Error deleting tourism governor:", error);
+    res.status(500).json({
+      message: "Error deleting user",
+      error,
+    });
   }
 };
 
-module.exports = { createTourist, updateTourist, getTourist, getTouristById,deleteTourist };
+const deleteAllTourist = async (req, res) => {
+  try {
+    await touristModel.deleteMany({});
+    res.status(200).json({ message: "All tourist have been deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createTourist,
+  updateTourist,
+  getTourist,
+  getTouristById,
+  deleteTourist,
+  deleteAllTourist,
+};

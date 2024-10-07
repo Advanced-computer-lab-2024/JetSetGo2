@@ -10,6 +10,7 @@ const TouristSchema = new Schema(
     UserName: {
       type: String,
       required: true,
+      immutable: true,
     },
     Password: {
       type: String,
@@ -24,12 +25,19 @@ const TouristSchema = new Schema(
       required: true,
     },
     DateOfBirth: {
-      type: [Date],
+      type: Date,
       required: true,
+      immutable: true,
     },
     Job: {
       type: String,
       required: true,
+    },
+    Wallet: {
+      type: Number,
+      default: 0,
+      required: false,
+      immutable: true,
     },
   },
   { timestamps: true }

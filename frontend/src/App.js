@@ -27,9 +27,9 @@ import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import ProductList from "./components/ProductList";
-import AddAdmin from './components/AddAdmin';
-import AddTourismGovernor from './components/AddTourismGovernor';
-import DeleteUsers from './components/DeleteUsers';
+import AddAdmin from "./components/AddAdmin";
+import AddTourismGovernor from "./components/AddTourismGovernor";
+import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 
@@ -37,7 +37,6 @@ function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
   const [selectedAdverId, setselectedAdverId] = useState(null);
-  
 
   return (
     <Router>
@@ -60,8 +59,14 @@ function App() {
               <UpdateTouristPage selectedTouristId={selectedTouristId} />
             }
           />
-<Route path="/AdvirtiserMain" element={<AdvertiserForm setselectedAdverId={setselectedAdverId}/>} />
-<Route path="/list" element={<AdvertiserManagement selectedAdverId={selectedAdverId}/>} />
+          <Route
+            path="/AdvirtiserMain"
+            element={<AdvertiserForm setselectedAdverId={setselectedAdverId} />}
+          />
+          <Route
+            path="/list"
+            element={<AdvertiserManagement selectedAdverId={selectedAdverId} />}
+          />
           <Route
             path="/CreateTourGuide"
             element={
@@ -83,7 +88,10 @@ function App() {
             }
           />
           <Route path="/other-signup" element={<OtherSignup />} />
-          <Route path="/activities" element={<ActivityCRUD selectedAdverId={selectedAdverId}/>} />
+          <Route
+            path="/activities"
+            element={<ActivityCRUD selectedAdverId={selectedAdverId} />}
+          />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route

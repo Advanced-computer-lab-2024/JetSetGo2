@@ -10,14 +10,13 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
     Nationality: "",
     DateOfBirth: "",
     Job: "",
+    wallet: 0, // Initialize wallet (still used for display)
   });
   const [formData, setFormData] = useState({
     Email: "",
-    UserName: "",
     Password: "",
     MobileNumber: "",
     Nationality: "",
-    DateOfBirth: "",
     Job: "",
   });
   const [error, setError] = useState("");
@@ -92,6 +91,10 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
           <p>
             <strong>Job:</strong> {touristData.Job}
           </p>
+          <p>
+            <strong>Wallet:</strong> ${touristData.wallet}{" "}
+            {/* Display wallet balance */}
+          </p>
         </div>
 
         {/* Update Form */}
@@ -103,17 +106,6 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
                 type="email"
                 name="Email"
                 value={formData.Email}
-                onChange={handleChange}
-                style={styles.input}
-                required
-              />
-            </div>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>UserName:</label>
-              <input
-                type="text"
-                name="UserName"
-                value={formData.UserName}
                 onChange={handleChange}
                 style={styles.input}
                 required
@@ -150,16 +142,6 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
                 onChange={handleChange}
                 style={styles.input}
                 required
-              />
-            </div>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Date of Birth:</label>
-              <input
-                type="date"
-                name="DateOfBirth"
-                value={formData.DateOfBirth}
-                style={styles.input}
-                readOnly // This makes the Date of Birth field uneditable
               />
             </div>
             <div style={styles.inputGroup}>
@@ -257,9 +239,6 @@ const styles = {
     marginTop: "10px",
     transition: "background-color 0.3s ease",
     boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-  },
-  buttonHover: {
-    backgroundColor: "#79c1e0",
   },
   error: {
     color: "red",

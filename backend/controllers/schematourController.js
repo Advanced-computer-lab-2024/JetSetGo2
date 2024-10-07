@@ -62,6 +62,7 @@ const readGuideID = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 const updateGuide = async (req, res) => {
   const { id } = req.params; // Extract id from the request body
   const updateData = {}; // Initialize an empty object for updates
