@@ -155,6 +155,9 @@ const TouristHome = ({ selectedTouristId }) => {
 
         {/* Navigation Links */}
         <nav style={styles.navbar}>
+        <button  onClick={() => navigate("/productList")}>
+          View Products
+        </button>
           <Link to="/Upcoming-activities" style={styles.navLink}>
             Activities
           </Link>
