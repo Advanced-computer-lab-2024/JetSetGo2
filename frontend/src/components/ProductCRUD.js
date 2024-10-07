@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css'; // Assuming you still want to keep this for other styles
+import '../App.css';
 import { useNavigate } from 'react-router-dom'; 
 import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService'; 
 
@@ -130,6 +130,12 @@ const ProductCRUD = () => {
     setEditData(null);
   };
 
+  // Cancel button logic
+  const handleCancel = () => {
+    resetEditForm();
+    navigate('/product'); // You can navigate to any page you prefer, like back to the product list
+  };
+
   return (
     <div style={{
       display: 'flex',
@@ -161,7 +167,7 @@ const ProductCRUD = () => {
           </button>
         </div>
 
-        {/* Add/Edit Product Button */}
+        {/* View Product Button */}
         <button onClick={() => navigate("/productlist")} style={{
           padding: '10px 20px',
           backgroundColor: '#ff6348',
@@ -173,7 +179,7 @@ const ProductCRUD = () => {
           width: '100%',
           fontSize: '16px',
         }}>
-          View Product
+          View Products
         </button>
       </div>
       {/* Main content */}
@@ -244,7 +250,7 @@ const ProductCRUD = () => {
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="number" name="availableQuantity" value={formData.availableQuantity} onChange={(e) => handleChange(e, setFormData)} required />
 
-            <button style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+            <button style={{ padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
               Create Product
             </button>
           </form>
@@ -289,8 +295,22 @@ const ProductCRUD = () => {
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 type="number" name="availableQuantity" value={editData.availableQuantity} onChange={(e) => handleChange(e, setEditData)} required />
 
-              <button style={{ padding: '10px 20px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+              <button style={{ padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
                 Update Product
+              </button>
+
+              {/* Cancel Button */}
+              <button type="button" onClick={handleCancel} style={{
+                padding: '10px 20px',
+                backgroundColor: '#ff6348',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                marginTop: '10px',
+                width: '100%',
+              }}>
+                Cancel
               </button>
             </form>
           </section>
@@ -330,10 +350,10 @@ const ProductCRUD = () => {
                   <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller.Name}</td>
                   <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
                   <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                    <button onClick={() => handleEdit(product)} style={{ padding: '5px 10px', backgroundColor: '#ffce00', color: '#fff', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
+                    <button onClick={() => handleEdit(product)} style={{ padding: '5px 10px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(product._id)} style={{ padding: '5px 10px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '5px' }}>
+                    <button onClick={() => handleDelete(product._id)} style={{ padding: '5px 10px', backgroundColor: '#ff6348', color: '#fff', border: 'none', borderRadius: '5px' }}>
                       Delete
                     </button>
                   </td>

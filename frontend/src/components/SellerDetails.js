@@ -231,7 +231,7 @@ const SellerDetails = () => {
     <div style={containerStyle}>
       {/* Sidebar */}
       <div style={sidebarStyle}>
-        <h3>        Welcome   </h3>
+        <h3>  Welcome   </h3>
         <button onClick={() => handleSidebarClick('details')} style={buttonStyle}>
           View Details
         </button>
