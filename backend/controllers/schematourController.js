@@ -55,7 +55,9 @@ const readGuide = async (req, res) => {
 
 const readGuideID = async (req, res) => {
   try {
-    const schema = await Schema.find();
+    const schema = await Schema.find()
+      .populate("activities")
+      .populate("Tags", "name");
     if (!schema) return res.status(404).json({ message: "schema not found" });
     res.status(200).json(schema);
   } catch (err) {
