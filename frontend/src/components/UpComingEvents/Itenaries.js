@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Service method to fetch itineraries
@@ -17,11 +17,20 @@ const getItineraries = async () => {
 
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
+  const [filteredItineraries, setFilteredItineraries] = useState([]); // To store filtered itineraries
   const [error, setError] = useState(null);
-  const [sortOrder, setSortOrder] = useState(""); // State for price sorting
-  const [sortRating, setSortRating] = useState(""); // State for rating sorting
+
+  const [sortOrder, setSortOrder] = useState("");
+  const [sortRating, setSortRating] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+
   const [Tags, setTags] = useState([]);
   const [activities, setActivities] = useState([]);
+
+  const navigate = useNavigate();
 
   const fetchItineraries = async () => {
     try {
@@ -29,13 +38,12 @@ const Itineraries = () => {
         `http://localhost:8000/itinerary/readTourId`
       );
       setItineraries(response.data);
+      setFilteredItineraries(response.data); // Initially set filtered to all itineraries
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");
     }
   };
-
-  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const fetchActivities = async () => {
     try {
@@ -63,13 +71,54 @@ const Itineraries = () => {
     fetchActivities();
   }, []);
 
-  // Function to handle sorting based on price
+  // Filter itineraries based on selected filters
+  useEffect(() => {
+    let filtered = itineraries;
+
+    // Filter by tag
+    if (selectedTag) {
+      filtered = filtered.filter((itinerary) =>
+        Array.isArray(itinerary.Tags)
+          ? itinerary.Tags.some((tag) => tag.name === selectedTag)
+          : itinerary.Tags.name === selectedTag
+      );
+    }
+
+    // Filter by price
+    if (selectedPrice) {
+      filtered = filtered.filter(
+        (itinerary) =>
+          Math.min(...itinerary.TourPrice) <= parseFloat(selectedPrice)
+      );
+    }
+
+    // Filter by date
+    if (selectedDate) {
+      filtered = filtered.filter((itinerary) =>
+        itinerary.availableDates.some(
+          (date) =>
+            new Date(date).toDateString() ===
+            new Date(selectedDate).toDateString()
+        )
+      );
+    }
+
+    // Filter by language
+    if (selectedLanguage) {
+      filtered = filtered.filter((itinerary) =>
+        itinerary.tourLanguage.includes(selectedLanguage)
+      );
+    }
+
+    setFilteredItineraries(filtered);
+  }, [itineraries, selectedTag, selectedPrice, selectedDate, selectedLanguage]);
+
+  // Sorting functions remain unchanged
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortOrder(value);
 
-    // Sort itineraries based on price
-    let sortedItineraries = [...itineraries];
+    let sortedItineraries = [...filteredItineraries];
     if (value === "asc") {
       sortedItineraries.sort(
         (a, b) => Math.min(...a.TourPrice) - Math.min(...b.TourPrice)
@@ -79,37 +128,61 @@ const Itineraries = () => {
         (a, b) => Math.max(...b.TourPrice) - Math.max(...a.TourPrice)
       );
     }
-    setItineraries(sortedItineraries);
+    setFilteredItineraries(sortedItineraries);
   };
 
-  // Function to handle sorting based on rating
   const handleSortRatingChange = (e) => {
     const value = e.target.value;
     setSortRating(value);
 
-    // Sort itineraries based on rating
-    let sortedItineraries = [...itineraries];
+    let sortedItineraries = [...filteredItineraries];
     if (value === "asc") {
       sortedItineraries.sort((a, b) => a.rating - b.rating);
     } else if (value === "desc") {
       sortedItineraries.sort((a, b) => b.rating - a.rating);
     }
-    setItineraries(sortedItineraries);
+    setFilteredItineraries(sortedItineraries);
   };
 
   return (
     <div id="itineraries">
       <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
+        <button className="back-button" onClick={() => navigate(-1)}>
           Back
         </button>
       </div>
       <h2 className="title">Upcoming Itineraries</h2>
 
-      {/* Dropdown for sorting itineraries by price */}
+      {/* Filter and Sort controls */}
+      <div className="sort-container">
+        <label htmlFor="filterTag">Filter by Tag:</label>
+        <input
+          type="text"
+          id="filterTag"
+          value={selectedTag}
+          onChange={(e) => setSelectedTag(e.target.value)}
+          placeholder="Enter tag"
+        />
+
+        <label htmlFor="filterPrice">Filter by Max Price:</label>
+        <input
+          type="number"
+          id="filterPrice"
+          value={selectedPrice}
+          onChange={(e) => setSelectedPrice(e.target.value)}
+          placeholder="Enter max price"
+        />
+
+        <label htmlFor="filterDate">Filter by Date:</label>
+        <input
+          type="date"
+          id="filterDate"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
+      </div>
+
+      {/* Sort by Price */}
       <div className="sort-container">
         <label htmlFor="sortPrice">Sort by Price:</label>
         <select id="sortPrice" value={sortOrder} onChange={handleSortChange}>
@@ -118,20 +191,25 @@ const Itineraries = () => {
           <option value="desc">Highest to Lowest</option>
         </select>
 
-        {/* Dropdown for sorting itineraries by rating */}
+        {/* Sort by Rating */}
         <label htmlFor="sortRating">Sort by Rating:</label>
-        <select id="sortRating" value={sortRating} onChange={handleSortRatingChange}>
+        <select
+          id="sortRating"
+          value={sortRating}
+          onChange={handleSortRatingChange}
+        >
           <option value="">Select</option>
           <option value="asc">Lowest to Highest</option>
           <option value="desc">Highest to Lowest</option>
         </select>
       </div>
 
+      {/* Display itineraries */}
       {error && <p className="error">{error}</p>}
 
-      {itineraries.length > 0 ? (
+      {filteredItineraries.length > 0 ? (
         <ul className="itinerary-list">
-          {itineraries.map((itinerary) => (
+          {filteredItineraries.map((itinerary) => (
             <li key={itinerary._id} className="itinerary-item">
               <h3>{itinerary.name}</h3>
               <p>
@@ -189,56 +267,6 @@ const Itineraries = () => {
       ) : (
         <p>No itineraries available.</p>
       )}
-
-      <style>
-        {`
-          #itineraries {
-            padding: 20px;
-            font-family: Arial, sans-serif;
-          }
-          .title {
-            text-align: center;
-            color: #000;
-            margin-bottom: 20px;
-          }
-          .sort-container {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-          .sort-container label {
-            margin-right: 10px;
-          }
-          .itinerary-list {
-            list-style: none;
-            padding: 0;
-          }
-          .itinerary-item {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-          }
-          .itinerary-item:hover {
-            transform: translateY(-5px);
-          }
-          .itinerary-item h3 {
-            color: #ff5722;
-            margin-bottom: 10px;
-          }
-          .itinerary-item p {
-            margin: 5px 0;
-          }
-          .error {
-            color: red;
-            text-align: center;
-          }
-        `}
-      </style>
     </div>
   );
 };

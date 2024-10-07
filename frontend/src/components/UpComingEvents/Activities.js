@@ -246,7 +246,7 @@ const Activities = () => {
                   </p>
                   <p>
                     <strong>Tags:</strong>{" "}
-                    {activity.tags ? activity.tags.name : "No Tags"}
+                    {activity.tags ? activity.tags.type : "No Tags"}
                   </p>
                   <p>
                     <strong>Special Discount:</strong>{" "}
