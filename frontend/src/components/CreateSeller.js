@@ -38,7 +38,7 @@ const CreateSeller = () => {
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
       <form onSubmit={handleSubmit}>
         <h2>Create Seller</h2>
 

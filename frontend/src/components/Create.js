@@ -39,7 +39,7 @@ const CreateAdvertiser = ({setselectedAdverId}) => {
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
       <form onSubmit={handleSubmit}>
         <h2>Create Advertiser</h2>
         {Object.keys(formData).map((key) => (

@@ -172,7 +172,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
       <h1>Activity Management</h1>
       {message && <p className="message">{message}</p>}
 

@@ -187,22 +187,15 @@
       </div>
 
       {/* Main content */}
-      <div style={{
-        flex: 1,
-        marginLeft: '30px',
-        padding: '20px',
-        backgroundColor: '#fff',
-        borderRadius: '10px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-      }}></div>
-        <div style={{
-          flex: 1,
-          marginLeft: '30px',
-          padding: '20px',
-          backgroundColor: '#fff',
-          borderRadius: '10px',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-        }}>
+
+<div style={{
+  flex: 1,
+  padding: '20px',
+  backgroundColor: '#fff',
+  borderRadius: '10px',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+}}>
+
           <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>
             Virtual Trip Planner
           </h2>
