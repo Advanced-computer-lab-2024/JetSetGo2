@@ -1,25 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {
+    getActivity,
+    createActivity,
+    updateActivity,
+    deleteActivity,
+    getCategories,
+    getAdvertiser,
+    getActivityById,
+    getTags,
+  } from "../services/ActivityService";
 
 const predefinedLocations = [
-    { name: 'Cairo, Egypt', coordinates: '31.2357,30.0444,31.2557,30.0644' },
-    { name: 'Giza Pyramids, Egypt', coordinates: '31.1313,29.9765,31.1513,29.9965' },
-    { name: 'Alexandria, Egypt', coordinates: '29.9097,31.2156,29.9297,31.2356' },
-    { name: 'German University in Cairo, Egypt', coordinates: '31.4486,29.9869,31.4686,30.0069' },
-    { name: 'Cairo Festival City, Egypt', coordinates: '31.4015,30.0254,31.4215,30.0454' },
+    {
+        name: "Cairo, Egypt",
+        coordinates: "31.2357,30.0444,31.2557,30.0644",
+    },
+    {
+        name: "Giza Pyramids, Egypt",
+        coordinates: "31.1313,29.9765,31.1513,29.9965",
+    },
+    {
+        name: "Alexandria, Egypt",
+        coordinates: "29.9097,31.2156,29.9297,31.2356",
+    },
+    {
+        name: "German University in Cairo, Egypt",
+        coordinates: "31.4486,29.9869,31.4686,30.0069",
+    },
+    {
+        name: "Cairo Festival City, Egypt",
+        coordinates: "31.4015,30.0254,31.4215,30.0454",
+    },
 ];
 
 const AdvertiserDetails = ({ selectedAdverId }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const id = location.state?.id;
 
     const [advertiser, setAdvertiser] = useState(null);
+    const [tags, setTags] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [error, setError] = useState(null);
     const [activities, setActivities] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({
+    const [isEditingAdvertiser, setIsEditingAdvertiser] = useState(false);
+    const [isEditingActivity, setIsEditingActivity] = useState(false);
+    const [activityToEdit, setActivityToEdit] = useState(null);
+    const [advertiserFormData, setAdvertiserFormData] = useState({
         Name: '',
         Link: '',
         Hotline: '',
@@ -28,6 +56,15 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
         Loc: '',
         CompanyDes: '',
         Services: '',
+    });
+    const [activityFormData, setActivityFormData] = useState({
+        date: '',
+        time: '',
+        location: '',
+        price: '',
+        tags: '',
+        specialDiscount: '',
+        isBookingOpen: false,
     });
     const [showDetails, setShowDetails] = useState(false);
     const [showActivities, setShowActivities] = useState(false);
@@ -38,7 +75,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                 if (selectedAdverId) {
                     const response = await axios.get(`http://localhost:8000/home/adver/getadver/${selectedAdverId}`);
                     setAdvertiser(response.data);
-                    setFormData(response.data);
+                    setAdvertiserFormData(response.data);
                 } else {
                     setError("No Advertiser ID provided.");
                 }
@@ -47,8 +84,11 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                 setError("Error fetching advertiser data.");
             }
         };
+        
 
         fetchAdvertiser();
+        fetchTags();
+        fetchCategories();
     }, [selectedAdverId]);
 
     const fetchAdverActivities = async () => {
@@ -66,49 +106,86 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
         }
     };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const fetchTags = async () => {
+        try {
+          const data = await getTags();
+          setTags(data);
+          console.log('tagss data', data);
+        } catch (error) {
+          console.error("Error fetching tags", error);
+        }
+      };
+    
+      const fetchCategories = async () => {
+        try {
+          const data = await getCategories();
+          setCategories(data);
+        } catch (error) {
+          console.error("Error fetching categories", error);
+        }
+      };
+
+    const handleAdvertiserChange = (e) => {
+        setAdvertiserFormData({ ...advertiserFormData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleActivityChange = (e) => {
+        setActivityFormData({ ...activityFormData, [e.target.name]: e.target.value });
+    };
+
+    const handleAdvertiserSubmit = async (e) => {
         e.preventDefault();
-        const { _selectedAdverId, ...updatedData } = formData;
+        const { _selectedAdverId, ...updatedData } = advertiserFormData;
 
         try {
             const response = await axios.put(`http://localhost:8000/home/adver/updateadver/${selectedAdverId}`, updatedData);
             setAdvertiser(response.data);
-            setIsEditing(false);
-            console.log('eee = ', response.data);
+            setIsEditingAdvertiser(false);
+            console.log('Advertiser updated:', response.data);
         } catch (error) {
             console.error("Error updating advertiser:", error.response ? error.response.data : error.message);
             setError("Error updating advertiser.");
         }
     };
 
-    const handleViewDetails = () => {
-        setShowDetails(!showDetails);
-        setIsEditing(false);
+    const handleEditActivity = (activity) => {
+        setActivityToEdit(activity);
+        setActivityFormData({
+            date: activity.date,
+            time: activity.time,
+            location: activity.location,
+            price: activity.price,
+            tags: activity.tags,
+            specialDiscount: activity.specialDiscount,
+            isBookingOpen: activity.isBookingOpen,
+        });
+        setIsEditingActivity(true);
     };
 
-    const handleEdit = () => {
-        setIsEditing(true);
-        setShowDetails(true);
+    const handleSaveActivity = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.put(`http://localhost:8000/activity/update/${activityToEdit._id}`, activityFormData);
+            setActivities(activities.map(activity => (activity._id === response.data._id ? response.data : activity)));
+            setIsEditingActivity(false);
+            setActivityToEdit(null);
+        } catch (error) {
+            console.error("Error updating activity:", error.response ? error.response.data : error.message);
+            setError("Error updating activity.");
+        }
     };
 
-    const handleClose = () => {
-        setShowDetails(false);
-    };
-
-    const handleViewActivities = () => {
-        fetchAdverActivities();
-        setShowActivities(!showActivities);
-        setShowDetails(false);
-    };
-
-    const handleCreateActivities = () => {
-        navigate('/activities');
-        
-        console.log('addddv = ',advertiser );
+    const handleDeleteActivity = async (activityId) => {
+        if (window.confirm("Are you sure you want to delete this activity?")) {
+            try {
+                await axios.delete(`http://localhost:8000/activity/delete/${activityId}`);
+                setActivities(activities.filter(activity => activity._id !== activityId));
+                console.log('Activity deleted:', activityId);
+            } catch (error) {
+                console.error("Error deleting activity:", error.response ? error.response.data : error.message);
+                setError("Error deleting activity.");
+            }
+        }
     };
 
     const generateMapSrc = (coordinates) => {
@@ -123,64 +200,72 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
         <div className="advertiser-details">
             <h2>Advertiser Details</h2>
 
-            <button onClick={handleViewDetails}>View Details</button>
-            <button onClick={handleEdit} disabled={isEditing || !showDetails}>Update</button>
-            <button onClick={handleViewActivities}>View Activities</button>
-            <button onClick={handleCreateActivities}>Create Activities</button>
+            <button onClick={() => setShowDetails(!showDetails)}>
+                {showDetails ? "Hide Details" : "View Details"}
+            </button>
+            <button onClick={() => setIsEditingAdvertiser(!isEditingAdvertiser)}>
+                {isEditingAdvertiser ? "Cancel Update Advertiser" : "Update Advertiser"}
+            </button>
+            <button onClick={() => fetchAdverActivities() && setShowActivities(!showActivities)}>
+                {showActivities ? "Hide Activities" : "View Activities"}
+            </button>
+            <button onClick={() => navigate('/activities')}>Create Activities</button>
 
             {showDetails && (
-                <>
-                    <button onClick={handleClose}>Close</button>
-                    {isEditing ? (
-                        <form onSubmit={handleSubmit}>
-                            <div>
-                                <label>Name:</label>
-                                <input name="Name" value={formData.Name} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Link:</label>
-                                <input name="Link" value={formData.Link} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Hotline:</label>
-                                <input name="Hotline" value={formData.Hotline} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Email:</label>
-                                <input name="Mail" value={formData.Mail} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Profile:</label>
-                                <input name="Profile" value={formData.Profile} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Location:</label>
-                                <input name="Loc" value={formData.Loc} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Company Description:</label>
-                                <textarea name="CompanyDes" value={formData.CompanyDes} onChange={handleChange} required />
-                            </div>
-                            <div>
-                                <label>Services:</label>
-                                <textarea name="Services" value={formData.Services} onChange={handleChange} required />
-                            </div>
-                            <button type="submit">Update</button>
-                            <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-                        </form>
-                    ) : (
-                        <ul>
-                            <li><strong>Name:</strong> {advertiser.Name}</li>
-                            <li><strong>Link:</strong> {advertiser.Link}</li>
-                            <li><strong>Hotline:</strong> {advertiser.Hotline}</li>
-                            <li><strong>Email:</strong> {advertiser.Mail}</li>
-                            <li><strong>Profile:</strong> {advertiser.Profile}</li>
-                            <li><strong>Location:</strong> {advertiser.Loc}</li>
-                            <li><strong>Company Description:</strong> {advertiser.CompanyDes || 'N/A'}</li>
-                            <li><strong>Services:</strong> {advertiser.Services || 'N/A'}</li>
-                        </ul>
-                    )}
-                </>
+                <div>
+                    <h3>Details</h3>
+                    <p><strong>Name:</strong> {advertiser.Name}</p>
+                    <p><strong>Link:</strong> {advertiser.Link}</p>
+                    <p><strong>Hotline:</strong> {advertiser.Hotline}</p>
+                    <p><strong>Email:</strong> {advertiser.Mail}</p>
+                    <p><strong>Profile:</strong> {advertiser.Profile}</p>
+                    <p><strong>Location:</strong> {advertiser.Loc}</p>
+                    <p><strong>Company Description:</strong> {advertiser.CompanyDes}</p>
+                    <p><strong>Services:</strong> {advertiser.Services}</p>
+                    <button onClick={() => setShowDetails(false)}>Close Details</button>
+                </div>
+            )}
+
+            {isEditingAdvertiser && (
+                <div>
+                    <h3>Update Advertiser</h3>
+                    <form onSubmit={handleAdvertiserSubmit}>
+                        <div>
+                            <label>Name:</label>
+                            <input name="Name" value={advertiserFormData.Name} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Link:</label>
+                            <input name="Link" value={advertiserFormData.Link} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Hotline:</label>
+                            <input name="Hotline" value={advertiserFormData.Hotline} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Email:</label>
+                            <input name="Mail" value={advertiserFormData.Mail} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Profile:</label>
+                            <input name="Profile" value={advertiserFormData.Profile} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Location:</label>
+                            <input name="Loc" value={advertiserFormData.Loc} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Company Description:</label>
+                            <textarea name="CompanyDes" value={advertiserFormData.CompanyDes} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <div>
+                            <label>Services:</label>
+                            <textarea name="Services" value={advertiserFormData.Services} onChange={handleAdvertiserChange} required />
+                        </div>
+                        <button type="submit">Update</button>
+                        <button type="button" onClick={() => setIsEditingAdvertiser(false)}>Cancel</button>
+                    </form>
+                </div>
             )}
 
             {showActivities && (
@@ -190,21 +275,27 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                         {activities.length > 0 ? (
                             activities.map(activity => {
                                 const locationData = predefinedLocations.find(
-                                    location => location.name === activity.location
+                                    (location) => location.name === activity.location
                                 );
                                 const mapSrc = locationData
                                     ? generateMapSrc(locationData.coordinates)
                                     : null;
 
+                                    const category = categories.find(cat => cat._id === activity.category);
+                                    const categoryName = category ? category.name : "Unknown Category";
+
+                                    const tt = tags.find(t => t._id === activity.tags);
+                                    const ttname = tt ? tt.name : "unknown tag";
+
                                 return (
                                     <div key={activity._id} className="activity-card">
-                                        <h4>{activity.category.name}</h4>
-                                        <h4>{advertiser.Name}</h4>
+                                        <h4>{categoryName}</h4>
+                                        <h3>{activity.advertiser.Name}</h3>
                                         <p><strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}</p>
                                         <p><strong>Time:</strong> {activity.time}</p>
                                         <p><strong>Location:</strong> {activity.location}</p>
                                         <p><strong>Price:</strong> ${activity.price}</p>
-                                        <p><strong>Tags:</strong> {activity.tags}</p>
+                                        <p><strong>Tags:</strong> {ttname}</p>
                                         <p><strong>Special Discount:</strong> {activity.specialDiscount}%</p>
                                         <p><strong>Booking Open:</strong> {activity.isBookingOpen ? 'Yes' : 'No'}</p>
                                         {mapSrc && (
@@ -213,10 +304,12 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                                                 src={mapSrc}
                                                 width="300"
                                                 height="200"
-                                                style={{ border: 'none' }}
-                                            />
+                                                style={{ border: "none" }}
+                                            ></iframe>
                                         )}
-                                        <hr />
+                                        <button onClick={() => handleEditActivity(activity)}>Edit</button>
+                                        <button onClick={() => handleDeleteActivity(activity._id)}>Delete</button>
+                                        <hr style={{ margin: '20px 0' }} /> {/* Separator */}
                                     </div>
                                 );
                             })
@@ -224,7 +317,87 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                             <p>No activities found for this advertiser.</p>
                         )}
                     </div>
-                    <button onClick={handleViewActivities}>Close Activities</button>
+                    <button onClick={() => setShowActivities(false)}>Close Activities</button>
+                </div>
+            )}
+
+            {isEditingActivity && activityToEdit && (
+                <div className="activity-edit-form">
+                    <h3>Edit Activity</h3>
+                    <form onSubmit={handleSaveActivity}>
+                        <div>
+                            <label>Date:</label>
+                            <input 
+                                name="date" 
+                                type="date" 
+                                value={activityFormData.date} 
+                                onChange={handleActivityChange} 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label>Time:</label>
+                            <input 
+                                name="time" 
+                                type="time" 
+                                value={activityFormData.time} 
+                                onChange={handleActivityChange} 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label>Location:</label>
+                            <input 
+                                name="location" 
+                                value={activityFormData.location} 
+                                onChange={handleActivityChange} 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label>Price:</label>
+                            <input 
+                                name="price" 
+                                type="number" 
+                                value={activityFormData.price} 
+                                onChange={handleActivityChange} 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label>Tags:</label>
+                            <input 
+                                name="tags" 
+                                value={activityFormData.tags} 
+                                onChange={handleActivityChange} 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label>Special Discount:</label>
+                            <input 
+                                name="specialDiscount" 
+                                type="number" 
+                                value={activityFormData.specialDiscount} 
+                                onChange={handleActivityChange} 
+                                required 
+                            />
+                        </div>
+                        <div>
+                            <label>Booking Open:</label>
+                            <select 
+                                name="isBookingOpen" 
+                                value={activityFormData.isBookingOpen} 
+                                onChange={handleActivityChange} 
+                                required
+                            >
+                                <option value={true}>Yes</option>
+                                <option value={false}>No</option>
+                            </select>
+                        </div>
+                        <button type="submit">Save Activity</button>
+                        <button type="button" onClick={() => setIsEditingActivity(false)}>Cancel</button>
+                    </form>
                 </div>
             )}
         </div>
