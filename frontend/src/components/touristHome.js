@@ -67,6 +67,7 @@ const TouristHome = ({ selectedTouristId }) => {
       );
       console.log("Search Results:", response.data); // Log results for debugging
       setSearchResults(response.data);
+      console.log('datata = ' , response.data);
     } catch (error) {
       console.error("Error fetching search results:", error);
       setSearchResults({
@@ -237,7 +238,8 @@ const TouristHome = ({ selectedTouristId }) => {
               {searchResults.itinaries.map((itinerary, index) => (
                 <li key={index} style={styles.resultItem}>
                   <h4>{itinerary.name}</h4>
-                  <p>{itinerary.description}</p>
+                  <p>{itinerary.activities.date}</p>
+                  
                 </li>
               ))}
             </ul>

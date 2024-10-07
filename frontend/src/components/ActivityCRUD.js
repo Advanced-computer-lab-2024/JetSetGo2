@@ -170,6 +170,13 @@ const ActivityCRUD = ({ selectedAdverId }) => {
   const handleHomeNavigation = () => {
     navigate('/list'); // Adjust this path according to your routing setup
   };
+  const handleRatingChange = (e) => {
+    const value = Math.max(0, Math.min(5, Number(e.target.value)));
+    setFormData(prev => ({
+      ...prev,
+      rating: isNaN(value) ? 0 : value
+    }));
+  };
 
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
@@ -221,6 +228,9 @@ const ActivityCRUD = ({ selectedAdverId }) => {
               ))}
             </select>
           </label>
+          <label>Rating:</label>
+            <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} style={{ marginBottom: '10px' }} />
+            <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span>
           <label>
             Price:
             <input
@@ -313,6 +323,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
                   <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                   <p>Location: {activity.location}</p>
                   <p>Price: {activity.price}</p>
+                  <p>Rating: {activity.rating}</p>
                   <p>Tags: {tagName}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
