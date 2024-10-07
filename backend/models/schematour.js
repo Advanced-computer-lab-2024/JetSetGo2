@@ -19,7 +19,6 @@ const schema = new mongoose.Schema(
     tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
     Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true },
 
- 
 }, {
     timestamps: true
 });

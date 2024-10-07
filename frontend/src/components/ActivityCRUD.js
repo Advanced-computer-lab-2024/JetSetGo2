@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import "../App.css";
 import {
   getActivity,
@@ -10,7 +10,7 @@ import {
   getAdvertiser,
   getActivityById,
   getTags,
-} from "../services/ActivityService"; // Ensure to import the necessary services
+} from "../services/ActivityService";
 
 const predefinedLocations = [
   {
@@ -27,18 +27,17 @@ const predefinedLocations = [
   },
   {
     name: "German University in Cairo, Egypt",
-    coordinates: "31.4486,29.9869,31.4686,30.0069", // Sample bounding box
+    coordinates: "31.4486,29.9869,31.4686,30.0069",
   },
   {
     name: "Cairo Festival City, Egypt",
-    coordinates: "31.4015,30.0254,31.4215,30.0454", // Sample bounding box
+    coordinates: "31.4015,30.0254,31.4215,30.0454",
   },
-  // Add more locations as needed
 ];
 
-const ActivityCRUD = ({selectedAdverId}) => {
+const ActivityCRUD = ({ selectedAdverId }) => {
   const [activities, setActivities] = useState([]);
-  const [categories, setCategories] = useState([]); // State to hold categories
+  const [categories, setCategories] = useState([]);
   const [advertisers, setAdvertisers] = useState([]);
   const [tags, setTags] = useState([]);
   const [message, setMessage] = useState("");
@@ -57,23 +56,19 @@ const ActivityCRUD = ({selectedAdverId}) => {
   const [editData, setEditData] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch activities and categories when the component mounts
   useEffect(() => {
     fetchCategories();
     fetchTags();
-    // fetchActivitiesByAdver();
+    fetchActivitiesByAdver();
   }, [selectedAdverId]);
 
   const fetchActivitiesByAdver = async () => {
     try {
-      const data = await getActivityById({selectedAdverId});
-
-      console.log("Fetched activities:", data);
-      console.log('selectedadver = ', selectedAdverId);
+      const data = await getActivityById({ selectedAdverId });
       setActivities(data);
     } catch (error) {
-      console.error("Error fetching activities:", error.response ? error.response.data : error.message);
-      setMessage("Failed to fetch activities.", selectedAdverId);
+      console.error("Error fetching activities:", error);
+      setMessage("Failed to fetch activities.");
     }
   };
 
@@ -81,7 +76,6 @@ const ActivityCRUD = ({selectedAdverId}) => {
     try {
       const data = await getTags();
       setTags(data);
-      console.log('tagss data', data);
     } catch (error) {
       console.error("Error fetching tags", error);
     }
@@ -95,6 +89,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
       console.error("Error fetching categories", error);
     }
   };
+
   const handleChange = (e, setData) => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({
@@ -103,34 +98,15 @@ const ActivityCRUD = ({selectedAdverId}) => {
     }));
   };
 
-  const handleLocationChange = (e) => {
-    const selectedLocation = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      location: selectedLocation,
-    }));
-  };
-  const handleRatingChange = (e) => {
-    const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
-    setFormData(prev => ({
-      ...prev,
-      rating: isNaN(value) ? 0 : value  // Ensure it's never undefined
-    }));
-  };
-
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("adverid before creating" , selectedAdverId);
       await createActivity(formData);
       setMessage("Activity created successfully!");
       resetCreateForm();
-     fetchActivitiesByAdver();
+      fetchActivitiesByAdver();
     } catch (error) {
-      const errorMessage = error.response
-        ? error.response.data.message
-        : "Error occurred while creating the activity";
-      setMessage(errorMessage);
+      setMessage("Error occurred while creating the activity.");
       console.error("Error:", error);
     }
   };
@@ -140,15 +116,12 @@ const ActivityCRUD = ({selectedAdverId}) => {
     if (!editData) return;
 
     try {
-      await updateActivity(editData._id, formData); // Send updated formData
+      await updateActivity(editData._id, formData);
       setMessage("Activity updated successfully!");
       resetEditForm();
       fetchActivitiesByAdver();
     } catch (error) {
-      const errorMessage = error.response
-        ? error.response.data.message
-        : "Error occurred while updating the activity.";
-      setMessage(errorMessage);
+      setMessage("Error occurred while updating the activity.");
       console.error(error);
     }
   };
@@ -166,7 +139,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
 
   const handleEdit = (activity) => {
     setEditData(activity);
-    setFormData({ ...activity }); // Set formData to the activity being edited
+    setFormData({ ...activity });
   };
 
   const resetCreateForm = () => {
@@ -193,6 +166,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
+
   const handleHomeNavigation = () => {
     navigate('/list'); // Adjust this path according to your routing setup
   };
@@ -201,6 +175,11 @@ const ActivityCRUD = ({selectedAdverId}) => {
     <div>
       <h1>Activity Management</h1>
       {message && <p className="message">{message}</p>}
+
+      {/* Home Button */}
+      <button onClick={handleHomeNavigation} className="home-button">
+        Home
+      </button>
 
       {/* Form for creating a new activity */}
       <section className="form-section">
@@ -216,10 +195,6 @@ const ActivityCRUD = ({selectedAdverId}) => {
               required
             />
           </label>
-          <label>Rating:
-  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
-  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
-</label>
           <label>
             Time:
             <input
@@ -235,7 +210,7 @@ const ActivityCRUD = ({selectedAdverId}) => {
             <select
               name="location"
               value={formData.location}
-              onChange={handleLocationChange}
+              onChange={(e) => handleChange(e, setFormData)}
               required
             >
               <option value="">Select Location</option>
@@ -272,7 +247,6 @@ const ActivityCRUD = ({selectedAdverId}) => {
               ))}
             </select>
           </label>
-         
           <label>
             Tags:
             <select
@@ -325,37 +299,32 @@ const ActivityCRUD = ({selectedAdverId}) => {
                 ? generateMapSrc(locationData.coordinates)
                 : null;
 
+              const category = categories.find(cat => cat._id === activity.category);
+              const categoryName = category ? category.name : "Unknown Category";
+
+              const tag = tags.find(t => t._id === activity.tags);
+              const tagName = tag ? tag.name : "unknown tag";
+
               return (
                 <li key={activity._id} className="activity-item">
-                  <h3>{activity.category.name}</h3>
+                  <h3>{categoryName}</h3>
                   <h3>{activity.advertiser.Name}</h3>
                   <p>Date: {new Date(activity.date).toLocaleDateString()}</p>
                   <p>Time: {new Date(activity.time).toLocaleTimeString()}</p>
                   <p>Location: {activity.location}</p>
-                  <p>Price: ${activity.price}</p>
-                  <p>Tags: {activity.tags.name}</p>
-                  <p>Rating: {activity.rating}</p>
+                  <p>Price: {activity.price}</p>
+                  <p>Tags: {tagName}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
-                  {mapSrc && (
-                    <iframe
-                      title={`Map for ${activity.location}`}
-                      src={mapSrc}
-                      width="300"
-                      height="200"
-                      style={{ border: "none" }}
-                    ></iframe>
-                  )}
                   <button onClick={() => handleEdit(activity)}>Edit</button>
-                  <button onClick={() => handleDelete(activity._id)}>
-                    Delete
-                  </button>
+                  <button onClick={() => handleDelete(activity._id)}>Delete</button>
+                  {mapSrc && <iframe src={mapSrc} width="600" height="450" style={{ border: 0 }} allowFullScreen loading="lazy"></iframe>}
                 </li>
               );
             })}
           </ul>
         ) : (
-          <p>No activities available.</p>
+          <p>No activities found.</p>
         )}
       </section>
 
@@ -384,16 +353,12 @@ const ActivityCRUD = ({selectedAdverId}) => {
                 required
               />
             </label>
-            <label>Rating:
-  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
-  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
-</label>
             <label>
               Location:
               <select
                 name="location"
                 value={formData.location}
-                onChange={handleLocationChange}
+                onChange={(e) => handleChange(e, setFormData)}
                 required
               >
                 <option value="">Select Location</option>
@@ -430,7 +395,6 @@ const ActivityCRUD = ({selectedAdverId}) => {
                 ))}
               </select>
             </label>
-           
             <label>
               Tags:
               <select
@@ -440,9 +404,9 @@ const ActivityCRUD = ({selectedAdverId}) => {
                 required
               >
                 <option value="">Select Tags</option>
-                {tags.map((tags) => (
-                  <option key={tags._id} value={tags._id}>
-                    {tags.name}
+                {tags.map((tag) => (
+                  <option key={tag._id} value={tag._id}>
+                    {tag.name}
                   </option>
                 ))}
               </select>
@@ -467,9 +431,6 @@ const ActivityCRUD = ({selectedAdverId}) => {
               />
             </label>
             <button type="submit">Update Activity</button>
-            <button type="button" onClick={resetEditForm}>
-              Cancel
-            </button>
           </form>
         </section>
       )}

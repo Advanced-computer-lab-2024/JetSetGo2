@@ -1,0 +1,69 @@
+.advertiser-details-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 900px;
+}
+
+.buttons {
+    margin-bottom: 20px;
+}
+
+.primary-btn, .secondary-btn, .danger-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.primary-btn {
+    background-color: #2d3e50;
+    color: white;
+}
+
+.secondary-btn {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.danger-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.primary-btn:hover, .secondary-btn:hover, .danger-btn:hover {
+    opacity: 0.8;
+}
+
+.details, .activities-list, .form-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.activity {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
