@@ -3,12 +3,24 @@ const SellerModel = require('../models/Seller.js');
 
 // Create a new seller
 const createSeller = async (req, res) => {
-    const { Name, Password, Email, Description } = req.body;
+    const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age, Email } = req.body;
 
     try {
+        // Validate required fields
+        if (!Name || !PickUp_Location || !Type_Of_Products || !Previous_Work || !Age || !Email) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
+
         // Create a new seller with the data provided in the request body
-        const seller = await SellerModel.create({ Name, Password, Email, Description });
-        
+        const seller = await SellerModel.create({
+            Name,
+            PickUp_Location,
+            Type_Of_Products,
+            Previous_Work,
+            Age,
+            Email
+        });
+
         // Respond with the created seller
         res.status(200).json(seller);
     } catch (error) {
@@ -17,7 +29,7 @@ const createSeller = async (req, res) => {
     }
 };
 
-// Read a seller by the MongoDB `_id` (generated automatically when creating a seller)
+// Read a seller by the MongoDB `_id`
 const readSeller = async (req, res) => {
     const { id } = req.params; // Get the 'id' from the request parameters
 
@@ -41,15 +53,17 @@ const readSeller = async (req, res) => {
 // Update a seller by the MongoDB `_id`
 const updateSeller = async (req, res) => {
     const { id } = req.params; // Get the 'id' from the request parameters
-    const { Name, Password, Email, Description } = req.body;
+    const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age, Email } = req.body;
 
     try {
         // Construct an object containing only the fields that are provided
         const updateFields = {};
         if (Name) updateFields.Name = Name;
-        if (Password) updateFields.Password = Password;
+        if (PickUp_Location) updateFields.PickUp_Location = PickUp_Location;
+        if (Type_Of_Products) updateFields.Type_Of_Products = Type_Of_Products;
+        if (Previous_Work) updateFields.Previous_Work = Previous_Work;
+        if (Age) updateFields.Age = Age;
         if (Email) updateFields.Email = Email;
-        if (Description) updateFields.Description = Description;
 
         // Update the seller with only the provided fields, using _id to search
         const seller = await SellerModel.findByIdAndUpdate(
@@ -70,37 +84,47 @@ const updateSeller = async (req, res) => {
     }
 };
 
+// Get all sellers
 const getSeller = async (req, res) => {
     try {
-      const seller = await SellerModel.find();
-      res.status(200).json(seller);
+        const sellers = await SellerModel.find();
+        res.status(200).json(sellers);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+        res.status(400).json({ error: error.message });
+    }
+};
+
+const deleteAllSellers = async (req, res) => {
+    try {
+      await SellerModel.deleteMany({});  // This will delete all sellers in the Seller collection
+      res.status(200).json({ message: "All sellers have been deleted" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   };
-  const deleteSeller = async (req, res) => {
+  
+// Delete a seller
+const deleteSeller = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find the user by username and delete them
+        // Find the seller by ID and delete it
         const deletedSeller = await SellerModel.findByIdAndDelete(id);
- 
-       if (!deletedSeller) {
-          return res.status(404).json({
-             message: "User not found",
-          });
-       }
- 
-       // Respond with a success message
-       res.status(200).json({
-          message: "User deleted successfully",
-          user: deletedSeller,
-       });
+
+        if (!deletedSeller) {
+            return res.status(404).json({ message: "Seller not found" });
+        }
+
+        // Respond with a success message
+        res.status(200).json({
+            message: "Seller deleted successfully",
+            seller: deletedSeller,
+        });
     } catch (error) {
-       res.status(500).json({
-          message: "Error deleting user",
-          error,
-       });
+        res.status(500).json({
+            message: "Error deleting seller",
+            error,
+        });
     }
 };
 
@@ -109,5 +133,6 @@ module.exports = {
     readSeller,
     updateSeller,
     getSeller,
-    deleteSeller
+    deleteSeller,
+    deleteAllSellers
 };
