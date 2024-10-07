@@ -68,7 +68,7 @@ const HistoricalPlaces = () => {
       <div className="back-button-container">
         <button
           className="back-button"
-          onClick={() => navigate("/tourist-home")}
+          onClick={() => navigate(-1)}
         >
           Back
         </button>

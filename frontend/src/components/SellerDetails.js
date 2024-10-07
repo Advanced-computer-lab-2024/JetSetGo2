@@ -238,8 +238,28 @@ const SellerDetails = () => {
         <button onClick={() => handleSidebarClick('edit')} style={buttonStyle}>
           Edit Details
         </button>
-        <button style={buttonStyle} onClick={() => navigate("/productList")}>View Products</button>
-        <button style={buttonStyle} onClick={() => navigate("/product")}>Add/Edit Product</button>
+        <h3 style={{ color: '#ff6348' }}>Explore</h3>
+        <button style={buttonStyle} onClick={() => navigate("/productList")}>
+          View Products
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/product")}>
+          Add/Edit Product
+        </button>
+
+
+        <button style={buttonStyle} onClick={() => navigate("/Upcoming-activities")}>
+          View Activities
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/Upcoming-itineraries")}>
+          View Itineraries
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/all-historicalplaces")}>
+          Historical Places
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
+          Museums
+        </button>
+      
       </div>
 
       {/* Main content */}

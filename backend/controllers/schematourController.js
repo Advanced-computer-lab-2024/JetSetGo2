@@ -15,6 +15,7 @@ const createGuide = async (req, res) => {
     DropOffLoc,
     tourGuide,
     Tags,
+    rating,
   } = req.body;
 
   const newSchema = new Schema({
@@ -31,6 +32,7 @@ const createGuide = async (req, res) => {
     DropOffLoc,
     tourGuide,
     Tags,
+    rating,
   });
   try {
     const savedSchema = await newSchema.save();

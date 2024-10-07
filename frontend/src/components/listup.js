@@ -249,6 +249,21 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                 <button onClick={() => navigate('/activities')} style={buttonStyle}>
                     Create Activities
                 </button>
+                <h3 style={{ color: '#ff6348' }}>Explore</h3>
+
+        <button style={buttonStyle} onClick={() => navigate("/Upcoming-activities")}>
+          View Upcoming Activities
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/Upcoming-itineraries")}>
+          View Itineraries
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/all-historicalplaces")}>
+          Historical Places
+        </button>
+        <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
+          Museums
+        </button>
+      
             </div>
 
             {/* Main Content */}

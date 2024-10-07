@@ -18,7 +18,8 @@ const getItineraries = async () => {
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
   const [error, setError] = useState(null);
-  const [sortOrder, setSortOrder] = useState("");
+  const [sortOrder, setSortOrder] = useState(""); // State for price sorting
+  const [sortRating, setSortRating] = useState(""); // State for rating sorting
   const [Tags, setTags] = useState([]);
   const [activities, setActivities] = useState([]);
 
@@ -75,8 +76,23 @@ const Itineraries = () => {
       );
     } else if (value === "desc") {
       sortedItineraries.sort(
-        (a, b) => Math.max(...b.TourPrice) - Math.max(...a.TourPrice)
+        (a, b) => Math.max(...b.TTourPrice) - Math.max(...a.TourPrice)
       );
+    }
+    setItineraries(sortedItineraries);
+  };
+
+  // Function to handle sorting based on rating
+  const handleSortRatingChange = (e) => {
+    const value = e.target.value;
+    setSortRating(value);
+
+    // Sort itineraries based on rating
+    let sortedItineraries = [...itineraries];
+    if (value === "asc") {
+      sortedItineraries.sort((a, b) => a.rating - b.rating);
+    } else if (value === "desc") {
+      sortedItineraries.sort((a, b) => b.rating - a.rating);
     }
     setItineraries(sortedItineraries);
   };
@@ -86,7 +102,7 @@ const Itineraries = () => {
       <div className="back-button-container">
         <button
           className="back-button"
-          onClick={() => navigate("/tourist-home")}
+          onClick={() => navigate(-1)}
         >
           Back
         </button>
@@ -95,8 +111,16 @@ const Itineraries = () => {
 
       {/* Dropdown for sorting itineraries by price */}
       <div className="sort-container">
-        <label htmlFor="sort">Sort by Price:</label>
-        <select id="sort" value={sortOrder} onChange={handleSortChange}>
+        <label htmlFor="sortPrice">Sort by Price:</label>
+        <select id="sortPrice" value={sortOrder} onChange={handleSortChange}>
+          <option value="">Select</option>
+          <option value="asc">Lowest to Highest</option>
+          <option value="desc">Highest to Lowest</option>
+        </select>
+
+        {/* Dropdown for sorting itineraries by rating */}
+        <label htmlFor="sortRating">Sort by Rating:</label>
+        <select id="sortRating" value={sortRating} onChange={handleSortRatingChange}>
           <option value="">Select</option>
           <option value="asc">Lowest to Highest</option>
           <option value="desc">Highest to Lowest</option>
@@ -137,6 +161,9 @@ const Itineraries = () => {
                 {Array.isArray(itinerary.Tags)
                   ? itinerary.Tags.map((tag) => tag.name).join(", ")
                   : itinerary.Tags.name}
+              </p>
+              <p>
+                <strong>Rating:</strong> {itinerary.rating}
               </p>
               <p>
                 <strong>Locations:</strong> {itinerary.locations.join(", ")}

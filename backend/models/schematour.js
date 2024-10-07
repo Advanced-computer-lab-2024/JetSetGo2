@@ -18,6 +18,10 @@ const schema = new mongoose.Schema(
     bookings: { type: Number, default: 0 },
     tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
     Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true },
+    rating: {
+        type: Number,
+        required: true,
+      },
 
 }, {
     timestamps: true

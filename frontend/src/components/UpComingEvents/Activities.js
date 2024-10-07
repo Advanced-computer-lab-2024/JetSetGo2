@@ -24,6 +24,7 @@ const Activities = () => {
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [categories, setCategories] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc"); // Added state for sort order
+  const [sortBy, setSortBy] = useState("price"); // Added state for sorting by price or rating
 
   const [filters, setFilters] = useState({
     date: "",
@@ -98,9 +99,14 @@ const Activities = () => {
       filtered = filtered.filter((activity) => activity.rating >= ratingLimit);
     }
 
-    // Sort activities by price based on selected order
+    // Sort activities based on selected criteria (price or rating) and order
     filtered.sort((a, b) => {
-      return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+      if (sortBy === "price") {
+        return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+      } else if (sortBy === "rating") {
+        return sortOrder === "asc" ? a.rating - b.rating : b.rating - a.rating;
+      }
+      return 0;
     });
 
     setFilteredActivities(filtered);
@@ -108,7 +114,7 @@ const Activities = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [filters, sortOrder]); // Add sortOrder to the dependency array
+  }, [filters, sortOrder, sortBy]); // Add sortOrder and sortBy to the dependency array
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -119,12 +125,16 @@ const Activities = () => {
     setSortOrder(e.target.value); // Update sort order state
   };
 
+  const handleSortByChange = (e) => {
+    setSortBy(e.target.value); // Update sorting by price or rating
+  };
+
   return (
     <div id="activities">
       <div className="back-button-container">
         <button
           className="back-button"
-          onClick={() => navigate("/tourist-home")}
+          onClick={() => navigate(-1)}
         >
           Back
         </button>
@@ -185,7 +195,14 @@ const Activities = () => {
             />
           </div>
           <div>
-            <label>Sort by Price:</label>
+            <label>Sort by:</label>
+            <select value={sortBy} onChange={handleSortByChange}>
+              <option value="price">Price</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+          <div>
+            <label>Sort Order:</label>
             <select value={sortOrder} onChange={handleSortChange}>
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
@@ -239,6 +256,9 @@ const Activities = () => {
                     <strong>Booking Open:</strong>{" "}
                     {activity.isBookingOpen ? "Yes" : "No"}
                   </p>
+                  <p>
+                    <strong>Rating:</strong> {activity.rating}
+                  </p>
                   {mapSrc && (
                     <iframe
                       title={`Map for ${activity.location}`}
@@ -265,30 +285,21 @@ const Activities = () => {
           border-radius: 8px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .filter-section {
+        .filter-section, .activity-list {
           margin-bottom: 20px;
-          padding: 20px;
-          background-color: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
-        .filter-section h2 {
-          margin-bottom: 15px;
+        .filter-section h2, .activity-list h2 {
+          font-size: 24px;
+          margin-bottom: 10px;
         }
         .filter-inputs {
           display: flex;
           flex-wrap: wrap;
-          gap: 15px;
+          gap: 20px;
         }
         .filter-inputs div {
           flex: 1;
-          min-width: 150px;
-        }
-        .activity-list {
-          padding: 20px;
-        }
-        .activity-list h2 {
-          margin-bottom: 20px;
+          min-width: 200px;
         }
         .activity-grid {
           display: grid;
@@ -296,18 +307,26 @@ const Activities = () => {
           gap: 20px;
         }
         .activity-card {
-          padding: 15px;
+          padding: 20px;
           background-color: #fff;
           border-radius: 8px;
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .activity-card h3 {
-          margin-top: 0;
+        .back-button-container {
+          display: flex;
+          justify-content: flex-start;
         }
-        @media (max-width: 600px) {
-          .filter-inputs {
-            flex-direction: column;
-          }
+        .back-button {
+          padding: 10px 20px;
+          background-color: #3498db;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+        }
+        .back-button:hover {
+          background-color: #2980b9;
         }
       `}</style>
     </div>
