@@ -39,6 +39,7 @@ const updateTourist = async (req, res) => {
   if (req.body.Nationality) updateData.Nationality = req.body.Nationality;
   if (req.body.DateOfBirth) updateData.DateOfBirth = req.body.DateOfBirth;
   if (req.body.Job) updateData.Job = req.body.Job;
+  if (req.body.Wallet) updateData.Wallet = req.body.Wallet;
   try {
     const updatetourist = await touristModel.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -71,4 +72,19 @@ const getTouristById = async (req, res) => {
   }
 };
 
-module.exports = { createTourist, updateTourist, getTourist, getTouristById };
+const deleteAllTourist = async (req, res) => {
+  try {
+    await touristModel.deleteMany({});
+    res.status(200).json({ message: "All tourist have been deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createTourist,
+  updateTourist,
+  getTourist,
+  getTouristById,
+  deleteAllTourist,
+};

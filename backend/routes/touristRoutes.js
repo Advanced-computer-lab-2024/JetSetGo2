@@ -5,6 +5,7 @@ const {
   updateTourist,
   getTourist,
   getTouristById,
+  deleteAllTourist,
 } = require("../controllers/touristController");
 
 router.get("/", (req, res) => {
@@ -15,5 +16,6 @@ router.post("/addTourist", createTourist);
 router.put("/updateTourist/:id", updateTourist);
 router.get("/getTourist", getTourist);
 router.get("/getTourist/:id", getTouristById);
+router.delete("/deleteAllTourist", deleteAllTourist);
 
 module.exports = router;

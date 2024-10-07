@@ -1,8 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const schema = new mongoose.Schema({
+const schema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
-    activities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Activity', required: true }],
+    activities: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Activity", required: true },
+    ],
     locations: [{ type: String, required: true }],
     timeline: [{ type: String, required: true }],
     durationActivity: [{ type: Number, required: true }],
@@ -13,11 +16,20 @@ const schema = new mongoose.Schema({
     pickUpLoc: [{ type: String, required: true }],
     DropOffLoc: [{ type: String, required: true }],
     bookings: { type: Number, default: 0 },
-    tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
-    Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true } 
- 
-}, {
-    timestamps: true
-});
+    tourGuide: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tour",
+      required: true,
+    },
+    Tags: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PreferenceTag",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model('SchemaT', schema);
+module.exports = mongoose.model("SchemaT", schema);
