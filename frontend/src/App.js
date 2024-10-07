@@ -29,6 +29,8 @@ import Itineraries from "./components/UpComingEvents/Itenaries";
 import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
 import AddTourismGovernor from "./components/AddTourismGovernor";
+import ProductListp from "./components/p";
+
 import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
@@ -101,6 +103,8 @@ function App() {
             }
           />
           <Route path="/TagsManagement" element={<TagsManagement />} />
+          <Route path="/p" element={<ProductListp />} />
+
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/product" element={<ProductCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
