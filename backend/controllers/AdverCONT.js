@@ -78,9 +78,33 @@ const createAdver = async(req,res) => {
          res.status(400).json({ error: error.message });
       }
    };
+   const deleteAdver = async (req, res) => {
+      console.log('Request to delete Advertiser:', req.params.id);  // Log the ID
+      try {
+         const { id } = req.params;
+         const deletedAdver = await adverModel.findByIdAndDelete(id);
+   
+         if (!deletedAdver) {
+            return res.status(404).json({
+               message: "User not found",
+            });
+         }
+   
+         res.status(200).json({
+            message: "User deleted successfully",
+            user: deletedAdver,
+         });
+      } catch (error) {
+         console.error('Error deleting tourism governor:', error);
+         res.status(500).json({
+            message: "Error deleting user",
+            error,
+         });
+      }
+   };
 
   
 
 
 // Export the router
-module.exports = {createAdver, getAdver, updateAdver , getAdverById, getAdvertiser};
+module.exports = {createAdver, getAdver, updateAdver , getAdverById, getAdvertiser,deleteAdver};

@@ -28,11 +28,28 @@ const predefinedLocations = [
 const Museums = () => {
   const [museums, setMuseums] = useState([]);
   const [error, setError] = useState(null);
+  const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
+  const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
 
   // Fetch museums when the component mounts
   useEffect(() => {
     fetchMuseums();
   }, []);
+
+  useEffect(() => {
+    if (selectedTag) {
+      // Filter museums by the selected tag
+      setFilteredMuseums(museums.filter((museum) => 
+        museum.tourismGovernerTags?.type === selectedTag
+      ));
+    } else {
+      // If no tag is selected, show all museums
+      setFilteredMuseums(museums);
+
+
+      
+    }
+  }, [selectedTag, museums]); // Trigger filtering when selectedTag or museums change
 
   const fetchMuseums = async () => {
     try {
@@ -53,33 +70,57 @@ const Museums = () => {
     <div id="museums">
       <h2>Museums</h2>
       {error && <p className="error">{error}</p>}
-      {museums.length > 0 ? (
+
+      {/* Filter by Tag */}
+      <div>
+        <label htmlFor="tagFilter">Filter by Tourism Governor Tag:</label>
+        <select
+          id="tagFilter"
+          value={selectedTag}
+          onChange={(e) => setSelectedTag(e.target.value)}
+        >
+         <option value="">All Tags</option>
+          {museums
+            .map((place) => place.tourismGovernerTags?.type)
+            .filter((value, index, self) => value && self.indexOf(value) === index) // Remove duplicates
+            .map((tag) => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+        </select>
+      </div>
+
+      {filteredMuseums.length > 0 ? (
         <ul>
-          {museums.map((museum) => {
+          {filteredMuseums.map((place) => {
             const locationData = predefinedLocations.find(
-              (location) => location.name === museum.location
+              (location) => location.name === place.location
             );
             const mapSrc = locationData
               ? generateMapSrc(locationData.coordinates)
               : null;
 
             return (
-              <li key={museum._id} className="museum-item">
-                <h3>{museum.description}</h3>
-                <p>Location: {museum.location}</p>
-                <p>Opening Hours: {museum.openingHours}</p>
-                <p>Ticket Price: ${museum.ticketPrice}</p>
+              <li key={place._id} className="historical-place-item">
+  <h3>{place.tourismGovernerTags.name}</h3>
+  <p>Description: {place.description}</p>                <p>Location: {place.location}</p>
+                <p>Opening Hours: {place.openingHours}</p>
+                <p>Ticket Price: ${place.ticketPrice}</p>
                 <p>
                   Pictures:{" "}
                   <img
-                    src={museum.pictures}
-                    alt={`Picture of ${museum.description}`}
+                    src={place.pictures}
+                    alt={`Picture of ${place.description}`}
                     style={{ width: "100px", height: "auto" }}
                   />
                 </p>
+                <p>  Tourism Governor Tags: {
+    place.tourismGovernerTags.type
+  }</p>
                 {mapSrc && (
                   <iframe
-                    title={`Map for ${museum.location}`}
+                    title={`Map for ${place.location}`}
                     src={mapSrc}
                     width="300"
                     height="200"
@@ -91,10 +132,12 @@ const Museums = () => {
           })}
         </ul>
       ) : (
-        <p>No museums available.</p>
+        <p>No Museums available.</p>
       )}
     </div>
   );
 };
+
+;
 
 export default Museums;

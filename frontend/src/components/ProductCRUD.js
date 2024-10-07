@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/ProductService'; // Ensure you have these service functions defined
+import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService'; // Ensure you have these service functions defined
 
 const ProductCRUD = () => {
   const [products, setProducts] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     description: '',
@@ -19,6 +20,7 @@ const ProductCRUD = () => {
   // Fetch products when the component mounts
   useEffect(() => {
     fetchProducts();
+    fetchSellers();
   }, []);
 
   // Fetch all products
@@ -28,6 +30,15 @@ const ProductCRUD = () => {
       setProducts(data);                // Update state with fetched data
     } catch (error) {
       console.error("Error fetching products", error);
+    }
+  };
+
+  const fetchSellers = async () => {
+    try {
+      const data = await getSellers(); // Fetch sellers from the backend
+      setSellers(data);                // Update state with fetched data
+    } catch (error) {
+      console.error("Error fetching sellers", error);
     }
   };
 
@@ -41,14 +52,14 @@ const ProductCRUD = () => {
   };
 
   // Handle rating change using a slider
-  const handleRatingChange = (e) => {
+  const handleRatingChange = (e, setData) => {
     const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
-    setFormData(prev => ({
+    setData(prev => ({
       ...prev,
-      rating: value
+      rating: isNaN(value) ? 0 : value  // Ensure it's never undefined
     }));
   };
-
+  
   // Handle form submission for creating a new product
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
@@ -137,12 +148,24 @@ const ProductCRUD = () => {
             <input type="number" name="price" value={formData.price} onChange={(e) => handleChange(e, setFormData)} required />
           </label>
           <label>Seller:
-            <input type="text" name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required />
+            <select name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
+              <option value="">Select a Seller</option>
+              {sellers.map(seller => (
+                <option key={seller._id} value={seller._id}>{seller.Name}</option> 
+              ))}
+            </select>
           </label>
           <label>Rating:
-            <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
-            <span>{formData.rating.toFixed(1)}</span> {/* Display the current rating */}
-          </label>
+  <input
+    type="range"
+    min="0"
+    max="5"
+    step="0.1"
+    value={formData.rating}
+    onChange={(e) => handleRatingChange(e, setFormData)} // Pass setFormData here
+  />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
           <label>Reviews:
             <input type="text" name="reviews" value={formData.reviews} onChange={(e) => handleChange(e, setFormData)} required />
           </label>
@@ -168,12 +191,24 @@ const ProductCRUD = () => {
               <input type="number" name="price" value={editData.price} onChange={(e) => handleChange(e, setEditData)} required />
             </label>
             <label>Seller:
-              <input type="text" name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required />
+              <select name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
+                <option value="">Select a Seller</option>
+                {sellers.map(seller => (
+                  <option key={seller._id} value={seller._id}>{seller.Name}</option>
+                ))}
+              </select>
             </label>
             <label>Rating:
-              <input type="range" min="0" max="5" step="0.1" value={editData.rating} onChange={handleRatingChange} />
-              <span>{editData.rating.toFixed(1)}</span> {/* Display the current rating */}
-            </label>
+  <input
+    type="range"
+    min="0"
+    max="5"
+    step="0.1"
+    value={editData.rating}
+    onChange={(e) => handleRatingChange(e, setEditData)} // Pass setEditData here
+  />
+  <span>{editData.rating.toFixed(1)}</span> {/* Display the current rating */}
+</label>
             <label>Reviews:
               <input type="text" name="reviews" value={editData.reviews} onChange={(e) => handleChange(e, setEditData)} required />
             </label>
@@ -187,7 +222,7 @@ const ProductCRUD = () => {
       )}
 
       {/* List of products */}
-<section className="product-list">
+      <section className="product-list">
   <h2>Product List</h2>
   {products.length > 0 ? (
     <ul>
@@ -196,7 +231,7 @@ const ProductCRUD = () => {
           <h3>{product.description}</h3>
           <img src={product.pictures} alt={product.description} style={{ width: '100px', height: 'auto' }} /> {/* Display the image */}
           <p>Price: ${product.price}</p>
-          <p>Seller: {product.seller}</p>
+          <p>Seller: {product.seller.Name}</p> {/* Access seller's Name */}
           <p>Rating: {product.rating}</p>
           <p>Available Quantity: {product.availableQuantity}</p>
           <div className="product-actions">

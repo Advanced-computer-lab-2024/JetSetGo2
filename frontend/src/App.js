@@ -26,10 +26,16 @@ import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
+import ProductList from "./components/ProductList";
+import AddAdmin from "./components/AddAdmin";
+import AddTourismGovernor from "./components/AddTourismGovernor";
+import DeleteUsers from "./components/DeleteUsers";
+import AdminCapabilities from "./components/AdminCapabilities";
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
+  const [selectedAdverId, setselectedAdverId] = useState(null);
 
   return (
     <Router>
@@ -52,8 +58,14 @@ function App() {
               <UpdateTouristPage selectedTouristId={selectedTouristId} />
             }
           />
-          <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
-          <Route path="/list" element={<AdvertiserManagement />} />
+          <Route
+            path="/AdvirtiserMain"
+            element={<AdvertiserForm setselectedAdverId={setselectedAdverId} />}
+          />
+          <Route
+            path="/list"
+            element={<AdvertiserManagement selectedAdverId={selectedAdverId} />}
+          />
           <Route
             path="/CreateTourGuide"
             element={
@@ -75,7 +87,10 @@ function App() {
             }
           />
           <Route path="/other-signup" element={<OtherSignup />} />
-          <Route path="/activities" element={<ActivityCRUD />} />
+          <Route
+            path="/activities"
+            element={<ActivityCRUD selectedAdverId={selectedAdverId} />}
+          />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route
@@ -95,6 +110,11 @@ function App() {
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
+          <Route path="/productList" element={<ProductList />} />
+          <Route path="/AddAdmin" element={<AddAdmin />} />
+          <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
+          <Route path="/DeleteUsers" element={<DeleteUsers />} />
+          <Route path="/adminCapabilities" element={<AdminCapabilities />} />
         </Routes>
       </div>
     </Router>

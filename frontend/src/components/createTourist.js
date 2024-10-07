@@ -47,83 +47,27 @@ const TouristSignup = ({ setSelectedTouristId }) => {
       {error && <p style={styles.error}>{error}</p>}{" "}
       {/* Display error message */}
       <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Email:</label>
-          <input
-            type="email"
-            name="Email"
-            value={formData.Email}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>UserName:</label>
-          <input
-            type="text"
-            name="UserName"
-            value={formData.UserName}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Password:</label>
-          <input
-            type="password"
-            name="Password"
-            value={formData.Password}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Mobile Number:</label>
-          <input
-            type="text"
-            name="MobileNumber"
-            value={formData.MobileNumber}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Nationality:</label>
-          <input
-            type="text"
-            name="Nationality"
-            value={formData.Nationality}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Date of Birth:</label>
-          <input
-            type="date"
-            name="DateOfBirth"
-            value={formData.DateOfBirth}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Job:</label>
-          <input
-            type="text"
-            name="Job"
-            value={formData.Job}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
-        </div>
+        {Object.entries(formData).map(([key, value]) => (
+          <div style={styles.inputGroup} key={key}>
+            <label style={styles.label}>
+              {key.replace(/([A-Z])/g, " $1").trim()}:
+            </label>
+            <input
+              type={
+                key === "Password"
+                  ? "password"
+                  : key === "DateOfBirth"
+                  ? "date"
+                  : "text"
+              }
+              name={key}
+              value={value}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+        ))}
         <button type="submit" style={styles.button}>
           Sign Up
         </button>
@@ -139,24 +83,26 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #74ebd5 0%, #9face6 100%)",
+    backgroundColor: "#2d3e50", // Dark background color
     fontFamily: "'Poppins', sans-serif",
+    margin: 0, // Remove any margin
+    padding: 0, // Remove any padding
   },
   header: {
-    color: "#fff",
+    color: "#ffffff", // Change header color to white for better visibility
     fontSize: "36px",
     marginBottom: "20px",
-    textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+    textAlign: "center",
   },
   form: {
     background: "#fff",
     padding: "40px",
     borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
     width: "350px",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: "stretch",
   },
   inputGroup: {
     width: "100%",
@@ -174,12 +120,12 @@ const styles = {
     padding: "12px",
     fontSize: "16px",
     borderRadius: "5px",
-    border: "1px solid #ddd",
+    border: "1px solid #ccc",
     outline: "none",
     transition: "border-color 0.3s ease",
   },
   button: {
-    backgroundColor: "#9face6",
+    backgroundColor: "#ff6348", // Match with tourist home page button color
     color: "#fff",
     padding: "12px 25px",
     borderRadius: "5px",
@@ -189,11 +135,17 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
     transition: "background-color 0.3s ease",
+    width: "100%", // Ensure button takes full width
   },
   error: {
     color: "red",
     marginBottom: "15px",
+    textAlign: "center",
   },
 };
+
+// Set global styles in the body
+document.body.style.margin = "0"; // Remove any margin from body
+document.body.style.backgroundColor = "#2d3e50"; // Set dark background color for the entire page
 
 export default TouristSignup;

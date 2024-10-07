@@ -42,6 +42,10 @@ const activitySchema = new Schema(
       ref: "adver", // Reference to the Category model
       required: true,
     },
+    rating: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

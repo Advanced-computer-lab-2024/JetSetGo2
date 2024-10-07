@@ -70,8 +70,44 @@ const updateSeller = async (req, res) => {
     }
 };
 
+const getSeller = async (req, res) => {
+    try {
+      const seller = await SellerModel.find();
+      res.status(200).json(seller);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+  const deleteSeller = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the user by username and delete them
+        const deletedSeller = await SellerModel.findByIdAndDelete(id);
+ 
+       if (!deletedSeller) {
+          return res.status(404).json({
+             message: "User not found",
+          });
+       }
+ 
+       // Respond with a success message
+       res.status(200).json({
+          message: "User deleted successfully",
+          user: deletedSeller,
+       });
+    } catch (error) {
+       res.status(500).json({
+          message: "Error deleting user",
+          error,
+       });
+    }
+};
+
 module.exports = {
     createSeller,
     readSeller,
-    updateSeller
+    updateSeller,
+    getSeller,
+    deleteSeller
 };

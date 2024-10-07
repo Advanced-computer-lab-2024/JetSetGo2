@@ -3,16 +3,37 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 const TouristHome = ({ selectedTouristId }) => {
+  const predefinedLocations = [
+    { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
+    {
+      name: "Giza Pyramids, Egypt",
+      coordinates: "31.1313,29.9765,31.1513,29.9965",
+    },
+    {
+      name: "Alexandria, Egypt",
+      coordinates: "29.9097,31.2156,29.9297,31.2356",
+    },
+    {
+      name: "German University in Cairo, Egypt",
+      coordinates: "31.4486,29.9869,31.4686,30.0069",
+    },
+    {
+      name: "Cairo Festival City, Egypt",
+      coordinates: "31.4015,30.0254,31.4215,30.0454",
+    },
+  ];
   const [touristData, setTouristData] = useState({
     UserName: "",
     wallet: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState({
-    MuseumsOrHistoricalPlace: [],
+    Museums: [],
+    HistoricalPlace: [],
     activities: [],
+    itinaries: [],
   });
-  const [searchMethod, setSearchMethod] = useState("name"); // State for search method
+  const [searchMethod, setSearchMethod] = useState("name");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,21 +53,27 @@ const TouristHome = ({ selectedTouristId }) => {
     }
   }, [selectedTouristId]);
 
-  // Function to handle search input and set results
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+
+    // Debugging: Log search query and method
+    console.log("Searching for:", searchQuery, "Method:", searchMethod);
+
     try {
       const response = await axios.get(
         `http://localhost:8000/search?searchword=${encodeURIComponent(
           searchQuery
         )}&searchType=${searchMethod}`
       );
+      console.log("Search Results:", response.data); // Log results for debugging
       setSearchResults(response.data);
     } catch (error) {
       console.error("Error fetching search results:", error);
       setSearchResults({
-        MuseumsOrHistoricalPlace: [],
+        Museums: [],
+        HistoricalPlace: [],
         activities: [],
+        itinaries: [],
       });
     }
   };
@@ -56,11 +83,20 @@ const TouristHome = ({ selectedTouristId }) => {
   };
 
   const handleSearchMethodChange = (e) => {
-    setSearchMethod(e.target.value); // Update search method based on dropdown selection
+    setSearchMethod(e.target.value);
   };
 
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+  const generateMapSrc = (coordinates) => {
+    const [long1, lat1, long2, lat2] = coordinates.split(",");
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
+  };
+
+  const findLocationMap = (name) => {
+    const location = predefinedLocations.find((loc) => loc.name === name);
+    return location ? generateMapSrc(location.coordinates) : null;
   };
 
   if (!touristData) {
@@ -74,27 +110,27 @@ const TouristHome = ({ selectedTouristId }) => {
   return (
     <div style={styles.container}>
       {/* Tourist Profile Section */}
-      <div style={styles.profileContainer}>
-        <div style={styles.profileHeader}>
+      <div style={styles.sidebar}>
+        <div style={styles.profileContainer}>
           <img
-            src="https://via.placeholder.com/60"
+            src="https://via.placeholder.com/80"
             alt="Profile"
             style={styles.profileImage}
           />
-          <h1 style={styles.profileName}>{touristData.UserName}</h1>
+          <h2 style={styles.profileName}>{touristData.UserName}</h2>
+          <p style={styles.walletText}>Wallet: ${touristData.wallet}</p>
+          <button onClick={handleUpdateClick} style={styles.button}>
+            Update Profile
+          </button>
         </div>
-        <p style={styles.walletText}>Wallet Balance: ${touristData.wallet}</p>
-        <button onClick={handleUpdateClick} style={styles.button}>
-          Update Profile
-        </button>
       </div>
 
       {/* Main Content */}
-      <div style={styles.contentContainer}>
-        <h2 style={styles.contentHeader}>Welcome to Your Dashboard</h2>
+      <div style={styles.mainContent}>
+        <h1 style={styles.header}>Welcome to Your Dashboard</h1>
 
         {/* Search Bar Section */}
-        <div style={styles.searchContainer}>
+        <div style={styles.searchSection}>
           <select
             onChange={handleSearchMethodChange}
             value={searchMethod}
@@ -109,14 +145,14 @@ const TouristHome = ({ selectedTouristId }) => {
             value={searchQuery}
             onChange={handleInputChange}
             placeholder="Search..."
-            style={styles.input}
+            style={styles.searchInput}
           />
-          <button onClick={handleSearch} style={styles.button}>
+          <button onClick={handleSearch} style={styles.searchButton}>
             Search
           </button>
         </div>
 
-        {/* Navbar Section */}
+        {/* Navigation Links */}
         <nav style={styles.navbar}>
           <Link to="/Upcoming-activities" style={styles.navLink}>
             Activities
@@ -134,21 +170,51 @@ const TouristHome = ({ selectedTouristId }) => {
 
         {/* Search Results Section */}
         <div style={styles.resultsContainer}>
-          <h3>Search Results:</h3>
-          {Array.isArray(searchResults.MuseumsOrHistoricalPlace) &&
-          Array.isArray(searchResults.activities) &&
-          (searchResults.MuseumsOrHistoricalPlace.length > 0 ||
-            searchResults.activities.length > 0) ? (
+          <h3 style={styles.resultsHeader}>Search Results:</h3>
+          {searchResults.Museums.length > 0 ||
+          searchResults.HistoricalPlace.length > 0 ||
+          searchResults.activities.length > 0 ||
+          searchResults.itinaries.length > 0 ? (
             <ul style={styles.resultsList}>
-              {searchResults.MuseumsOrHistoricalPlace.map((place, index) => (
+              {/* Museums */}
+              {searchResults.Museums.map((museum, index) => (
                 <li key={index} style={styles.resultItem}>
-                  <h4>{place.name}</h4>
-                  <p>{place.description}</p>
-                  <p>Location: {place.location}</p>
-                  <p>Opening Hours: {place.openingHours}</p>
-                  <p>Ticket Price: ${place.ticketPrice}</p>
+                  <h4>Name: {museum.tourismGovernerTags.name}</h4>
+                  <p>Description: {museum.description}</p>
+                  <p>Location: {museum.location}</p>
+                  <p>Opening Hours: {museum.openingHours}</p>
+                  <p>foreignerTicketPrice: ${museum.foreignerTicketPrice}</p>
+                  <p>nativeTicketPrice: ${museum.nativeTicketPrice}</p>
+                  <p>studentTicketPrice: ${museum.studentTicketPrice}</p>
+                  {findLocationMap(museum.location) && (
+                    <iframe
+                      title="Map"
+                      src={findLocationMap(museum.location)}
+                      style={styles.map}
+                    ></iframe>
+                  )}
                 </li>
               ))}
+              {/* Historical Places */}
+              {searchResults.HistoricalPlace.map((place, index) => (
+                <li key={index} style={styles.resultItem}>
+                  <h4>Name: {place.tourismGovernerTags.name}</h4>
+                  <p>Description: {place.description}</p>
+                  <p>Location: {place.location}</p>
+                  <p>Opening Hours: {place.openingHours}</p>
+                  <p>foreignerTicketPrice: ${place.foreignerTicketPrice}</p>
+                  <p>nativeTicketPrice: ${place.nativeTicketPrice}</p>
+                  <p>studentTicketPrice: ${place.studentTicketPrice}</p>
+                  {findLocationMap(place.location) && (
+                    <iframe
+                      title="Map"
+                      src={findLocationMap(place.location)}
+                      style={styles.map}
+                    ></iframe>
+                  )}
+                </li>
+              ))}
+              {/* Activities */}
               {searchResults.activities.map((activity, index) => (
                 <li key={index} style={styles.resultItem}>
                   <h4>{activity.name}</h4>
@@ -158,11 +224,25 @@ const TouristHome = ({ selectedTouristId }) => {
                   <p>Price: ${activity.price}</p>
                   <p>Special Discount: ${activity.specialDiscount}</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
+                  {findLocationMap(activity.location) && (
+                    <iframe
+                      title="Map"
+                      src={findLocationMap(activity.location)}
+                      style={styles.map}
+                    ></iframe>
+                  )}
+                </li>
+              ))}
+              {/* Itineraries */}
+              {searchResults.itinaries.map((itinerary, index) => (
+                <li key={index} style={styles.resultItem}>
+                  <h4>{itinerary.name}</h4>
+                  <p>{itinerary.description}</p>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No results found.</p>
+            <p style={styles.noResultsText}>No results found.</p>
           )}
         </div>
       </div>
@@ -170,115 +250,132 @@ const TouristHome = ({ selectedTouristId }) => {
   );
 };
 
-// Add your styles here
+// Improved styles for the modern look
 const styles = {
   container: {
     display: "flex",
-    flexDirection: "row",
+    minHeight: "100vh",
+    backgroundColor: "#f7f8fa",
     padding: "20px",
-    backgroundColor: "#f4f4f4", // Light background color for better contrast
+  },
+  sidebar: {
+    width: "250px",
+    backgroundColor: "#2d3e50",
+    padding: "20px",
+    borderRadius: "10px",
+    color: "#fff",
   },
   profileContainer: {
-    width: "250px",
-    marginRight: "20px",
-    backgroundColor: "#fff", // White background for the profile container
-    padding: "15px",
-    borderRadius: "10px", // Rounded corners for a modern look
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
-  },
-  profileHeader: {
-    display: "flex",
-    alignItems: "center",
-    marginBottom: "10px",
+    textAlign: "center",
   },
   profileImage: {
-    width: "60px",
-    height: "60px",
+    width: "80px",
+    height: "80px",
     borderRadius: "50%",
-    marginRight: "10px",
+    marginBottom: "15px",
+    border: "3px solid #fff",
   },
   profileName: {
-    fontSize: "24px",
+    fontSize: "22px",
     fontWeight: "bold",
   },
   walletText: {
-    marginTop: "10px",
     fontSize: "18px",
+    margin: "10px 0",
   },
   button: {
-    marginTop: "20px",
-    padding: "10px",
-    backgroundColor: "#ff6348", // Tomato color for the button
+    backgroundColor: "#ff6348",
     color: "#fff",
-    border: "none",
+    padding: "10px 15px",
     borderRadius: "5px",
+    border: "none",
     cursor: "pointer",
-    transition: "background-color 0.3s ease", // Transition for hover effect
+    marginTop: "10px",
   },
-  contentContainer: {
+  mainContent: {
     flex: 1,
+    marginLeft: "30px",
+    backgroundColor: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
   },
-  contentHeader: {
+  header: {
     fontSize: "28px",
     marginBottom: "20px",
+    color: "#333",
   },
-  searchContainer: {
+  searchSection: {
     display: "flex",
     alignItems: "center",
-    marginBottom: "20px",
-    width: "100%", // Full width
-    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", // Shadow for search container
-    backgroundColor: "#fff", // White background
-    padding: "10px", // Padding around the search elements
+    marginBottom: "30px",
   },
-  input: {
+  searchInput: {
     flex: 1,
     padding: "10px",
     borderRadius: "4px",
     border: "1px solid #ccc",
     marginRight: "10px",
-    fontSize: "16px",
-    backgroundColor: "#f9f9f9", // Light background for input
-    transition: "border-color 0.3s ease", // Transition for border on focus
   },
   dropdown: {
-    marginRight: "10px",
     padding: "10px",
     borderRadius: "4px",
-    border: "1px solid #ccc",
-    fontSize: "16px",
-    backgroundColor: "#f9f9f9", // Light background for dropdown
+    marginRight: "10px",
+  },
+  searchButton: {
+    padding: "10px 20px",
+    backgroundColor: "#2d3e50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
   },
   navbar: {
     display: "flex",
     justifyContent: "space-around",
-    backgroundColor: "#333",
-    padding: "1rem 2rem",
-    marginBottom: "20px", // Space between navbar and search results
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+    backgroundColor: "#2d3e50",
+    padding: "10px",
+    borderRadius: "5px",
+    marginBottom: "20px",
   },
   navLink: {
-    color: "white",
+    color: "#fff",
     textDecoration: "none",
-    padding: "0.5rem 1rem",
+    padding: "10px 15px",
+    borderRadius: "4px",
+    backgroundColor: "#2d3e50",
+    fontWeight: "bold",
+    transition: "background-color 0.3s",
   },
   resultsContainer: {
-    backgroundColor: "#fff", // White background for results container
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Shadow for depth
+    marginTop: "20px",
+  },
+  resultsHeader: {
+    fontSize: "22px",
+    marginBottom: "15px",
+    color: "#333",
   },
   resultsList: {
     listStyleType: "none",
-    padding: 0,
+    paddingLeft: "0",
   },
   resultItem: {
-    marginBottom: "20px",
     padding: "15px",
-    backgroundColor: "#f9f9f9", // Light background for each result item
-    borderRadius: "5px",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", // Shadow for depth on result items
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    marginBottom: "10px",
+    backgroundColor: "#f9f9f9",
+  },
+  map: {
+    width: "100%",
+    height: "250px",
+    border: "none",
+    borderRadius: "10px",
+    marginTop: "10px",
+  },
+  noResultsText: {
+    fontSize: "18px",
+    color: "#999",
   },
 };
 

@@ -19,7 +19,15 @@ const museumSchema = new Schema(
       type: String,
       required: true,
     },
-    ticketPrice: {
+    foreignerTicketPrice: {
+      type: Number,
+      required: true,
+    },
+    nativeTicketPrice: {
+      type: Number,
+      required: true,
+    },
+    studentTicketPrice: {
       type: Number,
       required: true,
     },

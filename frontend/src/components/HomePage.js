@@ -1,4 +1,3 @@
-// HomePage.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -18,6 +17,12 @@ const HomePage = () => {
         <button style={styles.button} onClick={() => navigate("/other-signup")}>
           Other Signup
         </button>
+        <button
+          style={styles.button}
+          onClick={() => navigate("/adminCapabilities")}
+        >
+          Admin
+        </button>
       </div>
     </div>
   );
@@ -30,23 +35,26 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundImage: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+    backgroundColor: "#2d3e50", // Dark background color to match the signup page
     fontFamily: "'Poppins', sans-serif",
+    color: "#fff", // White text for contrast
+    margin: 0, // Remove white border
+    padding: 0, // Remove white border
   },
   header: {
-    color: "#fff",
     fontSize: "36px",
     marginBottom: "40px",
     textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
   },
   buttonContainer: {
     display: "flex",
-    justifyContent: "space-around",
-    width: "50%",
+    flexDirection: "column", // Stack buttons vertically
+    alignItems: "center", // Center align buttons
+    width: "100%", // Full width for responsiveness
   },
   button: {
-    backgroundColor: "#fff",
-    color: "#2575fc",
+    backgroundColor: "#ff6348", // Adjusted button color to match signup page
+    color: "#fff", // White text for buttons
     border: "none",
     padding: "15px 30px",
     borderRadius: "30px",
@@ -56,26 +64,10 @@ const styles = {
     transition: "transform 0.3s ease, box-shadow 0.3s ease",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
     outline: "none",
-  },
-  buttonHover: {
-    transform: "translateY(-5px)",
-    boxShadow: "0 6px 14px rgba(0, 0, 0, 0.3)",
+    marginBottom: "15px", // Spacing between buttons
+    width: "80%", // Make buttons responsive
   },
 };
 
-// Apply hover effect using plain JS
-document.addEventListener("DOMContentLoaded", () => {
-  const buttons = document.querySelectorAll("button");
-  buttons.forEach((button) => {
-    button.addEventListener("mouseover", () => {
-      button.style.transform = styles.buttonHover.transform;
-      button.style.boxShadow = styles.buttonHover.boxShadow;
-    });
-    button.addEventListener("mouseout", () => {
-      button.style.transform = "";
-      button.style.boxShadow = styles.button.boxShadow;
-    });
-  });
-});
-
+// Removed hover effect using plain JS to streamline the component
 export default HomePage;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import "../App.css";
 import {
   getActivity,
@@ -7,6 +8,7 @@ import {
   deleteActivity,
   getCategories,
   getAdvertiser,
+  getActivityById,
   getTags,
 } from "../services/ActivityService"; // Ensure to import the necessary services
 
@@ -34,7 +36,7 @@ const predefinedLocations = [
   // Add more locations as needed
 ];
 
-const ActivityCRUD = () => {
+const ActivityCRUD = ({selectedAdverId}) => {
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]); // State to hold categories
   const [advertisers, setAdvertisers] = useState([]);
@@ -46,27 +48,32 @@ const ActivityCRUD = () => {
     location: "",
     price: "",
     category: "",
-    advertiser: "",
+    advertiser: selectedAdverId,
     tags: "",
     specialDiscount: "",
     isBookingOpen: true,
+    rating: 0,
   });
   const [editData, setEditData] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch activities and categories when the component mounts
   useEffect(() => {
-    fetchActivities();
     fetchCategories();
-    fetchAdvertisers();
     fetchTags();
-  }, []);
+    // fetchActivitiesByAdver();
+  }, [selectedAdverId]);
 
-  const fetchActivities = async () => {
+  const fetchActivitiesByAdver = async () => {
     try {
-      const data = await getActivity();
+      const data = await getActivityById({selectedAdverId});
+
+      console.log("Fetched activities:", data);
+      console.log('selectedadver = ', selectedAdverId);
       setActivities(data);
     } catch (error) {
-      console.error("Error fetching activities", error);
+      console.error("Error fetching activities:", error.response ? error.response.data : error.message);
+      setMessage("Failed to fetch activities.", selectedAdverId);
     }
   };
 
@@ -74,6 +81,7 @@ const ActivityCRUD = () => {
     try {
       const data = await getTags();
       setTags(data);
+      console.log('tagss data', data);
     } catch (error) {
       console.error("Error fetching tags", error);
     }
@@ -87,16 +95,6 @@ const ActivityCRUD = () => {
       console.error("Error fetching categories", error);
     }
   };
-  const fetchAdvertisers = async () => {
-    try {
-      const data = await getAdvertiser();
-      setAdvertisers(data);
-      console.log(advertisers);
-    } catch (error) {
-      console.error("Error fetching advertisers", error);
-    }
-  };
-
   const handleChange = (e, setData) => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({
@@ -112,14 +110,22 @@ const ActivityCRUD = () => {
       location: selectedLocation,
     }));
   };
+  const handleRatingChange = (e) => {
+    const value = Math.max(0, Math.min(5, Number(e.target.value))); // Limit rating between 0 and 5
+    setFormData(prev => ({
+      ...prev,
+      rating: isNaN(value) ? 0 : value  // Ensure it's never undefined
+    }));
+  };
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("adverid before creating" , selectedAdverId);
       await createActivity(formData);
       setMessage("Activity created successfully!");
       resetCreateForm();
-      fetchActivities();
+     fetchActivitiesByAdver();
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message
@@ -137,7 +143,7 @@ const ActivityCRUD = () => {
       await updateActivity(editData._id, formData); // Send updated formData
       setMessage("Activity updated successfully!");
       resetEditForm();
-      fetchActivities();
+      fetchActivitiesByAdver();
     } catch (error) {
       const errorMessage = error.response
         ? error.response.data.message
@@ -151,7 +157,7 @@ const ActivityCRUD = () => {
     try {
       await deleteActivity(id);
       setMessage("Activity deleted successfully!");
-      fetchActivities();
+      fetchActivitiesByAdver();
     } catch (error) {
       setMessage("Error deleting activity.");
       console.error(error);
@@ -170,31 +176,25 @@ const ActivityCRUD = () => {
       location: "",
       price: "",
       category: "",
-      advertiser: "",
+      advertiser: selectedAdverId,
       tags: "",
       specialDiscount: "",
       isBookingOpen: true,
+      rating: 0,
     });
   };
 
   const resetEditForm = () => {
     setEditData(null);
-    setFormData({
-      date: "",
-      time: "",
-      location: "",
-      price: "",
-      category: "",
-      advertiser: "",
-      tags: "",
-      specialDiscount: "",
-      isBookingOpen: true,
-    }); // Reset formData on edit reset
+    resetCreateForm();
   };
 
   const generateMapSrc = (coordinates) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
+  };
+  const handleHomeNavigation = () => {
+    navigate('/list'); // Adjust this path according to your routing setup
   };
 
   return (
@@ -216,6 +216,10 @@ const ActivityCRUD = () => {
               required
             />
           </label>
+          <label>Rating:
+  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
           <label>
             Time:
             <input
@@ -268,22 +272,7 @@ const ActivityCRUD = () => {
               ))}
             </select>
           </label>
-          <label>
-            Advertiser:
-            <select
-              name="advertiser"
-              value={formData.advertiser}
-              onChange={(e) => handleChange(e, setFormData)}
-              required
-            >
-              <option value="">Select Advertiser</option>
-              {advertisers.map((advertiser) => (
-                <option key={advertiser._id} value={advertiser._id}>
-                  {advertiser.Name}
-                </option>
-              ))}
-            </select>
-          </label>
+         
           <label>
             Tags:
             <select
@@ -345,8 +334,8 @@ const ActivityCRUD = () => {
                   <p>Location: {activity.location}</p>
                   <p>Price: ${activity.price}</p>
                   <p>Tags: {activity.tags.name}</p>
+                  <p>Rating: {activity.rating}</p>
                   <p>Special Discount: {activity.specialDiscount}%</p>
-                  <p>Advertiser: {activity.advertiser.Name}%</p>
                   <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
                   {mapSrc && (
                     <iframe
@@ -395,6 +384,10 @@ const ActivityCRUD = () => {
                 required
               />
             </label>
+            <label>Rating:
+  <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} />
+  <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span> {/* Display the current rating */}
+</label>
             <label>
               Location:
               <select
@@ -437,22 +430,7 @@ const ActivityCRUD = () => {
                 ))}
               </select>
             </label>
-            <label>
-              Advertiser:
-              <select
-                name="advertiser"
-                value={formData.advertiser}
-                onChange={(e) => handleChange(e, setFormData)}
-                required
-              >
-                <option value="">Select Advertiser</option>
-                {advertisers.map((advertiser) => (
-                  <option key={advertiser._id} value={advertiser._id}>
-                    {advertiser.Name}
-                  </option>
-                ))}
-              </select>
-            </label>
+           
             <label>
               Tags:
               <select
