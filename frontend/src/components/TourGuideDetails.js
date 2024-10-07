@@ -35,7 +35,7 @@ const styles = {
     margin: '10px',
     padding: '10px 20px', // Reduced padding for smaller buttons
     fontSize: '16px', // Adjusted font size for smaller buttons
-    backgroundColor: '#2d3e50',
+    backgroundColor: '#ff6348',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
@@ -163,6 +163,8 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
         <div style={styles.profileContainer}>
           <img src="https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg" alt="Profile" style={styles.profileImage} />
           <p style={styles.profileName}>{tourGuide.Name}</p>
+          <button onClick={handleSchemaTourFrontPage} style={styles.button}>Create/View Itinerary</button>
+          <button onClick={() => setIsEditing(true)} style={styles.button}>Edit</button>
         </div>
       </div>
 
@@ -186,7 +188,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
             <li><strong>Mobile Number:</strong> {tourGuide.MobileNumber}</li>
             <li><strong>Years of Experience:</strong> {tourGuide.YearsOfExperience}</li>
             <li><strong>Previous Work:</strong> {tourGuide.PreviousWork || 'N/A'}</li>
-            <button onClick={() => setIsEditing(true)} style={styles.button}>Edit</button>
+           
           </ul>
         )}
 
@@ -207,8 +209,6 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
         </nav>
 
         <hr />
-
-        <button onClick={handleSchemaTourFrontPage} style={styles.button}>Create/View Itinerary</button>
       </div>
     </div>
   );

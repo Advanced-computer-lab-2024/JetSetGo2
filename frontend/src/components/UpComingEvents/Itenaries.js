@@ -17,23 +17,44 @@ const getItineraries = async () => {
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
   const [error, setError] = useState(null);
-  const [sortOrder, setSortOrder] = useState(""); // State to store the sorting order
+  const [sortOrder, setSortOrder] = useState(""); 
+  const [Tags, setTags] = useState([]);
+  const [activities, setActivities] = useState([]);
 
   // Fetch itineraries when the component mounts
-  useEffect(() => {
-    fetchItineraries();
-  }, []);
+ 
 
   const fetchItineraries = async () => {
     try {
-      const data = await getItineraries(); // Call the service method
-      setItineraries(data);
+      const response = await axios.get(`http://localhost:8000/itinerary/readTourId`);
+      setItineraries(response.data);
+      console.log('dataaaa= ' , response.data);
     } catch (error) {
-      console.error("Error fetching itineraries:", error);
-      setError("Could not fetch itineraries. Please try again later.");
+      console.error('Error fetching itineraries:', error);
+    }
+  };
+  const fetchActivities = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/activity/get');
+      setActivities(response.data);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/prefTags/readtag');
+      setTags(response.data);
+    } catch (error) {
+      console.error('Error fetching Tags:', error);
+    }
+  };
+  useEffect(() => {
+    fetchItineraries();
+    fetchTags();
+    fetchActivities();
+  }, []);
   // Function to handle sorting based on price
   const handleSortChange = (e) => {
     const value = e.target.value;
@@ -52,6 +73,7 @@ const Itineraries = () => {
     }
     setItineraries(sortedItineraries); // Update the state with sorted itineraries
   };
+  
 
   return (
     <div id="itineraries">
@@ -82,12 +104,13 @@ const Itineraries = () => {
                   .map((date) => new Date(date).toLocaleDateString())
                   .join(", ")}
               </p>
-              <p>Activities:</p>
-              <ul>
-                {itinerary.activities.map((activity) => (
-                  <li key={activity._id}>{activity.name}</li> // Ensure 'name' exists in your Activity model
-                ))}
-              </ul>
+              <p>Activities: 
+                  {itinerary.activities.map(activity => 
+                      `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category} - ${activity.specialDiscount}`
+                  ).join(', ')}
+              </p>
+              <p>Tags: {Array.isArray(itinerary.Tags) ? itinerary.Tags.map(tag => tag.name).join(', ') : itinerary.Tags.name}</p>
+
               <p>Locations: {itinerary.locations.join(", ")}</p>
               <p>Accessibility: {itinerary.accessibility.join(", ")}</p>
               <p>Pick Up Location: {itinerary.pickUpLoc.join(", ")}</p>
