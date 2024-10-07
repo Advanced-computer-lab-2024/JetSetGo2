@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
+import { useNavigate } from "react-router-dom";
 import {
   getMuseum,
   createMuseum,
@@ -9,6 +10,7 @@ import {
 import { getTourismGovernerTags,createTags, readGuide } from '../services/TourismGovernerTagService';
 
 const MuseumCRUD = () => {
+  const navigate = useNavigate();
   const [museums, setMuseums] = useState([]);
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
@@ -205,6 +207,10 @@ const MuseumCRUD = () => {
   return (
     <div>
       <h1>Museums</h1>
+
+      <button  onClick={() => navigate("/tourismGovernorPage")}>
+          Tourism Governor Home
+        </button>
 
       {message && <p className="message">{message}</p>}
       <section className="form-section">
@@ -407,7 +413,8 @@ const MuseumCRUD = () => {
       <ul>
         {museums.map((place) => (
           <li key={place._id}>
-            <h3>{place.tourismGovernerTags.name}</h3>
+            <h3>Name: {place.tourismGovernerTags.name}</h3>
+            <img src={place.pictures} alt={place.description} style={{ width: '100px', height: 'auto' }} />
             <p>Description: {place.description}</p>
             <p>Location: {place.location}</p>
             <p>Opening Hours: {place.openingHours}</p>

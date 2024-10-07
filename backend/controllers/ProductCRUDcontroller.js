@@ -80,6 +80,15 @@ const deleteProduct = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+const deleteAllProducts = async (req, res) => {
+  try {
+    await Product.deleteMany({});  // This will delete all products in the Product collection
+    res.status(200).json({ message: "All products have been deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Exporting the controller functions
 module.exports = {
@@ -87,4 +96,5 @@ module.exports = {
   getProducts,
   updateProduct,
   deleteProduct,
+  deleteAllProducts
 };

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
 
 const OtherSignup = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ const OtherSignup = () => {
     Password: "",
     AccountType: "", // Added this field to match the enum
   });
+
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +25,17 @@ const OtherSignup = () => {
         formData
       );
       console.log("Signup successful:", response.data);
+
+      // After successful signup, navigate to the appropriate page based on AccountType
+      if (formData.AccountType === "Advertiser") {
+        navigate("/AdvirtiserMain");
+      } else if (formData.AccountType === "Tour Guide") {
+        navigate("/CreateTourGuide");
+      } else if (formData.AccountType === "Seller") {
+        navigate("/CreateSeller");
+      } else {
+        console.error("Unknown account type");
+      }
     } catch (error) {
       console.error("Error signing up:", error);
     }
@@ -134,9 +148,6 @@ const styles = {
     boxSizing: "border-box",
     transition: "border-color 0.3s",
   },
-  inputFocus: {
-    borderColor: "#764ba2",
-  },
   button: {
     backgroundColor: "#764ba2",
     color: "#fff",
@@ -149,31 +160,6 @@ const styles = {
     marginTop: "15px",
     transition: "background-color 0.3s ease",
   },
-  buttonHover: {
-    backgroundColor: "#5c3d8e",
-  },
 };
-
-// Add event listeners for hover and focus effects
-/*
-document.addEventListener("DOMContentLoaded", () => {
-  const inputs = document.querySelectorAll("input, select");
-  inputs.forEach((input) => {
-    input.addEventListener("focus", () => {
-      input.style.borderColor = styles.inputFocus.borderColor;
-    });
-    input.addEventListener("blur", () => {
-      input.style.borderColor = styles.input.borderColor;
-    });
-  });
-
-  const button = document.querySelector("button");
-  button.addEventListener("mouseover", () => {
-    button.style.backgroundColor = styles.buttonHover.backgroundColor;
-  });
-  button.addEventListener("mouseout", () => {
-    button.style.backgroundColor = styles.button.backgroundColor;
-  });
-});*/
 
 export default OtherSignup;
