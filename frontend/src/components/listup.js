@@ -10,7 +10,7 @@ import {
     getAdvertiser,
     getActivityById,
     getTags,
-  } from "../services/ActivityService";
+} from "../services/ActivityService";
 
 const predefinedLocations = [
     {
@@ -84,7 +84,6 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                 setError("Error fetching advertiser data.");
             }
         };
-        
 
         fetchAdvertiser();
         fetchTags();
@@ -108,22 +107,22 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
 
     const fetchTags = async () => {
         try {
-          const data = await getTags();
-          setTags(data);
-          console.log('tagss data', data);
+            const data = await getTags();
+            setTags(data);
+            console.log('Tags data', data);
         } catch (error) {
-          console.error("Error fetching tags", error);
+            console.error("Error fetching tags", error);
         }
-      };
-    
-      const fetchCategories = async () => {
+    };
+
+    const fetchCategories = async () => {
         try {
-          const data = await getCategories();
-          setCategories(data);
+            const data = await getCategories();
+            setCategories(data);
         } catch (error) {
-          console.error("Error fetching categories", error);
+            console.error("Error fetching categories", error);
         }
-      };
+    };
 
     const handleAdvertiserChange = (e) => {
         setAdvertiserFormData({ ...advertiserFormData, [e.target.name]: e.target.value });
@@ -196,210 +195,148 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
     if (error) return <div>{error}</div>;
     if (!advertiser) return <div>Loading...</div>;
 
+    // Styles
+    const containerStyle = {
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#f7f8fa',
+        padding: '20px',
+    };
+
+    const sidebarStyle = {
+        width: '250px',
+        padding: '20px',
+        backgroundColor: '#2d3e50',
+        borderRadius: '10px',
+        color: '#fff',
+    };
+
+    const mainContentStyle = {
+        flex: 1,
+        marginLeft: '30px',
+        padding: '20px',
+        backgroundColor: '#fff',
+        borderRadius: '10px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+    };
+
+    const buttonStyle = {
+        padding: '10px 20px',
+        backgroundColor: '#ff6348',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        marginBottom: '10px',
+        width: '100%',
+        fontSize: '16px',
+    };
+
     return (
-        <div className="advertiser-details">
-            <h2>Advertiser Details</h2>
+        <div style={containerStyle}>
+            {/* Sidebar */}
+            <div style={sidebarStyle}>
+                <h3>Welcome</h3>
+                <button onClick={() => setShowDetails(!showDetails)} style={buttonStyle}>
+                    {showDetails ? "Hide Details" : "View Details"}
+                </button>
+                <button onClick={() => setIsEditingAdvertiser(!isEditingAdvertiser)} style={buttonStyle}>
+                    {isEditingAdvertiser ? "Cancel Update Advertiser" : "Update Advertiser"}
+                </button>
+                <button onClick={() => fetchAdverActivities() && setShowActivities(!showActivities)} style={buttonStyle}>
+                    {showActivities ? "Hide Activities" : "View Activities"}
+                </button>
+                <button onClick={() => navigate('/activities')} style={buttonStyle}>
+                    Create Activities
+                </button>
+            </div>
 
-            <button onClick={() => setShowDetails(!showDetails)}>
-                {showDetails ? "Hide Details" : "View Details"}
-            </button>
-            <button onClick={() => setIsEditingAdvertiser(!isEditingAdvertiser)}>
-                {isEditingAdvertiser ? "Cancel Update Advertiser" : "Update Advertiser"}
-            </button>
-            <button onClick={() => fetchAdverActivities() && setShowActivities(!showActivities)}>
-                {showActivities ? "Hide Activities" : "View Activities"}
-            </button>
-            <button onClick={() => navigate('/activities')}>Create Activities</button>
-
-            {showDetails && (
-                <div>
-                    <h3>Details</h3>
-                    <p><strong>Name:</strong> {advertiser.Name}</p>
-                    <p><strong>Link:</strong> {advertiser.Link}</p>
-                    <p><strong>Hotline:</strong> {advertiser.Hotline}</p>
-                    <p><strong>Email:</strong> {advertiser.Mail}</p>
-                    <p><strong>Profile:</strong> {advertiser.Profile}</p>
-                    <p><strong>Location:</strong> {advertiser.Loc}</p>
-                    <p><strong>Company Description:</strong> {advertiser.CompanyDes}</p>
-                    <p><strong>Services:</strong> {advertiser.Services}</p>
-                    <button onClick={() => setShowDetails(false)}>Close Details</button>
-                </div>
-            )}
-
-            {isEditingAdvertiser && (
-                <div>
-                    <h3>Update Advertiser</h3>
-                    <form onSubmit={handleAdvertiserSubmit}>
-                        <div>
-                            <label>Name:</label>
-                            <input name="Name" value={advertiserFormData.Name} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Link:</label>
-                            <input name="Link" value={advertiserFormData.Link} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Hotline:</label>
-                            <input name="Hotline" value={advertiserFormData.Hotline} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Email:</label>
-                            <input name="Mail" value={advertiserFormData.Mail} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Profile:</label>
-                            <input name="Profile" value={advertiserFormData.Profile} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Location:</label>
-                            <input name="Loc" value={advertiserFormData.Loc} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Company Description:</label>
-                            <textarea name="CompanyDes" value={advertiserFormData.CompanyDes} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <div>
-                            <label>Services:</label>
-                            <textarea name="Services" value={advertiserFormData.Services} onChange={handleAdvertiserChange} required />
-                        </div>
-                        <button type="submit">Update</button>
-                        <button type="button" onClick={() => setIsEditingAdvertiser(false)}>Cancel</button>
-                    </form>
-                </div>
-            )}
-
-            {showActivities && (
-                <div className="activities-container">
-                    <h3>Activities</h3>
-                    <div className="activities-list">
-                        {activities.length > 0 ? (
-                            activities.map(activity => {
-                                const locationData = predefinedLocations.find(
-                                    (location) => location.name === activity.location
-                                );
-                                const mapSrc = locationData
-                                    ? generateMapSrc(locationData.coordinates)
-                                    : null;
-
-                                    const category = categories.find(cat => cat._id === activity.category);
-                                    const categoryName = category ? category.name : "Unknown Category";
-
-                                    const tt = tags.find(t => t._id === activity.tags);
-                                    const ttname = tt ? tt.name : "unknown tag";
-
-                                return (
-                                    <div key={activity._id} className="activity-card">
-                                        <h4>{categoryName}</h4>
-                                        <h3>{activity.advertiser.Name}</h3>
-                                        <p><strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}</p>
-                                        <p><strong>Time:</strong> {activity.time}</p>
-                                        <p><strong>Location:</strong> {activity.location}</p>
-                                        <p><strong>Price:</strong> ${activity.price}</p>
-                                        <p><strong>Tags:</strong> {ttname}</p>
-                                        <p><strong>Special Discount:</strong> {activity.specialDiscount}%</p>
-                                        <p><strong>Booking Open:</strong> {activity.isBookingOpen ? 'Yes' : 'No'}</p>
-                                        {mapSrc && (
-                                            <iframe
-                                                title={`Map for ${activity.location}`}
-                                                src={mapSrc}
-                                                width="300"
-                                                height="200"
-                                                style={{ border: "none" }}
-                                            ></iframe>
-                                        )}
-                                        <button onClick={() => handleEditActivity(activity)}>Edit</button>
-                                        <button onClick={() => handleDeleteActivity(activity._id)}>Delete</button>
-                                        <hr style={{ margin: '20px 0' }} /> {/* Separator */}
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <p>No activities found for this advertiser.</p>
-                        )}
+            {/* Main Content */}
+            <div style={mainContentStyle}>
+                {showDetails && (
+                    <div>
+                        <h3>Advertiser Details</h3>
+                        <p><strong>Name:</strong> {advertiser.Name}</p>
+                        <p><strong>Link:</strong> {advertiser.Link}</p>
+                        <p><strong>Hotline:</strong> {advertiser.Hotline}</p>
+                        <p><strong>Email:</strong> {advertiser.Mail}</p>
+                        <p><strong>Profile:</strong> {advertiser.Profile}</p>
+                        <p><strong>Location:</strong> {advertiser.Loc}</p>
+                        <p><strong>Company Description:</strong> {advertiser.CompanyDes}</p>
+                        <p><strong>Services:</strong> {advertiser.Services}</p>
                     </div>
-                    <button onClick={() => setShowActivities(false)}>Close Activities</button>
-                </div>
-            )}
+                )}
 
-            {isEditingActivity && activityToEdit && (
-                <div className="activity-edit-form">
-                    <h3>Edit Activity</h3>
-                    <form onSubmit={handleSaveActivity}>
-                        <div>
-                            <label>Date:</label>
-                            <input 
-                                name="date" 
-                                type="date" 
-                                value={activityFormData.date} 
-                                onChange={handleActivityChange} 
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <label>Time:</label>
-                            <input 
-                                name="time" 
-                                type="time" 
-                                value={activityFormData.time} 
-                                onChange={handleActivityChange} 
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <label>Location:</label>
-                            <input 
-                                name="location" 
-                                value={activityFormData.location} 
-                                onChange={handleActivityChange} 
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <label>Price:</label>
-                            <input 
-                                name="price" 
-                                type="number" 
-                                value={activityFormData.price} 
-                                onChange={handleActivityChange} 
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <label>Tags:</label>
-                            <input 
-                                name="tags" 
-                                value={activityFormData.tags} 
-                                onChange={handleActivityChange} 
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <label>Special Discount:</label>
-                            <input 
-                                name="specialDiscount" 
-                                type="number" 
-                                value={activityFormData.specialDiscount} 
-                                onChange={handleActivityChange} 
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <label>Booking Open:</label>
-                            <select 
-                                name="isBookingOpen" 
-                                value={activityFormData.isBookingOpen} 
-                                onChange={handleActivityChange} 
-                                required
-                            >
-                                <option value={true}>Yes</option>
-                                <option value={false}>No</option>
-                            </select>
-                        </div>
-                        <button type="submit">Save Activity</button>
-                        <button type="button" onClick={() => setIsEditingActivity(false)}>Cancel</button>
-                    </form>
-                </div>
-            )}
+                {isEditingAdvertiser && (
+                    <div>
+                        <h3>Update Advertiser</h3>
+                        <form onSubmit={handleAdvertiserSubmit}>
+                            <div>
+                                <label>Name:</label>
+                                <input name="Name" value={advertiserFormData.Name} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Link:</label>
+                                <input name="Link" value={advertiserFormData.Link} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Hotline:</label>
+                                <input name="Hotline" value={advertiserFormData.Hotline} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Email:</label>
+                                <input name="Mail" value={advertiserFormData.Mail} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Profile:</label>
+                                <input name="Profile" value={advertiserFormData.Profile} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Location:</label>
+                                <input name="Loc" value={advertiserFormData.Loc} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Company Description:</label>
+                                <textarea name="CompanyDes" value={advertiserFormData.CompanyDes} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <div>
+                                <label>Services:</label>
+                                <textarea name="Services" value={advertiserFormData.Services} onChange={handleAdvertiserChange} required />
+                            </div>
+                            <button type="submit">Update</button>
+                            <button type="button" onClick={() => setIsEditingAdvertiser(false)}>Cancel</button>
+                        </form>
+                    </div>
+                )}
+
+                {/* Display Activities Section */}
+                {showActivities && (
+                    <div>
+                        <h3>Activities</h3>
+                        {activities.length > 0 ? activities.map(activity => (
+                            <div key={activity._id}>
+                                <h4>{categories.find(cat => cat._id === activity.category)?.name || 'Unknown Category'}</h4>
+                                <p><strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}</p>
+                                <p><strong>Time:</strong> {activity.time}</p>
+                                <p><strong>Location:</strong> {activity.location}</p>
+                                <p><strong>Price:</strong> ${activity.price}</p>
+                                <p><strong>Tags:</strong> {tags.find(t => t._id === activity.tags)?.name || 'Unknown Tag'}</p>
+                                <p><strong>Special Discount:</strong> {activity.specialDiscount}%</p>
+                                <p><strong>Booking Open:</strong> {activity.isBookingOpen ? 'Yes' : 'No'}</p>
+                                {predefinedLocations.find(loc => loc.name === activity.location) && (
+                                    <iframe
+                                        title={`Map for ${activity.location}`}
+                                        src={generateMapSrc(predefinedLocations.find(loc => loc.name === activity.location).coordinates)}
+                                        width="300"
+                                        height="200"
+                                        style={{ border: "none" }}
+                                    ></iframe>
+                                )}
+                            </div>
+                        )) : <p>No activities found for this advertiser.</p>}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
