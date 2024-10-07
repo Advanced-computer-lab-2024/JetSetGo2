@@ -21,6 +21,9 @@ const HomePage = () => {
         <button style={styles.button} onClick={() => navigate("/adminCapabilities")}>
           Admin
         </button>
+        <button style={styles.button} onClick={() => navigate("/tourismGovernorPage")}>
+          Tourism Governor
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
+import { useNavigate } from "react-router-dom";
 import {
   getHistoricalPlace,
   createHistoricalPlace,
@@ -9,6 +10,7 @@ import {
 import { getTourismGovernerTags, createTags,readGuide } from '../services/TourismGovernerTagService'; // Import the createTags function
 
 const HistoricalplaceCRUD = () => {
+  const navigate = useNavigate();
   const [tourismTags, setTourismTags] = useState([]);
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [message, setMessage] = useState('');
@@ -192,13 +194,20 @@ const HistoricalplaceCRUD = () => {
   };
 
   const generateMapSrc = (coordinates) => {
+    if (!coordinates) {
+      // Return a default map view or a blank one if no coordinates are provided
+      return 'https://www.openstreetmap.org/export/embed.html?bbox=31.2357,30.0444,31.2557,30.0644&layer=mapnik'; // Cairo as a default location
+    }
+  
     const [long1, lat1] = coordinates.split(',').slice(0, 2);
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
-
   return (
     <div>
       <h1>Historical Places</h1>
+      <button  onClick={() => navigate("/tourismGovernorPage")}>
+          Tourism Governor Home
+        </button>
 
       {message && <p className="message">{message}</p>}
       <section className="form-section">
@@ -390,7 +399,8 @@ const HistoricalplaceCRUD = () => {
           <ul>
             {historicalPlaces.map((place) => (
               <li key={place._id}>
-               <h3>{place.tourismGovernerTags.name}</h3>
+               <h3>Name: {place.tourismGovernerTags.name}</h3>
+               <img src={place.pictures} alt={place.description} style={{ width: '100px', height: 'auto' }} />
                <p>Description: {place.description}</p>
                <p>Location: {place.location}</p>
                <p>Opening Hours: {place.openingHours}</p>
@@ -398,6 +408,12 @@ const HistoricalplaceCRUD = () => {
                 <p>Native Ticket Price: {place.nativeTicketPrice}</p>
                 <p>Student Ticket Price: {place.studentTicketPrice}</p>
                 <p>Tags: {place.tourismGovernerTags?.type}</p>
+                <iframe
+              title="Location Map"
+              width="300"
+              height="200"
+              src={generateMapSrc(predefinedLocations.find(loc => loc.name === place.location)?.coordinates)}
+            ></iframe>
                 <button onClick={() => handleEdit(place)}>Edit</button>
                 <button onClick={() => handleDelete(place._id)}>Delete</button>
               </li>
