@@ -76,7 +76,7 @@ const Itineraries = () => {
       );
     } else if (value === "desc") {
       sortedItineraries.sort(
-        (a, b) => Math.max(...b.TTourPrice) - Math.max(...a.TourPrice)
+        (a, b) => Math.max(...b.TourPrice) - Math.max(...a.TourPrice)
       );
     }
     setItineraries(sortedItineraries);
