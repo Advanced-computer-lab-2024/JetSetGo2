@@ -174,8 +174,35 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
 
         {isEditing ? (
           <form onSubmit={handleSubmit}>
-            {/* Form fields */}
-            {/* ... */}
+           <div>
+            <label>Name:</label>
+            <input name="Name" value={formData.Name} onChange={handleChange} required />
+          </div>
+          <div>
+            <label>Email:</label>
+            <input name="Email" value={formData.Email} onChange={handleChange} required />
+          </div>
+          <div>
+            <label>Age:</label>
+            <input name="Age" value={formData.Age} onChange={handleChange} required />
+          </div>
+          <div>
+            <label>Languages Spoken:</label>
+            <input name="LanguagesSpoken" value={formData.LanguagesSpoken} onChange={handleChange} required />
+          </div>
+          <div>
+            <label>Mobile Number:</label>
+            <input name="MobileNumber" value={formData.MobileNumber} onChange={handleChange} required />
+          </div>
+          <div>
+            <label>Years of Experience:</label>
+            <input name="YearsOfExperience" value={formData.YearsOfExperience} onChange={handleChange} required />
+          </div>
+          <div>
+            <label>Previous Work:</label>
+            <input name="PreviousWork" value={formData.PreviousWork} onChange={handleChange} />
+          </div>
+
             <button type="submit" style={styles.button}>Update</button>
             <button type="button" onClick={() => setIsEditing(false)} style={styles.button}>Cancel</button>
           </form>
