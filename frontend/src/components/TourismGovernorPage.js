@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AdminCapabilities = () => {
+const TourismGovernorPage = () => {
   const navigate = useNavigate();
 
   const buttonStyle = {
@@ -29,12 +29,10 @@ const AdminCapabilities = () => {
     e.target.style.transform = 'scale(1)';
   };
 
-  const handleUpdateClick = () => {
-    navigate('/admin-update');
-  };
+  
 
   const adminData = {
-    UserName: 'Admin',
+    UserName: 'Tourism Governor',
     
   };
 
@@ -49,7 +47,7 @@ const AdminCapabilities = () => {
             style={styles.profileImage}
           />
           <h2 style={styles.profileName}>{adminData.UserName}</h2>
-          <p>Admin</p>
+          <p>Tourism Governor</p>
           <button style={styles.button} onClick={() => navigate("/")}>
           Home
         </button>
@@ -59,17 +57,12 @@ const AdminCapabilities = () => {
 
       {/* Main Content */}
       <div style={styles.mainContent}>
-        <h1 style={styles.header}>Admin Capabilities</h1>
+        <h1 style={styles.header}>Hello Tourism Governor</h1>
 
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
-            { label: 'Manage Categories', path: '/category' },
-            { label: 'Manage Tags', path: '/TagsManagement' },
-            { label: 'Manage Products', path: '/product' },
-            { label: 'View Product List', path: '/productList' },
-            { label: 'Delete Users', path: '/DeleteUsers' },
-            { label: 'Add a Tourism Governor', path: '/AddTourismGovernor' },
-            { label: 'Add an Admin', path: '/AddAdmin' },
+            { label: 'Historical Places', path: '/historicalplaces' },
+            { label: 'Museum', path: '/museums' },
           ].map((button) => (
             <button
               key={button.path}
@@ -144,4 +137,4 @@ const styles = {
   },
 };
 
-export default AdminCapabilities;
+export default TourismGovernorPage;

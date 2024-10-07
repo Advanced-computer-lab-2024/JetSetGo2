@@ -15,13 +15,9 @@ const styles = {
     padding: "20px",
     borderRadius: "10px",
     color: "#fff",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
   },
   profileContainer: {
     textAlign: "center",
-    marginBottom: "20px", // Space between profile and edit button
   },
   profileImage: {
     width: "80px",
@@ -34,6 +30,7 @@ const styles = {
     fontSize: "22px",
     fontWeight: "bold",
   },
+  
   button: {
     margin: '10px',
     padding: '10px 20px', // Reduced padding for smaller buttons
@@ -80,6 +77,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
   const id = location.state?.id;
 
   const [tourGuide, setTourGuide] = useState(null);
+  const [activities, setActivities] = useState([]);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -120,21 +118,39 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { _selectedTourGuideId, ...updatedData } = formData;
+    const { _selectedTourGuideId, ...updatedData } = formData; // Assuming the ID is in formData
 
     try {
       const response = await axios.put(`http://localhost:8000/TourGuide/update/${selectedTourGuideId}`, updatedData);
       console.log('Update response:', response.data);
-      setTourGuide(response.data);
-      setIsEditing(false);
+      setTourGuide(response.data); // Update local state with response
+      setIsEditing(false); // Exit edit mode
     } catch (error) {
       console.error('Error updating tour guide:', error.response ? error.response.data : error.message);
       setError('Error updating tour guide.');
     }
   };
 
+  const handleViewTourGuideActivities = () => {
+    fetchTourGuideActivities();
+  };
+
   const handleSchemaTourFrontPage = () => {
     navigate('/SchemaTourFront');
+  };
+
+  const fetchTourGuideActivities = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/itinerary/readTour?userId=${selectedTourGuideId}`);
+      setActivities(response.data);
+    } catch (error) {
+      console.error('Error fetching itineraries', error);
+      setError('Failed to fetch itineraries');
+    }
+  };
+
+  const handleUpdateActivity = (activityId) => {
+    navigate(`/update-activity/${activityId}`);
   };
 
   if (error) return <div>{error}</div>;
@@ -148,9 +164,6 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
           <img src="https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg" alt="Profile" style={styles.profileImage} />
           <p style={styles.profileName}>{tourGuide.Name}</p>
         </div>
-        <button style={styles.button} onClick={() => setIsEditing(true)}>
-          Edit
-        </button>
       </div>
 
       {/* Main Content */}
@@ -159,36 +172,10 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
 
         {isEditing ? (
           <form onSubmit={handleSubmit}>
-            <div>
-              <label>Name:</label>
-              <input name="Name" value={formData.Name} onChange={handleChange} required />
-            </div>
-            <div>
-              <label>Email:</label>
-              <input name="Email" value={formData.Email} onChange={handleChange} required />
-            </div>
-            <div>
-              <label>Age:</label>
-              <input name="Age" value={formData.Age} onChange={handleChange} required />
-            </div>
-            <div>
-              <label>Languages Spoken:</label>
-              <input name="LanguagesSpoken" value={formData.LanguagesSpoken} onChange={handleChange} required />
-            </div>
-            <div>
-              <label>Mobile Number:</label>
-              <input name="MobileNumber" value={formData.MobileNumber} onChange={handleChange} required />
-            </div>
-            <div>
-              <label>Years of Experience:</label>
-              <input name="YearsOfExperience" value={formData.YearsOfExperience} onChange={handleChange} required />
-            </div>
-            <div>
-              <label>Previous Work:</label>
-              <input name="PreviousWork" value={formData.PreviousWork} onChange={handleChange} />
-            </div>
+            {/* Form fields */}
+            {/* ... */}
             <button type="submit" style={styles.button}>Update</button>
-            <button type="button" style={styles.button} onClick={() => setIsEditing(false)}>Cancel</button>
+            <button type="button" onClick={() => setIsEditing(false)} style={styles.button}>Cancel</button>
           </form>
         ) : (
           <ul>
@@ -199,20 +186,29 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
             <li><strong>Mobile Number:</strong> {tourGuide.MobileNumber}</li>
             <li><strong>Years of Experience:</strong> {tourGuide.YearsOfExperience}</li>
             <li><strong>Previous Work:</strong> {tourGuide.PreviousWork || 'N/A'}</li>
+            <button onClick={() => setIsEditing(true)} style={styles.button}>Edit</button>
           </ul>
         )}
 
         {/* Navigation Links */}
         <nav style={styles.navbar}>
-          <Link to="/Upcoming-activities" style={styles.navLink}>Activities</Link>
-          <Link to="/Upcoming-itineraries" style={styles.navLink}>Itineraries</Link>
-          <Link to="/all-historicalplaces" style={styles.navLink}>Historical Places</Link>
-          <Link to="/all-museums" style={styles.navLink}>Museums</Link>
+          <Link to="/Upcoming-activities" style={styles.navLink}>
+            Activities
+          </Link>
+          <Link to="/Upcoming-itineraries" style={styles.navLink}>
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" style={styles.navLink}>
+            Historical Places
+          </Link>
+          <Link to="/all-museums" style={styles.navLink}>
+            Museums
+          </Link>
         </nav>
 
-        <button style={styles.button} onClick={handleSchemaTourFrontPage}>
-          Create/View Itinerary
-        </button>
+        <hr />
+
+        <button onClick={handleSchemaTourFrontPage} style={styles.button}>Create/View Itinerary</button>
       </div>
     </div>
   );
