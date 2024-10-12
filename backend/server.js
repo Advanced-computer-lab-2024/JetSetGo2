@@ -1,11 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const fs = require("fs");
+const path = require("path");
 mongoose.set("strictQuery", false);
 require("dotenv").config();
 
 const MongoURI = process.env.MONGO_URI;
 
+// schemas used in search method
 const TourGouvnerTagSearch = require("./models/tourismGovernerTags.js");
 const Museum = require("./models/MuseumCRUD.js");
 const HistoricalPlace = require("./models/HistoricalPlaceCRUD.js");
@@ -14,6 +17,7 @@ const Category = require("./models/CategoryCRUD.js");
 const Itinerary = require("./models/schematour.js");
 const PreferenceTagSearch = require("./models/preferanceTagsCRUD.js");
 
+// routes
 const activityRoutes = require("./routes/ActivityCRUDroute");
 const historicalPlaceRoutes = require("./routes/HistoricalPlaceCRUDroute");
 const museumRoutes = require("./routes/MuseumCRUDroute");
