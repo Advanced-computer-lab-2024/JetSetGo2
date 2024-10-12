@@ -68,6 +68,9 @@ app.use("/admin", adminRoutes);
 app.use("/Advertiser", AdvertiserRoutes);
 app.use("/Tourist", tourist);
 
+// Serve static files from the 'uploads' folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.get("/search", async (req, res) => {
   const { searchword, searchType } = req.query; // Add searchType to query parameters
 
