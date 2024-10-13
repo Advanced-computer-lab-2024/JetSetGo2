@@ -231,7 +231,10 @@ const SellerDetails = () => {
         <li style={listItemStyle}>
           <strong>Logo:</strong>{" "}
           <img
-            src={`http://localhost:8000/uploads/sellerLogo/${Seller.logo}`} // Use the actual logo field from the seller object
+            src={
+              `http://localhost:8000/uploads/sellerLogo/${Seller.logo}` ||
+              "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
+            } // Use the actual logo field from the seller object
             alt="Logo"
             style={{ width: "100px", height: "auto" }}
           />
@@ -341,7 +344,7 @@ const SellerDetails = () => {
           src={
             Seller?.logo
               ? `http://localhost:8000/uploads/sellerLogo/${Seller.logo}`
-              : "path/to/default/avatar.jpg"
+              : "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
           } // Default avatar path
           alt="Avatar"
           style={avatarStyle}
