@@ -6,13 +6,15 @@ const createOther = async (req, res) => {
   const { UserName, Email, Password, AccountType } = req.body;
 
   // Ensure files are uploaded and present in req.files
-  const IDDocument = req.files.IDDocument ? req.files.IDDocument[0].path : null; // Path to the uploaded ID document
+  const IDDocument = req.files.IDDocument
+    ? req.files.IDDocument[0].path.split("/").pop()
+    : null; // Extract only the last part of the path for the ID document
   const Certificates = req.files.Certificates
-    ? req.files.Certificates[0].path
-    : null; // Path to the uploaded certificate (if applicable)
+    ? req.files.Certificates[0].path.split("/").pop()
+    : null; // Extract only the last part of the path for the certificate (if applicable)
   const TaxationRegistryCard = req.files.TaxationRegistryCard
-    ? req.files.TaxationRegistryCard[0].path
-    : null; // Path to the uploaded taxation registry card (if applicable)
+    ? req.files.TaxationRegistryCard[0].path.split("/").pop()
+    : null; // Extract only the last part of the path for the taxation registry card (if applicable)
 
   try {
     const other = await otherModel.create({
@@ -20,9 +22,9 @@ const createOther = async (req, res) => {
       Email,
       Password,
       AccountType,
-      IDDocument, // Include the path to the uploaded ID document
-      Certificates, // Include the path to the uploaded certificates (if applicable)
-      TaxationRegistryCard, // Include the path to the uploaded taxation registry card (if applicable)
+      IDDocument, // Include the extracted file name for ID document
+      Certificates, // Include the extracted file name for certificates (if applicable)
+      TaxationRegistryCard, // Include the extracted file name for taxation registry card (if applicable)
     });
 
     res.status(201).json(other); // Use 201 for resource creation
