@@ -1,32 +1,68 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
+import { useNavigate } from "react-router-dom";
+
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB file size limit
 
 const OtherSignup = () => {
   const [formData, setFormData] = useState({
     Email: "",
     UserName: "",
     Password: "",
-    AccountType: "", // Added this field to match the enum
+    AccountType: "",
+    IDDocument: null,
+    Certificates: null,
+    TaxationRegistryCard: null,
   });
 
-  const navigate = useNavigate(); // Hook to navigate programmatically
+  const [error, setError] = useState(""); // State for error messages
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (
+      name === "IDDocument" ||
+      name === "Certificates" ||
+      name === "TaxationRegistryCard"
+    ) {
+      const file = e.target.files[0];
+      // Validate file size
+      if (file && file.size > MAX_FILE_SIZE) {
+        alert("File size exceeds 2 MB limit.");
+        return;
+      }
+      setFormData({ ...formData, [name]: file });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const data = new FormData();
+    data.append("Email", formData.Email);
+    data.append("UserName", formData.UserName);
+    data.append("Password", formData.Password);
+    data.append("AccountType", formData.AccountType);
+    if (formData.IDDocument) data.append("IDDocument", formData.IDDocument);
+    if (formData.Certificates)
+      data.append("Certificates", formData.Certificates);
+    if (formData.TaxationRegistryCard)
+      data.append("TaxationRegistryCard", formData.TaxationRegistryCard);
+
     try {
       const response = await axios.post(
         "http://localhost:8000/home/other/addOther", // Adjust the endpoint as necessary
-        formData
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       console.log("Signup successful:", response.data);
-
-      // After successful signup, navigate to the appropriate page based on AccountType
+      // After successful signup, navigate based on AccountType
       if (formData.AccountType === "Advertiser") {
         navigate("/AdvirtiserMain");
       } else if (formData.AccountType === "Tour Guide") {
@@ -38,12 +74,14 @@ const OtherSignup = () => {
       }
     } catch (error) {
       console.error("Error signing up:", error);
+      setError("Signup failed. Please try again."); // Set error message
     }
   };
 
   return (
     <div style={styles.container}>
       <h2 style={styles.header}>Sign Up for Other Users</h2>
+      {error && <p style={styles.error}>{error}</p>} {/* Show error message */}
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Email:</label>
@@ -93,6 +131,48 @@ const OtherSignup = () => {
             <option value="Seller">Seller</option>
           </select>
         </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>ID Document:</label>
+          <input
+            type="file"
+            name="IDDocument"
+            onChange={handleChange}
+            style={styles.input}
+            accept=".jpg, .jpeg, .png, .pdf"
+            required
+          />
+        </div>
+
+        {/* Conditional rendering for file uploads */}
+        {formData.AccountType === "Advertiser" ||
+        formData.AccountType === "Seller" ? (
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Tax Registry:</label>
+            <input
+              type="file"
+              name="TaxationRegistryCard"
+              onChange={handleChange}
+              style={styles.input}
+              accept=".jpg, .jpeg, .png, .pdf"
+              required
+            />
+          </div>
+        ) : null}
+
+        {formData.AccountType === "Tour Guide" ? (
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Certificates:</label>
+            <input
+              type="file"
+              name="Certificates"
+              onChange={handleChange}
+              style={styles.input}
+              accept=".jpg, .jpeg, .png, .pdf"
+              required
+            />
+          </div>
+        ) : null}
+
         <button type="submit" style={styles.button}>
           Sign Up
         </button>
@@ -116,6 +196,10 @@ const styles = {
     fontSize: "30px",
     marginBottom: "20px",
     textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
+  },
+  error: {
+    color: "red",
+    marginBottom: "10px",
   },
   form: {
     background: "#fff",
