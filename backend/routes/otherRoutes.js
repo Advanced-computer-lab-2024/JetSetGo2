@@ -8,10 +8,12 @@ const {
   deleteAllOthers,
 } = require("../controllers/otherController");
 
+// Health check endpoint
 router.get("/", (req, res) => {
   res.status(200).send("You have everything installed!");
 });
 
+// User creation endpoint with file uploads
 router.post(
   "/addOther",
   upload.fields([
@@ -21,7 +23,11 @@ router.post(
   ]),
   createOther
 );
+
+// Get all users
 router.get("/getOther", getOther);
+
+// Delete all users
 router.delete("/deleteAllOther", deleteAllOthers);
 
 module.exports = router;

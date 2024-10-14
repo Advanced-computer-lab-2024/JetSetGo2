@@ -127,7 +127,7 @@ async function main() {
     const maxPrice = 200; // Example max price
 
     const accessToken = await getAccessToken(clientId, clientSecret);
-
+ 
     if (accessToken) {
         const destinations = await getFlightDestinations(origin, maxPrice, accessToken);
         console.log('Flight Destinations:', destinations);

@@ -52,8 +52,9 @@ const OtherSignup = () => {
       data.append("TaxationRegistryCard", formData.TaxationRegistryCard);
 
     try {
+      console.log("Form Data before submit:", formData); // Debug log
       const response = await axios.post(
-        "http://localhost:8000/home/other/addOther", // Adjust the endpoint as necessary
+        "http://localhost:8000/home/other/addOther",
         data,
         {
           headers: {
@@ -62,16 +63,9 @@ const OtherSignup = () => {
         }
       );
       console.log("Signup successful:", response.data);
-      // After successful signup, navigate based on AccountType
-      if (formData.AccountType === "Advertiser") {
-        navigate("/AdvirtiserMain");
-      } else if (formData.AccountType === "Tour Guide") {
-        navigate("/CreateTourGuide");
-      } else if (formData.AccountType === "Seller") {
-        navigate("/CreateSeller");
-      } else {
-        console.error("Unknown account type");
-      }
+      
+        navigate("/login");
+      
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Signup failed. Please try again."); // Set error message
@@ -127,7 +121,7 @@ const OtherSignup = () => {
           >
             <option value="">Select Account Type</option>
             <option value="Advertiser">Advertiser</option>
-            <option value="Tour Guide">Tour Guide</option>
+            <option value="TourGuide">Tour Guide</option> {/* Corrected here */}
             <option value="Seller">Seller</option>
           </select>
         </div>
@@ -159,7 +153,7 @@ const OtherSignup = () => {
           </div>
         ) : null}
 
-        {formData.AccountType === "Tour Guide" ? (
+        {formData.AccountType === "TourGuide" ? (
           <div style={styles.inputGroup}>
             <label style={styles.label}>Certificates:</label>
             <input
@@ -180,6 +174,7 @@ const OtherSignup = () => {
     </div>
   );
 };
+
 
 const styles = {
   container: {
