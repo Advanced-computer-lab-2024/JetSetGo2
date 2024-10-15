@@ -235,7 +235,9 @@ const ProductList = () => {
                     </td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>${product.price}</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller.Name}</td>
+                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
+                      {product.seller && product.seller.Name ? product.seller.Name : 'Unknown Seller'}
+                    </td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
                   </tr>
                 ))

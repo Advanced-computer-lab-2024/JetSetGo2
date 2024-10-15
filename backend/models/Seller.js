@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 const SellerSchema = new Schema(
   {
+    _id: { // Use the same ID as in the Other schema
+      type: Schema.Types.ObjectId,
+      ref: 'Other',
+      required: true
+    },
     Name: {
       type: String,
       required: true,

@@ -1,8 +1,13 @@
 const express = require("express");
+const Other =  require("../models/Other.js")
 const SellerModel = require("../models/Seller.js");
 
 // Create a new seller
 const createSeller = async (req, res) => {
+  const other = await Other.findById(req.userId);
+  if(!other){
+    return res.status(404).json({message: "user not found"});
+  }
   const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age, Email } =
     req.body;
   const logo = req.file ? req.file.filename.split("/").pop() : null; // Get the logo path if uploaded
@@ -22,6 +27,7 @@ const createSeller = async (req, res) => {
 
     // Create a new seller with the data provided in the request body
     const seller = await SellerModel.create({
+      _id:other._id,
       Name,
       PickUp_Location,
       Type_Of_Products,

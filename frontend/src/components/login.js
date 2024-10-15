@@ -87,16 +87,36 @@ const Login = () => {
       setSuccessMessage('Login successful!');
       setErrorMessage('');
 
-      if (userType === 'TourGuide') {
-        navigate('/CreateTourGuide');
-      } else if (userType === 'Advertiser') {
-        navigate('/AdvirtiserMain');
-      } else if (userType === 'Seller') {
-        navigate('/CreateSeller');
-      } else if (userType === 'Tourist') {
-        navigate('/tourist-home');
+      // Check if this is the user's first login
+      const hasLoggedInBefore = localStorage.getItem('hasLoggedInBefore');
+
+      if (!hasLoggedInBefore) {
+        // First-time login, store the flag in localStorage
+        localStorage.setItem('hasLoggedInBefore', 'true');
+        if (userType === 'TourGuide') {
+          navigate('/CreateTourGuide');
+        } else if (userType === 'Advertiser') {
+          navigate('/AdvirtiserMain');
+        } else if (userType === 'Seller') {
+          navigate('/CreateSeller');
+        } else if (userType === 'Tourist') {
+          navigate('/tourist-home');
+        } else {
+          setErrorMessage('User type not recognized.');
+        }
       } else {
-        setErrorMessage('User type not recognized.');
+        // Second or subsequent login
+        if (userType === 'TourGuide') {
+          navigate('/tour-guide');
+        } else if (userType === 'Advertiser') {
+          navigate('/list');
+        } else if (userType === 'Seller') {
+          navigate('/seller-details');
+        } else if (userType === 'Tourist') {
+          navigate('/tourist-home');
+        } else {
+          setErrorMessage('User type not recognized.');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);

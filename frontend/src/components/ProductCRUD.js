@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { useNavigate } from 'react-router-dom'; 
-import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService'; 
+import { useNavigate } from 'react-router-dom';
+import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService';
 
 const ProductCRUD = () => {
   const [products, setProducts] = useState([]);
@@ -29,8 +29,8 @@ const ProductCRUD = () => {
   // Fetch all products
   const fetchProducts = async () => {
     try {
-      const data = await getProducts(); 
-      setProducts(data);                
+      const data = await getProducts();
+      setProducts(data);
     } catch (error) {
       console.error("Error fetching products", error);
     }
@@ -38,8 +38,8 @@ const ProductCRUD = () => {
 
   const fetchSellers = async () => {
     try {
-      const data = await getSellers(); 
-      setSellers(data);                
+      const data = await getSellers();
+      setSellers(data);
     } catch (error) {
       console.error("Error fetching sellers", error);
     }
@@ -59,7 +59,7 @@ const ProductCRUD = () => {
     const value = Math.max(0, Math.min(5, Number(e.target.value)));
     setData(prev => ({
       ...prev,
-      rating: isNaN(value) ? 0 : value  
+      rating: isNaN(value) ? 0 : value
     }));
   };
 
@@ -70,7 +70,7 @@ const ProductCRUD = () => {
       await createProduct(formData);
       setMessage('Product created successfully!');
       resetCreateForm();
-      fetchProducts(); 
+      fetchProducts();
     } catch (error) {
       const errorMessage = error.response ? error.response.data.error : 'Error occurred while creating the product';
       setMessage(errorMessage);
@@ -87,7 +87,7 @@ const ProductCRUD = () => {
       await updateProduct(editData._id, editData);
       setMessage('Product updated successfully!');
       resetEditForm();
-      fetchProducts(); 
+      fetchProducts();
     } catch (error) {
       const errorMessage = error.response ? error.response.data.error : 'Error occurred while updating the product.';
       setMessage(errorMessage);
@@ -100,7 +100,7 @@ const ProductCRUD = () => {
     try {
       await deleteProduct(id);
       setMessage('Product deleted successfully!');
-      fetchProducts(); 
+      fetchProducts();
     } catch (error) {
       setMessage('Error deleting product.');
       console.error(error);
@@ -219,15 +219,15 @@ const ProductCRUD = () => {
             <label style={{ display: 'block', marginBottom: '10px' }}>Description:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="text" name="description" value={formData.description} onChange={(e) => handleChange(e, setFormData)} required />
-            
+
             <label style={{ display: 'block', marginBottom: '10px' }}>Picture (URL):</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="text" name="pictures" value={formData.pictures} onChange={(e) => handleChange(e, setFormData)} required />
-            
+
             <label style={{ display: 'block', marginBottom: '10px' }}>Price:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="number" name="price" value={formData.price} onChange={(e) => handleChange(e, setFormData)} required />
-            
+
             <label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
             <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
@@ -244,13 +244,16 @@ const ProductCRUD = () => {
 
             <label style={{ display: 'block', marginBottom: '10px' }}>Reviews:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-              type="text" name="reviews" value={formData.reviews} onChange={(e) => handleChange(e, setFormData)} required />
+              type="text" name="reviews" value={formData.reviews} onChange={(e) => handleChange(e, setFormData)} />
 
             <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="number" name="availableQuantity" value={formData.availableQuantity} onChange={(e) => handleChange(e, setFormData)} required />
 
-            <button style={{ padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+            <button style={{
+              padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none',
+              borderRadius: '5px', cursor: 'pointer', width: '100%', marginTop: '20px'
+            }}>
               Create Product
             </button>
           </form>
@@ -258,7 +261,7 @@ const ProductCRUD = () => {
 
         {/* Edit Product Form */}
         {editData && (
-          <section style={{ marginBottom: '40px' }}>
+          <section>
             <h2>Edit Product</h2>
             <form onSubmit={handleEditSubmit}>
               <label style={{ display: 'block', marginBottom: '10px' }}>Description:</label>
@@ -289,26 +292,21 @@ const ProductCRUD = () => {
 
               <label style={{ display: 'block', marginBottom: '10px' }}>Reviews:</label>
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="text" name="reviews" value={editData.reviews} onChange={(e) => handleChange(e, setEditData)} required />
+                type="text" name="reviews" value={editData.reviews} onChange={(e) => handleChange(e, setEditData)} />
 
               <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 type="number" name="availableQuantity" value={editData.availableQuantity} onChange={(e) => handleChange(e, setEditData)} required />
 
-              <button style={{ padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+              <button style={{
+                padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none',
+                borderRadius: '5px', cursor: 'pointer', width: '100%', marginTop: '20px'
+              }}>
                 Update Product
               </button>
-
-              {/* Cancel Button */}
               <button type="button" onClick={handleCancel} style={{
-                padding: '10px 20px',
-                backgroundColor: '#ff6348',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginTop: '10px',
-                width: '100%',
+                padding: '10px 20px', backgroundColor: '#dc3545', color: '#fff', border: 'none',
+                borderRadius: '5px', cursor: 'pointer', width: '100%', marginTop: '10px'
               }}>
                 Cancel
               </button>
@@ -317,51 +315,31 @@ const ProductCRUD = () => {
         )}
 
         {/* Product List */}
-        <section>
-          <h2>Product List</h2>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            marginTop: '20px',
-            borderRadius: '10px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-          }}>
-            <thead style={{
-              backgroundColor: '#343a40',
-              color: '#fff',
+        <h2>Product List</h2>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {products.map((product) => (
+            <li key={product._id} style={{
+              padding: '10px', borderBottom: '1px solid #ccc', marginBottom: '10px'
             }}>
-              <tr>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Picture</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Description</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Price</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Seller</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Rating</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(product => (
-                <tr key={product._id} style={{ textAlign: 'center' }}>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                    {product.pictures ? <img src={product.pictures} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} /> : 'No Image'}
-                  </td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>${product.price}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller.Name}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                    <button onClick={() => handleEdit(product)} style={{ padding: '5px 10px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(product._id)} style={{ padding: '5px 10px', backgroundColor: '#ff6348', color: '#fff', border: 'none', borderRadius: '5px' }}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+              <p><strong>Description:</strong> {product.description}</p>
+              <p><strong>Price:</strong> ${product.price}</p>
+              <p><strong>Seller:</strong> {product.seller && sellers.find(seller => seller._id === product.seller)?.Name}</p>
+              <p><strong>Rating:</strong> {product.rating}</p>
+              <button onClick={() => handleEdit(product)} style={{
+                padding: '5px 10px', marginRight: '10px', backgroundColor: '#17a2b8', color: '#fff',
+                border: 'none', borderRadius: '5px'
+              }}>
+                Edit
+              </button>
+              <button onClick={() => handleDelete(product._id)} style={{
+                padding: '5px 10px', backgroundColor: '#dc3545', color: '#fff',
+                border: 'none', borderRadius: '5px'
+              }}>
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
