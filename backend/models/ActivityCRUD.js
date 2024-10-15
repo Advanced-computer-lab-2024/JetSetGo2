@@ -20,8 +20,8 @@ const activitySchema = new Schema(
       required: true,
     },
     category: {
-      type: Schema.Types.ObjectId, // Using ObjectId to reference the Category model
-      ref: "Category", // Reference to the Category model
+      type: Schema.Types.ObjectId, 
+      ref: "Category", 
       required: true,
     },
     tags: {
@@ -38,11 +38,15 @@ const activitySchema = new Schema(
       required: true,
     },
     advertiser: {
-      type: Schema.Types.ObjectId, // Using ObjectId to reference the Category model
-      ref: "adver", // Reference to the Category model
+      type: Schema.Types.ObjectId, 
+      ref: "adver", 
       required: true,
     },
-    rating: {
+    bookings: { 
+      type: Number, 
+      default: 0,  
+    },
+    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },       rating: {
       type: Number,
       required: true,
     },
@@ -50,5 +54,24 @@ const activitySchema = new Schema(
   { timestamps: true }
 );
 
+// Increment booking and ensure no double-booking
+activitySchema.methods.incrementBookings = async function (userId) {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
+  // Check if the user has already booked
+  const alreadyBooked = this.bookedUsers.some(bookedUserId => 
+    bookedUserId.equals(userObjectId)
+  );
+
+  if (alreadyBooked) {
+    throw new Error("User has already booked this activity.");
+  }
+
+  // Increment bookings and push userId to bookedUsers
+  this.bookings += 1;
+  this.bookedUsers.push(userObjectId);
+
+  await this.save();  // Save the updated activity
+};
 const Activity = mongoose.model("Activity", activitySchema);
 module.exports = Activity;

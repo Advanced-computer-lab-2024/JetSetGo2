@@ -23,10 +23,14 @@ import CreateSeller from "./components/CreateSeller";
 import SellerDetails from "./components/SellerDetails";
 import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
 import Activities from "./components/UpComingEvents/Activities";
+import Activitiest from "./components/UpComingEvents/Activitiest";
+
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
+import Itinerariest from "./components/UpComingEvents/Itenariest";
+
 import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
 import AddTourismGovernor from "./components/AddTourismGovernor";
@@ -114,9 +118,13 @@ function App() {
           <Route path="/seller-details" element={<SellerDetails />} />
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
           <Route path="/Upcoming-activities" element={<Activities />} />
+          <Route path="/Upcoming-activitiest" element={<Activitiest />} />
+
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
+          <Route path="/Upcoming-itinerariest" element={<Itinerariest />} />
+
           <Route path="/productList" element={<ProductList />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
           <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />

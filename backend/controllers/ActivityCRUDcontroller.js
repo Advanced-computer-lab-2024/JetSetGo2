@@ -38,6 +38,8 @@ const createActivity = async (req, res) => {
   }
 };
 
+
+
 // Get All Activities with Category and Advertiser Populated
 const getActivity = async (req, res) => {
   try {
@@ -128,6 +130,44 @@ const deleteActivity = async (req, res) => {
   }
 };
 
+const bookactivity = async (req, res) => {
+  const { id } = req.params;  // Extract the activity ID from the URL parameters
+  const userId = req.body.userId;  // Extract the user ID from the request body
+
+  // Log incoming parameters for debugging
+  console.log("Incoming ID:", id);
+  console.log("Incoming User ID:", userId);
+
+  // Check if ID is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid Activity ID." });
+  }
+
+  // Check if userId is provided
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required." });
+  }
+
+  try {
+    const activity = await Activity.findById(id);  // Find the activity by its ID
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found." });
+    }
+
+    // Increment bookings if the user has not already booked
+    await activity.incrementBookings(userId);
+
+    res.status(200).json({ message: "Booking successful", bookings: activity.bookings });
+  } catch (error) {
+    console.error("Error during booking:", error); // Log error to console for debugging
+    if (error.message.includes("already booked")) {
+      return res.status(400).json({ message: "You have already booked this activity." });
+    }
+    res.status(500).json({ message: "Internal Server Error", error: error.message }); // Send the error message in response
+  }
+};
+
+
 const deleteAllActivities = async (req, res) => {
   try {
     await Activity.deleteMany({});
@@ -173,4 +213,5 @@ module.exports = {
   deleteAllActivities,
   upcomingactivity,
   readAdverActivites,
+  bookactivity
 };
