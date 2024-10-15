@@ -54,6 +54,24 @@ const readGuide = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const bookTour = async (req, res) => {
+  const { id } = req.params; // Extract the tour ID from the URL parameters
+  const userId = req.body.userId;  // Get userId from the request body (can come from the frontend or authenticated session)
+
+  try {
+    const schema = await Schema.findById(id);
+    if (!schema) {
+      return res.status(404).json({ message: "Tour not found" });
+    }
+
+    // Increment the bookings count if the user has not booked this tour before
+    await schema.incrementBookings(userId);
+
+    res.status(200).json({ message: "Booking successful", bookings: schema.bookings });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const readGuideID = async (req, res) => {
   try {
@@ -120,4 +138,5 @@ module.exports = {
   readGuideID,
   updateGuide,
   deleteGuide,
+  bookTour
 };

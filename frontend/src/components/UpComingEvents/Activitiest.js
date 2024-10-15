@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getActivity, getCategories } from "../../services/ActivityService";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
+import axios from "axios";
 
 const predefinedLocations = [
   { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
@@ -19,7 +20,7 @@ const predefinedLocations = [
   },
 ];
 
-const Activities = () => {
+const Activitiest = () => {
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -35,11 +36,42 @@ const Activities = () => {
   });
 
   const navigate = useNavigate(); // Initialize useNavigate hook
+  const location = useLocation(); // Use useLocation to access the state
+  const touristId = location.state?.touristId || ""; // Extract touristId from the location state
 
   useEffect(() => {
     fetchActivities();
     fetchCategories();
   }, []);
+
+  const handleBookTour = async (id) => {
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+
+      const response = await axios.patch(
+        `http://localhost:8000/activity/book/${id}`,
+        { userId: touristId } // Send touristId in the request body
+      );
+
+      if (response.status === 200) {
+        // Update the bookings count in the UI
+        setFilteredActivities((upcomingActivities) =>
+          upcomingActivities.map((activity) =>
+            activity._id === id
+              ? { ...activity, bookings: activity.bookings + 1 }
+              : activity
+          )
+        );
+        alert("Tour booked successfully!");
+      }
+    } catch (error) {
+      console.error("Error booking tour:", error);
+      alert("already booked");
+    }
+  };
 
   const fetchActivities = async () => {
     try {
@@ -257,8 +289,10 @@ const Activities = () => {
                     {activity.isBookingOpen ? "Yes" : "No"}
                   </p>
                   <p>
-                <strong>Bookings:</strong> {activity.bookings}
-              </p>
+                    <strong>Bookings:</strong> {activity.bookings}
+                  </p>
+
+                  {/* Add a "Book Now" button */}
                   <p>
                     <strong>Rating:</strong> {activity.rating}
                   </p>
@@ -271,6 +305,9 @@ const Activities = () => {
                       style={{ border: "none" }}
                     ></iframe>
                   )}
+                  <button onClick={() => handleBookTour(activity._id)}>
+                    Book Now
+                  </button>
                 </div>
               );
             })}
@@ -336,4 +373,4 @@ const Activities = () => {
   );
 };
 
-export default Activities;
+export default Activitiest;
