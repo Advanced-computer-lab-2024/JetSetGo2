@@ -26,6 +26,9 @@ const HomePage = () => {
         <button style={styles.button} onClick={() => navigate("/tourismGovernorPage")}>
           Tourism Governor
         </button>
+        <button style={styles.button} onClick={() => navigate("/login")}>
+          Login
+        </button>
       </div>
     </div>
   );

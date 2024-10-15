@@ -12,6 +12,29 @@ const createTourist = async (req, res) => {
     DateOfBirth,
     Job,
   } = req.body;
+
+  // Validation checks
+  if (!Email || !UserName || !Password || !MobileNumber || !Nationality || !DateOfBirth || !Job) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
+
+  // Example: Validate Email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(Email)) {
+    return res.status(400).json({ error: "Invalid email format." });
+  }
+
+  // Example: Validate MobileNumber (it should be a number and not less than 10 digits)
+  if (isNaN(MobileNumber) || MobileNumber.toString().length < 10) {
+    return res.status(400).json({ error: "Mobile number must be at least 10 digits." });
+  }
+
+  // Example: Validate DateOfBirth (it should be a valid date)
+  const dob = new Date(DateOfBirth);
+  if (isNaN(dob.getTime())) {
+    return res.status(400).json({ error: "Invalid date of birth." });
+  }
+
   try {
     const tourist = await touristModel.create({
       Email,
@@ -27,6 +50,7 @@ const createTourist = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const updateTourist = async (req, res) => {
   const { id } = req.params;

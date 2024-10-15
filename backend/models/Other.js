@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
 const OtherSchema = new Schema(
@@ -10,6 +11,8 @@ const OtherSchema = new Schema(
     Email: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
     },
     Password: {
       type: String,
@@ -17,12 +20,39 @@ const OtherSchema = new Schema(
     },
     AccountType: {
       type: String,
-      enum: ["Advertiser", "Tour Guide", "Seller"], // Only these values are allowed
+      enum: ['TourGuide', 'Advertiser', 'Seller', 'Admin'], // Ensure the AccountType values are consistent
       required: true,
+    },
+    IDDocument: {
+      type: String,
+      required: true,
+    },
+    Certificates: {
+      type: String,
+      required: function () {
+        return this.AccountType === "TourGuide"; // Corrected the condition
+      },
+    },
+    TaxationRegistryCard: {
+      type: String,
+      required: function () {
+        return (
+          this.AccountType === "Advertiser" || this.AccountType === "Seller"
+        );
+      },
     },
   },
   { timestamps: true }
 );
+
+// Hash password before saving
+OtherSchema.pre("save", async function (next) {
+  if (this.isModified("Password")) {
+    const salt = await bcrypt.genSalt(10);
+    this.Password = await bcrypt.hash(this.Password, salt);
+  }
+  next();
+});
 
 const Other = mongoose.model("Other", OtherSchema);
 module.exports = Other;

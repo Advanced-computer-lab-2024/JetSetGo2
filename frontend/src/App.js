@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import ActivityCRUD from "./components/ActivityCRUD"; // Import ActivityCRUD component
+// Importing components
+import ActivityCRUD from "./components/ActivityCRUD";
 import HistoricalplaceCRUD from "./components/HistoricalplaceCRUD";
 import MuseumCRUD from "./components/MuseumCRUD";
 import SchemaTourFront from "./components/schemaTourFront";
 import HomePage from "./components/HomePage";
 import TouristSignup from "./components/createTourist";
-import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
+import UpdateTouristPage from "./components/touristUpdate";
 import OtherSignup from "./components/createOther";
 import TagsManagement from "./components/TagsManagement";
 import CreateTourGuide from "./components/CreateTourGuide";
@@ -34,13 +35,14 @@ import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
 import AddTourismGovernor from "./components/AddTourismGovernor";
 import ProductListp from "./components/p";
-
 import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
+import Login from "./components/login";
+
 
 function App() {
-  const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
+  const [selectedTouristId, setSelectedTouristId] = useState(null);
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
   const [selectedAdverId, setselectedAdverId] = useState(null);
 
@@ -49,6 +51,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} /> {/* Login Route */}
           <Route
             path="/tourist-signup"
             element={
@@ -108,7 +111,6 @@ function App() {
           />
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/p" element={<ProductListp />} />
-
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/product" element={<ProductCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
