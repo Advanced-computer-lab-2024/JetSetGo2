@@ -6,23 +6,26 @@ const createOther = async (req, res) => {
 
   const { UserName, Email, Password, AccountType } = req.body;
 
-  const IDDocument = req.files.IDDocument ? req.files.IDDocument[0].path : null;
-  const Certificates = req.files.Certificates ? req.files.Certificates[0].path : null;
-  const TaxationRegistryCard = req.files.TaxationRegistryCard ? req.files.TaxationRegistryCard[0].path : null;
+  // Ensure files are uploaded and present in req.files
+  const IDDocument = req.files.IDDocument
+    ? req.files.IDDocument[0].path.split("/").pop()
+    : null; // Extract only the last part of the path for the ID document
+  const Certificates = req.files.Certificates
+    ? req.files.Certificates[0].path.split("/").pop()
+    : null; // Extract only the last part of the path for the certificate (if applicable)
+  const TaxationRegistryCard = req.files.TaxationRegistryCard
+    ? req.files.TaxationRegistryCard[0].path.split("/").pop()
+    : null; // Extract only the last part of the path for the taxation registry card (if applicable)
 
   try {
-    if (!UserName || !Email || !Password || !AccountType) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
     const other = await otherModel.create({
       UserName,
       Email,
       Password,
       AccountType,
-      IDDocument,
-      Certificates,
-      TaxationRegistryCard,
+      IDDocument, // Include the extracted file name for ID document
+      Certificates, // Include the extracted file name for certificates (if applicable)
+      TaxationRegistryCard, // Include the extracted file name for taxation registry card (if applicable)
     });
 
     res.status(201).json({ message: "User created successfully", other });

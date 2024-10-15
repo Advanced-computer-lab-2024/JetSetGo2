@@ -1,4 +1,4 @@
-const {default: mongoose} = require('mongoose');
+const { default: mongoose } = require("mongoose");
 const Activity = require("../models/ActivityCRUD");
 const Category = require("../models/CategoryCRUD");
 const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
@@ -178,12 +178,13 @@ const deleteAllActivities = async (req, res) => {
 };
 const readAdverActivites = async (req, res) => {
   try {
-      const userId = req.query.userId;
-      const schemas = await Activity.find({advertiser: new mongoose.Types.ObjectId(userId)})
-      .populate('advertiser'); 
-      res.status(200).json(schemas);
+    const userId = req.query.userId;
+    const schemas = await Activity.find({
+      advertiser: new mongoose.Types.ObjectId(userId),
+    }).populate("advertiser");
+    res.status(200).json(schemas);
   } catch (err) {
-      res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 

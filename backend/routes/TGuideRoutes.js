@@ -1,17 +1,20 @@
-const TourModel = require('../models/TGuide.js');
-const { default: mongoose } = require('mongoose');
-const express = require('express');
+const TourModel = require("../models/TGuide.js");
+const { default: mongoose } = require("mongoose");
+const upload = require("../middleware/uploadtourguidephoto.js");
+const express = require("express");
 const router = express.Router();
-const {getuser,updateUser,createUser,getUserById,deleteTGuide} = require('../controllers/TGuideController');
+const {
+  getuser,
+  updateUser,
+  createUser,
+  getUserById,
+  deleteTGuide,
+} = require("../controllers/TGuideController");
 
-
-router.post("/add",createUser);
-router.get("/get",getuser);
-router.put("/update/:id",updateUser)
-router.get("/users/:id",getUserById)
+router.post("/add", createUser);
+router.get("/get", getuser);
+router.put("/update/:id", upload.single("Photo"), updateUser);
+router.get("/users/:id", getUserById);
 router.delete("/delete/:id", deleteTGuide);
 
-
 module.exports = router;
-
- 
