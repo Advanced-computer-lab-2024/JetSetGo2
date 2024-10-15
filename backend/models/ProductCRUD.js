@@ -35,6 +35,11 @@ const productSchema = new Schema({
         ref: 'Seller',  // Reference to the Category model
         required: true,
       },
+      sales: {
+        type: Number,  // Add this field to track the number of sales
+        required: true,
+        default: 0,    // Default to 0 if no sales yet
+      },
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

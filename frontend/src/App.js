@@ -34,6 +34,8 @@ import ProductListp from "./components/p";
 import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
+import ItinerariesAdmin from "./components/ItinerariesAdmin";
+
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
@@ -121,6 +123,8 @@ function App() {
           <Route path="/DeleteUsers" element={<DeleteUsers />} />
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
           <Route path="/tourismGovernorPage" element={<TourismGovernorPage />} />
+          <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
+          
         </Routes>
       </div>
     </Router>

@@ -70,6 +70,7 @@ const AdminCapabilities = () => {
             { label: 'Delete Users', path: '/DeleteUsers' },
             { label: 'Add a Tourism Governor', path: '/AddTourismGovernor' },
             { label: 'Add an Admin', path: '/AddAdmin' },
+            { label: 'Manage Itineraries', path: '/ItinerariesAdmin' },
           ].map((button) => (
             <button
               key={button.path}
