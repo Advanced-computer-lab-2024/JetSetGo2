@@ -47,7 +47,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login />} /> {/* Login Route */}
+          <Route path="/login" element={<Login />} /> 
           <Route
             path="/tourist-signup"
             element={

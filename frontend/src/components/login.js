@@ -90,7 +90,7 @@ const Login = () => {
       if (userType === 'TourGuide') {
         navigate('/CreateTourGuide');
       } else if (userType === 'Advertiser') {
-        navigate('/AdvertiserMain');
+        navigate('/AdvirtiserMain');
       } else if (userType === 'Seller') {
         navigate('/CreateSeller');
       } else if (userType === 'Tourist') {
