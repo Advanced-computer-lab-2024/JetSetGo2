@@ -12,14 +12,17 @@ export const getActivity = async () => {
     throw error;
   }
 };
-export const getActivityById = async ({selectedAdverId}) => {
+
+// Get activity by advertiser ID
+export const getActivityById = async ({ selectedAdverId }) => {
   try {
-     console.log(selectedAdverId)
-     const response = await axios.get(`${API_URL}/activity/getAdverAct?userId=${selectedAdverId}`);
-     return response.data;
+    const response = await axios.get(
+      `${API_URL}/activity/getAdverAct?userId=${selectedAdverId}`
+    );
+    return response.data;
   } catch (error) {
-     console.error("Error fetching activities:", error);
-     throw error;
+    console.error("Error fetching activities:", error);
+    throw error;
   }
 };
 
@@ -62,7 +65,7 @@ export const deleteActivity = async (id) => {
 // Get all categories
 export const getCategories = async () => {
   try {
-    const response = await axios.get(`${API_URL}/category/get`); // Adjust this endpoint according to your backend
+    const response = await axios.get(`${API_URL}/category/get`);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -70,22 +73,38 @@ export const getCategories = async () => {
   }
 };
 
+// Get advertisers
 export const getAdvertiser = async () => {
   try {
-    const response = await axios.get(`${API_URL}/home/adver/get`); // Adjust this endpoint according to your backend
+    const response = await axios.get(`${API_URL}/home/adver/get`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching advertisers:", error);
     throw error;
   }
 };
 
+// Get tags
 export const getTags = async () => {
   try {
-    const response = await axios.get(`${API_URL}/prefTags/readtag`); // Adjust this endpoint according to your backend
+    const response = await axios.get(`${API_URL}/prefTags/readtag`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching preftags:", error);
+    console.error("Error fetching tags:", error);
+    throw error;
+  }
+};
+
+// Book an activity
+export const bookActivity = async (activityId, userId) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}/activity/book/${activityId}`,
+      { userId } // Send the user ID with the request
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error booking activity:", error);
     throw error;
   }
 };

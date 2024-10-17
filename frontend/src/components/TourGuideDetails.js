@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import axios from "axios";
 
 const styles = {
   container: {
@@ -30,20 +30,20 @@ const styles = {
     fontSize: "22px",
     fontWeight: "bold",
   },
-  
+
   button: {
-    margin: '10px',
-    padding: '10px 20px', // Reduced padding for smaller buttons
-    fontSize: '16px', // Adjusted font size for smaller buttons
-    backgroundColor: '#ff6348',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-    transition: 'background-color 0.3s, transform 0.3s',
-    width: '180px', // Ensures all buttons have equal width
-    textAlign: 'center',
+    margin: "10px",
+    padding: "10px 20px",
+    fontSize: "16px",
+    backgroundColor: "#ff6348",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+    transition: "background-color 0.3s, transform 0.3s",
+    width: "180px",
+    textAlign: "center",
   },
   mainContent: {
     flex: 1,
@@ -81,13 +81,14 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    Name: '',
-    Email: '',
-    Age: '',
-    LanguagesSpoken: '',
-    MobileNumber: '',
-    YearsOfExperience: '',
-    PreviousWork: '',
+    Name: "",
+    Email: "",
+    Age: "",
+    LanguagesSpoken: "",
+    MobileNumber: "",
+    YearsOfExperience: "",
+    PreviousWork: "",
+    Photo: null, // State to hold the photo file
   });
 
   const navigate = useNavigate();
@@ -96,15 +97,17 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
     const fetchTourGuide = async () => {
       try {
         if (selectedTourGuideId) {
-          const response = await axios.get(`http://localhost:8000/TourGuide/users/${selectedTourGuideId}`);
+          const response = await axios.get(
+            `http://localhost:8000/TourGuide/users/${selectedTourGuideId}`
+          );
           setTourGuide(response.data);
           setFormData(response.data); // Set initial form data for editing
         } else {
-          setError('No Tour Guide ID provided.');
+          setError("No Tour Guide ID provided.");
         }
       } catch (err) {
-        console.error('Error fetching tour guide:', err);
-        setError('Error fetching tour guide data.');
+        console.error("Error fetching tour guide:", err);
+        setError("Error fetching tour guide data.");
       }
     };
 
@@ -115,42 +118,51 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    setFormData({ ...formData, Photo: e.target.files[0] });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { _selectedTourGuideId, ...updatedData } = formData; // Assuming the ID is in formData
+    const { Photo, ...updatedData } = formData; // Separate the photo file from the rest of the form data
+
+    const formDataToSend = new FormData();
+
+    // Append the photo file only if a new one is selected
+    if (Photo) {
+      formDataToSend.append("Photo", Photo);
+    }
+
+    // Append the other form data fields
+    Object.keys(updatedData).forEach((key) => {
+      formDataToSend.append(key, updatedData[key]);
+    });
 
     try {
-      const response = await axios.put(`http://localhost:8000/TourGuide/update/${selectedTourGuideId}`, updatedData);
-      console.log('Update response:', response.data);
-      setTourGuide(response.data); // Update local state with response
-      setIsEditing(false); // Exit edit mode
-    } catch (error) {
-      console.error('Error updating tour guide:', error.response ? error.response.data : error.message);
-      setError('Error updating tour guide.');
-    }
-  };
+      const response = await axios.put(
+        `http://localhost:8000/TourGuide/update/${selectedTourGuideId}`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-  const handleViewTourGuideActivities = () => {
-    fetchTourGuideActivities();
+      setTourGuide(response.data); // Update the local state with the updated tour guide data
+      setIsEditing(false); // Exit the edit mode
+    } catch (error) {
+      console.error(
+        "Error updating tour guide:",
+        error.response ? error.response.data : error.message
+      );
+      setError("Error updating tour guide.");
+    }
   };
 
   const handleSchemaTourFrontPage = () => {
-    navigate('/SchemaTourFront');
-  };
-
-  const fetchTourGuideActivities = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8000/itinerary/readTour?userId=${selectedTourGuideId}`);
-      setActivities(response.data);
-    } catch (error) {
-      console.error('Error fetching itineraries', error);
-      setError('Failed to fetch itineraries');
-    }
-  };
-
-  const handleUpdateActivity = (activityId) => {
-    navigate(`/update-activity/${activityId}`);
+    navigate("/SchemaTourFront");
   };
 
   if (error) return <div>{error}</div>;
@@ -161,61 +173,137 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
       {/* Sidebar */}
       <div style={styles.sidebar}>
         <div style={styles.profileContainer}>
-          <img src="https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg" alt="Profile" style={styles.profileImage} />
+          <img
+            src={
+              `http://localhost:8000/uploads/tourguidePhoto/${tourGuide.Photo}` ||
+              "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
+            } // Fallback profile image
+            alt="Profile"
+            style={styles.profileImage}
+          />
           <p style={styles.profileName}>{tourGuide.Name}</p>
-          <button onClick={handleSchemaTourFrontPage} style={styles.button}>Create/View Itinerary</button>
-          <button onClick={() => setIsEditing(true)} style={styles.button}>Edit</button>
+          <button onClick={handleSchemaTourFrontPage} style={styles.button}>
+            Create/View Itinerary
+          </button>
+          <button onClick={() => setIsEditing(true)} style={styles.button}>
+            Edit
+          </button>
         </div>
       </div>
 
       {/* Main Content */}
       <div style={styles.mainContent}>
-        <h1 style={styles.header}>Tour Guide Details and Itineraries</h1>
+        <h1 style={styles.header}>Tour Guide Details</h1>
 
         {isEditing ? (
           <form onSubmit={handleSubmit}>
-           <div>
-            <label>Name:</label>
-            <input name="Name" value={formData.Name} onChange={handleChange} required />
-          </div>
-          <div>
-            <label>Email:</label>
-            <input name="Email" value={formData.Email} onChange={handleChange} required />
-          </div>
-          <div>
-            <label>Age:</label>
-            <input name="Age" value={formData.Age} onChange={handleChange} required />
-          </div>
-          <div>
-            <label>Languages Spoken:</label>
-            <input name="LanguagesSpoken" value={formData.LanguagesSpoken} onChange={handleChange} required />
-          </div>
-          <div>
-            <label>Mobile Number:</label>
-            <input name="MobileNumber" value={formData.MobileNumber} onChange={handleChange} required />
-          </div>
-          <div>
-            <label>Years of Experience:</label>
-            <input name="YearsOfExperience" value={formData.YearsOfExperience} onChange={handleChange} required />
-          </div>
-          <div>
-            <label>Previous Work:</label>
-            <input name="PreviousWork" value={formData.PreviousWork} onChange={handleChange} />
-          </div>
+            <div>
+              <label>Name:</label>
+              <input
+                name="Name"
+                value={formData.Name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Email:</label>
+              <input
+                name="Email"
+                value={formData.Email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Age:</label>
+              <input
+                name="Age"
+                value={formData.Age}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Languages Spoken:</label>
+              <input
+                name="LanguagesSpoken"
+                value={formData.LanguagesSpoken}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Mobile Number:</label>
+              <input
+                name="MobileNumber"
+                value={formData.MobileNumber}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Years of Experience:</label>
+              <input
+                name="YearsOfExperience"
+                value={formData.YearsOfExperience}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Previous Work:</label>
+              <input
+                name="PreviousWork"
+                value={formData.PreviousWork}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Upload Photo:</label>
+              <input
+                type="file"
+                accept="image/*"
+                name="Photo" // Use "Photo" here to match the state
+                onChange={handleImageChange}
+              />
+            </div>
 
-            <button type="submit" style={styles.button}>Update</button>
-            <button type="button" onClick={() => setIsEditing(false)} style={styles.button}>Cancel</button>
+            <button type="submit" style={styles.button}>
+              Update
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              style={styles.button}
+            >
+              Cancel
+            </button>
           </form>
         ) : (
           <ul>
-            <li><strong>Name:</strong> {tourGuide.Name}</li>
-            <li><strong>Email:</strong> {tourGuide.Email}</li>
-            <li><strong>Age:</strong> {tourGuide.Age}</li>
-            <li><strong>Languages Spoken:</strong> {tourGuide.LanguagesSpoken}</li>
-            <li><strong>Mobile Number:</strong> {tourGuide.MobileNumber}</li>
-            <li><strong>Years of Experience:</strong> {tourGuide.YearsOfExperience}</li>
-            <li><strong>Previous Work:</strong> {tourGuide.PreviousWork || 'N/A'}</li>
-           
+            <li>
+              <strong>Name:</strong> {tourGuide.Name}
+            </li>
+            <li>
+              <strong>Email:</strong> {tourGuide.Email}
+            </li>
+            <li>
+              <strong>Age:</strong> {tourGuide.Age}
+            </li>
+            <li>
+              <strong>Languages Spoken:</strong> {tourGuide.LanguagesSpoken}
+            </li>
+            <li>
+              <strong>Mobile Number:</strong> {tourGuide.MobileNumber}
+            </li>
+            <li>
+              <strong>Years of Experience:</strong>{" "}
+              {tourGuide.YearsOfExperience}
+            </li>
+            <li>
+              <strong>Previous Work:</strong> {tourGuide.PreviousWork || "N/A"}
+            </li>
           </ul>
         )}
 
@@ -234,8 +322,6 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
             Museums
           </Link>
         </nav>
-
-        <hr />
       </div>
     </div>
   );

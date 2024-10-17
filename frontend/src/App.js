@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import ActivityCRUD from "./components/ActivityCRUD"; // Import ActivityCRUD component
+// Importing components
+import ActivityCRUD from "./components/ActivityCRUD";
 import HistoricalplaceCRUD from "./components/HistoricalplaceCRUD";
 import MuseumCRUD from "./components/MuseumCRUD";
 import SchemaTourFront from "./components/schemaTourFront";
 import HomePage from "./components/HomePage";
 import TouristSignup from "./components/createTourist";
-import UpdateTouristPage from "./components/touristUpdate"; // Make sure this component exists
+import UpdateTouristPage from "./components/touristUpdate";
 import OtherSignup from "./components/createOther";
 import TagsManagement from "./components/TagsManagement";
 import CreateTourGuide from "./components/CreateTourGuide";
@@ -22,23 +23,29 @@ import CreateSeller from "./components/CreateSeller";
 import SellerDetails from "./components/SellerDetails";
 import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
 import Activities from "./components/UpComingEvents/Activities";
+import Activitiest from "./components/UpComingEvents/Activitiest";
+
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
+import Itinerariest from "./components/UpComingEvents/Itenariest";
+import OthersListPage from "./components/FetchDocuments";
 import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
 import AddTourismGovernor from "./components/AddTourismGovernor";
 import ProductListp from "./components/p";
-
 import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
+import Login from "./components/login";
+
+
 import ItinerariesAdmin from "./components/ItinerariesAdmin";
 
 
 function App() {
-  const [selectedTouristId, setSelectedTouristId] = useState(null); // State to hold selected tourist ID
+  const [selectedTouristId, setSelectedTouristId] = useState(null);
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
   const [selectedAdverId, setselectedAdverId] = useState(null);
 
@@ -47,6 +54,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} /> 
           <Route
             path="/tourist-signup"
             element={
@@ -106,7 +114,6 @@ function App() {
           />
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/p" element={<ProductListp />} />
-
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/product" element={<ProductCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
@@ -114,15 +121,27 @@ function App() {
           <Route path="/seller-details" element={<SellerDetails />} />
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
           <Route path="/Upcoming-activities" element={<Activities />} />
+          <Route path="/Upcoming-activitiest" element={<Activitiest />} />
+
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
+          <Route path="/Upcoming-itinerariest" element={<Itinerariest />} />
+
           <Route path="/productList" element={<ProductList />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
           <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
           <Route path="/DeleteUsers" element={<DeleteUsers />} />
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
-          <Route path="/tourismGovernorPage" element={<TourismGovernorPage />} />
+          <Route
+            path="/tourismGovernorPage"
+            element={<TourismGovernorPage />}
+          />
+          <Route
+            path="/tourismGovernorPage"
+            element={<TourismGovernorPage />}
+          />
+          <Route path="/fetchdocuments" element={<OthersListPage />} />
           <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
           
         </Routes>

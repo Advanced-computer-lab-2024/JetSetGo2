@@ -257,6 +257,9 @@ const Activities = () => {
                     {activity.isBookingOpen ? "Yes" : "No"}
                   </p>
                   <p>
+                <strong>Bookings:</strong> {activity.bookings}
+              </p>
+                  <p>
                     <strong>Rating:</strong> {activity.rating}
                   </p>
                   {mapSrc && (

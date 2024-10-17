@@ -34,7 +34,7 @@ const TouristSignup = ({ setSelectedTouristId }) => {
       setSelectedTouristId(response.data._id);
 
       // Redirect to the update page without the ID in the URL
-      navigate("/tourist-home");
+      navigate("/login");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("An error occurred while signing up. Please try again."); // Setting error message

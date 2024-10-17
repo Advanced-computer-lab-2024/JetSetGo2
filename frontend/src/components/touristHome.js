@@ -158,12 +158,19 @@ const TouristHome = ({ selectedTouristId }) => {
         <button  onClick={() => navigate("/p")}>
           View Products
         </button>
-          <Link to="/Upcoming-activities" style={styles.navLink}>
-            Activities
-          </Link>
-          <Link to="/Upcoming-itineraries" style={styles.navLink}>
-            Itineraries
-          </Link>
+        <button 
+    onClick={() => navigate("/upcoming-activitiest", { state: { touristId: selectedTouristId } })}
+    style={styles.navLink}
+  >
+    Activities
+  </button>
+  <button 
+    onClick={() => navigate("/upcoming-itinerariest", { state: { touristId: selectedTouristId } })}
+    style={styles.navLink}
+  >
+    Itineraries
+  </button>
+          
           <Link to="/all-historicalplaces" style={styles.navLink}>
             Historical Places
           </Link>
