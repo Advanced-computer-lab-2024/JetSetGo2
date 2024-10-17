@@ -155,6 +155,7 @@ const SchemaTourFront = ({ selectedTourGuideId }) => {
       setEditId(null);
     } catch (error) {
       console.error('Error submitting form:', error);
+      console.error('Error submitting form:', error);
     }
   };
 
