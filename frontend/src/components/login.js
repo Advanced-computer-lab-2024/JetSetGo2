@@ -75,12 +75,8 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Email:', Email);
-    console.log('Password:', Password);
     try {
       const response = await axios.post('http://localhost:8000/login/login', { Email, Password });
-      console.log('Login response:', response.data);
-
       const { userType } = response.data;
       localStorage.setItem('token', response.data.token);
 
@@ -88,11 +84,11 @@ const Login = () => {
       setErrorMessage('');
 
       // Check if this is the user's first login
-      const hasLoggedInBefore = localStorage.getItem('hasLoggedInBefore');
+      const hasLoggedInBefore = localStorage.getItem(`hasLoggedInBefore_${Email}`);
 
       if (!hasLoggedInBefore) {
         // First-time login, store the flag in localStorage
-        localStorage.setItem('hasLoggedInBefore', 'true');
+        localStorage.setItem(`hasLoggedInBefore_${Email}`, 'true');
         if (userType === 'TourGuide') {
           navigate('/CreateTourGuide');
         } else if (userType === 'Advertiser') {
@@ -119,7 +115,6 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error('Login error:', error);
       setErrorMessage(error.response?.data.message || 'Login failed. Please try again.');
       setSuccessMessage('');
     }
