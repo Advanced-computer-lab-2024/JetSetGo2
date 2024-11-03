@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const otherModel = require('../models/Other'); 
 const Tourist = require('../models/Tourist'); 
 
-const JWT_SECRET = "your_jwt_secret_key"; 
+const JWT_SECRET = "123@abc$in"; 
 
 const createUser = async (req, res) => {
     const { UserName, Email, Password, AccountType, MobileNumber, Nationality, DateOfBirth, Job } = req.body;
