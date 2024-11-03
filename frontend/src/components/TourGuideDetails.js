@@ -224,7 +224,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
           <Link to="/Upcoming-activities" style={styles.navLink}>
             Activities
           </Link>
-          <Link to="/Upcoming-itineraries" style={styles.navLink}>
+          <Link to="/Upcoming-itinerariestg" style={styles.navLink}>
             Itineraries
           </Link>
           <Link to="/all-historicalplaces" style={styles.navLink}>

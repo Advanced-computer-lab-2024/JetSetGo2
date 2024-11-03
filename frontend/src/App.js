@@ -30,6 +30,7 @@ import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import Itinerariest from "./components/UpComingEvents/Itenariest";
+import Itinerariestg from "./components/UpComingEvents/Itenariestg";
 
 import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
@@ -124,6 +125,7 @@ function App() {
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
           <Route path="/Upcoming-itinerariest" element={<Itinerariest />} />
+          <Route path="/Upcoming-itinerariestg" element={<Itinerariestg />} />
 
           <Route path="/productList" element={<ProductList />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
