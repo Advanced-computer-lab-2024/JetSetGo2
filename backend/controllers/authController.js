@@ -86,7 +86,7 @@ const loginHandler = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user._id, userType: user.AccountType }, JWT_SECRET);
+        const token = jwt.sign({ id: user._id, userType: user.AccountType }, JWT_SECRET);  +
         res.status(200).json({ token, userType: user.AccountType });
     } catch (error) {
         console.error('Login error:', error);

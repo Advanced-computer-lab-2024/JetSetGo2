@@ -30,6 +30,7 @@ import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import Itinerariest from "./components/UpComingEvents/Itenariest";
+import Itinerariestg from "./components/UpComingEvents/Itenariestg";
 import OthersListPage from "./components/FetchDocuments";
 import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
@@ -39,6 +40,8 @@ import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
+import FlightSearch from "./components/FlightSearch";
+
 
 
 
@@ -125,6 +128,7 @@ function App() {
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
           <Route path="/Upcoming-itinerariest" element={<Itinerariest />} />
+          <Route path="/Upcoming-itinerariestg" element={<Itinerariestg />} />
 
           <Route path="/productList" element={<ProductList />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
@@ -140,6 +144,7 @@ function App() {
             element={<TourismGovernorPage />}
           />
           <Route path="/fetchdocuments" element={<OthersListPage />} />
+          <Route path="/flight-search" element={<FlightSearch />} />
         </Routes>
       </div>
     </Router>

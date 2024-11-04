@@ -35,6 +35,9 @@ const TouristHome = ({ selectedTouristId }) => {
   });
   const [searchMethod, setSearchMethod] = useState("name");
   const navigate = useNavigate();
+  const handleFlightSearchClick = () => {
+    navigate('/flight-search'); // Redirect to the Flight Search page
+};
 
   useEffect(() => {
     const fetchTouristData = async () => {
@@ -158,6 +161,7 @@ const TouristHome = ({ selectedTouristId }) => {
         <button  onClick={() => navigate("/p")}>
           View Products
         </button>
+        <button onClick={handleFlightSearchClick}>Search Flights</button>
         <button 
     onClick={() => navigate("/upcoming-activitiest", { state: { touristId: selectedTouristId } })}
     style={styles.navLink}

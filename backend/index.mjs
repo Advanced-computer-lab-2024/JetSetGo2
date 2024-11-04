@@ -1,150 +1,136 @@
-import fetch from 'node-fetch';
-import axios from 'axios';
+import Amadeus from 'amadeus';
+import fetch from 'node-fetch'; // Ensure to install node-fetch if not already installed
 
-async function getAccessToken(clientId, clientSecret) {
-    const url = 'https://test.api.amadeus.com/v1/security/oauth2/token';
-    const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-    };
-    const body = `grant_type=client_credentials&client_id=${'3DHXX1uuxJOMekdpB3StiavXPqgH2AXs'}&client_secret=${'iInm210Sk4QrKx8E'}`;
+// Initialize Amadeus with your credentials
+const amadeus = new Amadeus({
+  clientId: 'LYT4JF7n7vkYqq6pYNDUMbOBDFSA7ieh',
+  clientSecret: 'oGEoeufzY0Miwu4n'
+});
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body,
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        return data.access_token; // Return the access token
-    } catch (error) {
-        console.error('Error fetching access token:', error);
-    }
-}
-
-async function getFlightDestinations(origin, maxPrice, accessToken) {
-    const url = `https://test.api.amadeus.com/v1/shopping/flight-destinations?origin=${origin}&maxPrice=${maxPrice}`;
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: headers,
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        return data.data; // Return the list of flight destinations
-    } catch (error) {
-        console.error('Error fetching flight destinations:', error);
-    }
-}
-async function getFlightOffers(origin, destination, departureDate, returnDate) {
-    const url = `https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${origin}&destinationLocationCode=${destination}&departureDate=${departureDate}&returnDate=${returnDate}&adults=1&nonStop=false&maxPrice=200&currency=EUR`;
-    
-    try {
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${'YOUR_ACCESS_TOKEN'}`
-            }
-        });
-        return response.data.data; // Assuming the flight offers are in response.data.data
-    } catch (error) {
-        console.error("Error fetching flight offers:", error.response?.data || error.message);
-        throw error; // Re-throw the error to handle it in the main function
-    }
-}
-
-async function bookFlight(flightOffer, accessToken) {
-    const url = `https://test.api.amadeus.com/v2/flight-orders`;
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-    };
-    const body = JSON.stringify({
-        data: {
-            type: 'flight-order',
-            flightOffers: [flightOffer],
-            passengers: [
-                {
-                    id: '1',
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    dateOfBirth: '1980-01-01',
-                    nationality: 'US',
-                    email: 'john.doe@example.com',
-                    phone: {
-                        countryCode: '1',
-                        number: '1234567890'
-                    }
-                }
-            ],
-            payment: {
-                method: 'creditCard',
-                card: {
-                    type: 'visa',
-                    number: '4111111111111111',
-                    expirationMonth: '12',
-                    expirationYear: '2025',
-                    securityCode: '123'
-                }
-            }
-        }
+// Function to get the Bearer token
+async function getBearerToken() {
+  try {
+    const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: 'LYT4JF7n7vkYqq6pYNDUMbOBDFSA7ieh',
+        client_secret: 'oGEoeufzY0Miwu4n'
+      })
     });
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body,
-        });
+    const data = await response.json();
+    if (data.access_token) {
+      return data.access_token;
+    } else {
+      throw new Error('Failed to retrieve access token');
+    }
+  } catch (error) {
+    console.error('Error fetching Bearer token:', error);
+    throw error;
+  }
+}
 
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status} ${response.statusText}`);
+// Function to search for flights
+async function searchFlights() {
+  try {
+    const token = await getBearerToken();
+
+    const response = await fetch(
+      'https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=CAI&destinationLocationCode=LHR&departureDate=2024-11-15&adults=1',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
+      }
+    );
 
-        const data = await response.json();
-        return data; // Return the booking confirmation
-    } catch (error) {
-        console.error('Error booking flight:', error);
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('Error searching for flights:', data.errors);
+    } else {
+      console.log('Flight search results:');
+      data.data.forEach((offer, index) => {
+        console.log(`\nFlight Offer #${index + 1}:`);
+        console.log(`ID: ${offer.id}`);
+        console.log(`Price: ${offer.price.total} ${offer.price.currency}`);
+        console.log(`Number of Bookable Seats: ${offer.numberOfBookableSeats}`);
+        offer.itineraries.forEach((itinerary, i) => {
+          console.log(`\n  Itinerary ${i + 1}:`);
+          itinerary.segments.forEach((segment, j) => {
+            console.log(`    Segment ${j + 1}:`);
+            console.log(`      Departure: ${segment.departure.iataCode} at ${segment.departure.at}`);
+            console.log(`      Arrival: ${segment.arrival.iataCode} at ${segment.arrival.at}`);
+            console.log(`      Carrier: ${segment.carrierCode} Flight Number: ${segment.number}`);
+          });
+        });
+        console.log(`\nPricing Options: Included Checked Bags Only - ${offer.pricingOptions.includedCheckedBagsOnly}`);
+        console.log(`Validating Airline Codes: ${offer.validatingAirlineCodes.join(', ')}`);
+      });
     }
+  } catch (error) {
+    console.error('Error searching for flights:', error);
+  }
 }
 
+// Function to book a flight
+async function bookFlight(flightOfferId) {
+  try {
+    const token = await getBearerToken();
 
-async function main() {
-    const clientId = '3DHXX1uuxJOMekdpB3StiavXPqgH2AXs'; // Replace with your API Key
-    const clientSecret = 'iInm210Sk4QrKx8E'; // Replace with your API Secret
-    const origin = 'PAR'; // Example origin
-    const maxPrice = 200; // Example max price
+    const response = await fetch(`https://test.api.amadeus.com/v2/booking/flight-orders`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: {
+          type: 'flight-order',
+          flightOfferIds: [flightOfferId],
+          traveler: [
+            {
+              id: '1',
+              name: {
+                first: 'John',
+                last: 'Doe'
+              },
+              contact: {
+                email: 'john.doe@example.com',
+                phones: [
+                  {
+                    countryCallingCode: '1',
+                    number: '123456789'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      })
+    });
 
-    const accessToken = await getAccessToken(clientId, clientSecret);
- 
-    if (accessToken) {
-        const destinations = await getFlightDestinations(origin, maxPrice, accessToken);
-        console.log('Flight Destinations:', destinations);
+    const data = await response.json();
 
-        // Choose a flight offer to view details
-        const chosenDestination = destinations[0]; // Example: selecting the first destination
-        const flightOffers = await getFlightOffers(origin, chosenDestination.destination, chosenDestination.departureDate, chosenDestination.returnDate, accessToken);
-        
-        console.log('Flight Offers:', flightOffers);
-
-        // Choose a flight offer to book
-        const chosenOffer = flightOffers[0]; // Example: selecting the first offer
-        const bookingConfirmation = await bookFlight(chosenOffer, accessToken);
-        
-        console.log('Booking Confirmation:', bookingConfirmation);
+    if (data.errors) {
+      console.error('Error booking flight:', data.errors);
+    } else {
+      console.log('Flight booked successfully:', data);
     }
+  } catch (error) {
+    console.error('Error during booking:', error);
+  }
 }
 
-main();
-
+// Call the function to test flight search
+searchFlights().then(() => {
+  // You can book a flight after searching
+  // Replace 'YOUR_FLIGHT_OFFER_ID' with the actual ID of the flight you want to book
+  bookFlight('70'); // Example flight offer ID
+});

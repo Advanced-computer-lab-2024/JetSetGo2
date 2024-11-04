@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Service method to fetch itineraries
-const getItineraries = async (touristId) => {
+const getItineraries = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:8000/itinerary/readTour`,
-      {
-        params: {
-          userId:touristId // Pass userId to filter itineraries
-        }
-      }
+      `http://localhost:8000/itinerary/readTourId`
     );
     return response.data;
   } catch (error) {
@@ -20,9 +15,24 @@ const getItineraries = async (touristId) => {
   }
 };
 
-const Itinerariest = () => {
+// Service method to toggle activation of an itinerary
+const toggleItineraryActivation = async (id) => {
+  try {
+    console.log(`Toggling activation for itinerary with ID: ${id}`); // Log request
+    const response = await axios.patch(
+      `http://localhost:8000/itinerary/toggleActivation/${id}`
+    );
+    console.log(`Response from toggle activation:`, response.data); // Log response
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling activation:", error);
+    throw error;
+  }
+};
+
+const Itinerariestg = () => {
   const [itineraries, setItineraries] = useState([]);
-  const [filteredItineraries, setFilteredItineraries] = useState([]);
+  const [filteredItineraries, setFilteredItineraries] = useState([]); // To store filtered itineraries
   const [error, setError] = useState(null);
 
   const [sortOrder, setSortOrder] = useState("");
@@ -36,15 +46,12 @@ const Itinerariest = () => {
   const [activities, setActivities] = useState([]);
 
   const navigate = useNavigate();
-  const location = useLocation();
-  const touristId = location.state?.touristId || ""; // Extract touristId from the location state
 
   const fetchItineraries = async () => {
     try {
-      const itinerariesData = await getItineraries(touristId);
-      setItineraries(itinerariesData);
-      setFilteredItineraries(itinerariesData); // Initially set filtered to all itineraries
-      console.log("Fetched Itineraries:", itinerariesData); // Log fetched itineraries
+      const response = await getItineraries();
+      setItineraries(response);
+      setFilteredItineraries(response); // Initially set filtered to all itineraries
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");
@@ -117,9 +124,9 @@ const Itinerariest = () => {
     }
 
     setFilteredItineraries(filtered);
-    console.log("Filtered Itineraries:", filtered); // Log filtered itineraries
   }, [itineraries, selectedTag, selectedPrice, selectedDate, selectedLanguage]);
 
+  // Sorting functions remain unchanged
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortOrder(value);
@@ -127,7 +134,7 @@ const Itinerariest = () => {
     let sortedItineraries = [...filteredItineraries];
     if (value === "asc") {
       sortedItineraries.sort(
-        (a, b) => Math.min(...a.TourPrice) - Math.min(...b.TourPrice)
+        (a, b) => Math.min(...a.TTourPrice) - Math.min(...b.TourPrice)
       );
     } else if (value === "desc") {
       sortedItineraries.sort(
@@ -150,35 +157,52 @@ const Itinerariest = () => {
     setFilteredItineraries(sortedItineraries);
   };
 
-  // Function to handle booking the tour
-  const handleBookTour = async (id) => {
+  // Toggle activation handler
+// Toggle activation handler
+// Toggle activation handler
+const handleToggleActivation = async (id) => {
     try {
-      if (!touristId) {
-        alert("Tourist ID not found. Please log in.");
-        return;
-      }
-
-      const response = await axios.patch(
-        `http://localhost:8000/itinerary/book/${id}`,
-        { userId: touristId } // Send touristId in the request body
-      );
-
-      if (response.status === 200) {
-        // Update the bookings count in the UI
-        setFilteredItineraries((prevItineraries) =>
-          prevItineraries.map((itinerary) =>
-            itinerary._id === id
-              ? { ...itinerary, bookings: itinerary.bookings + 1 }
-              : itinerary
-          )
-        );
-        alert("Tour booked successfully!");
-      }
+      console.log(`Handling toggle activation for ID: ${id}`);
+      const updatedItinerary = await toggleItineraryActivation(id);
+      console.log("Updating itinerary in the state...");
+  
+      // Update the specific itinerary in the state
+      setItineraries((prevItineraries) => {
+        const updated = prevItineraries.map((itinerary) => {
+          // Check if the itinerary ID matches the toggled one
+          if (itinerary._id === updatedItinerary.itinerary._id) {
+            // Merge the updated fields with the existing fields to preserve `activities` and others
+            return {
+              ...itinerary, // Preserve the existing fields
+              isActive: updatedItinerary.itinerary.isActive, // Update only the status
+            };
+          }
+          return itinerary; // Return unchanged itineraries
+        });
+        console.log("Updated itineraries:", updated);
+        return updated;
+      });
+  
+      // Optionally, you can also update filtered itineraries
+      setFilteredItineraries((prevItineraries) => {
+        const updated = prevItineraries.map((itinerary) => {
+          if (itinerary._id === updatedItinerary.itinerary._id) {
+            return {
+              ...itinerary,
+              isActive: updatedItinerary.itinerary.isActive,
+            };
+          }
+          return itinerary;
+        });
+        console.log("Updated filtered itineraries:", updated);
+        return updated;
+      });
     } catch (error) {
-      console.error("Error booking tour:", error);
-      alert("Error booking tour. Please try again.");
+      console.error("Error toggling activation:", error);
+      setError("Failed to toggle activation.");
     }
   };
+  
 
   return (
     <div id="itineraries">
@@ -277,25 +301,32 @@ const Itinerariest = () => {
                   : itinerary.Tags.name}
               </p>
               <p>
-                <strong>Language:</strong> {itinerary.tourLanguage.join(", ")}
+                <strong>Languages:</strong>{" "}
+                {itinerary.tourLanguage.join(", ")}
               </p>
               <p>
-                <strong>Rating:</strong> {itinerary.rating}
+                <strong>Number of Bookings:</strong> {itinerary.bookings}
               </p>
               <p>
-                <strong>Bookings:</strong> {itinerary.bookings}
+                <strong>Status:</strong>{" "}
+                {itinerary.isActive ? "Active" : "Deactivated"}
               </p>
-              <button onClick={() => handleBookTour(itinerary._id)}>
-                Book Tour
+
+              {/* Toggle activation button */}
+              <button
+                onClick={() => handleToggleActivation(itinerary._id)}
+                className={itinerary.isActive ? "deactivate-btn" : "activate-btn"}
+              >
+                {itinerary.isActive ? "Deactivate" : "Activate"}
               </button>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No itineraries found.</p>
+        <p>No itineraries available.</p>
       )}
     </div>
   );
 };
 
-export default Itinerariest;
+export default Itinerariestg;
