@@ -14,6 +14,8 @@ import {
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import 'leaflet-control-geocoder';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -42,6 +44,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
     rating: 0,
   });
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
+  const [searchLocation, setSearchLocation] = useState("");
   const [editData, setEditData] = useState(null);
   const navigate = useNavigate();
 
@@ -59,6 +62,18 @@ const ActivityCRUD = ({ selectedAdverId }) => {
       console.error("Error fetching activities:", error);
       setMessage("Failed to fetch activities.");
     }
+  };
+
+  const handleSearch = () => {
+    const geocoder = L.Control.Geocoder.nominatim();
+    geocoder.geocode(searchLocation, (results) => {
+      if (results && results.length > 0) {
+        const { lat, lng } = results[0].center;
+        setPinPosition([lat, lng]);
+      } else {
+        setMessage("Location not found.");
+      }
+    });
   };
 
   const fetchTags = async () => {
@@ -185,12 +200,12 @@ const ActivityCRUD = ({ selectedAdverId }) => {
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
       <h1>Activity Management</h1>
       {message && <p className="message">{message}</p>}
-
+  
       {/* Home Button */}
       <button onClick={handleHomeNavigation} className="home-button">
         Home
       </button>
-
+  
       {/* Form for creating a new activity */}
       <section className="form-section">
         <h2>Create New Activity</h2>
@@ -215,9 +230,16 @@ const ActivityCRUD = ({ selectedAdverId }) => {
               required
             />
           </label>
-
+  
           {/* Map for selecting location */}
           <label>Location: (Click on the map to place the pin)</label>
+          <input
+            type="text"
+            placeholder="Search location..."
+            value={searchLocation}
+            onChange={(e) => setSearchLocation(e.target.value)}
+          />
+          <button type="button" onClick={handleSearch}>Search</button>
           <div style={{ height: "400px", width: "100%", marginBottom: "20px" }}>
             <MapContainer center={pinPosition} zoom={13} style={{ height: "100%", width: "100%" }}>
               <TileLayer
@@ -227,7 +249,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
               <LocationMarker />
             </MapContainer>
           </div>
-
+  
           <label>
             Price:
             <input
@@ -300,7 +322,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
           <button type="submit">Create Activity</button>
         </form>
       </section>
-
+  
       {/* Form for editing an activity */}
       {editData && (
         <section className="form-section">
@@ -326,9 +348,16 @@ const ActivityCRUD = ({ selectedAdverId }) => {
                 required
               />
             </label>
-
+  
             {/* Map for editing location */}
             <label>Location: (Click on the map to change pin position)</label>
+            <input
+              type="text"
+              placeholder="Search location..."
+              value={searchLocation}
+              onChange={(e) => setSearchLocation(e.target.value)}
+            />
+            <button type="button" onClick={handleSearch}>Search</button>
             <div style={{ height: "400px", width: "100%", marginBottom: "20px" }}>
               <MapContainer center={pinPosition} zoom={13} style={{ height: "100%", width: "100%" }}>
                 <TileLayer
@@ -338,7 +367,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
                 <LocationMarker />
               </MapContainer>
             </div>
-
+  
             <label>
               Price:
               <input
@@ -413,102 +442,84 @@ const ActivityCRUD = ({ selectedAdverId }) => {
           <button onClick={resetEditForm}>Cancel Edit</button>
         </section>
       )}
-
-<section className="activity-list" style={{ marginTop: '20px' }}>
-  <h2>Activity List</h2>
-  {activities.length > 0 ? (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {activities.map((activity) => {
-        const locationCoords = activity.location.split(",");
-        const latitude = locationCoords[0];
-        const longitude = locationCoords[1];
-        const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
-
-        const category = categories.find(cat => cat._id === activity.category);
-        const categoryName = category ? category.name : "Unknown Category";
-
-        const tag = tags.find(t => t._id === activity.tags);
-        const tagName = tag ? tag.name : "Unknown Tag";
-
-        return (
-          <div
-            key={activity._id}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: '#f9f9f9',
-              padding: '20px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-            }}
-          >
-            {/* Activity details */}
-            <div style={{ flex: 1, paddingRight: '20px' }}>
-              <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
-                {categoryName}
-              </h3>
-              <h4>Advertiser: {activity.advertiser.Name}</h4>
-              <p><strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> {new Date(activity.time).toLocaleTimeString()}</p>
-              <p><strong>Location:</strong> {activity.location}</p>
-              <p><strong>Price:</strong> ${activity.price}</p>
-              <p><strong>Rating:</strong> {activity.rating.toFixed(1)} / 5</p>
-              <p><strong>Tags:</strong> {tagName}</p>
-              <p><strong>Special Discount:</strong> {activity.specialDiscount}%</p>
-              <p><strong>Booking Open:</strong> {activity.isBookingOpen ? "Yes" : "No"}</p>
-              <button
-                onClick={() => handleEdit(activity)}
-                style={{
-                  marginRight: '10px',
-                  padding: '10px 20px',
-                  backgroundColor: '#007bff',
-                  border: 'none',
-                  borderRadius: '5px',
-                  color: 'white',
-                  cursor: 'pointer',
-                }}
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(activity._id)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#dc3545',
-                  border: 'none',
-                  borderRadius: '5px',
-                  color: 'white',
-                  cursor: 'pointer',
-                }}
-              >
-                Delete
-              </button>
-            </div>
-
-            {/* Embedded map showing the location with the pin */}
-            <div style={{ flexShrink: 0, width: '300px', height: '200px', borderRadius: '5px', overflow: 'hidden' }}>
-              <iframe
-                src={mapSrc}
-                width="300"
-                height="200"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                title="Activity Location"
-              ></iframe>
-            </div>
+  
+      <section className="activity-list" style={{ marginTop: '20px' }}>
+        <h2>Activity List</h2>
+        {activities.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {activities.map((activity) => {
+              const locationCoords = activity.location.split(",");
+              const latitude = locationCoords[0];
+              const longitude = locationCoords[1];
+              const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  
+              const category = categories.find(cat => cat._id === activity.category);
+              const categoryName = category ? category.name : "Unknown Category";
+  
+              const tag = tags.find(t => t._id === activity.tags);
+              const tagName = tag ? tag.name : "Unknown Tag";
+  
+              return (
+                <div
+                  key={activity._id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    backgroundColor: '#f9f9f9',
+                    padding: '20px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                  }}
+                >
+                  {/* Activity details */}
+                  <div style={{ flex: 1, paddingRight: '20px' }}>
+                    <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
+                      {categoryName}
+                    </h3>
+                    <h4>Advertiser: {activity.advertiser}</h4>
+                    <p>Date: {activity.date}</p>
+                    <p>Time: {activity.time}</p>
+                    <p>Location: {activity.location}</p>
+                    <p>Tags: {tagName}</p>
+                    <p>Special Discount: {activity.specialDiscount}</p>
+                    <p>Booking Open: {activity.isBookingOpen ? 'Yes' : 'No'}</p>
+                    <p>Rating: {activity.rating}</p>
+                    <p>Price: {activity.price} EGP</p>
+                  </div>
+                  {/* Edit and Delete buttons */}
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <button
+                      onClick={() => handleEdit(activity._id)}
+                      style={{ marginBottom: '10px' }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(activity._id)}
+                      style={{ backgroundColor: 'red', color: '#fff' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <iframe
+                    src={mapSrc}
+                    width="250"
+                    height="200"
+                    style={{ border: 'none' }}
+                    title={`Map of ${activity.location}`}
+                  ></iframe>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-    </div>
-  ) : (
-    <p>No activities found.</p>
-  )}
-</section>
-
+        ) : (
+          <p>No activities found.</p>
+        )}
+      </section>
     </div>
   );
+  
 };
 
 export default ActivityCRUD;
