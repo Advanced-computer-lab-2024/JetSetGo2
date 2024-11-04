@@ -40,6 +40,7 @@ const productSchema = new Schema({
         required: true,
         default: 0,    // Default to 0 if no sales yet
       },
+      isArchived: { type: Boolean, default: false },
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

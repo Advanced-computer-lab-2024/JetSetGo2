@@ -71,6 +71,7 @@ const AdminCapabilities = () => {
             { label: 'Add a Tourism Governor', path: '/AddTourismGovernor' },
             { label: 'Add an Admin', path: '/AddAdmin' },
             { label: 'Manage Itineraries', path: '/ItinerariesAdmin' },
+            { label: 'Fetch Documents', path: '/fetchdocuments' },
           ].map((button) => (
             <button
               key={button.path}

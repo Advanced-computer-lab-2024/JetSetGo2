@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css'; 
-import { useNavigate } from 'react-router-dom'; 
-import { getProducts } from '../services/ProductService'; 
+import '../App.css';
+import { useNavigate } from 'react-router-dom';
+import { getProducts } from '../services/ProductService';
+import axios from 'axios'; // Don't forget to import axios
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -11,8 +12,8 @@ const ProductList = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [message, setMessage] = useState('');
-  
-  const navigate = useNavigate(); 
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
@@ -20,8 +21,8 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const data = await getProducts(); 
-      setProducts(data);                
+      const data = await getProducts();
+      setProducts(data);
       setFilteredProducts(data);
     } catch (error) {
       setMessage('Error fetching products');
@@ -29,11 +30,35 @@ const ProductList = () => {
     }
   };
 
+  // Archive a product
+  const handleArchive = async (id) => {
+    try {
+      await axios.patch(`http://localhost:8000/product/archive/${id}`);
+      setMessage('Product archived successfully!');
+      fetchProducts(); // Refresh product list
+    } catch (error) {
+      console.error("Error archiving product:", error);
+      setMessage('Error archiving product.');
+    }
+  };
+
+  // Unarchive a product
+  const handleUnarchive = async (id) => {
+    try {
+      await axios.patch(`http://localhost:8000/product/unarchive/${id}`);
+      setMessage('Product unarchived successfully!');
+      fetchProducts(); // Refresh product list
+    } catch (error) {
+      console.error("Error unarchiving product:", error);
+      setMessage('Error unarchiving product.');
+    }
+  };
+
   const filterProducts = (searchTerm, minPrice, maxPrice, sortOrder) => {
     let filtered = products.filter(product => {
       const matchesSearch = product.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesPrice = (minPrice === '' || product.price >= parseFloat(minPrice)) &&
-                           (maxPrice === '' || product.price <= parseFloat(maxPrice));
+        (maxPrice === '' || product.price <= parseFloat(maxPrice));
       return matchesSearch && matchesPrice;
     });
 
@@ -141,6 +166,7 @@ const ProductList = () => {
                 <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Rating</th>
                 <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Available Quantity</th>
                 <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Sales</th>
+                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Actions</th> {/* New Actions column */}
               </tr>
             </thead>
             <tbody>
@@ -158,11 +184,32 @@ const ProductList = () => {
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.availableQuantity}</td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.sales}</td>
+                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
+                      {product.isArchived ? (
+                        <button onClick={() => handleUnarchive(product._id)} style={{
+                          padding: '5px 10px',
+                          backgroundColor: '#ffc107',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}>Unarchive</button>
+                      ) : (
+                        <button onClick={() => handleArchive(product._id)} style={{
+                          padding: '5px 10px',
+                          backgroundColor: '#ffc107',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}>Archive</button>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ padding: '10px', border: '1px solid #dee2e6' }}>No products found.</td>
+                  <td colSpan="8" style={{ padding: '10px', border: '1px solid #dee2e6' }}>No products found.</td>
                 </tr>
               )}
             </tbody>
