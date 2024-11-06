@@ -4,24 +4,19 @@ const Schema = mongoose.Schema;
 
 const TouristSchema = new Schema(
   {
+    UserName: {
+      type: String,
+      required: true,
+    },
     Email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
     },
-    UserName: {
-      type: String,
-      required: true,
-      immutable: true,
-    },
     Password: {
       type: String,
       required: true,
-    },
-    AccountType: {
-      type: String,
-      default: 'Tourist',
     },
     MobileNumber: {
       type: Number,
@@ -48,16 +43,6 @@ const TouristSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// Hash password before saving
-TouristSchema.pre("save", async function (next) {
-  if (this.isModified("Password")) {
-    const salt = await bcrypt.genSalt(10);
-    this.Password = await bcrypt.hash(this.Password, salt);
-  }
-  next();
-});
-
 
 const Tourist = mongoose.model("Tourist", TouristSchema);
 module.exports = Tourist;

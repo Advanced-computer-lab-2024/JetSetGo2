@@ -11,7 +11,6 @@ const MongoURI = process.env.MONGO_URI;
 
 // Import models
 const Tourist = require("./models/Tourist");
-const Other = require("./models/Other");
 const TourGouvnerTagSearch = require("./models/tourismGovernerTags.js");
 const Museum = require("./models/MuseumCRUD.js");
 const HistoricalPlace = require("./models/HistoricalPlaceCRUD.js");

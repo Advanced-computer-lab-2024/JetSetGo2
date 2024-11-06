@@ -1,5 +1,4 @@
 const express = require("express");
-const Other = require("../models/Other.js");
 const SellerModel = require("../models/Seller.js");
 
 // Read a seller by the MongoDB `_id`

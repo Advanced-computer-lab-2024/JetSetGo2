@@ -41,7 +41,6 @@ import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
 
 function App() {
-  const [selectedTouristId, setSelectedTouristId] = useState(null);
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
   const [selectedAdverId, setselectedAdverId] = useState(null);
 
@@ -51,22 +50,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/tourist-signup"
-            element={
-              <TouristSignup setSelectedTouristId={setSelectedTouristId} />
-            }
-          />
-          <Route
-            path="/tourist-home"
-            element={<TouristHome selectedTouristId={selectedTouristId} />}
-          />
-          <Route
-            path="/tourist-update"
-            element={
-              <UpdateTouristPage selectedTouristId={selectedTouristId} />
-            }
-          />
+          <Route path="/tourist-signup" element={<TouristSignup />} />
+          <Route path="/tourist-home" element={<TouristHome />} />
+          <Route path="/tourist-update" element={<UpdateTouristPage />} />
           <Route
             path="/AdvirtiserMain"
             element={<AdvertiserForm setselectedAdverId={setselectedAdverId} />}

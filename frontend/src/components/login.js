@@ -92,8 +92,11 @@ const Login = () => {
         setSuccessMessage("Login successful!");
         setErrorMessage("");
 
-        // Navigate based on profile completion and AccountType
+        if (AccountType === "Tourist") {
+          navigate("/tourist-home");
+        }
         if (!profileCompleted) {
+          // Navigate based on profile completion and AccountType
           if (AccountType === "TourGuide") {
             navigate("/CreateTourGuide"); // Redirect to profile completion page
           } else if (AccountType === "Advertiser") {

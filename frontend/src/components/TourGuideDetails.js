@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 const styles = {
@@ -73,7 +73,6 @@ const styles = {
 };
 
 const TourGuidePage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [tourGuide, setTourGuide] = useState(null);
   const [error, setError] = useState(null);
@@ -304,7 +303,7 @@ const TourGuidePage = () => {
         ) : (
           <ul>
             <li>
-              <strong>Name:</strong> {tourGuide.Name}
+              <strong>Name:</strong> {tourGuide.UserName}
             </li>
             <li>
               <strong>Email:</strong> {tourGuide.Email}

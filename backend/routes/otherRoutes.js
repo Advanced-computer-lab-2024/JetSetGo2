@@ -2,12 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const upload = require("../middleware/uploadDocuments"); // Adjust the path based on your structure
-const {
-  createOther,
-  getOther,
-  getOtherById,
-  deleteAllOthers,
-} = require("../controllers/otherController");
+const { createOther } = require("../controllers/otherController");
 
 // Health check endpoint
 router.get("/", (req, res) => {
@@ -24,14 +19,5 @@ router.post(
   ]),
   createOther
 );
-
-// Get all users
-router.get("/getOther", getOther);
-
-// GET request to fetch Other user by ID
-router.get("/:id", getOtherById);
-
-// Delete all users
-router.delete("/deleteAllOther", deleteAllOthers);
 
 module.exports = router;
