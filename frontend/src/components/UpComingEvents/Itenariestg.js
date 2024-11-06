@@ -6,7 +6,7 @@ import axios from "axios";
 const getItineraries = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:8000/itinerary/readTourId`
+      `http://localhost:8000/itinerary/getIteneraries`
     );
     return response.data;
   } catch (error) {
@@ -157,8 +157,7 @@ const Itinerariestg = () => {
     setFilteredItineraries(sortedItineraries);
   };
 
-  // Toggle activation handler
-// Toggle activation handler
+
 // Toggle activation handler
 const handleToggleActivation = async (id) => {
     try {

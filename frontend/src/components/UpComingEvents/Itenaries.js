@@ -3,17 +3,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Service method to fetch itineraries
-const getItineraries = async () => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8000/itinerary/readTourId`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching itineraries:", error);
-    throw error;
-  }
-};
+// const getItineraries = async () => {
+//   try {
+//     const response = await axios.get(
+//       `http://localhost:8000/itinerary/getIteneraries`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching itineraries:", error);
+//     throw error;
+//   }
+// };
 
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
@@ -35,7 +35,7 @@ const Itineraries = () => {
   const fetchItineraries = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/itinerary/readTourId`
+        `http://localhost:8000/itinerary/getIteneraries`
       );
       const data = response.data;
 

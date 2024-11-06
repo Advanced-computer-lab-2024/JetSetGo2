@@ -122,6 +122,17 @@ const readGuideID = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const getIteneraries = async (req, res) => {
+  try {
+    const schema = await Schema.find()
+      .populate("activities")
+      .populate("Tags", "name");
+    if (!schema) return res.status(404).json({ message: "schema not found" });
+    res.status(200).json(schema);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // Update Guide
 const updateGuide = async (req, res) => {
@@ -239,4 +250,5 @@ module.exports = {
   bookTour,
   flagItinerary,
   toggleActivation,
+  getIteneraries,
 };

@@ -148,17 +148,7 @@ const UpdateSeller = () => {
         <button type="submit">Create</button>
       </form>
 
-      {successMessage && (
-        <div>
-          <p>{successMessage}</p>
-          <Link
-            to={`/seller-details`}
-            state={{ id: localStorage.getItem("userId") }}
-          >
-            View Seller Details
-          </Link>
-        </div>
-      )}
+      
     </div>
   );
 };
