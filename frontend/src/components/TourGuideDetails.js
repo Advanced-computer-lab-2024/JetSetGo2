@@ -25,12 +25,12 @@ const styles = {
     borderRadius: "50%",
     marginBottom: "15px",
     border: "3px solid #fff",
+    objectFit: "cover",
   },
   profileName: {
     fontSize: "22px",
     fontWeight: "bold",
   },
-
   button: {
     margin: "10px",
     padding: "10px 20px",
@@ -72,16 +72,14 @@ const styles = {
   },
 };
 
-const TourGuidePage = ({ selectedTourGuideId }) => {
+const TourGuidePage = () => {
   const location = useLocation();
-  const id = location.state?.id;
-
+  const navigate = useNavigate();
   const [tourGuide, setTourGuide] = useState(null);
-  const [activities, setActivities] = useState([]);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    Name: "",
+    UserName: "",
     Email: "",
     Age: "",
     LanguagesSpoken: "",
@@ -90,20 +88,21 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
     PreviousWork: "",
     Photo: null, // State to hold the photo file
   });
+  const [notification, setNotification] = useState("");
 
-  const navigate = useNavigate();
+  const userId = localStorage.getItem("userId"); // Retrieve the Tour Guide ID from local storage
 
   useEffect(() => {
     const fetchTourGuide = async () => {
       try {
-        if (selectedTourGuideId) {
+        if (userId) {
           const response = await axios.get(
-            `http://localhost:8000/TourGuide/users/${selectedTourGuideId}`
+            `http://localhost:8000/TourGuide/users/${userId}`
           );
           setTourGuide(response.data);
-          setFormData(response.data); // Set initial form data for editing
+          setFormData(response.data); // Populate form with fetched data
         } else {
-          setError("No Tour Guide ID provided.");
+          setError("No Tour Guide ID found in local storage.");
         }
       } catch (err) {
         console.error("Error fetching tour guide:", err);
@@ -112,7 +111,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
     };
 
     fetchTourGuide();
-  }, [selectedTourGuideId]);
+  }, [userId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -122,14 +121,15 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
     setFormData({ ...formData, Photo: e.target.files[0] });
   };
 
+  const handleSchemaTourFrontPage = () => {
+    navigate("/SchemaTourFront");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { Photo, ...updatedData } = formData; // Separate the photo file from the rest of the form data
 
     const formDataToSend = new FormData();
-
-    // Append the photo file only if a new one is selected
     if (Photo) {
       formDataToSend.append("Photo", Photo);
     }
@@ -141,7 +141,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/TourGuide/update/${selectedTourGuideId}`,
+        `http://localhost:8000/TourGuide/update/${userId}`,
         formDataToSend,
         {
           headers: {
@@ -152,6 +152,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
 
       setTourGuide(response.data); // Update the local state with the updated tour guide data
       setIsEditing(false); // Exit the edit mode
+      setNotification("Tour guide details updated successfully!");
     } catch (error) {
       console.error(
         "Error updating tour guide:",
@@ -161,12 +162,12 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
     }
   };
 
-  const handleSchemaTourFrontPage = () => {
-    navigate("/SchemaTourFront");
+  const handleCancel = () => {
+    setIsEditing(false); // Exit edit mode without saving changes
   };
 
-  if (error) return <div>{error}</div>;
-  if (!tourGuide) return <div>Loading...</div>;
+  if (error) return <div style={styles.error}>{error}</div>;
+  if (!tourGuide) return <div style={styles.loading}>Loading...</div>;
 
   return (
     <div style={styles.container}>
@@ -175,18 +176,19 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
         <div style={styles.profileContainer}>
           <img
             src={
-              `http://localhost:8000/uploads/tourguidePhoto/${tourGuide.Photo}` ||
-              "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-            } // Fallback profile image
+              tourGuide.Photo
+                ? `http://localhost:8000/uploads/tourguidePhoto/${tourGuide.Photo}`
+                : "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg" // Fallback profile image
+            }
             alt="Profile"
             style={styles.profileImage}
           />
-          <p style={styles.profileName}>{tourGuide.Name}</p>
-          <button onClick={handleSchemaTourFrontPage} style={styles.button}>
-            Create/View Itinerary
-          </button>
+          <p style={styles.profileName}>{tourGuide.UserName}</p>
           <button onClick={() => setIsEditing(true)} style={styles.button}>
             Edit
+          </button>
+          <button onClick={handleSchemaTourFrontPage} style={styles.button}>
+            Create/View Itinerary
           </button>
         </div>
       </div>
@@ -195,88 +197,107 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Tour Guide Details</h1>
 
+        {notification && (
+          <div
+            style={{
+              padding: "10px",
+              backgroundColor: "#28a745",
+              color: "#fff",
+              borderRadius: "5px",
+              marginBottom: "20px",
+              textAlign: "center",
+            }}
+          >
+            {notification}
+          </div>
+        )}
+
         {isEditing ? (
           <form onSubmit={handleSubmit}>
-            <div>
+            <div style={styles.formGroup}>
               <label>Name:</label>
               <input
                 name="Name"
-                value={formData.Name}
+                value={formData.UserName}
                 onChange={handleChange}
+                style={styles.inputStyle}
                 required
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Email:</label>
               <input
                 name="Email"
                 value={formData.Email}
                 onChange={handleChange}
+                style={styles.inputStyle}
                 required
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Age:</label>
               <input
                 name="Age"
                 value={formData.Age}
                 onChange={handleChange}
+                style={styles.inputStyle}
                 required
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Languages Spoken:</label>
               <input
                 name="LanguagesSpoken"
                 value={formData.LanguagesSpoken}
                 onChange={handleChange}
+                style={styles.inputStyle}
                 required
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Mobile Number:</label>
               <input
                 name="MobileNumber"
                 value={formData.MobileNumber}
                 onChange={handleChange}
+                style={styles.inputStyle}
                 required
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Years of Experience:</label>
               <input
                 name="YearsOfExperience"
                 value={formData.YearsOfExperience}
                 onChange={handleChange}
+                style={styles.inputStyle}
                 required
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Previous Work:</label>
               <input
                 name="PreviousWork"
                 value={formData.PreviousWork}
                 onChange={handleChange}
+                style={styles.inputStyle}
               />
             </div>
-            <div>
+            <div style={styles.formGroup}>
               <label>Upload Photo:</label>
               <input
                 type="file"
                 accept="image/*"
-                name="Photo" // Use "Photo" here to match the state
+                name="Photo"
                 onChange={handleImageChange}
+                style={styles.inputStyle}
               />
             </div>
 
             <button type="submit" style={styles.button}>
               Update
             </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              style={styles.button}
-            >
+            <button type="button" onClick={handleCancel} style={styles.button}>
               Cancel
             </button>
           </form>
@@ -302,7 +323,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
               {tourGuide.YearsOfExperience}
             </li>
             <li>
-              <strong>Previous Work:</strong> {tourGuide.PreviousWork || "N/A"}
+              <strong>Previous Work:</strong> {tourGuide.PreviousWork}
             </li>
           </ul>
         )}
@@ -312,7 +333,7 @@ const TourGuidePage = ({ selectedTourGuideId }) => {
           <Link to="/Upcoming-activities" style={styles.navLink}>
             Activities
           </Link>
-          <Link to="/Upcoming-itineraries" style={styles.navLink}>
+          <Link to="/Upcoming-itinerariestg" style={styles.navLink}>
             Itineraries
           </Link>
           <Link to="/all-historicalplaces" style={styles.navLink}>

@@ -1,9 +1,11 @@
 const otherModel = require("../models/Other.js");
-const mongoose = require("mongoose");
-const createOther = async (req, res) => {
-  console.log("Received request body:", req.body);
-  console.log("Received files:", req.files);
+const SellerModel = require("../models/Seller.js");
+const TourModel = require("../models/TGuide.js");
+const AdverModel = require("../models/AdverMODEL.js");
 
+const mongoose = require("mongoose");
+
+const createOther = async (req, res) => {
   const { UserName, Email, Password, AccountType } = req.body;
 
   // Ensure files are uploaded and present in req.files
@@ -18,23 +20,45 @@ const createOther = async (req, res) => {
     : null; // Extract only the last part of the path for the taxation registry card (if applicable)
 
   try {
-    const other = await otherModel.create({
-      UserName,
-      Email,
-      Password,
-      AccountType,
-      IDDocument, // Include the extracted file name for ID document
-      Certificates, // Include the extracted file name for certificates (if applicable)
-      TaxationRegistryCard, // Include the extracted file name for taxation registry card (if applicable)
-    });
+    if (AccountType == "Seller") {
+      const seller = await SellerModel.create({
+        UserName,
+        Email,
+        Password,
+        IDDocument,
+        TaxationRegistryCard,
+        Profile_Completed: false,
+      });
+    }
 
-    res.status(201).json({ message: "User created successfully", other });
+    if (AccountType == "TourGuide") {
+      const seller = await TourModel.create({
+        UserName,
+        Email,
+        Password,
+        IDDocument,
+        Certificates,
+        Profile_Completed: false,
+      });
+    }
+
+    if (AccountType == "Advertiser") {
+      const seller = await AdverModel.create({
+        UserName,
+        Email,
+        Password,
+        IDDocument,
+        TaxationRegistryCard,
+        Profile_Completed: false,
+      });
+    }
+
+    res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    console.error("Error creating user:", error); 
+    console.error("Error creating user:", error);
     res.status(400).json({ error: error.message });
   }
 };
-
 
 const getOther = async (req, res) => {
   try {
@@ -43,6 +67,26 @@ const getOther = async (req, res) => {
   } catch (error) {
     console.error("Error fetching users:", error); // Log error for debugging
     res.status(400).json({ error: error.message });
+  }
+};
+
+// Fetch Other user by ID
+const getOtherById = async (req, res) => {
+  try {
+    const { id } = req.params; // Get the ID from the URL parameters
+    const otherUser = await otherModel.findById(id); // Find the Other user by ID
+
+    if (!otherUser) {
+      return res.status(404).json({ error: "Other user not found" });
+    }
+
+    // Respond with the required fields (Name and Email)
+    res.status(200).json({
+      Name: otherUser.UserName, // Assuming UserName is the field for Name
+      Email: otherUser.Email,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Server error: " + error.message });
   }
 };
 
@@ -56,4 +100,4 @@ const deleteAllOthers = async (req, res) => {
   }
 };
 
-module.exports = { createOther, getOther, deleteAllOthers };
+module.exports = { createOther, getOther, getOtherById, deleteAllOthers };

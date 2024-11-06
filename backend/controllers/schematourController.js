@@ -1,5 +1,6 @@
 const Schema = require("../models/schematour.js");
 const { default: mongoose } = require("mongoose");
+
 const createGuide = async (req, res) => {
   const {
     name,
@@ -41,6 +42,7 @@ const createGuide = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
 const readGuide = async (req, res) => {
   try {
     const userId = req.query.userId;
@@ -54,9 +56,10 @@ const readGuide = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 const bookTour = async (req, res) => {
   const { id } = req.params; // Extract the tour ID from the URL parameters
-  const userId = req.body.userId;  // Get userId from the request body (can come from the frontend or authenticated session)
+  const userId = req.body.userId; // Get userId from the request body (can come from the frontend or authenticated session)
 
   try {
     const schema = await Schema.findById(id);
@@ -67,7 +70,9 @@ const bookTour = async (req, res) => {
     // Increment the bookings count if the user has not booked this tour before
     await schema.incrementBookings(userId);
 
-    res.status(200).json({ message: "Booking successful", bookings: schema.bookings });
+    res
+      .status(200)
+      .json({ message: "Booking successful", bookings: schema.bookings });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -116,6 +121,7 @@ const updateGuide = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 const deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {
@@ -138,5 +144,5 @@ module.exports = {
   readGuideID,
   updateGuide,
   deleteGuide,
-  bookTour
+  bookTour,
 };

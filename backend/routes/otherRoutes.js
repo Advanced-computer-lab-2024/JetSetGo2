@@ -5,6 +5,7 @@ const upload = require("../middleware/uploadDocuments"); // Adjust the path base
 const {
   createOther,
   getOther,
+  getOtherById,
   deleteAllOthers,
 } = require("../controllers/otherController");
 
@@ -26,6 +27,9 @@ router.post(
 
 // Get all users
 router.get("/getOther", getOther);
+
+// GET request to fetch Other user by ID
+router.get("/:id", getOtherById);
 
 // Delete all users
 router.delete("/deleteAllOther", deleteAllOthers);

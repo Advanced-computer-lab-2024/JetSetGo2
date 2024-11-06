@@ -40,8 +40,6 @@ import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
 
-
-
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null);
   const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
@@ -52,7 +50,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login />} /> 
+          <Route path="/login" element={<Login />} />
           <Route
             path="/tourist-signup"
             element={

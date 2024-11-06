@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const LoginContainer = styled.div`
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   background-color: #ffffff;
   padding: 2rem;
   border-radius: 8px;
@@ -67,61 +67,56 @@ const SuccessMessage = styled.div`
 `;
 
 const Login = () => {
-  const [Email, setEmail] = useState('');
-  const [Password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [Email, setEmail] = useState("");
+  const [Password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Email:', Email);
-    console.log('Password:', Password);
     try {
-      const response = await axios.post('http://localhost:8000/login/login', { Email, Password });
-      console.log('Login response:', response.data);
+      const response = await axios.post("http://localhost:8000/login/login", {
+        Email,
+        Password,
+      });
 
-      const { userType } = response.data;
-      localStorage.setItem('token', response.data.token);
+      // Check for successful login response
+      if (response.status === 200) {
+        const { token, userId, AccountType, profileCompleted } = response.data;
 
-      setSuccessMessage('Login successful!');
-      setErrorMessage('');
+        // Store the token and user ID in local storage
+        localStorage.setItem("token", token);
+        localStorage.setItem("userId", userId);
 
-      // Check if this is the user's first login
-      const hasLoggedInBefore = localStorage.getItem('hasLoggedInBefore');
+        setSuccessMessage("Login successful!");
+        setErrorMessage("");
 
-      if (!hasLoggedInBefore) {
-        // First-time login, store the flag in localStorage
-        localStorage.setItem('hasLoggedInBefore', 'true');
-        if (userType === 'TourGuide') {
-          navigate('/CreateTourGuide');
-        } else if (userType === 'Advertiser') {
-          navigate('/AdvirtiserMain');
-        } else if (userType === 'Seller') {
-          navigate('/CreateSeller');
-        } else if (userType === 'Tourist') {
-          navigate('/tourist-home');
+        // Navigate based on profile completion and AccountType
+        if (!profileCompleted) {
+          if (AccountType === "TourGuide") {
+            navigate("/CreateTourGuide"); // Redirect to profile completion page
+          } else if (AccountType === "Advertiser") {
+            navigate("/AdvirtiserMain"); // Redirect to profile completion page
+          } else if (AccountType === "Seller") {
+            navigate("/CreateSeller"); // Redirect to profile completion page
+          }
         } else {
-          setErrorMessage('User type not recognized.');
-        }
-      } else {
-        // Second or subsequent login
-        if (userType === 'TourGuide') {
-          navigate('/tour-guide');
-        } else if (userType === 'Advertiser') {
-          navigate('/list');
-        } else if (userType === 'Seller') {
-          navigate('/seller-details');
-        } else if (userType === 'Tourist') {
-          navigate('/tourist-home');
-        } else {
-          setErrorMessage('User type not recognized.');
+          if (AccountType === "TourGuide") {
+            navigate("/tour-guide");
+          } else if (AccountType === "Advertiser") {
+            navigate("/list");
+          } else if (AccountType === "Seller") {
+            navigate("/seller-details");
+          }
         }
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setErrorMessage(error.response?.data.message || 'Login failed. Please try again.');
-      setSuccessMessage('');
+      console.error("Login error:", error);
+      setErrorMessage(
+        error.response?.data.message || "Login failed. Please try again."
+      );
+      setSuccessMessage("");
     }
   };
 

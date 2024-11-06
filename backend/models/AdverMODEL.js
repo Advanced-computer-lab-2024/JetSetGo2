@@ -3,15 +3,60 @@ const Schema = mongoose.Schema;
 
 const advertiserSchema = new Schema(
   {
-    Name: { type: String, required: true },
-    Link: { type: String, required: true },
-    Hotline: { type: Number, required: true },
-    Mail: { type: String, required: true },
-    Profile: { type: String, required: true },
-    Loc: { type: String, required: true },
-    CompanyDes: { type: String, required: true },
-    Services: { type: String, required: true },
-    logo: { type: String },
+    UserName: {
+      type: String,
+      required: true,
+    },
+    Email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    Password: {
+      type: String,
+      required: true,
+    },
+    IDDocument: {
+      type: String,
+      required: true,
+    },
+    TaxationRegistryCard: {
+      type: String,
+      required: true,
+    },
+    Link: {
+      type: String,
+      required: false,
+    },
+    Hotline: {
+      type: Number,
+      required: false,
+    },
+    Profile: {
+      type: String,
+      required: false,
+    },
+    Loc: {
+      type: String,
+      required: false,
+    },
+    CompanyDes: {
+      type: String,
+      required: false,
+    },
+    Services: {
+      type: String,
+      required: false,
+    },
+    logo: {
+      type: String,
+      required: false,
+    },
+    Profile_Completed: {
+      type: Boolean,
+      required: false,
+    },
   },
   { timestamps: true }
 );

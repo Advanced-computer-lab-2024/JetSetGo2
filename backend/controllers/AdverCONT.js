@@ -1,28 +1,6 @@
 const adverModel = require("../models/AdverMODEL.js");
 const { default: mongoose } = require("mongoose");
 
-const createAdver = async (req, res) => {
-  const { Name, Link, Hotline, Mail, Profile, Loc, CompanyDes, Services } =
-    req.body;
-  const logo = req.file ? req.file.filename.split("/").pop() : null; // Get the logo path if uploaded
-  try {
-    const adver = await adverModel.create({
-      Name,
-      Link,
-      Hotline,
-      Mail,
-      Profile,
-      Loc,
-      CompanyDes,
-      Services,
-      logo,
-    });
-    res.status(200).json(adver);
-  } catch (error) {
-    res.status(400).json({ error: error.messege });
-  }
-};
-
 const getAdver = async (req, res) => {
   const { id } = req.params;
   try {
@@ -66,6 +44,7 @@ const updateAdver = async (req, res) => {
   if (req.body.CompanyDes) UpdateAdver.CompanyDes = req.body.CompanyDes;
   if (req.body.Services) UpdateAdver.Services = req.body.Services;
   if (logo) UpdateAdver.logo = logo; // Update logo if provided, saving only the filename
+  updateAdver.Profile_Completed = true;
 
   try {
     const updateAdver = await adverModel.findByIdAndUpdate(id, UpdateAdver, {
@@ -107,7 +86,6 @@ const deleteAdver = async (req, res) => {
 
 // Export the router
 module.exports = {
-  createAdver,
   getAdver,
   updateAdver,
   getAdverById,

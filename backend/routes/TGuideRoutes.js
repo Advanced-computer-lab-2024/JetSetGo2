@@ -6,12 +6,10 @@ const router = express.Router();
 const {
   getuser,
   updateUser,
-  createUser,
   getUserById,
   deleteTGuide,
 } = require("../controllers/TGuideController");
 
-router.post("/add", createUser);
 router.get("/get", getuser);
 router.put("/update/:id", upload.single("Photo"), updateUser);
 router.get("/users/:id", getUserById);

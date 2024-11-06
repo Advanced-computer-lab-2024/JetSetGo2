@@ -1,48 +1,6 @@
 const express = require("express");
-const Other =  require("../models/Other.js")
+const Other = require("../models/Other.js");
 const SellerModel = require("../models/Seller.js");
-
-// Create a new seller
-const createSeller = async (req, res) => {
-  const other = await Other.findById(req.userId);
-  if(!other){
-    return res.status(404).json({message: "user not found"});
-  }
-  const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age, Email } =
-    req.body;
-  const logo = req.file ? req.file.filename.split("/").pop() : null; // Get the logo path if uploaded
-
-  try {
-    // Validate required fields
-    if (
-      !Name ||
-      !PickUp_Location ||
-      !Type_Of_Products ||
-      !Previous_Work ||
-      !Age ||
-      !Email
-    ) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-
-    // Create a new seller with the data provided in the request body
-    const seller = await SellerModel.create({
-      _id:other._id,
-      Name,
-      PickUp_Location,
-      Type_Of_Products,
-      Previous_Work,
-      Age,
-      Email,
-      logo, // Include the logo path
-    });
-
-    // Respond with the created seller
-    res.status(200).json(seller);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
 
 // Read a seller by the MongoDB `_id`
 const readSeller = async (req, res) => {
@@ -68,7 +26,7 @@ const readSeller = async (req, res) => {
 // Update a seller by the MongoDB `_id`
 const updateSeller = async (req, res) => {
   const { id } = req.params; // Get the 'id' from the request parameters
-  const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age, Email } =
+  const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age } =
     req.body;
   const logo = req.file ? req.file.filename.split("/").pop() : null; // Get just the filename if uploaded
 
@@ -80,13 +38,12 @@ const updateSeller = async (req, res) => {
     if (Type_Of_Products) updateFields.Type_Of_Products = Type_Of_Products;
     if (Previous_Work) updateFields.Previous_Work = Previous_Work;
     if (Age) updateFields.Age = Age;
-    if (Email) updateFields.Email = Email;
     if (logo) updateFields.logo = logo; // Update logo if provided, saving only the filename
 
     // Update the seller with only the provided fields, using _id to search
     const seller = await SellerModel.findByIdAndUpdate(
       id,
-      { $set: updateFields },
+      { $set: updateFields, Profile_Completed: true },
       { new: true } // Return the updated document
     );
 
@@ -147,7 +104,6 @@ const deleteSeller = async (req, res) => {
 };
 
 module.exports = {
-  createSeller,
   readSeller,
   updateSeller,
   getSeller,

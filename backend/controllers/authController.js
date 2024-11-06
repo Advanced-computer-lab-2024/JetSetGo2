@@ -1,97 +1,56 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken'); 
-const otherModel = require('../models/Other'); 
-const Tourist = require('../models/Tourist'); 
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const SellerModel = require("../models/Seller.js");
+const AdverModel = require("../models/AdverMODEL.js");
+const TourModel = require("../models/TGuide.js");
 
-const JWT_SECRET = "your_jwt_secret_key"; 
+// Login controller
+const loginUser = async (req, res) => {
+  const { Email, Password } = req.body;
 
-const createUser = async (req, res) => {
-    const { UserName, Email, Password, AccountType, MobileNumber, Nationality, DateOfBirth, Job } = req.body;
+  try {
+    let user = await SellerModel.findOne({ Email });
+    let AccountType = "Seller";
 
-    if (!UserName || !Email || !Password || !AccountType) {
-        return res.status(400).json({ error: "All fields are required." });
+    // If not found in Seller, search in Adver
+    if (!user) {
+      user = await AdverModel.findOne({ Email });
+      AccountType = "Advertiser";
     }
 
-    let userData = {
-        UserName,
-        Email,
-        Password,
-        AccountType,
-    };
-
-    if (AccountType === 'Tourist') {
-        if (!MobileNumber || !Nationality || !DateOfBirth || !Job) {
-            return res.status(400).json({ error: "All tourist-specific fields are required." });
-        }
-
-        userData.MobileNumber = MobileNumber;
-        userData.Nationality = Nationality;
-        userData.DateOfBirth = DateOfBirth;
-        userData.Job = Job;
-        userData.Wallet = 0; 
-    } else {
-      
-        if (!req.files || !req.files.IDDocument) {
-            return res.status(400).json({ error: "IDDocument is required for Other account types." });
-        }
-
-        const IDDocument = req.files.IDDocument[0].path; 
-        const Certificates = req.files.Certificates ? req.files.Certificates[0].path : null; 
-        const TaxationRegistryCard = req.files.TaxationRegistryCard ? req.files.TaxationRegistryCard[0].path : null; 
-
-        userData.IDDocument = IDDocument;
-        userData.Certificates = Certificates;
-        userData.TaxationRegistryCard = TaxationRegistryCard;
+    // If not found in Adver, search in TourGuide
+    if (!user) {
+      user = await TourModel.findOne({ Email });
+      AccountType = "TourGuide";
     }
 
-    try {
-       
-        const salt = await bcrypt.genSalt(10);
-        userData.Password = await bcrypt.hash(Password, salt);
-
-    
-        let user;
-        if (AccountType === 'Tourist') {
-            user = await Tourist.create(userData);
-        } else {
-            user = await otherModel.create(userData);
-        }
-
-        res.status(201).json({ message: "User created successfully", user });
-    } catch (error) {
-        console.error("Error creating user:", error);
-        res.status(400).json({ error: error.message });
+    // If user is not found in any model
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    // Check if password matches
+    if (user.Password !== Password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate JWT token including AccountType
+    const token = jwt.sign(
+      { userId: user._id, Email: user.Email, AccountType: AccountType }, // Include AccountType
+      process.env.JWT_SECRET, // Your secret key
+      { expiresIn: "1h" } // Token expiration
+    );
+
+    res.json({
+      token,
+      userId: user._id,
+      Email: user.Email,
+      AccountType: AccountType,
+      profileCompleted: user.Profile_Completed || false, // Assuming the field 'profileCompleted' exists
+    }); // Send token, AccountType, and profileCompleted back to client
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-
-const loginHandler = async (req, res) => {
-    const { Email, Password } = req.body;
-
-    try {
-        console.log("Login attempt for email:", Email);
-       
-        let user = await Tourist.findOne({ Email });
-
-        if (!user) {
-            user = await otherModel.findOne({ Email });
-        }
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const isMatch = await bcrypt.compare(Password, user.Password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        const token = jwt.sign({ id: user._id, userType: user.AccountType }, JWT_SECRET);
-        res.status(200).json({ token, userType: user.AccountType });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-module.exports = { createUser, loginHandler };
+module.exports = { loginUser };

@@ -1,67 +1,165 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 
-const CreateTourGuide = ({setselectedTourGuideId}) => {
+const UpdateTourGuide = () => {
   const [formData, setFormData] = useState({
-    Name: '',
-    Email: '',
-    Age: '',
-    LanguagesSpoken: '',
-    MobileNumber: '',
-    YearsOfExperience: '',
-    PreviousWork: '',
+    Name: "",
+    Email: "",
+    Age: "",
+    LanguagesSpoken: "",
+    MobileNumber: "",
+    YearsOfExperience: "",
+    PreviousWork: "",
   });
-  const [createdId, setCreatedId] = useState(null);
-  const navigate = useNavigate(); // Hook for navigation
+
+  const [photo, setPhoto] = useState(null); // State to store the selected photo file
+  const [existingPhoto, setExistingPhoto] = useState(""); // State for existing photo URL
+  const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const tourGuideId = localStorage.getItem("userId"); // Assuming tour guide ID is stored in local storage
+
+    // Fetch existing tour guide details from the backend
+    if (tourGuideId) {
+      axios
+        .get(`http://localhost:8000/TourGuide/users/${tourGuideId}`)
+        .then((response) => {
+          const tourGuide = response.data;
+
+          // Manually set the necessary fields only
+          setFormData({
+            Name: tourGuide.Name || "",
+            Email: tourGuide.Email || "",
+            Age: tourGuide.Age || "",
+            LanguagesSpoken: tourGuide.LanguagesSpoken || "",
+            MobileNumber: tourGuide.MobileNumber || "",
+            YearsOfExperience: tourGuide.YearsOfExperience || "",
+            PreviousWork: tourGuide.PreviousWork || "",
+          });
+
+          // Set existing photo URL
+          if (tourGuide.Photo) {
+            setExistingPhoto(
+              `http://localhost:8000/uploads/tourGuidePhotos/${tourGuide.Photo}`
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching tour guide data:", error);
+          alert("Error fetching tour guide data. Please try again.");
+        });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    setPhoto(e.target.files[0]); // Store the selected photo file in state
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting:', formData);
+    const tourGuideId = localStorage.getItem("userId"); // Get tour guide ID from local storage
+    console.log("Updating tour guide with ID:", tourGuideId);
+
+    const formDataWithPhoto = new FormData(); // Use FormData to handle both text fields and file upload
+
+    // Append text fields
+    for (const key in formData) {
+      formDataWithPhoto.append(key, formData[key]);
+    }
+
+    // Append the photo if it's been uploaded
+    if (photo) {
+      formDataWithPhoto.append("Photo", photo); // Add photo to form data
+    }
+
     try {
-      const response = await axios.post('http://localhost:8000/TourGuide/add', formData);
-      console.log('Response:', response.data);
-      setselectedTourGuideId(response.data._id);
+      const response = await axios.put(
+        `http://localhost:8000/TourGuide/update/${tourGuideId}`,
+        formDataWithPhoto,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Ensure the request is sent as multipart/form-data
+          },
+        }
+      );
+
       if (response.status === 200) {
-        setCreatedId(response.data._id);
-        navigate('/tour-guide', { state: { id: response.data._id } }); // Pass ID via state
+        setSuccessMessage("Tour guide updated successfully!");
+        setTimeout(
+          () => navigate("/tour-guide-details", { state: { id: tourGuideId } }),
+          2000
+        ); // Redirect after a short delay
       }
     } catch (error) {
-      console.error("Error creating tour guide:", error.response ? error.response.data : error.message);
-      alert("Error creating tour guide: " + (error.response ? error.response.data.error : error.message));
+      console.error("Error updating tour guide:", error);
+      alert(
+        "Error updating tour guide: " +
+          (error.response ? error.response.data.error : error.message)
+      );
     }
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
+    <div
+      style={{ backgroundColor: "#fff", minHeight: "100vh", padding: "20px" }}
+    >
       <form onSubmit={handleSubmit}>
-        <h2>Create Tour Guide</h2>
+        <h2>Update Tour Guide Profile</h2>
+
+        {/* Render each form field based on formData keys */}
         {Object.keys(formData).map((key) => (
           <div key={key}>
-            <label>{key}:</label>
-            <input 
-              type="text" 
-              name={key} 
-              value={formData[key]} 
-              onChange={handleChange} 
-              required 
+            <label>{key.replace(/_/g, " ")}:</label>
+            <input
+              type={key === "Age" ? "number" : "text"} // For Age, use number input type
+              name={key}
+              value={formData[key]}
+              onChange={handleChange}
+              required
             />
           </div>
         ))}
-        <button type="submit">Create</button>
-      </form>
-      {createdId && (
+
+        {/* Photo file input */}
         <div>
-          <p>Tour guide created successfully!</p>
-          <Link to={`/tour-guide/${createdId}`}>View Tour Guide Details</Link>
+          <label>Photo:</label>
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+        </div>
+
+        {/* Display existing photo if available */}
+        {existingPhoto && (
+          <div>
+            <h4>Current Photo:</h4>
+            <img
+              src={existingPhoto}
+              alt="Current Tour Guide Photo"
+              style={{ width: "100px", height: "auto" }}
+            />
+          </div>
+        )}
+
+        <button type="submit">Update</button>
+      </form>
+
+      {successMessage && (
+        <div>
+          <p>{successMessage}</p>
+          <Link
+            to={`/tour-guide-details`}
+            state={{ id: localStorage.getItem("userId") }}
+          >
+            View Tour Guide Details
+          </Link>
         </div>
       )}
     </div>
   );
 };
 
-export default CreateTourGuide;
+export default UpdateTourGuide;

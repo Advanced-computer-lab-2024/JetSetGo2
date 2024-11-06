@@ -9,7 +9,7 @@ const SellerDetails = () => {
 
   const [Seller, setSeller] = useState(null);
   const [error, setError] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Fix the state definition
   const [formData, setFormData] = useState({
     Name: "",
     PickUp_Location: "",
@@ -19,7 +19,7 @@ const SellerDetails = () => {
     Email: "",
     logoFile: null, // State to hold the logo file
   });
-  const [selectedSection, setSelectedSection] = useState(""); // Track selected section
+  const [selectedSection, setSelectedSection] = useState("details"); // Default to details
   const [notification, setNotification] = useState(""); // For success or error messages
 
   const containerStyle = {
@@ -139,14 +139,15 @@ const SellerDetails = () => {
   useEffect(() => {
     const fetchSeller = async () => {
       try {
-        if (id) {
+        const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
+        if (userId) {
           const response = await axios.get(
-            `http://localhost:8000/Seller/readSeller/${id}`
+            `http://localhost:8000/Seller/readSeller/${userId}`
           );
           setSeller(response.data);
           setFormData(response.data); // Set initial form data for editing
         } else {
-          setError("No Seller ID provided.");
+          setError("No Seller ID found in local storage.");
         }
       } catch (err) {
         console.error("Error fetching Seller:", err);
@@ -154,8 +155,8 @@ const SellerDetails = () => {
       }
     };
 
-    if (id) fetchSeller();
-  }, [id]);
+    fetchSeller(); // Call fetchSeller without dependency on location state
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -179,8 +180,9 @@ const SellerDetails = () => {
     });
 
     try {
+      const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
       const response = await axios.put(
-        `http://localhost:8000/Seller/updateSeller/${id}`,
+        `http://localhost:8000/Seller/updateSeller/${userId}`,
         formDataToSend,
         {
           headers: {
@@ -205,6 +207,11 @@ const SellerDetails = () => {
 
   const handleSidebarClick = (section) => {
     setSelectedSection(section);
+    if (section === "edit") {
+      setIsEditing(true); // Set editing state when clicking on edit section
+    } else {
+      setIsEditing(false); // Reset editing state for other sections
+    }
   };
 
   const renderDetails = () => (
@@ -290,9 +297,9 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Age"
-          type="number"
           value={formData.Age}
           onChange={handleChange}
+          type="number"
           required
         />
       </div>
@@ -301,18 +308,18 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Email"
-          type="email"
           value={formData.Email}
           onChange={handleChange}
+          type="email"
           required
         />
       </div>
       <div style={formGroupStyle}>
-        <label style={labelStyle}>Upload New Logo:</label>
+        <label style={labelStyle}>Logo:</label>
         <input
+          style={inputStyle}
           type="file"
           accept="image/*"
-          name="logoFile"
           onChange={handleLogoChange}
         />
       </div>
@@ -322,7 +329,7 @@ const SellerDetails = () => {
       <button
         style={cancelButtonStyle}
         type="button"
-        onClick={() => setIsEditing(false)}
+        onClick={() => setIsEditing(false)} // Cancel button logic
       >
         Cancel
       </button>
@@ -330,11 +337,11 @@ const SellerDetails = () => {
   );
 
   if (error) {
-    return <div style={errorStyle}>{error}</div>;
+    return <div style={errorStyle}>{error}</div>; // Display error message
   }
 
   if (!Seller) {
-    return <div style={loadingStyle}>Loading...</div>;
+    return <div style={loadingStyle}>Loading...</div>; // Display loading message
   }
 
   return (
@@ -342,21 +349,21 @@ const SellerDetails = () => {
       <div style={sidebarStyle}>
         <img
           src={
-            Seller?.logo
-              ? `http://localhost:8000/uploads/sellerLogo/${Seller.logo}`
-              : "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-          } // Default avatar path
-          alt="Avatar"
+            `http://localhost:8000/uploads/sellerLogo/${Seller.logo}` ||
+            "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
+          }
+          alt="Logo"
           style={avatarStyle}
         />
+        <h2>{Seller.UserName}</h2>
         <button
           style={buttonStyle}
           onClick={() => handleSidebarClick("details")}
         >
-          Seller Details
+          View Details
         </button>
         <button style={buttonStyle} onClick={() => handleSidebarClick("edit")}>
-          Edit Seller
+          Edit Details
         </button>
         <h3 style={{ color: "#ff6348" }}>Explore</h3>
         <button style={buttonStyle} onClick={() => navigate("/productList")}>
@@ -389,12 +396,11 @@ const SellerDetails = () => {
         </button>
       </div>
       <div style={mainContentStyle}>
-        <h2 style={headerStyle}>
-          {selectedSection === "details" ? "Seller Details" : "Edit Seller"}
-        </h2>
+        <h1 style={headerStyle}>
+          {isEditing ? "Edit Seller" : "Seller Details"}
+        </h1>
         {notification && <div style={notificationStyle}>{notification}</div>}
-        {selectedSection === "details" && renderDetails()}
-        {selectedSection === "edit" && renderEditForm()}
+        {isEditing ? renderEditForm() : renderDetails()}
       </div>
     </div>
   );

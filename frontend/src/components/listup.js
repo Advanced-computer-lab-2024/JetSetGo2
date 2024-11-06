@@ -48,10 +48,10 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
   const [isEditingActivity, setIsEditingActivity] = useState(false);
   const [activityToEdit, setActivityToEdit] = useState(null);
   const [advertiserFormData, setAdvertiserFormData] = useState({
-    Name: "",
+    UserName: "",
     Link: "",
     Hotline: "",
-    Mail: "",
+    Email: "",
     Profile: "",
     Loc: "",
     CompanyDes: "",
@@ -70,17 +70,19 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showActivities, setShowActivities] = useState(false);
 
+  const adverId = localStorage.getItem("userId"); // Retrieve the Tour Guide ID from local storage
+
   useEffect(() => {
     const fetchAdvertiser = async () => {
       try {
-        if (selectedAdverId) {
+        if (adverId) {
           const response = await axios.get(
-            `http://localhost:8000/home/adver/getadver/${selectedAdverId}`
+            `http://localhost:8000/home/adver/getadver/${adverId}`
           );
           setAdvertiser(response.data);
-          setAdvertiserFormData(response.data);
+          setAdvertiserFormData(response.data); // Populate form with fetched data
         } else {
-          setError("No Advertiser ID provided.");
+          setError("No advertiser ID found in local storage.");
         }
       } catch (err) {
         console.error("Error fetching advertiser:", err);
@@ -89,9 +91,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
     };
 
     fetchAdvertiser();
-    fetchTags();
-    fetchCategories();
-  }, [selectedAdverId]);
+  }, [adverId]);
 
   const fetchAdverActivities = async () => {
     if (!selectedAdverId) {
@@ -164,7 +164,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/home/adver/updateadver/${selectedAdverId}`,
+        `http://localhost:8000/home/adver/updateadver/${adverId}`,
         formDataToSend,
         {
           headers: {
@@ -362,7 +362,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
           <div>
             <h3>Advertiser Details</h3>
             <p>
-              <strong>Name:</strong> {advertiser.Name}
+              <strong>Name:</strong> {advertiser.UserName}
             </p>
             <p>
               <strong>Link:</strong> {advertiser.Link}
@@ -371,7 +371,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
               <strong>Hotline:</strong> {advertiser.Hotline}
             </p>
             <p>
-              <strong>Email:</strong> {advertiser.Mail}
+              <strong>Email:</strong> {advertiser.Email}
             </p>
             <p>
               <strong>Profile:</strong> {advertiser.Profile}
@@ -396,7 +396,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
                 <label>Name:</label>
                 <input
                   name="Name"
-                  value={advertiserFormData.Name}
+                  value={advertiserFormData.UserName}
                   onChange={handleAdvertiserChange}
                   required
                 />
@@ -422,8 +422,8 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
               <div>
                 <label>Email:</label>
                 <input
-                  name="Mail"
-                  value={advertiserFormData.Mail}
+                  name="Eail"
+                  value={advertiserFormData.Email}
                   onChange={handleAdvertiserChange}
                   required
                 />

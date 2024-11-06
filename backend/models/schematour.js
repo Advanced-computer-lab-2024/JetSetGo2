@@ -15,13 +15,26 @@ const schema = new mongoose.Schema(
     accessibility: [{ type: String, required: true }],
     pickUpLoc: [{ type: String, required: true }],
     DropOffLoc: [{ type: String, required: true }],
-    bookings: { type: Number, default: 0 },  // Tracks the number of bookings
-    bookedUsers: { type: [mongoose.Schema.Types.ObjectId], ref: 'User', default: [] },       tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
-    Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true },
+    bookings: { type: Number, default: 0 }, // Tracks the number of bookings
+    bookedUsers: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
+    tourGuide: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tour",
+      required: true,
+    },
+    Tags: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PreferenceTag",
+      required: true,
+    },
     rating: { type: Number, required: true },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
@@ -31,7 +44,7 @@ schema.methods.incrementBookings = async function (userId) {
     throw new Error("User has already booked this tour.");
   }
   this.bookings += 1;
-  this.bookedUsers.push(userId);  // Add user to the bookedUsers array
+  this.bookedUsers.push(userId); // Add user to the bookedUsers array
   await this.save();
 };
 
