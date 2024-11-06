@@ -10,6 +10,7 @@ const {
   getSeller,
   deleteSeller,
   deleteAllSellers,
+  acceptSeller,
 } = require("../controllers/SellerController.js");
 
 router.get("/readSeller/:id", readSeller);
@@ -17,5 +18,6 @@ router.put("/updateSeller/:id", upload.single("logoFile"), updateSeller); // Use
 router.get("/get", getSeller);
 router.delete("/delete/:id", deleteSeller);
 router.delete("/deleteall", deleteAllSellers);
+router.put("/acceptSeller/:id", acceptSeller);
 
 module.exports = router;

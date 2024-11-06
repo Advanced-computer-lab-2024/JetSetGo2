@@ -53,6 +53,7 @@ const loginUser = async (req, res) => {
       Email: user.Email,
       AccountType: AccountType,
       profileCompleted: user.Profile_Completed || false, // Assuming the field 'profileCompleted' exists
+      adminAccept: user.Admin_Acceptance || false,
     }); // Send token, AccountType, and profileCompleted back to client
   } catch (error) {
     res.status(500).json({ message: "Server error" });

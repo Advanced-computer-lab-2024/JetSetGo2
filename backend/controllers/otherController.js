@@ -27,6 +27,7 @@ const createOther = async (req, res) => {
         IDDocument,
         TaxationRegistryCard,
         Profile_Completed: false,
+        Admin_Acceptance: false,
       });
     }
 
@@ -38,6 +39,7 @@ const createOther = async (req, res) => {
         IDDocument,
         Certificates,
         Profile_Completed: false,
+        Admin_Acceptance: false,
       });
     }
 
@@ -49,6 +51,7 @@ const createOther = async (req, res) => {
         IDDocument,
         TaxationRegistryCard,
         Profile_Completed: false,
+        Admin_Acceptance: false,
       });
     }
 

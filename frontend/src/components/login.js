@@ -83,7 +83,8 @@ const Login = () => {
 
       // Check for successful login response
       if (response.status === 200) {
-        const { token, userId, AccountType, profileCompleted } = response.data;
+        const { token, userId, AccountType, profileCompleted, adminAccept } =
+          response.data;
 
         // Store the token and user ID in local storage
         localStorage.setItem("token", token);
@@ -95,7 +96,10 @@ const Login = () => {
         if (AccountType === "Tourist") {
           navigate("/tourist-home");
         }
-        if (!profileCompleted) {
+
+        if (!adminAccept) {
+          navigate("/AdminAcceptance");
+        } else if (!profileCompleted) {
           // Navigate based on profile completion and AccountType
           if (AccountType === "TourGuide") {
             navigate("/CreateTourGuide"); // Redirect to profile completion page

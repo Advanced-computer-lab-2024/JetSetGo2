@@ -84,6 +84,32 @@ const deleteAdver = async (req, res) => {
   }
 };
 
+const acceptAdver = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the seller by ID and delete it
+    const acceptAdver = await adverModel.findByIdAndUpdate(id, {
+      Admin_Acceptance: true,
+    });
+
+    if (!acceptAdver) {
+      return res.status(404).json({ message: "Seller is accepted/rejected" });
+    }
+
+    // Respond with a success message
+    res.status(200).json({
+      message: "Seller deleted successfully",
+      seller: acceptAdver,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting seller",
+      error,
+    });
+  }
+};
+
 // Export the router
 module.exports = {
   getAdver,
@@ -91,4 +117,5 @@ module.exports = {
   getAdverById,
   getAdvertiser,
   deleteAdver,
+  acceptAdver,
 };

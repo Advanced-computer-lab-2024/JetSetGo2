@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 // Importing components
@@ -24,7 +23,6 @@ import SellerDetails from "./components/SellerDetails";
 import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
 import Activities from "./components/UpComingEvents/Activities";
 import Activitiest from "./components/UpComingEvents/Activitiest";
-
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
@@ -39,11 +37,9 @@ import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
+import AdminApprovalPage from "./components/Acceptance";
 
 function App() {
-  const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
-  const [selectedAdverId, setselectedAdverId] = useState(null);
-
   return (
     <Router>
       <div>
@@ -53,47 +49,16 @@ function App() {
           <Route path="/tourist-signup" element={<TouristSignup />} />
           <Route path="/tourist-home" element={<TouristHome />} />
           <Route path="/tourist-update" element={<UpdateTouristPage />} />
-          <Route
-            path="/AdvirtiserMain"
-            element={<AdvertiserForm setselectedAdverId={setselectedAdverId} />}
-          />
-          <Route
-            path="/list"
-            element={<AdvertiserManagement selectedAdverId={selectedAdverId} />}
-          />
-          <Route
-            path="/CreateTourGuide"
-            element={
-              <CreateTourGuide
-                setselectedTourGuideId={setselectedTourGuideId}
-              />
-            }
-          />
-          <Route
-            path="/editTourGuide"
-            element={
-              <EditTourGuide selectedTourGuideId={selectedTourGuideId} />
-            }
-          />
-          <Route
-            path="/tour-guide"
-            element={
-              <TourGuideDetails selectedTourGuideId={selectedTourGuideId} />
-            }
-          />
+          <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
+          <Route path="/list" element={<AdvertiserManagement />} />
+          <Route path="/CreateTourGuide" element={<CreateTourGuide />} />
+          <Route path="/editTourGuide" element={<EditTourGuide />} />
+          <Route path="/tour-guide" element={<TourGuideDetails />} />
           <Route path="/other-signup" element={<OtherSignup />} />
-          <Route
-            path="/activities"
-            element={<ActivityCRUD selectedAdverId={selectedAdverId} />}
-          />
+          <Route path="/activities" element={<ActivityCRUD />} />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
-          <Route
-            path="/SchemaTourFront"
-            element={
-              <SchemaTourFront selectedTourGuideId={selectedTourGuideId} />
-            }
-          />
+          <Route path="/SchemaTourFront" element={<SchemaTourFront />} />
           <Route path="/TagsManagement" element={<TagsManagement />} />
           <Route path="/p" element={<ProductListp />} />
           <Route path="/category" element={<CategoryCRUD />} />
@@ -104,12 +69,10 @@ function App() {
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
           <Route path="/Upcoming-activities" element={<Activities />} />
           <Route path="/Upcoming-activitiest" element={<Activitiest />} />
-
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
           <Route path="/Upcoming-itinerariest" element={<Itinerariest />} />
-
           <Route path="/productList" element={<ProductList />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
           <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
@@ -124,6 +87,7 @@ function App() {
             element={<TourismGovernorPage />}
           />
           <Route path="/fetchdocuments" element={<OthersListPage />} />
+          <Route path="/AdminAcceptance" element={<AdminApprovalPage />} />
         </Routes>
       </div>
     </Router>
