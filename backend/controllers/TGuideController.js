@@ -16,6 +16,37 @@ const TourModel = require('../models/TGuide.js');
  }
 
 
+ // Controller function for submitting a tour guide review
+ const submitReview = async (req, res) => {
+   const { userId, rating, comment } = req.body;
+   const { tourGuideId } = req.params;
+ 
+   try {
+     // Find the tour guide by ID and add the review directly to the reviews array
+     const tourGuide = await Tour.findById(tourGuideId);
+ 
+     if (!tourGuide) {
+       return res.status(404).json({ message: 'Tour guide not found' });
+     }
+ 
+     // Add review to the array
+     tourGuide.reviews.push({ userId, rating, comment });
+ 
+     // Calculate the new average rating
+     const totalRatings = tourGuide.reviews.reduce((sum, review) => sum + review.rating, 0);
+     tourGuide.rating = totalRatings / tourGuide.reviews.length;
+ 
+     // Save the document
+     await tourGuide.save();
+ 
+     return res.status(200).json({ message: 'Review submitted successfully' });
+   } catch (error) {
+     console.error(error);
+     return res.status(500).json({ message: 'Server error' });
+   }
+ };
+ 
+ 
  
 // Method to get all tour guides or a specific one by ID
 const getuser = async (req, res) => {
@@ -99,4 +130,4 @@ const deleteTGuide = async (req, res) => {
    }
 };
 
-    module.exports ={getuser,updateUser,createUser,getUserById,deleteTGuide};
+    module.exports ={getuser,submitReview,updateUser,createUser,getUserById,deleteTGuide};

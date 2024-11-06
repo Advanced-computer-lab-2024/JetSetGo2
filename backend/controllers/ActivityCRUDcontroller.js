@@ -204,6 +204,34 @@ const upcomingactivity = async (req, res) => {
     res.status(500).json({ message: "Error fetching upcoming activities." });
   }
 };
+const cancelactivity = async (req, res) => {
+  let { id } = req.params;
+  const userId = req.body.userId;
+
+  // Trim and validate the id parameter
+  id = id.trim();
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid itinerary ID format" });
+  }
+
+  try {
+    const activity = await Activity.findById(id);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    // Attempt to cancel the booking
+    await activity.cancelBooking(userId);
+
+    res.status(200).json({ message: "Booking canceled successfully", bookings: activity.bookings });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 
 module.exports = {
   createActivity,
@@ -213,5 +241,6 @@ module.exports = {
   deleteAllActivities,
   upcomingactivity,
   readAdverActivites,
+  cancelactivity,
   bookactivity
 };
