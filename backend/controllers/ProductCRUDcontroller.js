@@ -4,6 +4,7 @@ const Product = require('../models/ProductCRUD'); // Adjust the path if needed
 const Seller = require('../models/Seller');
 
 // Create a new product
+// Create a new product
 const createProduct = async (req, res) => {
   try {
     // Check if the provided seller ID is valid
@@ -12,12 +13,26 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ error: "Invalid seller ID" });
     }
 
-    const product = await Product.create(req.body);
+    // Check if the pictures field is a valid base64 string
+    if (!req.body.pictures || !req.body.pictures.startsWith('data:image/')) {
+      return res.status(400).json({ error: "Invalid image format" });
+    }
+
+    // Optionally, you can remove the prefix before saving (if you only want the base64 part)
+    const base64Image = req.body.pictures.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
+
+    const productData = {
+      ...req.body,
+      pictures: base64Image, // Save only the base64 part
+    };
+
+    const product = await Product.create(productData);
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Get all products and populate seller information
 const getProducts = async (req, res) => {
@@ -36,8 +51,19 @@ const updateProduct = async (req, res) => {
 
   // Only add fields to updateData if they exist in the request body
   if (req.body.description) updateData.description = req.body.description;
-  if (req.body.pictures) updateData.pictures = req.body.pictures;
+
+  if (req.body.pictures) {
+    // Check if the pictures field is a valid base64 string
+    if (!req.body.pictures.startsWith('data:image/')) {
+      return res.status(400).json({ error: "Invalid image format" });
+    }
+
+    // Remove the prefix before saving (if you only want the base64 part)
+    updateData.pictures = req.body.pictures.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
+  }
+
   if (req.body.price) updateData.price = req.body.price;
+  
   if (req.body.seller) {
     // Check if the provided seller ID is valid before updating
     const sellerExists = await Seller.findById(req.body.seller);
@@ -46,6 +72,7 @@ const updateProduct = async (req, res) => {
     }
     updateData.seller = req.body.seller;
   }
+  
   if (req.body.rating) updateData.rating = req.body.rating;
   if (req.body.reviews) updateData.reviews = req.body.reviews;
   if (req.body.availableQuantity) updateData.availableQuantity = req.body.availableQuantity;
@@ -66,6 +93,7 @@ const updateProduct = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Delete a product
 const deleteProduct = async (req, res) => {

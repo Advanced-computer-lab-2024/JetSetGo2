@@ -24,6 +24,7 @@ const ProductList = () => {
       const data = await getProducts();
       setProducts(data);
       setFilteredProducts(data);
+      console.log(filteredProducts);
     } catch (error) {
       setMessage('Error fetching products');
       console.error("Error fetching products", error);
@@ -174,7 +175,15 @@ const ProductList = () => {
                 filteredProducts.map(product => (
                   <tr key={product._id} style={{ textAlign: 'center' }}>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                      {product.pictures && <img src={product.pictures} alt={product.description} width="100" />}
+                      {product.pictures && product.pictures.length > 0 ? (
+                        <img 
+                          src={`data:image/png;base64,${product.pictures}`} 
+                          alt="Product" 
+                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                        />
+                      ) : (
+                        'No Image'
+                      )}
                     </td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.price} $</td>
@@ -209,7 +218,7 @@ const ProductList = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" style={{ padding: '10px', border: '1px solid #dee2e6' }}>No products found.</td>
+                  <td colSpan="5" style={{ padding: '20px', textAlign: 'center' }}>No products available</td>
                 </tr>
               )}
             </tbody>

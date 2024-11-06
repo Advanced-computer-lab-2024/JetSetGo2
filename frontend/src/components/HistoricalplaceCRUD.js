@@ -8,6 +8,19 @@ import {
   deleteHistoricalPlace,
 } from '../services/HistoricalPlaceService';
 import { getTourismGovernerTags, createTags,readGuide } from '../services/TourismGovernerTagService'; // Import the createTags function
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import 'leaflet-control-geocoder';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+
+// Fix marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const HistoricalplaceCRUD = () => {
   const navigate = useNavigate();
@@ -23,6 +36,8 @@ const HistoricalplaceCRUD = () => {
       nativeTicketPrice: '',
       studentTicketPrice: '',
   });
+  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
+  const [searchLocation, setSearchLocation] = useState("");
   const [editData, setEditData] = useState(null);
   const [newTag, setNewTag] = useState({
     name: '',
@@ -31,21 +46,19 @@ const HistoricalplaceCRUD = () => {
     description: '', // Add description for the new tag
   });
   const [createdTagId, setCreatedTagId] = useState(null); // Store the newly created tag ID
+  
 
-  const predefinedLocations = [
-    {
-      name: 'Cairo, Egypt',
-      coordinates: '31.2357,30.0444,31.2557,30.0644',
-    },
-    {
-      name: 'Giza Pyramids, Egypt',
-      coordinates: '31.1313,29.9765,31.1513,29.9965',
-    },
-    {
-      name: 'Alexandria, Egypt',
-      coordinates: '29.9097,31.2156,29.9297,31.2356',
-    },
-  ];
+  const handleSearch = () => {
+    const geocoder = L.Control.Geocoder.nominatim();
+    geocoder.geocode(searchLocation, (results) => {
+      if (results && results.length > 0) {
+        const { lat, lng } = results[0].center;
+        setPinPosition([lat, lng]);
+      } else {
+        setMessage("Location not found.");
+      }
+    });
+  };
 
   useEffect(() => {
     fetchHistoricalPlaces();
@@ -95,6 +108,8 @@ const HistoricalplaceCRUD = () => {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+    const locationString = `${pinPosition[0]},${pinPosition[1]}`; // Save lat, long as a string
+    
     if (!createdTagId) {
       setMessage('You must create a tag first before creating a Historical place.');
       return;
@@ -103,7 +118,8 @@ const HistoricalplaceCRUD = () => {
       // Associate the newly created tag with the historical place
       const newPlaceData = {
         ...formData,
-        tourismGovernerTags: createdTagId, // Set the createdTagId to associate the tag
+        tourismGovernerTags: createdTagId,
+        location: locationString , // Set the createdTagId to associate the tag
       };
       await createHistoricalPlace(newPlaceData);
       setMessage('Historical Place created successfully!');
@@ -119,10 +135,12 @@ const HistoricalplaceCRUD = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    const locationString = `${pinPosition[0]},${pinPosition[1]}`; // Save lat, long as a string
+    const updatedHistoricalPlace = { ...formData, location: locationString };
     if (!editData) return;
 
     try {
-      await updateHistoricalPlace(editData._id, formData);
+      await updateHistoricalPlace(editData._id, updatedHistoricalPlace);
       setMessage('Historical Place updated successfully!');
       resetEditForm();
       fetchHistoricalPlaces();
@@ -155,7 +173,12 @@ const HistoricalplaceCRUD = () => {
       nativeTicketPrice: historicalPlace.nativeTicketPrice,
       studentTicketPrice: historicalPlace.studentTicketPrice,
     });
+  
+    // Logic to set the pin position on the map based on the location
+    const [lat, lon] = historicalPlace.location.split(',').map(Number);
+    setPinPosition([lat, lon]); // Set the map pin to the historical place's location
   };
+  
 
   const resetCreateForm = () => {
     setFormData({
@@ -168,6 +191,7 @@ const HistoricalplaceCRUD = () => {
       studentTicketPrice: '',
     });
     setCreatedTagId(null); // Reset created tag ID
+    setPinPosition([30.0444, 31.2357]);
   };
 
   const resetEditForm = () => {
@@ -193,14 +217,14 @@ const HistoricalplaceCRUD = () => {
     }
   };
 
-  const generateMapSrc = (coordinates) => {
-    if (!coordinates) {
-      // Return a default map view or a blank one if no coordinates are provided
-      return 'https://www.openstreetmap.org/export/embed.html?bbox=31.2357,30.0444,31.2557,30.0644&layer=mapnik'; // Cairo as a default location
-    }
-  
-    const [long1, lat1] = coordinates.split(',').slice(0, 2);
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
+  const LocationMarker = () => {
+    useMapEvents({
+      click(e) {
+        setPinPosition([e.latlng.lat, e.latlng.lng]);
+      },
+    });
+
+    return pinPosition ? <Marker position={pinPosition}></Marker> : null;
   };
   return (
     <div>
@@ -283,22 +307,24 @@ const HistoricalplaceCRUD = () => {
               required
             />
           </label>
-          <label>
-            Location:
-            <select
-              name="location"
-              value={formData.location}
-              onChange={handleLocationChange}
-              required
-            >
-              <option value="">Select Location</option>
-              {predefinedLocations.map((location) => (
-                <option key={location.name} value={location.name}>
-                  {location.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          {/* Map for selecting location */}
+          <label>Location: (Click on the map to place the pin)</label>
+          <input
+            type="text"
+            placeholder="Search location..."
+            value={searchLocation}
+            onChange={(e) => setSearchLocation(e.target.value)}
+          />
+          <button type="button" onClick={handleSearch}>Search</button>
+          <div style={{ height: "400px", width: "100%", marginBottom: "20px" }}>
+            <MapContainer center={pinPosition} zoom={13} style={{ height: "100%", width: "100%" }}>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationMarker />
+            </MapContainer>
+          </div>
           <label>
             Opening Hours:
             <input
@@ -355,17 +381,24 @@ const HistoricalplaceCRUD = () => {
               Pictures (URL):
               <input type="text" name="pictures" value={formData.pictures} onChange={(e) => handleChange(e, setFormData)} required />
             </label>
-            <label>
-              Location:
-              <select name="location" value={formData.location} onChange={handleLocationChange} required>
-                <option value="">Select Location</option>
-                {predefinedLocations.map((location) => (
-                  <option key={location.name} value={location.name}>
-                    {location.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {/* Map for editing location */}
+            <label>Location: (Click on the map to change pin position)</label>
+            <input
+              type="text"
+              placeholder="Search location..."
+              value={searchLocation}
+              onChange={(e) => setSearchLocation(e.target.value)}
+            />
+            <button type="button" onClick={handleSearch}>Search</button>
+            <div style={{ height: "400px", width: "100%", marginBottom: "20px" }}>
+              <MapContainer center={pinPosition} zoom={13} style={{ height: "100%", width: "100%" }}>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <LocationMarker />
+              </MapContainer>
+            </div>
             <label>
               Opening Hours:
               <input type="text" name="openingHours" value={formData.openingHours} onChange={(e) => handleChange(e, setFormData)} required />
@@ -393,36 +426,81 @@ const HistoricalplaceCRUD = () => {
      
     
 
-      <section className="historical-places">
-        <h2>Historical Places List</h2>
-        {historicalPlaces.length > 0 ? (
-          <ul>
-            {historicalPlaces.map((place) => (
-              <li key={place._id}>
-               <h3>Name: {place.tourismGovernerTags.name}</h3>
-               <img src={place.pictures} alt={place.description} style={{ width: '100px', height: 'auto' }} />
-               <p>Description: {place.description}</p>
-               <p>Location: {place.location}</p>
-               <p>Opening Hours: {place.openingHours}</p>
-                <p>Foreigner Ticket Price: {place.foreignerTicketPrice}</p>
-                <p>Native Ticket Price: {place.nativeTicketPrice}</p>
-                <p>Student Ticket Price: {place.studentTicketPrice}</p>
-                <p>Tags: {place.tourismGovernerTags?.type}</p>
-                <iframe
-              title="Location Map"
+<section className="historical-places">
+  <h2>Historical Places List</h2>
+  {historicalPlaces.length > 0 ? (
+    <ul>
+      {historicalPlaces.map((place) => {
+        // Extract latitude and longitude from the location string
+        const locationCoords = place.location.split(",");
+        const latitude = locationCoords[0];
+        const longitude = locationCoords[1];
+        const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+
+        return (
+          <li
+            key={place._id}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: '#f9f9f9',
+              padding: '20px',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              marginBottom: '20px',
+            }}
+          >
+            {/* Historical Place details */}
+            <div style={{ flex: 1, paddingRight: '20px' }}>
+              <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
+                Name: {place.tourismGovernerTags.name}
+              </h3>
+              <img
+                src={place.pictures}
+                alt={place.description}
+                style={{ width: '100px', height: 'auto', marginBottom: '10px' }}
+              />
+              <p>Description: {place.description}</p>
+              <p>Location: {place.location}</p>
+              <p>Opening Hours: {place.openingHours}</p>
+              <p>Foreigner Ticket Price: {place.foreignerTicketPrice}</p>
+              <p>Native Ticket Price: {place.nativeTicketPrice}</p>
+              <p>Student Ticket Price: {place.studentTicketPrice}</p>
+              <p>Tags: {place.tourismGovernerTags?.type}</p>
+            </div>
+            {/* Edit and Delete buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <button
+                onClick={() => handleEdit(place)}
+                style={{ marginBottom: '10px' }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(place._id)}
+                style={{ backgroundColor: 'red', color: '#fff' }}
+              >
+                Delete
+              </button>
+            </div>
+            {/* Map iframe */}
+            <iframe
+              src={mapSrc}
               width="300"
               height="200"
-              src={generateMapSrc(predefinedLocations.find(loc => loc.name === place.location)?.coordinates)}
+              style={{ border: 'none' }}
+              title={`Map of ${place.location}`}
             ></iframe>
-                <button onClick={() => handleEdit(place)}>Edit</button>
-                <button onClick={() => handleDelete(place._id)}>Delete</button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No historical places found.</p>
-        )}
-      </section>
+          </li>
+        );
+      })}
+    </ul>
+  ) : (
+    <p>No historical places found.</p>
+  )}
+</section>
+
     </div>
   );
 };
