@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import '../App.css';
 import { useNavigate } from 'react-router-dom'; 
 import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService'; 
@@ -17,6 +17,10 @@ const ProductCRUD = () => {
     availableQuantity: '',
   });
   const [editData, setEditData] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); // For image preview
+  const fileInputRef = useRef(null);
+
+
 
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -70,11 +74,17 @@ const ProductCRUD = () => {
       await createProduct(formData);
       setMessage('Product created successfully!');
       resetCreateForm();
-      fetchProducts(); 
+      fetchProducts();
+      // Clear the file input
+      
+      setImagePreview(null);
+      console.log(formData); // Logging formData
     } catch (error) {
+      // Handle any errors during the product creation
       const errorMessage = error.response ? error.response.data.error : 'Error occurred while creating the product';
       setMessage(errorMessage);
       console.error('Error:', error);
+      console.log(formData); // Logging formData
     }
   };
 
@@ -87,9 +97,18 @@ const ProductCRUD = () => {
       await updateProduct(editData._id, editData);
       setMessage('Product updated successfully!');
       resetEditForm();
-      fetchProducts(); 
+      fetchProducts();
+
+      // Clear the file input field
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null; // Reset file input
+      }
+      setImagePreview(null); // Clear the image preview
+      console.log(formData); // Logging formData
     } catch (error) {
-      const errorMessage = error.response ? error.response.data.error : 'Error occurred while updating the product.';
+      const errorMessage = error.response
+        ? error.response.data.error
+        : 'Error occurred while updating the product.';
       setMessage(errorMessage);
       console.error(error);
     }
@@ -107,6 +126,26 @@ const ProductCRUD = () => {
     }
   };
 
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        setImagePreview(reader.result);
+        console.log(imagePreview);
+        
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
+  };
+
+
   // Populate form with data for editing
   const handleEdit = (product) => {
     setEditData(product);
@@ -123,6 +162,9 @@ const ProductCRUD = () => {
       reviews: '',
       availableQuantity: '',
     });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   // Reset form for editing
@@ -220,9 +262,16 @@ const ProductCRUD = () => {
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="text" name="description" value={formData.description} onChange={(e) => handleChange(e, setFormData)} required />
             
-            <label style={{ display: 'block', marginBottom: '10px' }}>Picture (URL):</label>
-            <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-              type="text" name="pictures" value={formData.pictures} onChange={(e) => handleChange(e, setFormData)} required />
+            <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => handleImageUpload(e, setFormData)}
+  ref={fileInputRef} // Attach the reference here
+  required
+/>
+
+      {imagePreview && <img src={imagePreview} alt="Preview" width="100" />} {/* Image preview */}
             
             <label style={{ display: 'block', marginBottom: '10px' }}>Price:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
@@ -265,10 +314,16 @@ const ProductCRUD = () => {
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 type="text" name="description" value={editData.description} onChange={(e) => handleChange(e, setEditData)} required />
 
-              <label style={{ display: 'block', marginBottom: '10px' }}>Picture (URL):</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="text" name="pictures" value={editData.pictures} onChange={(e) => handleChange(e, setEditData)} required />
+<label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
+<input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, setEditData)}
+              ref={fileInputRef} // Attach the reference here
+              required
+            />
 
+      {imagePreview && <img src={imagePreview} alt="Preview" width="100" />} {/* Image preview */}
               <label style={{ display: 'block', marginBottom: '10px' }}>Price:</label>
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 type="number" name="price" value={editData.price} onChange={(e) => handleChange(e, setEditData)} required />
@@ -317,51 +372,113 @@ const ProductCRUD = () => {
         )}
 
         {/* Product List */}
-        <section>
-          <h2>Product List</h2>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            marginTop: '20px',
-            borderRadius: '10px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-          }}>
-            <thead style={{
-              backgroundColor: '#343a40',
-              color: '#fff',
-            }}>
-              <tr>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Picture</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Description</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Price</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Seller</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Rating</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(product => (
-                <tr key={product._id} style={{ textAlign: 'center' }}>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                    {product.pictures ? <img src={product.pictures} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} /> : 'No Image'}
-                  </td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>${product.price}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller.Name}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
-                  <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                    <button onClick={() => handleEdit(product)} style={{ padding: '5px 10px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(product._id)} style={{ padding: '5px 10px', backgroundColor: '#ff6348', color: '#fff', border: 'none', borderRadius: '5px' }}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        <section style={{ padding: '20px' }}>
+  <h2>Product List</h2>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '20px',
+    marginTop: '20px',
+  }}>
+    {products.map(product => (
+      <div key={product._id} style={{
+        border: '1px solid #dee2e6',
+        borderRadius: '10px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+        overflow: 'hidden',
+        transition: 'transform 0.2s',
+      }}
+        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        {/* Product Image */}
+        <div style={{ height: '200px', overflow: 'hidden' }}>
+  {product.pictures ? (
+    <>
+      {/*console.log("Product Picture URL:", product.pictures)*/} {/* Log the URL */}
+      <img
+        src={`data:image/png;base64,${product.pictures}`}
+        alt="Product"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          borderTopLeftRadius: '10px',
+          borderTopRightRadius: '10px',
+        }}
+      />
+    </>
+  ) : (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#f8f9fa',
+      color: '#6c757d',
+    }}>
+      No Image
+    </div>
+  )}
+</div>
+
+        {/* Product Details */}
+        <div style={{ padding: '15px' }}>
+          <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#2d3e50' }}>
+            {product.description}
+          </h3>
+          <p style={{ fontSize: '16px', color: '#28a745', margin: '5px 0' }}>
+            ${product.price}
+          </p>
+          <p style={{ fontSize: '14px', color: '#6c757d', margin: '5px 0' }}>
+            Seller: {product.seller?.Name || 'N/A'}
+          </p>
+          <p style={{ fontSize: '14px', color: '#ffc107', margin: '5px 0' }}>
+            Rating: {product.rating || 'No rating'}
+          </p>
+          {/* Action Buttons */}
+          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
+            <button
+              onClick={() => handleEdit(product)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#2d3e50',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1b2838'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2d3e50'}
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(product._id)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#ff6348',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5533b'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ff6348'}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+
       </div>
     </div>
   );
