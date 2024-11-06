@@ -123,6 +123,11 @@ const TouristHome = ({ selectedTouristId }) => {
           <button onClick={handleUpdateClick} style={styles.button}>
             Update Profile
           </button>
+          
+          <button    onClick={() => navigate("/mi", { state: { touristId: selectedTouristId } })}
+  >
+           My Itenaries    
+               </button>
         </div>
       </div>
 

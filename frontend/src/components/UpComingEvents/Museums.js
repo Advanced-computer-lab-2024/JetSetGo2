@@ -26,11 +26,18 @@ const predefinedLocations = [
   // Add more locations as needed
 ];
 
+const currencyRates = {
+  EUR: 1,    // Base currency (assumed for conversion)
+  USD: 1,  // Example conversion rate
+  EGP: 30,   // Example conversion rate
+};
+
 const Museums = () => {
   const [museums, setMuseums] = useState([]);
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
+  const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
 
   // Fetch museums when the component mounts
   useEffect(() => {
@@ -68,13 +75,14 @@ const Museums = () => {
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
 
+  const convertPrice = (price) => {
+    return (price * currencyRates[selectedCurrency]).toFixed(2);
+  };
+
   return (
     <div id="museums" style={styles.museumsContainer}>
       <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
+        <button className="back-button" onClick={() => navigate(-1)}>
           Back
         </button>
       </div>
@@ -116,17 +124,22 @@ const Museums = () => {
         }
       `}</style>
 
-      <h2
-        style={{
-          color: "#FF4500",
-          fontSize: "24px",
-          textAlign: "center",
-          marginBottom: "20px",
-        }}
-      >
-        Museums
-      </h2>
+      <h2 style={styles.header}>Museums</h2>
       {error && <p className="error">{error}</p>}
+
+      {/* Currency Selection */}
+      <div className="filter-container">
+        <label htmlFor="currencySelect">Choose Currency:</label>
+        <select
+          id="currencySelect"
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+        >
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="EGP">EGP</option>
+        </select>
+      </div>
 
       {/* Filter by Tag */}
       <div className="filter-container">
@@ -139,9 +152,7 @@ const Museums = () => {
           <option value="">All Tags</option>
           {museums
             .map((place) => place.tourismGovernerTags?.type)
-            .filter(
-              (value, index, self) => value && self.indexOf(value) === index
-            ) // Remove duplicates
+            .filter((value, index, self) => value && self.indexOf(value) === index)
             .map((tag) => (
               <option key={tag} value={tag}>
                 {tag}
@@ -163,28 +174,22 @@ const Museums = () => {
             return (
               <div key={place._id} className="museum-card">
                 <h3>{place.tourismGovernerTags.name}</h3>
+                <p><strong>Description:</strong> {place.description}</p>
+                <p><strong>Location:</strong> {place.location}</p>
+                <p><strong>Opening Hours:</strong> {place.openingHours}</p>
                 <p>
-                  <strong>Description:</strong> {place.description}
+                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
                 </p>
                 <p>
-                  <strong>Location:</strong> {place.location}
+                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
                 </p>
                 <p>
-                  <strong>Opening Hours:</strong> {place.openingHours}
-                </p>
-                <p>
-                  <strong>Ticket Price:</strong> ${place.ticketPrice}
+                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
                 </p>
                 <div className="museum-image">
-                  <img
-                    src={place.pictures}
-                    alt={`Picture of ${place.description}`}
-                  />
+                  <img src={place.pictures} alt={`Picture of ${place.description}`} />
                 </div>
-                <p>
-                  <strong>Tourism Governor Tags:</strong>{" "}
-                  {place.tourismGovernerTags.type}
-                </p>
+                <p><strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags.type}</p>
                 {mapSrc && (
                   <iframe
                     title={`Map for ${place.location}`}
@@ -209,6 +214,12 @@ const styles = {
   museumsContainer: {
     padding: "20px",
     backgroundColor: "#f5f5f5",
+  },
+  header: {
+    color: "#FF4500",
+    fontSize: "24px",
+    textAlign: "center",
+    marginBottom: "20px",
   },
 };
 

@@ -18,12 +18,18 @@ const predefinedLocations = [
     coordinates: "31.4015,30.0254,31.4215,30.0454",
   },
 ];
+const currencyRates = {
+  EUR: 1,    // Base currency (assumed for conversion)
+  USD: 1,  // Example conversion rate
+  EGP: 30,   // Example conversion rate
+};
 
 const HistoricalPlaces = () => {
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
+  const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
 
   // Fetch historical places when the component mounts
   useEffect(() => {
@@ -60,7 +66,9 @@ const HistoricalPlaces = () => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
-
+  const convertPrice = (price) => {
+    return (price * currencyRates[selectedCurrency]).toFixed(2);
+  };
   return (
     <div id="historical-places" style={styles.container}>
       <h2 style={styles.heading}>Historical Places</h2>
@@ -72,6 +80,18 @@ const HistoricalPlaces = () => {
         >
           Back
         </button>
+      </div>
+      <div className="filter-container">
+        <label htmlFor="currencySelect">Choose Currency:</label>
+        <select
+          id="currencySelect"
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+        >
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="EGP">EGP</option>
+        </select>
       </div>
       {/* Filter by Tag */}
       <div style={styles.filterContainer}>
@@ -118,9 +138,15 @@ const HistoricalPlaces = () => {
                 <p style={styles.cardText}>
                   Opening Hours: {place.openingHours}
                 </p>
-                <p style={styles.cardText}>
-                  Ticket Price: ${place.ticketPrice}
+                <p>
+                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
                 </p>
+                <p>
+                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
+                </p>
+                <p>
+                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
+                  </p>
                 <div style={styles.cardImageContainer}>
                   <img
                     src={place.pictures}
