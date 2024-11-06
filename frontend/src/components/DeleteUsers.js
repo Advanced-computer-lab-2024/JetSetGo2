@@ -27,7 +27,7 @@ const TourGuideComponent = () => {
 
     const fetchAdvertisers = async () => {
         try {
-            const response = await fetch('http://localhost:8000/Advertiser/get');
+            const response = await fetch('http://localhost:8000/home/adver/get');
             const data = await response.json();
             setAdvertisers(data);
         } catch (error) {
@@ -49,7 +49,7 @@ const TourGuideComponent = () => {
 
     const fetchTourists = async () => {
         try {
-            const response = await fetch('http://localhost:8000/Tourist/get');
+            const response = await fetch('http://localhost:8000/home/tourist/get');
             const data = await response.json();
             setTourists(data);
         } catch (error) {

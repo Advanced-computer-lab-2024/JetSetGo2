@@ -45,7 +45,6 @@ import ItinerariesAdmin from "./components/ItinerariesAdmin";
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null);
-  const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
   const [selectedAdverId, setselectedAdverId] = useState(null);
 
   return (
@@ -53,7 +52,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login />} /> 
+          <Route path="/login" element={<Login />} />
           <Route
             path="/tourist-signup"
             element={
@@ -72,30 +71,30 @@ function App() {
           />
           <Route
             path="/AdvirtiserMain"
-            element={<AdvertiserForm setselectedAdverId={setselectedAdverId} />}
+            element={<AdvertiserForm  />}
           />
           <Route
             path="/list"
-            element={<AdvertiserManagement selectedAdverId={selectedAdverId} />}
+            element={<AdvertiserManagement  />}
           />
           <Route
             path="/CreateTourGuide"
             element={
               <CreateTourGuide
-                setselectedTourGuideId={setselectedTourGuideId}
+                
               />
             }
           />
           <Route
             path="/editTourGuide"
             element={
-              <EditTourGuide selectedTourGuideId={selectedTourGuideId} />
+              <EditTourGuide />
             }
           />
           <Route
             path="/tour-guide"
             element={
-              <TourGuideDetails selectedTourGuideId={selectedTourGuideId} />
+              <TourGuideDetails  />
             }
           />
           <Route path="/other-signup" element={<OtherSignup />} />
@@ -108,7 +107,7 @@ function App() {
           <Route
             path="/SchemaTourFront"
             element={
-              <SchemaTourFront selectedTourGuideId={selectedTourGuideId} />
+              <SchemaTourFront />
             }
           />
           <Route path="/TagsManagement" element={<TagsManagement />} />

@@ -3,44 +3,42 @@ const multer = require("multer");
 const router = express.Router();
 const Tour = require("../models/TGuide");
 const TourModel = require("../models/TGuide.js");
+const { ProfilingLevel } = require("mongodb");
 
-const createUser = async (req, res) => {
-  // Create a new tour guide with details and photo
+const updateUser = async (req, res) => {
+  const { id } = req.params;
   const {
     Name,
-    Email,
-    Age,
-    LanguagesSpoken,
     MobileNumber,
-    YearsOfExperience,
+    Age,
     PreviousWork,
+    YearsOfExperience,
+    LanguagesSpoken,
+    Email,
   } = req.body;
-
-  // Get the photo path if uploaded
-  const Photo = req.file ? req.file.filename.split("/").pop() : null;
+  const imageFile = req.file ? req.file.filename.split("/").pop() : null; // Store the full path of the uploaded file
 
   try {
-    // Validate required fields
-    if (!Name || !Email || !Age || !MobileNumber) {
-      return res
-        .status(400)
-        .json({ error: "All required fields must be filled" });
+    const updateFields = {};
+    if (Name) updateFields.Name = Name;
+    if (MobileNumber) updateFields.MobileNumber = MobileNumber;
+    if (Age) updateFields.Age = Age;
+    if (PreviousWork) updateFields.PreviousWork = PreviousWork;
+    if (YearsOfExperience) updateFields.YearsOfExperience = YearsOfExperience;
+    if (LanguagesSpoken) updateFields.LanguagesSpoken = LanguagesSpoken;
+    if (Email) updateFields.Email = Email;
+    if (imageFile) updateFields.Photo = imageFile; // Save the full path of the photo if uploaded
+
+    const updatedTourGuide = await TourModel.findByIdAndUpdate(
+      id,
+      { $set: updateFields, Profile_Completed: true },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedTourGuide) {
+      return res.status(404).json({ error: "Tour guide not found" });
     }
-
-    // Create a new tour guide with the data provided in the request body
-    const tourGuide = await TourModel.create({
-      Name,
-      Email,
-      Age,
-      LanguagesSpoken,
-      MobileNumber,
-      YearsOfExperience,
-      PreviousWork,
-      Photo, // Include the photo path
-    });
-
-    // Respond with the created tour guide
-    res.status(200).json(tourGuide);
+    res.status(200).json(updatedTourGuide);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -81,45 +79,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const {
-    Name,
-    MobileNumber,
-    Age,
-    PreviousWork,
-    YearsOfExperience,
-    LanguagesSpoken,
-    Email,
-  } = req.body;
-  const imageFile = req.file ? req.file.filename.split("/").pop() : null; // Store the full path of the uploaded file
-
-  try {
-    const updateFields = {};
-    if (Name) updateFields.Name = Name;
-    if (MobileNumber) updateFields.MobileNumber = MobileNumber;
-    if (Age) updateFields.Age = Age;
-    if (PreviousWork) updateFields.PreviousWork = PreviousWork;
-    if (YearsOfExperience) updateFields.YearsOfExperience = YearsOfExperience;
-    if (LanguagesSpoken) updateFields.LanguagesSpoken = LanguagesSpoken;
-    if (Email) updateFields.Email = Email;
-    if (imageFile) updateFields.Photo = imageFile; // Save the full path of the photo if uploaded
-
-    const updatedTourGuide = await TourModel.findByIdAndUpdate(
-      id,
-      { $set: updateFields },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedTourGuide) {
-      return res.status(404).json({ error: "Tour guide not found" });
-    }
-    res.status(200).json(updatedTourGuide);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
 const deleteTGuide = async (req, res) => {
   console.log("Request to delete tourism guide:", req.params.id); // Log the ID
   try {
@@ -145,4 +104,4 @@ const deleteTGuide = async (req, res) => {
   }
 };
 
-module.exports = { getuser, updateUser, createUser, getUserById, deleteTGuide };
+module.exports = { getuser, updateUser, getUserById, deleteTGuide };

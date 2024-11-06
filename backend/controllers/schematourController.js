@@ -1,7 +1,6 @@
 const Schema = require("../models/schematour.js");
 const { default: mongoose } = require("mongoose");
 
-// Create Guide
 const createGuide = async (req, res) => {
   const {
     name,
@@ -45,8 +44,6 @@ const createGuide = async (req, res) => {
   }
 };
 
-// Read Guide
-// Read Guide with User ID
 const readGuide = async (req, res) => {
   try {
     // Log the entire request query to check its contents
@@ -87,10 +84,9 @@ const readGuide = async (req, res) => {
   }
 };
 
-// Book Tour
 const bookTour = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.body.userId;
+  const { id } = req.params; // Extract the tour ID from the URL parameters
+  const userId = req.body.userId; // Get userId from the request body (can come from the frontend or authenticated session)
 
   try {
     const schema = await Schema.findById(id);
@@ -101,7 +97,9 @@ const bookTour = async (req, res) => {
     // Increment the bookings count if the user has not booked this tour before
     await schema.incrementBookings(userId);
 
-    res.status(200).json({ message: "Booking successful", bookings: schema.bookings });
+    res
+      .status(200)
+      .json({ message: "Booking successful", bookings: schema.bookings });
   } catch (error) {
     if (error.message === "User has already booked this tour.") {
       return res.status(409).json({ message: error.message });  // Handle duplicate booking
@@ -113,11 +111,13 @@ const bookTour = async (req, res) => {
 // Read Guide by ID
 const readGuideID = async (req, res) => {
   try {
-    const schema = await Schema.find()
+    const userId = req.query.userId;
+    const schemas = await Schema.find({
+      tourGuide: new mongoose.Types.ObjectId(userId),
+    })
       .populate("activities")
       .populate("Tags", "name");
-    if (!schema) return res.status(404).json({ message: "schema not found" });
-    res.status(200).json(schema);
+    res.status(200).json(schemas);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -154,7 +154,6 @@ const updateGuide = async (req, res) => {
   }
 };
 
-// Delete Guide
 const deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {

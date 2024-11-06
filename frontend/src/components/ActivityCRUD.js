@@ -35,7 +35,8 @@ const predefinedLocations = [
   },
 ];
 
-const ActivityCRUD = ({ selectedAdverId }) => {
+const ActivityCRUD = () => {
+  const userId = localStorage.getItem("userId");
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]);
   const [advertisers, setAdvertisers] = useState([]);
@@ -47,7 +48,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
     location: "",
     price: "",
     category: "",
-    advertiser: selectedAdverId,
+    advertiser: userId,
     tags: "",
     specialDiscount: "",
     isBookingOpen: true,
@@ -60,11 +61,11 @@ const ActivityCRUD = ({ selectedAdverId }) => {
     fetchCategories();
     fetchTags();
     fetchActivitiesByAdver();
-  }, [selectedAdverId]);
+  }, [userId]);
 
   const fetchActivitiesByAdver = async () => {
     try {
-      const data = await getActivityById({ selectedAdverId });
+      const data = await getActivityById({ userId });
       setActivities(data);
     } catch (error) {
       console.error("Error fetching activities:", error);
@@ -149,7 +150,7 @@ const ActivityCRUD = ({ selectedAdverId }) => {
       location: "",
       price: "",
       category: "",
-      advertiser: selectedAdverId,
+      advertiser: userId,
       tags: "",
       specialDiscount: "",
       isBookingOpen: true,
