@@ -41,9 +41,7 @@ import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
 import FlightSearch from "./components/FlightSearch";
-
-
-
+import ItinerariesAdmin from "./components/ItinerariesAdmin";
 
 function App() {
   const [selectedTouristId, setSelectedTouristId] = useState(null);
@@ -144,6 +142,8 @@ function App() {
             element={<TourismGovernorPage />}
           />
           <Route path="/fetchdocuments" element={<OthersListPage />} />
+          <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
+          
           <Route path="/flight-search" element={<FlightSearch />} />
         </Routes>
       </div>

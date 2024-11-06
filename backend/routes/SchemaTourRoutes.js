@@ -1,5 +1,5 @@
     const express = require('express');
-    const { createGuide, readGuide, readGuideID, updateGuide, deleteGuide,bookTour,toggleActivation } = require('../controllers/schematourController');
+    const { createGuide, readGuide, readGuideID, updateGuide, deleteGuide,bookTour, flagItinerary,toggleActivation } = require('../controllers/schematourController');
 
     const router = express.Router();
 
@@ -11,5 +11,5 @@
     router.patch("/book/:id",bookTour); // PATCH request to book a tour
     router.patch("/toggleActivation/:id", toggleActivation); // Toggle activation of a tour by ID
 
-
+    router.patch("/flag/:id", flagItinerary);
     module.exports = router;

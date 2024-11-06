@@ -22,6 +22,7 @@ const TouristHome = ({ selectedTouristId }) => {
       coordinates: "31.4015,30.0254,31.4215,30.0454",
     },
   ];
+  const [bookedFlights, setBookedFlights] = useState([]);
   const [touristData, setTouristData] = useState({
     UserName: "",
     wallet: 0,
@@ -50,11 +51,23 @@ const TouristHome = ({ selectedTouristId }) => {
         console.error("Error fetching tourist data:", error);
       }
     };
+    const fetchBookedFlights = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/home/tourist/bookedFlights/${selectedTouristId}`
+        );
+        setBookedFlights(response.data); // Set booked flights data
+      } catch (error) {
+        console.error("Error fetching booked flights:", error);
+      }
+    };
 
     if (selectedTouristId) {
       fetchTouristData();
+      fetchBookedFlights(); 
     }
   }, [selectedTouristId]);
+  
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -132,6 +145,25 @@ const TouristHome = ({ selectedTouristId }) => {
       {/* Main Content */}
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Welcome to Your Dashboard</h1>
+         {/* Booked Flights Section */}
+         <div style={styles.bookedFlightsSection}>
+          <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
+          {bookedFlights.length > 0 ? (
+            <ul style={styles.bookedFlightsList}>
+              {bookedFlights.map((flight, index) => (
+                <li key={index} style={styles.flightItem}>
+                  <p><strong>Flight Number:</strong> {flight.flightNumber}</p>
+                  <p><strong>Departure:</strong> {flight.departure}</p>
+                  <p><strong>Arrival:</strong> {flight.arrival}</p>
+                  <p><strong>Date:</strong> {flight.date}</p>
+                  <p><strong>Price:</strong> ${flight.price}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={styles.noFlightsText}>You have no booked flights.</p>
+          )}
+        </div>
 
         {/* Search Bar Section */}
         <div style={styles.searchSection}>

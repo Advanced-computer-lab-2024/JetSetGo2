@@ -22,8 +22,10 @@ const ProductListp = () => {
   const fetchProducts = async () => {
     try {
       const data = await getProducts(); 
-      setProducts(data);                
-      setFilteredProducts(data);
+      // Filter out archived products
+      const unarchivedProducts = data.filter(product => !product.isArchived);
+      setProducts(unarchivedProducts);                
+      setFilteredProducts(unarchivedProducts);
     } catch (error) {
       setMessage('Error fetching products');
       console.error("Error fetching products", error);
@@ -80,7 +82,6 @@ const ProductListp = () => {
         </div>
 
         {/* Add/Edit Product Button */}
-      
       </div>
 
       {/* Main content */}
@@ -223,7 +224,7 @@ const ProductListp = () => {
                     </td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>${product.price}</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller.Name}</td>
+                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller && product.seller.Name ? product.seller.Name : 'No Seller'}</td>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
                   </tr>
                 ))

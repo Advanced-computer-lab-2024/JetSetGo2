@@ -45,6 +45,14 @@ const FlightSearch = () => {
 
         try {
             const token = await getBearerToken();
+
+            // Validate IATA codes before making the API call
+            if (!origin || origin.length !== 3 || !destination || destination.length !== 3) {
+                setError('Invalid IATA codes. Please enter valid 3-letter airport codes.');
+                setLoading(false);
+                return;
+            }
+
             const response = await axios.get(
                 'https://test.api.amadeus.com/v2/shopping/flight-offers',
                 {
@@ -60,20 +68,34 @@ const FlightSearch = () => {
                 }
             );
 
-            // Filter the results to only include flights that match the origin and destination
-            const filteredResults = response.data.data.filter(flight => {
-                const flightOrigin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                const flightDestination = flight.itineraries?.[0]?.segments?.[0]?.arrival?.iataCode;
-                return flightOrigin === origin && flightDestination === destination;
-            });
-
-            setResults(filteredResults);
+            // Set results from the API response
+            setResults(response.data.data);
         } catch (error) {
             console.error('Error fetching flight data:', error);
-            setError('Failed to fetch flight data. Please try again.');
+
+            // Handle specific errors based on response status
+            if (error.response) {
+                if (error.response.status === 400) {
+                    setError('Invalid request. Please check your input values.');
+                } else if (error.response.status === 401) {
+                    setError('Unauthorized. Please check your API credentials.');
+                } else {
+                    setError('An error occurred. Please try again.');
+                }
+            } else {
+                setError('Network error. Please check your internet connection.');
+            }
         } finally {
             setLoading(false);
         }
+    };
+
+    // Function to handle flight booking
+    const handleBooking = (flight) => {
+        // Implement your booking logic here
+        // For example, you might send flight details to a booking API or navigate to a booking page
+        console.log('Booking flight:', flight);
+        alert(`Booking flight with airline: ${flight.validatingAirlineCodes?.[0]}`);
     };
 
     return (
@@ -86,7 +108,7 @@ const FlightSearch = () => {
                     type="text"
                     placeholder="Origin (e.g., CAI)"
                     value={origin}
-                    onChange={(e) => setOrigin(e.target.value)}
+                    onChange={(e) => setOrigin(e.target.value.toUpperCase())}
                 />
             </div>
             <div>
@@ -96,7 +118,7 @@ const FlightSearch = () => {
                     type="text"
                     placeholder="Destination (e.g., ZRH)"
                     value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
+                    onChange={(e) => setDestination(e.target.value.toUpperCase())}
                 />
             </div>
             <div>
@@ -119,13 +141,13 @@ const FlightSearch = () => {
                     <h2>Flight Results</h2>
                     {results.map((flight, index) => (
                         <div key={index}>
-                            {/* Customize this based on the response structure */}
                             <p>
                                 Airline: {flight.validatingAirlineCodes?.[0]} <br />
                                 Departure: {flight.itineraries?.[0].segments?.[0].departure.iataCode} <br />
                                 Arrival: {flight.itineraries?.[0].segments?.[0].arrival.iataCode} <br />
                                 Price: {flight.price?.total} {flight.price?.currency}
                             </p>
+                            <button onClick={() => handleBooking(flight)}>Book Flight</button>
                         </div>
                     ))}
                 </div>

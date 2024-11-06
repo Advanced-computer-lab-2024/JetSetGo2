@@ -17,7 +17,7 @@ const getItineraries = async () => {
 
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
-  const [filteredItineraries, setFilteredItineraries] = useState([]); // To store filtered itineraries
+  const [filteredItineraries, setFilteredItineraries] = useState([]);
   const [error, setError] = useState(null);
 
   const [sortOrder, setSortOrder] = useState("");
@@ -37,8 +37,13 @@ const Itineraries = () => {
       const response = await axios.get(
         `http://localhost:8000/itinerary/readTourId`
       );
-      setItineraries(response.data);
-      setFilteredItineraries(response.data); // Initially set filtered to all itineraries
+      const data = response.data;
+
+      // Filter out flagged itineraries
+      const nonFlaggedItineraries = data.filter(itinerary => !itinerary.flagged);
+
+      setItineraries(nonFlaggedItineraries);
+      setFilteredItineraries(nonFlaggedItineraries); // Initially set filtered to all non-flagged itineraries
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");
@@ -256,16 +261,13 @@ const Itineraries = () => {
               </p>
               <p>
                 <strong>Drop Off Location:</strong>{" "}
-                {itinerary.DropOffLoc.join(", ")}
-              </p>
-              <p>
-                <strong>Bookings:</strong> {itinerary.bookings}
+                {itinerary.dropOffLoc ? itinerary.dropOffLoc.join(", ") : "No drop-off location"}
               </p>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No itineraries available.</p>
+        <p>No itineraries found.</p>
       )}
     </div>
   );

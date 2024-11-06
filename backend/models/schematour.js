@@ -20,6 +20,7 @@ const schema = new mongoose.Schema(
     tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
     Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true },
     rating: { type: Number, required: true },
+    flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
     isActive: { type: Boolean, default: true },
   },
   {

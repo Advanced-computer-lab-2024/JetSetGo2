@@ -171,6 +171,28 @@ const deleteGuide = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const flagItinerary = async (req, res) => {
+  const { id } = req.params; // Extract the itinerary ID from the URL
+
+  try {
+    // Find the itinerary by ID and update the 'flagged' status to true automatically
+    const updatedSchema = await Schema.findByIdAndUpdate(
+      id,
+      { flagged: true }, // Automatically set 'flagged' to true
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedSchema) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    res.status(200).json(updatedSchema);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 
 // Toggle Activation
 // Toggle Activation
@@ -216,5 +238,6 @@ module.exports = {
   updateGuide,
   deleteGuide,
   bookTour,
+  flagItinerary,
   toggleActivation,
 };

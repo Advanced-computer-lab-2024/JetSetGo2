@@ -1,0 +1,28 @@
+.activity-list {
+    padding: 20px;
+}
+
+.activity-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    /* Space between activity boxes */
+}
+
+.activity-box {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    width: calc(30% - 20px);
+    /* Adjust width as needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.activity-box h2 {
+    margin-top: 0;
+}
+
+.activity-box p {
+    margin: 5px 0;
+}

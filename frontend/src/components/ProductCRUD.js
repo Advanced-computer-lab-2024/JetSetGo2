@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService';
+import axios from 'axios';
 
 const ProductCRUD = () => {
   const [products, setProducts] = useState([]);
@@ -17,7 +18,6 @@ const ProductCRUD = () => {
     availableQuantity: '',
   });
   const [editData, setEditData] = useState(null);
-
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Fetch products and sellers when the component mounts
@@ -25,6 +25,30 @@ const ProductCRUD = () => {
     fetchProducts();
     fetchSellers();
   }, []);
+
+  // Archive a product
+  const handleArchive = async (id) => {
+    try {
+      await axios.patch(`http://localhost:8000/product/archive/${id}`);
+      setMessage('Product archived successfully!');
+      fetchProducts(); // Refresh product list
+    } catch (error) {
+      console.error("Error archiving product:", error);
+      setMessage('Error archiving product.');
+    }
+  };
+
+  // Unarchive a product
+  const handleUnarchive = async (id) => {
+    try {
+      await axios.patch(`http://localhost:8000/product/unarchive/${id}`);
+      setMessage('Product unarchived successfully!');
+      fetchProducts(); // Refresh product list
+    } catch (error) {
+      console.error("Error unarchiving product:", error);
+      setMessage('Error unarchiving product.');
+    }
+  };
 
   // Fetch all products
   const fetchProducts = async () => {
@@ -51,15 +75,6 @@ const ProductCRUD = () => {
     setData(prev => ({
       ...prev,
       [name]: value
-    }));
-  };
-
-  // Handle rating change using a slider
-  const handleRatingChange = (e, setData) => {
-    const value = Math.max(0, Math.min(5, Number(e.target.value)));
-    setData(prev => ({
-      ...prev,
-      rating: isNaN(value) ? 0 : value
     }));
   };
 
@@ -233,113 +248,96 @@ const ProductCRUD = () => {
               name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
               <option value="">Select a Seller</option>
               {sellers.map(seller => (
-                <option key={seller._id} value={seller._id}>{seller.Name}</option>
+                <option key={seller.id} value={seller.id}>{seller.name}</option>
               ))}
             </select>
-
-            <label style={{ display: 'block', marginBottom: '10px' }}>Rating:</label>
-            <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-              type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={(e) => handleRatingChange(e, setFormData)} />
-            <span>{formData.rating.toFixed(1)}</span>
-
-            <label style={{ display: 'block', marginBottom: '10px' }}>Reviews:</label>
-            <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-              type="text" name="reviews" value={formData.reviews} onChange={(e) => handleChange(e, setFormData)} />
 
             <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="number" name="availableQuantity" value={formData.availableQuantity} onChange={(e) => handleChange(e, setFormData)} required />
 
-            <button style={{
-              padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none',
-              borderRadius: '5px', cursor: 'pointer', width: '100%', marginTop: '20px'
+            <button type="submit" style={{
+              padding: '10px 20px',
+              backgroundColor: '#28a745',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              marginTop: '10px',
             }}>
               Create Product
             </button>
           </form>
         </section>
 
-        {/* Edit Product Form */}
-        {editData && (
-          <section>
-            <h2>Edit Product</h2>
-            <form onSubmit={handleEditSubmit}>
-              <label style={{ display: 'block', marginBottom: '10px' }}>Description:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="text" name="description" value={editData.description} onChange={(e) => handleChange(e, setEditData)} required />
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Picture (URL):</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="text" name="pictures" value={editData.pictures} onChange={(e) => handleChange(e, setEditData)} required />
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Price:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="number" name="price" value={editData.price} onChange={(e) => handleChange(e, setEditData)} required />
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
-              <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
-                <option value="">Select a Seller</option>
-                {sellers.map(seller => (
-                  <option key={seller._id} value={seller._id}>{seller.Name}</option>
-                ))}
-              </select>
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Rating:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="range" min="0" max="5" step="0.1" value={editData.rating} onChange={(e) => handleRatingChange(e, setEditData)} />
-              <span>{editData.rating.toFixed(1)}</span>
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Reviews:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="text" name="reviews" value={editData.reviews} onChange={(e) => handleChange(e, setEditData)} />
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="number" name="availableQuantity" value={editData.availableQuantity} onChange={(e) => handleChange(e, setEditData)} required />
-
-              <button style={{
-                padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none',
-                borderRadius: '5px', cursor: 'pointer', width: '100%', marginTop: '20px'
-              }}>
-                Update Product
-              </button>
-              <button type="button" onClick={handleCancel} style={{
-                padding: '10px 20px', backgroundColor: '#dc3545', color: '#fff', border: 'none',
-                borderRadius: '5px', cursor: 'pointer', width: '100%', marginTop: '10px'
-              }}>
-                Cancel
-              </button>
-            </form>
-          </section>
-        )}
-
         {/* Product List */}
         <h2>Product List</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {products.map((product) => (
-            <li key={product._id} style={{
-              padding: '10px', borderBottom: '1px solid #ccc', marginBottom: '10px'
-            }}>
-              <p><strong>Description:</strong> {product.description}</p>
-              <p><strong>Price:</strong> ${product.price}</p>
-              <p><strong>Seller:</strong> {product.seller && sellers.find(seller => seller._id === product.seller)?.Name}</p>
-              <p><strong>Rating:</strong> {product.rating}</p>
-              <button onClick={() => handleEdit(product)} style={{
-                padding: '5px 10px', marginRight: '10px', backgroundColor: '#17a2b8', color: '#fff',
-                border: 'none', borderRadius: '5px'
-              }}>
-                Edit
-              </button>
-              <button onClick={() => handleDelete(product._id)} style={{
-                padding: '5px 10px', backgroundColor: '#dc3545', color: '#fff',
-                border: 'none', borderRadius: '5px'
-              }}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#f2f2f2' }}>
+              <th style={{ padding: '10px', border: '1px solid #ccc' }}>ID</th>
+              <th style={{ padding: '10px', border: '1px solid #ccc' }}>Description</th>
+              <th style={{ padding: '10px', border: '1px solid #ccc' }}>Price</th>
+              <th style={{ padding: '10px', border: '1px solid #ccc' }}>Seller</th>
+              <th style={{ padding: '10px', border: '1px solid #ccc' }}>Available Quantity</th>
+              <th style={{ padding: '10px', border: '1px solid #ccc' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+            {products.map(product => (
+              <tr key={product._id}>
+                <td style={{ padding: '10px', border: '1px solid #ccc' }}>{product._id}</td>
+                <td style={{ padding: '10px', border: '1px solid #ccc' }}>{product.description}</td>
+                <td style={{ padding: '10px', border: '1px solid #ccc' }}>{product.price}</td>
+                <td style={{ padding: '10px', border: '1px solid #ccc' }}>
+                  {product.seller && product.seller.name ? product.seller.name : 'N/A'}
+                </td>
+                <td style={{ padding: '10px', border: '1px solid #ccc' }}>{product.availableQuantity}</td>
+                <td style={{ padding: '10px', border: '1px solid #ccc' }}>
+                  <button onClick={() => handleEdit(product)} style={{
+                    marginRight: '5px',
+                    padding: '5px 10px',
+                    backgroundColor: '#007bff',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}>Edit</button>
+                  <button onClick={() => handleDelete(product._id)} style={{
+                    marginRight: '5px',
+                    padding: '5px 10px',
+                    backgroundColor: '#dc3545',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}>Delete</button>
+                  {product.isArchived ? (
+                    <button onClick={() => handleUnarchive(product._id)} style={{
+                      padding: '5px 10px',
+                      backgroundColor: '#ffc107',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}>Unarchive</button>
+                  ) : (
+                    <button onClick={() => handleArchive(product._id)} style={{
+                      padding: '5px 10px',
+                      backgroundColor: '#ffc107',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}>Archive</button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

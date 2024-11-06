@@ -89,6 +89,45 @@ const deleteAllProducts = async (req, res) => {
   }
 };
 
+// Archive a product
+const archiveProduct = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { isArchived: true },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.status(200).json({ message: "Product archived successfully", product });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Unarchive a product
+const unarchiveProduct = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { isArchived: false },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.status(200).json({ message: "Product unarchived successfully", product });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 // Exporting the controller functions
 module.exports = {
@@ -96,5 +135,7 @@ module.exports = {
   getProducts,
   updateProduct,
   deleteProduct,
-  deleteAllProducts
+  deleteAllProducts,
+  archiveProduct,
+  unarchiveProduct
 };
