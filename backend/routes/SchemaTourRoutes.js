@@ -1,7 +1,7 @@
     const express = require('express');
     const { createGuide, readGuide, readGuideID, updateGuide, deleteGuide,bookTour, flagItinerary,toggleActivation } = require('../controllers/schematourController');
 
-    const router = express.Router();
+const router = express.Router();
 
     router.post("/createtour", createGuide);
     router.get("/readTour", readGuide);

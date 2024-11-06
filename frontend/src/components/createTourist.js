@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const TouristSignup = ({ setSelectedTouristId }) => {
+const TouristSignup = () => {
   const [formData, setFormData] = useState({
     Email: "",
     UserName: "",
@@ -29,9 +29,6 @@ const TouristSignup = ({ setSelectedTouristId }) => {
         formData
       );
       console.log("Signup successful:", response.data);
-
-      // Set the selected tourist ID in the parent component state
-      setSelectedTouristId(response.data._id);
 
       // Redirect to the update page without the ID in the URL
       navigate("/login");

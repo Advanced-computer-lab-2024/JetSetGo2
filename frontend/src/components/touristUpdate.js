@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const UpdateTouristPage = ({ selectedTouristId }) => {
+const UpdateTouristPage = () => {
   const [touristData, setTouristData] = useState({
     Email: "",
     UserName: "",
@@ -22,12 +22,13 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const touristId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchTouristData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/home/tourist/getTourist/${selectedTouristId}`
+          `http://localhost:8000/home/tourist/getTourist/${touristId}`
         );
         setTouristData(response.data);
         setFormData(response.data); // Pre-fill form with the current tourist data
@@ -39,10 +40,10 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
       }
     };
 
-    if (selectedTouristId) {
+    if (touristId) {
       fetchTouristData();
     }
-  }, [selectedTouristId]);
+  }, [touristId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,7 +54,7 @@ const UpdateTouristPage = ({ selectedTouristId }) => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://localhost:8000/home/tourist/updateTourist/${selectedTouristId}`,
+        `http://localhost:8000/home/tourist/updateTourist/${touristId}`,
         formData
       );
       console.log("Update successful:", response.data);

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const SellerModel = require("../models/Seller.js");
 const AdverModel = require("../models/AdverMODEL.js");
 const TourModel = require("../models/TGuide.js");
+const TouristModel = require("../models/Tourist.js");
 
 // Login controller
 const loginUser = async (req, res) => {
@@ -22,6 +23,11 @@ const loginUser = async (req, res) => {
     if (!user) {
       user = await TourModel.findOne({ Email });
       AccountType = "TourGuide";
+    }
+
+    if (!user) {
+      user = await TouristModel.findOne({ Email });
+      AccountType = "Tourist";
     }
 
     // If user is not found in any model
