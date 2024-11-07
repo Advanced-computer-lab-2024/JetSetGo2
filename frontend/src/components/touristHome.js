@@ -53,20 +53,19 @@ const TouristHome = () => {
         console.error("Error fetching tourist data:", error);
       }
     };
-    const fetchBookedFlights = async () => {
+    const fetchBookedFlights = async (touristId) => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/home/tourist/bookedFlights/${touristId}`
-        );
-        setBookedFlights(response.data); // Set booked flights data
+        const response = await axios.get(`http://localhost:8000/home/tourist/bookedFlights/${touristId}`);
+        console.log("Booked flights:", response.data);
+        setBookedFlights(response.data); // Update state with the fetched data
       } catch (error) {
         console.error("Error fetching booked flights:", error);
       }
     };
-
+    
     if (touristId) {
       fetchTouristData();
-      fetchBookedFlights(); 
+      fetchBookedFlights(touristId); 
     }
   }, [touristId]);
   

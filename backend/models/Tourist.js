@@ -40,6 +40,7 @@ const TouristSchema = new Schema(
       default: 0,
       immutable: true,
     },
+    bookedFlights: [Object],
   },
   { timestamps: true }
 );

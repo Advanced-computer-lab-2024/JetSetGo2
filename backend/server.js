@@ -123,6 +123,46 @@ app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({ message: "Welcome to the protected route!", userId: req.userId });
 });
 
+// In your backend (e.g., Node.js/Express)
+app.post('/home/tourist/bookFlight', async (req, res) => {
+    try {
+        const { touristId, flight } = req.body;
+
+        // Assuming you have a Tourist model/schema in your database
+        const tourist = await Tourist.findById(touristId);
+
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
+
+        // Add the flight to the tourist's booked flights
+        tourist.bookedFlights.push(flight);
+        await tourist.save();
+
+        res.status(200).json({ message: "Flight booked successfully" });
+    } catch (error) {
+        console.error("Error booking flight:", error);
+        res.status(500).json({ message: "Error booking flight" });
+    }
+});
+app.get('/home/tourist/bookedFlights/:touristId', async (req, res) => {
+  try {
+      const { touristId } = req.params;
+
+      // Assuming you have a Tourist model
+      const tourist = await Tourist.findById(touristId).select('bookedFlights');
+      if (!tourist) {
+          return res.status(404).json({ message: "Tourist not found" });
+      }
+
+      res.status(200).json(tourist.bookedFlights);
+  } catch (error) {
+      console.error("Error fetching booked flights:", error);
+      res.status(500).json({ message: "Error fetching booked flights" });
+  }
+});
+
+
 // Define your routes here
 app.use("/activity", activityRoutes);
 app.use("/historicalPlace", historicalPlaceRoutes);
