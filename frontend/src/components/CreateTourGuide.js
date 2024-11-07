@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const UpdateTourGuide = () => {
   const [formData, setFormData] = useState({
-    Name: "",
+    UserName: "",
     Email: "",
     Age: "",
     LanguagesSpoken: "",
@@ -30,7 +30,7 @@ const UpdateTourGuide = () => {
 
           // Manually set the necessary fields only
           setFormData({
-            Name: tourGuide.Name || "",
+            UserName: tourGuide.UserName || "",
             Email: tourGuide.Email || "",
             Age: tourGuide.Age || "",
             LanguagesSpoken: tourGuide.LanguagesSpoken || "",
@@ -92,7 +92,7 @@ const UpdateTourGuide = () => {
       if (response.status === 200) {
         setSuccessMessage("Tour guide updated successfully!");
         setTimeout(
-          () => navigate("/tour-guide-details", { state: { id: tourGuideId } }),
+          () => navigate("/tour-guide", { state: { id: tourGuideId } }),
           2000
         ); // Redirect after a short delay
       }
@@ -151,7 +151,7 @@ const UpdateTourGuide = () => {
         <div>
           <p>{successMessage}</p>
           <Link
-            to={`/tour-guide-details`}
+            to={`/tour-guide`}
             state={{ id: localStorage.getItem("userId") }}
           >
             View Tour Guide Details

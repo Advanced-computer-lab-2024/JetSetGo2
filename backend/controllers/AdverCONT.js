@@ -32,28 +32,32 @@ const getAdverById = async (req, res) => {
 
 const updateAdver = async (req, res) => {
   const { id } = req.params; // Extract id from the request body
+  const { UserName, Email, Link, Hotline, Profile, Loc, CompanyDes, Services } =
+    req.body; // Extract data from the
   const logo = req.file ? req.file.filename.split("/").pop() : null; // Get just the filename if uploaded
-  const UpdateAdver = {};
-
-  if (req.body.Name) UpdateAdver.Name = req.body.Name;
-  if (req.body.Link) UpdateAdver.Link = req.body.Link;
-  if (req.body.Hotline) UpdateAdver.Hotline = req.body.Hotline;
-  if (req.body.Mail) UpdateAdver.Mail = req.body.Mail;
-  if (req.body.Profile) UpdateAdver.Profile = req.body.Profile;
-  if (req.body.Loc) UpdateAdver.Loc = req.body.Loc;
-  if (req.body.CompanyDes) UpdateAdver.CompanyDes = req.body.CompanyDes;
-  if (req.body.Services) UpdateAdver.Services = req.body.Services;
-  if (logo) UpdateAdver.logo = logo; // Update logo if provided, saving only the filename
-  updateAdver.Profile_Completed = true;
 
   try {
-    const updateAdver = await adverModel.findByIdAndUpdate(id, UpdateAdver, {
-      new: true,
-    });
-    if (!updateAdver) {
+    const UpdateAdver = {};
+
+    if (UserName) UpdateAdver.UserName = UserName;
+    if (Email) UpdateAdver.Email = Email;
+    if (Link) UpdateAdver.Link = Link;
+    if (Hotline) UpdateAdver.Hotline = Hotline;
+    if (Profile) UpdateAdver.Profile = Profile;
+    if (Loc) UpdateAdver.Loc = Loc;
+    if (CompanyDes) UpdateAdver.CompanyDes = CompanyDes;
+    if (Services) UpdateAdver.Services = Services;
+    if (logo) UpdateAdver.logo = logo; // Update logo if provided, saving only the filename
+
+    const Adver = await adverModel.findByIdAndUpdate(
+      id,
+      { $set: UpdateAdver, Profile_Completed: true },
+      { new: true }
+    );
+    if (!Adver) {
       return res.status(404).json({ error: "Advertiser not found" });
     }
-    res.status(200).json(updateAdver);
+    res.status(200).json(Adver);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

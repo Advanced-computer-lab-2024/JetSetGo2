@@ -8,7 +8,7 @@ const { ProfilingLevel } = require("mongodb");
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const {
-    Name,
+    UserName,
     MobileNumber,
     Age,
     PreviousWork,
@@ -20,7 +20,7 @@ const updateUser = async (req, res) => {
 
   try {
     const updateFields = {};
-    if (Name) updateFields.Name = Name;
+    if (UserName) updateFields.UserName = UserName;
     if (MobileNumber) updateFields.MobileNumber = MobileNumber;
     if (Age) updateFields.Age = Age;
     if (PreviousWork) updateFields.PreviousWork = PreviousWork;

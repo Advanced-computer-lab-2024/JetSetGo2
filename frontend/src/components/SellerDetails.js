@@ -163,9 +163,7 @@ const SellerDetails = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleLogoChange = (e) => {
-    setFormData({ ...formData, logoFile: e.target.files[0] });
-  };
+  const handleLogoChange = (e) => {};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

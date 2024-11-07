@@ -362,7 +362,7 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
           <div>
             <h3>Advertiser Details</h3>
             <p>
-              <strong>Name:</strong> {advertiser.UserName}
+              <strong>UserName:</strong> {advertiser.UserName}
             </p>
             <p>
               <strong>Link:</strong> {advertiser.Link}
@@ -393,9 +393,9 @@ const AdvertiserDetails = ({ selectedAdverId }) => {
             <h3>Update Advertiser</h3>
             <form onSubmit={handleAdvertiserSubmit}>
               <div>
-                <label>Name:</label>
+                <label>UserName:</label>
                 <input
-                  name="Name"
+                  name="UserName"
                   value={advertiserFormData.UserName}
                   onChange={handleAdvertiserChange}
                   required

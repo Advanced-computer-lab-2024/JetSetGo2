@@ -25,14 +25,14 @@ const readSeller = async (req, res) => {
 // Update a seller by the MongoDB `_id`
 const updateSeller = async (req, res) => {
   const { id } = req.params; // Get the 'id' from the request parameters
-  const { Name, PickUp_Location, Type_Of_Products, Previous_Work, Age } =
+  const { UserName, PickUp_Location, Type_Of_Products, Previous_Work, Age } =
     req.body;
   const logo = req.file ? req.file.filename.split("/").pop() : null; // Get just the filename if uploaded
 
   try {
     // Construct an object containing only the fields that are provided
     const updateFields = {};
-    if (Name) updateFields.Name = Name;
+    if (UserName) updateFields.UserName = UserName;
     if (PickUp_Location) updateFields.PickUp_Location = PickUp_Location;
     if (Type_Of_Products) updateFields.Type_Of_Products = Type_Of_Products;
     if (Previous_Work) updateFields.Previous_Work = Previous_Work;
