@@ -332,6 +332,9 @@ const AdvertiserDetails = () => {
         <button onClick={() => navigate("/activities")} style={buttonStyle}>
           Create Activities
         </button>
+        <button onClick={() => navigate("/transportation")} style={buttonStyle}>
+          Create Transportation
+        </button>
         <h3 style={{ color: "#ff6348" }}>Explore</h3>
 
         <button

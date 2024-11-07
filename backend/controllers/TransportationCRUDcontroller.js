@@ -16,17 +16,29 @@ const createTransportation = async (req, res) => {
       advertiser: req.body.advertiser, // Add advertiser to the transportation
     };
 
+    // Check if the date has passed
+    const transportationDate = new Date(req.body.date); // Convert date from string to Date object
+    const currentDate = new Date();
+
+    // If the transportation date has passed, set isBookingOpen to false
+    if (transportationDate < currentDate) {
+      transportationData.isBookingOpen = false;
+    }
+
+    // Create the transportation with the updated data
     const transportation = await Transportation.create(transportationData);
+
     res.status(201).json(transportation);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
+
 // Get All Transportations with Advertiser Populated
 const getAllTransportations = async (req, res) => {
   try {
-    const transportations = await Transportation.find().populate("advertiser", "userName");
+    const transportations = await Transportation.find().populate("advertiser", "Name");
     console.log(transportations);
 
     res.status(200).json(transportations);

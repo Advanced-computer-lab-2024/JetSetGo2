@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
 const TouristSchema = new Schema(
@@ -40,6 +39,12 @@ const TouristSchema = new Schema(
       default: 0,
       immutable: true,
     },
+    bookedTransportations: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transportation",
+      },
+    ],
     bookedFlights: [Object],
   },
   { timestamps: true }

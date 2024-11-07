@@ -217,7 +217,11 @@ const ProductListp = () => {
                   <tr key={product._id} style={{ textAlign: 'center' }}>
                     <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
                       {product.pictures ? (
-                        <img src={product.pictures} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                        <img 
+                        src={`data:image/png;base64,${product.pictures}`} 
+                        alt="Product" 
+                        style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                      />
                       ) : (
                         'No Image'
                       )}

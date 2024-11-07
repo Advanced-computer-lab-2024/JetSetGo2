@@ -41,6 +41,8 @@ import Login from "./components/login";
 import AdminApprovalPage from "./components/Acceptance";
 import FlightSearch from "./components/FlightSearch";
 import ItinerariesAdmin from "./components/ItinerariesAdmin";
+import TransportationPage from "./components/TransportationCRUD";
+import TransportationBooking from "./components/BookTransportation";
 
 function App() {
 
@@ -55,6 +57,8 @@ function App() {
           <Route path="/tourist-signup" element={<TouristSignup />} />
           <Route path="/tourist-home" element={<TouristHome />} />
           <Route path="/tourist-update" element={<UpdateTouristPage />} />
+          <Route path="/transportation" element={<TransportationPage />} />
+          <Route path="/transportationBooking" element={<TransportationBooking />} />
           <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
           <Route path="/list" element={<AdvertiserManagement />} />
           <Route path="/CreateTourGuide" element={<CreateTourGuide />} />

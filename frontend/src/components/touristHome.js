@@ -221,6 +221,9 @@ const TouristHome = () => {
           <Link to="/all-museums" style={styles.navLink}>
             Museums
           </Link>
+          <Link to="/transportationBooking" style={styles.navLink}>
+            Book Transportation
+          </Link>
         </nav>
 
         {/* Search Results Section */}

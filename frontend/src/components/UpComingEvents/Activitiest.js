@@ -3,6 +3,20 @@ import { getActivity, getCategories } from "../../services/ActivityService";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
 import axios from "axios";
 
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import 'leaflet-control-geocoder';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+
+// Fix marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 const predefinedLocations = [
   { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
   {
@@ -26,6 +40,8 @@ const Activitiest = () => {
   const [categories, setCategories] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc"); // Added state for sort order
   const [sortBy, setSortBy] = useState("price"); // Added state for sorting by price or rating
+  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
+  const [searchLocation, setSearchLocation] = useState("");
 
   const [filters, setFilters] = useState({
     date: "",
@@ -161,6 +177,16 @@ const Activitiest = () => {
     setSortBy(e.target.value); // Update sorting by price or rating
   };
 
+  const LocationMarker = () => {
+    useMapEvents({
+      click(e) {
+        setPinPosition([e.latlng.lat, e.latlng.lng]);
+      },
+    });
+
+    return pinPosition ? <Marker position={pinPosition}></Marker> : null;
+  };
+
   return (
     <div id="activities">
       <div className="back-button-container">
@@ -244,78 +270,85 @@ const Activitiest = () => {
       </section>
 
       <section className="activity-list">
-        <h2>Upcoming Activities</h2>
-        {filteredActivities.length > 0 ? (
-          <div className="activity-grid">
-            {filteredActivities.map((activity) => {
-              const locationData = predefinedLocations.find(
-                (location) => location.name === activity.location
-              );
-              const mapSrc = locationData
-                ? `https://www.openstreetmap.org/export/embed.html?bbox=${
-                    locationData.coordinates
-                  }&layer=mapnik&marker=${
-                    locationData.coordinates.split(",")[1]
-                  },${locationData.coordinates.split(",")[0]}`
-                : null;
+  <h2>Upcoming Activities</h2>
+  {filteredActivities.length > 0 ? (
+    <ul>
+      {filteredActivities.map((activity) => {
+        // Extract latitude and longitude from the location string
+        const locationCoords = activity.location.split(",");
+        const latitude = locationCoords[0];
+        const longitude = locationCoords[1];
+        const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-              return (
-                <div key={activity._id} className="activity-card">
-                  <h3>{activity.category.name}</h3>
-                  <p>
-                    <strong>Date:</strong>{" "}
-                    {new Date(activity.date).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Time:</strong>{" "}
-                    {new Date(activity.time).toLocaleTimeString()}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {activity.location}
-                  </p>
-                  <p>
-                    <strong>Price:</strong> ${activity.price}
-                  </p>
-                  <p>
-                    <strong>Tags:</strong>{" "}
-                    {activity.tags ? activity.tags.type : "No Tags"}
-                  </p>
-                  <p>
-                    <strong>Special Discount:</strong>{" "}
-                    {activity.specialDiscount}%
-                  </p>
-                  <p>
-                    <strong>Booking Open:</strong>{" "}
-                    {activity.isBookingOpen ? "Yes" : "No"}
-                  </p>
-                  <p>
-                    <strong>Bookings:</strong> {activity.bookings}
-                  </p>
+        return (
+          <li
+            key={activity._id}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: '#f9f9f9',
+              padding: '20px',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              marginBottom: '20px',
+            }}
+          >
+            {/* Activity details */}
+            <div style={{ flex: 1, paddingRight: '20px' }}>
+              <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
+                Category: {activity.category.name}
+              </h3>
+              <p>
+                <strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Time:</strong> {new Date(activity.time).toLocaleTimeString()}
+              </p>
+              <p>
+                <strong>Location:</strong> {activity.location}
+              </p>
+              <p>
+                <strong>Price:</strong> ${activity.price}
+              </p>
+              <p>
+                <strong>Tags:</strong> {activity.tags ? activity.tags.type : "No Tags"}
+              </p>
+              <p>
+                <strong>Special Discount:</strong> {activity.specialDiscount}%
+              </p>
+              <p>
+                <strong>Booking Open:</strong> {activity.isBookingOpen ? "Yes" : "No"}
+              </p>
+              <p>
+                <strong>Bookings:</strong> {activity.bookings}
+              </p>
+              <p>
+                <strong>Rating:</strong> {activity.rating}
+              </p>
+              {/* Add a "Book Now" button */}
+              <button onClick={() => handleBookTour(activity._id)}>
+                Book Now
+              </button>
+            </div>
 
-                  {/* Add a "Book Now" button */}
-                  <p>
-                    <strong>Rating:</strong> {activity.rating}
-                  </p>
-                  {mapSrc && (
-                    <iframe
-                      title={`Map for ${activity.location}`}
-                      src={mapSrc}
-                      width="300"
-                      height="200"
-                      style={{ border: "none" }}
-                    ></iframe>
-                  )}
-                  <button onClick={() => handleBookTour(activity._id)}>
-                    Book Now
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p>No upcoming activities available.</p>
-        )}
-      </section>
+            {/* Map iframe */}
+            <iframe
+              src={mapSrc}
+              width="300"
+              height="200"
+              style={{ border: 'none' }}
+              title={`Map of ${activity.location}`}
+            ></iframe>
+          </li>
+        );
+      })}
+    </ul>
+  ) : (
+    <p>No upcoming activities available.</p>
+  )}
+</section>
+
       <style>{`
         #activities {
           max-width: 1200px;
