@@ -1,4 +1,5 @@
 const touristModel = require("../models/Tourist.js");
+const transportationModel = require("../models/TransportationCRUD.js");
 const { default: mongoose } = require("mongoose");
 
 const createTourist = async (req, res) => {
@@ -130,6 +131,101 @@ const deleteTourist = async (req, res) => {
   }
 };
 
+
+const bookTransportation = async (req, res) => {
+  const { touristId, transportationId } = req.params;
+
+  try {
+    const transportation = await transportationModel.findById(transportationId);
+
+    if (!transportation) {
+      return res.status(404).json({ error: "Transportation not found" });
+    }
+
+    if (!transportation.isBookingOpen) {
+      return res.status(400).json({ error: "Booking is closed for this transportation." });
+    }
+
+    if (transportation.seatsAvailable <= 0) {
+      return res.status(400).json({ error: "No available seats." });
+    }
+
+    const tourist = await touristModel.findById(touristId);
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    // Decrement seat and close booking if seats reach 0
+    transportation.seatsAvailable -= 1;
+    if (transportation.seatsAvailable === 0) {
+      transportation.isBookingOpen = false; // Close booking when no seats are left
+    }
+    await transportation.save();
+
+    // Add the booked transportation to the tourist's bookings
+    tourist.bookedTransportations.push(transportation._id);
+    await tourist.save();
+
+    res.status(200).json({
+      message: "Transportation booked successfully",
+      transportation,
+      tourist,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getBookedTransportations = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+    // Find the tourist without population to check if the array is correct
+    const tourist = await touristModel.findById(touristId);
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not foundddddd" });
+    }
+
+    console.log("Booked Transportations before population:", tourist.bookedTransportations); // Log the IDs to see if they are correct
+
+    // Now populate the booked transportations
+    const populatedTourist = await touristModel
+      .findById(touristId)
+      .populate('bookedTransportations');
+
+    console.log("Populated Booked Transportations:", populatedTourist.bookedTransportations); // Log after population
+
+    res.status(200).json(populatedTourist.bookedTransportations);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getTouristNationality = async (req, res) => {
+  const { touristId } = req.params;
+
+  // Ensure touristId is a valid MongoDB ObjectId
+  // if (!mongoose.Types.ObjectId.isValid(touristId)) {
+  //   return res.status(400).json({ error: "Invalid tourist ID format" });
+  // }
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    res.status(200).json({ Nationality: tourist.Nationality });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
 const deleteAllTourist = async (req, res) => {
   try {
     await touristModel.deleteMany({});
@@ -146,4 +242,7 @@ module.exports = {
   getTouristById,
   deleteTourist,
   deleteAllTourist,
+  bookTransportation,
+  getBookedTransportations,
+  getTouristNationality,
 };

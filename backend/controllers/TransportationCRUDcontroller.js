@@ -26,7 +26,7 @@ const createTransportation = async (req, res) => {
 // Get All Transportations with Advertiser Populated
 const getAllTransportations = async (req, res) => {
   try {
-    const transportations = await Transportation.find().populate("advertiser", "userName");
+    const transportations = await Transportation.find().populate("advertiser", "Name");
     console.log(transportations);
 
     res.status(200).json(transportations);
