@@ -478,7 +478,7 @@ const ActivityCRUD = () => {
                     <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
                       {categoryName}
                     </h3>
-                    <h4>Advertiser: {activity.advertiser}</h4>
+                    <h4>Advertiser: {activity.advertiser.UserName}</h4>
                     <p>Date: {activity.date}</p>
                     <p>Time: {activity.time}</p>
                     <p>Location: {activity.location}</p>
