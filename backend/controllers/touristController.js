@@ -185,7 +185,7 @@ const getBookedTransportations = async (req, res) => {
     const tourist = await touristModel.findById(touristId);
 
     if (!tourist) {
-      return res.status(404).json({ error: "Tourist not foundddddd" });
+      return res.status(404).json({ error: "Tourist not found" });
     }
 
     console.log("Booked Transportations before population:", tourist.bookedTransportations); // Log the IDs to see if they are correct
@@ -197,11 +197,30 @@ const getBookedTransportations = async (req, res) => {
 
     console.log("Populated Booked Transportations:", populatedTourist.bookedTransportations); // Log after population
 
-    res.status(200).json(populatedTourist.bookedTransportations);
+    // Loop through the transportations and close the bookings for past dates
+    const currentDate = new Date(); // Get the current date
+
+    const updatedTransportations = populatedTourist.bookedTransportations.map((transport) => {
+      // Check if the transportation's date has passed
+      const transportDate = new Date(transport.date); // Assuming transport.date is in a valid format
+
+      // If the transportation's date has passed, close the booking
+      if (transportDate < currentDate) {
+        transport.isBookingOpen = false; // Close the booking
+      }
+
+      return transport;
+    });
+
+    // Return the updated transportations (now with booking statuses updated)
+    res.status(200).json(updatedTransportations);
   } catch (error) {
+    console.error("Error fetching booked transportations:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 const getTouristNationality = async (req, res) => {
   const { touristId } = req.params;

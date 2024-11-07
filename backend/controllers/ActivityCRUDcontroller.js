@@ -45,7 +45,7 @@ const getActivity = async (req, res) => {
   try {
     const activities = await Activity.find()
       .populate("category", "name") // Populate the 'category' field with the 'name'
-      .populate("advertiser", "Name")
+      .populate("advertiser", "UserName")
       .populate("tags"); // Populate the 'advertiser' field with the 'name'
 
     res.status(200).json(activities);
@@ -104,7 +104,7 @@ const updateActivity = async (req, res) => {
       { new: true, runValidators: true } // Ensure validators run on updates
     )
       .populate("category", "name") // Populate category field
-      .populate("advertiser", "Name"); // Populate advertiser field
+      .populate("advertiser", "UserName"); // Populate advertiser field
 
     if (!updatedActivity) {
       return res.status(404).json({ error: "Activity not found" });

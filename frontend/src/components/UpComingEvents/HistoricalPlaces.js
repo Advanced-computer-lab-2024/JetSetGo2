@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
 import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
+
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import 'leaflet-control-geocoder';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+
+// Fix marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const predefinedLocations = [
   { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
@@ -24,6 +38,7 @@ const HistoricalPlaces = () => {
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
+  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
 
   // Fetch historical places when the component mounts
   useEffect(() => {
@@ -44,6 +59,7 @@ const HistoricalPlaces = () => {
   }, [selectedTag, historicalPlaces]);
 
   const navigate = useNavigate(); // Initialize useNavigate hook
+  const location = useLocation(); // Use useLocation to access the state
 
   const fetchHistoricalPlaces = async () => {
     try {
@@ -59,6 +75,16 @@ const HistoricalPlaces = () => {
   const generateMapSrc = (coordinates) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
+  };
+
+  const LocationMarker = () => {
+    useMapEvents({
+      click(e) {
+        setPinPosition([e.latlng.lat, e.latlng.lng]);
+      },
+    });
+
+    return pinPosition ? <Marker position={pinPosition}></Marker> : null;
   };
 
   return (
@@ -99,55 +125,56 @@ const HistoricalPlaces = () => {
       </div>
 
       {filteredPlaces.length > 0 ? (
-        <div style={styles.cardGrid}>
-          {filteredPlaces.map((place) => {
-            const locationData = predefinedLocations.find(
-              (location) => location.name === place.location
-            );
-            const mapSrc = locationData
-              ? generateMapSrc(locationData.coordinates)
-              : null;
+  <div style={styles.cardGrid}>
+    {filteredPlaces.map((place) => {
+      // Extract latitude and longitude from the location string
+      const locationCoords = place.location.split(",");
+      const latitude = locationCoords[0];
+      const longitude = locationCoords[1];
+      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-            return (
-              <div key={place._id} style={styles.card}>
-                <h3 style={styles.cardTitle}>
-                  {place.tourismGovernerTags?.name || "Unnamed"}
-                </h3>
-                <p style={styles.cardText}>Description: {place.description}</p>
-                <p style={styles.cardText}>Location: {place.location}</p>
-                <p style={styles.cardText}>
-                  Opening Hours: {place.openingHours}
-                </p>
-                <p style={styles.cardText}>
-                  Ticket Price: ${place.ticketPrice}
-                </p>
-                <div style={styles.cardImageContainer}>
-                  <img
-                    src={place.pictures}
-                    alt={`Picture of ${place.description}`}
-                    style={styles.cardImage}
-                  />
-                </div>
-                <p style={styles.cardText}>
-                  Tourism Governor Tags:{" "}
-                  {place.tourismGovernerTags?.type || "None"}
-                </p>
-                {mapSrc && (
-                  <iframe
-                    title={`Map for ${place.location}`}
-                    src={mapSrc}
-                    width="100%"
-                    height="200"
-                    style={styles.map}
-                  ></iframe>
-                )}
-              </div>
-            );
-          })}
+      return (
+        <div key={place._id} style={styles.card}>
+          <h3 style={styles.cardTitle}>
+            {place.tourismGovernerTags?.name || "Unnamed"}
+          </h3>
+          <p style={styles.cardText}>Description: {place.description}</p>
+          <p style={styles.cardText}>Location: {place.location}</p>
+          <p style={styles.cardText}>
+            Opening Hours: {place.openingHours}
+          </p>
+          <p style={styles.cardText}>
+            Ticket Price: ${place.ticketPrice}
+          </p>
+          <div style={styles.cardImageContainer}>
+            <img
+              src={place.pictures}
+              alt={`Picture of ${place.description}`}
+              style={styles.cardImage}
+            />
+          </div>
+          <p style={styles.cardText}>
+            Tourism Governor Tags:{" "}
+            {place.tourismGovernerTags?.type || "None"}
+          </p>
+          {/* Map iframe */}
+          {mapSrc && (
+            <iframe
+              title={`Map for ${place.location}`}
+              src={mapSrc}
+              width="100%"
+              height="200"
+              style={styles.map}
+            ></iframe>
+          )}
         </div>
-      ) : (
-        <p style={styles.noDataMessage}>No historical places available.</p>
-      )}
+      );
+    })}
+  </div>
+) : (
+  <p style={styles.noDataMessage}>No historical places available.</p>
+)}
+
     </div>
   );
 };

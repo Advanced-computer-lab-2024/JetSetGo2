@@ -92,7 +92,7 @@ const TransportationBooking = () => {
   };
 
   const handleHomeNavigation = () => {
-    navigate('/home'); // Adjust this path according to your routing setup
+    navigate('/tourist-home'); // Adjust this path according to your routing setup
   };
 
   return (
