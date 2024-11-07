@@ -49,6 +49,7 @@ const AdvertiserDetails = () => {
   const [activityToEdit, setActivityToEdit] = useState(null);
   const [advertiserFormData, setAdvertiserFormData] = useState({
     UserName: "",
+    Password: "",
     Link: "",
     Hotline: "",
     Email: "",
@@ -364,6 +365,7 @@ const AdvertiserDetails = () => {
             <p>
               <strong>Name:</strong> {advertiser.UserName}
             </p>
+            
             <p>
               <strong>Link:</strong> {advertiser.Link}
             </p>
@@ -401,6 +403,16 @@ const AdvertiserDetails = () => {
                   required
                 />
               </div>
+              <div>
+                <label>Password:</label>
+                <input
+                  name="Password"
+                  value={advertiserFormData.Password}
+                  onChange={handleAdvertiserChange}
+                  required
+                />
+              </div>
+              
               <div>
                 <label>Link:</label>
                 <input

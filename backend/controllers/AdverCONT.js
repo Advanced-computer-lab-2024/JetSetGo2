@@ -39,6 +39,7 @@ const updateAdver = async (req, res) => {
 
   // Update the fields based on the request body
   if (req.body.UserName) UpdateAdver.UserName = req.body.UserName;
+  if (req.body.Password) UpdateAdver.Password = req.body.Password;
   if (req.body.Link) UpdateAdver.Link = req.body.Link;
   if (req.body.Hotline) UpdateAdver.Hotline = req.body.Hotline;
   if (req.body.Email) UpdateAdver.Email = req.body.Email;

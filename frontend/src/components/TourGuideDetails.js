@@ -79,6 +79,7 @@ const TourGuidePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     UserName: "",
+    Password: "",
     Email: "",
     Age: "",
     LanguagesSpoken: "",
@@ -224,6 +225,16 @@ const TourGuidePage = () => {
               />
             </div>
             <div style={styles.formGroup}>
+              <label>Password:</label>
+              <input
+                name="Password"
+                value={formData.Password}
+                onChange={handleChange}
+                style={styles.inputStyle}
+                required
+              />
+            </div>
+            <div style={styles.formGroup}>
               <label>Email:</label>
               <input
                 name="Email"
@@ -305,6 +316,7 @@ const TourGuidePage = () => {
             <li>
               <strong>Name:</strong> {tourGuide.UserName}
             </li>
+            
             <li>
               <strong>Email:</strong> {tourGuide.Email}
             </li>

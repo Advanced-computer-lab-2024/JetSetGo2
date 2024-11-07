@@ -128,6 +128,7 @@ async function bookFlight(flightOfferId) {
   }
 }
 
+
 // Call the function to test flight search
 searchFlights().then(() => {
   // You can book a flight after searching

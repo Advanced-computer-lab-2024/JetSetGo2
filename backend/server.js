@@ -146,21 +146,22 @@ app.post('/home/tourist/bookFlight', async (req, res) => {
     }
 });
 app.get('/home/tourist/bookedFlights/:touristId', async (req, res) => {
-  try {
-      const { touristId } = req.params;
+    try {
+        const { touristId } = req.params;
 
-      // Assuming you have a Tourist model
-      const tourist = await Tourist.findById(touristId).select('bookedFlights');
-      if (!tourist) {
-          return res.status(404).json({ message: "Tourist not found" });
-      }
+        // Assuming you have a Tourist model
+        const tourist = await Tourist.findById(touristId).select('bookedFlights');
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist not found" });
+        }
 
-      res.status(200).json(tourist.bookedFlights);
-  } catch (error) {
-      console.error("Error fetching booked flights:", error);
-      res.status(500).json({ message: "Error fetching booked flights" });
-  }
+        res.status(200).json(tourist.bookedFlights);
+    } catch (error) {
+        console.error("Error fetching booked flights:", error);
+        res.status(500).json({ message: "Error fetching booked flights" });
+    }
 });
+
 
 
 // Define your routes here

@@ -125,7 +125,7 @@ const [departureTime, setDepartureTime] = useState('');
     };
 
     return (
-        <div>
+        <div >
             <h1>Flight Search</h1>
             <div>
                 <label htmlFor="origin">Origin (e.g., CAI)</label>
@@ -192,7 +192,8 @@ const [departureTime, setDepartureTime] = useState('');
                                 Departure: {flight.itineraries?.[0].segments?.[0].departure.iataCode} <br />
                                 Arrival: {flight.itineraries?.[0].segments?.[0].arrival.iataCode} <br />
                                 Date: {flight.itineraries?.[0].segments?.[0].departure.at} <br />
-                                Price: {flight.price?.total} {flight.price?.currency}
+                                Price: {flight.price?.total} {flight.price?.currency}<br />
+                                Number of Bookable Seats: {flight.numberOfBookableSeats}
                             </p>
                             <button onClick={() => handleBooking(flight)}>Book Flight</button>
                         </div>

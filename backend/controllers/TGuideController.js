@@ -9,6 +9,7 @@ const updateUser = async (req, res) => {
   const { id } = req.params;
   const {
     Name,
+    Password,
     MobileNumber,
     Age,
     PreviousWork,
@@ -21,6 +22,7 @@ const updateUser = async (req, res) => {
   try {
     const updateFields = {};
     if (Name) updateFields.Name = Name;
+    if (Password) updateFields.Password = Password;
     if (MobileNumber) updateFields.MobileNumber = MobileNumber;
     if (Age) updateFields.Age = Age;
     if (PreviousWork) updateFields.PreviousWork = PreviousWork;

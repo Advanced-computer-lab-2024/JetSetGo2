@@ -12,6 +12,7 @@ const SellerDetails = () => {
   const [isEditing, setIsEditing] = useState(false); // Fix the state definition
   const [formData, setFormData] = useState({
     Name: "",
+    Password: "",
     PickUp_Location: "",
     Type_Of_Products: "",
     Previous_Work: "",
@@ -258,6 +259,16 @@ const SellerDetails = () => {
           style={inputStyle}
           name="Name"
           value={formData.Name}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div style={formGroupStyle}>
+        <label style={labelStyle}>Password:</label>
+        <input
+          style={inputStyle}
+          name="Password"
+          value={formData.Password}
           onChange={handleChange}
           required
         />
