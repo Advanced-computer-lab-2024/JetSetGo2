@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const UpdateTourGuide = () => {
   const [formData, setFormData] = useState({
-    Name: "",
+    UserName: "",
     Email: "",
     Age: "",
     LanguagesSpoken: "",
@@ -30,7 +30,7 @@ const UpdateTourGuide = () => {
 
           // Manually set the necessary fields only
           setFormData({
-            Name: tourGuide.Name || "",
+            UserName: tourGuide.UserName || "",
             Email: tourGuide.Email || "",
             Age: tourGuide.Age || "",
             LanguagesSpoken: tourGuide.LanguagesSpoken || "",
@@ -151,7 +151,7 @@ const UpdateTourGuide = () => {
         <div>
           <p>{successMessage}</p>
           <Link
-            to={`/tour-guide-details`}
+            to={`/tour-guide`}
             state={{ id: localStorage.getItem("userId") }}
           >
             View Tour Guide Details

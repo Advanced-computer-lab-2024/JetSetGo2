@@ -52,6 +52,10 @@ const TGuidechema = new Schema(
       type: Boolean,
       required: false,
     },
+    Admin_Acceptance: {
+      type: Boolean,
+      required: false,
+    },
   },
   { timestamps: true }
 );

@@ -8,11 +8,13 @@ const {
   updateUser,
   getUserById,
   deleteTGuide,
+  acceptTourguide,
 } = require("../controllers/TGuideController");
 
 router.get("/get", getuser);
 router.put("/update/:id", upload.single("Photo"), updateUser);
 router.get("/users/:id", getUserById);
 router.delete("/delete/:id", deleteTGuide);
+router.put("/acceptTourguide/:id", acceptTourguide);
 
 module.exports = router;

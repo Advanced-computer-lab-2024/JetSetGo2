@@ -30,41 +30,36 @@ const getAdverById = async (req, res) => {
   }
 };
 
+
 const updateAdver = async (req, res) => {
-  const { id } = req.params;
-  const logo = req.file ? req.file.filename.split("/").pop() : null;
-
-  // Create an object to hold the fields to update
-  const UpdateAdver = {};
-
-  // Update the fields based on the request body
-  if (req.body.UserName) UpdateAdver.UserName = req.body.UserName;
-  if (req.body.Password) UpdateAdver.Password = req.body.Password;
-  if (req.body.Link) UpdateAdver.Link = req.body.Link;
-  if (req.body.Hotline) UpdateAdver.Hotline = req.body.Hotline;
-  if (req.body.Email) UpdateAdver.Email = req.body.Email;
-  if (req.body.Profile) UpdateAdver.Profile = req.body.Profile;
-  if (req.body.Loc) UpdateAdver.Loc = req.body.Loc;
-  if (req.body.CompanyDes) UpdateAdver.CompanyDes = req.body.CompanyDes;
-  if (req.body.Services) UpdateAdver.Services = req.body.Services;
-  if (logo) UpdateAdver.logo = logo;
-
-  // Set Profile_Completed to true if any profile field is updated
-  UpdateAdver.Profile_Completed = true;
+  const { id } = req.params; // Extract id from the request body
+  const { UserName, Email, Link, Hotline, Profile, Loc, CompanyDes, Services } =
+    req.body; // Extract data from the
+  const logo = req.file ? req.file.filename.split("/").pop() : null; // Get just the filename if uploaded
 
   try {
-    // Use findByIdAndUpdate with the correct syntax
-    const updatedAdver = await adverModel.findByIdAndUpdate(
-      id,
-      { $set: UpdateAdver },
-      { new: true } // Return the updated document
-    );
+    const UpdateAdver = {};
 
-    if (!updatedAdver) {
+    if (UserName) UpdateAdver.UserName = UserName;
+    if (req.body.Password) UpdateAdver.Password = req.body.Password;
+    if (Email) UpdateAdver.Email = Email;
+    if (Link) UpdateAdver.Link = Link;
+    if (Hotline) UpdateAdver.Hotline = Hotline;
+    if (Profile) UpdateAdver.Profile = Profile;
+    if (Loc) UpdateAdver.Loc = Loc;
+    if (CompanyDes) UpdateAdver.CompanyDes = CompanyDes;
+    if (Services) UpdateAdver.Services = Services;
+    if (logo) UpdateAdver.logo = logo; // Update logo if provided, saving only the filename
+
+    const Adver = await adverModel.findByIdAndUpdate(
+      id,
+      { $set: UpdateAdver, Profile_Completed: true },
+      { new: true }
+    );
+    if (!Adver) {
       return res.status(404).json({ error: "Advertiser not found" });
     }
-
-    res.status(200).json(updatedAdver);
+    res.status(200).json(Adver);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -95,6 +90,32 @@ const deleteAdver = async (req, res) => {
   }
 };
 
+const acceptAdver = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the seller by ID and delete it
+    const acceptAdver = await adverModel.findByIdAndUpdate(id, {
+      Admin_Acceptance: true,
+    });
+
+    if (!acceptAdver) {
+      return res.status(404).json({ message: "Seller is accepted/rejected" });
+    }
+
+    // Respond with a success message
+    res.status(200).json({
+      message: "Seller deleted successfully",
+      seller: acceptAdver,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting seller",
+      error,
+    });
+  }
+};
+
 // Export the router
 module.exports = {
   getAdver,
@@ -102,4 +123,5 @@ module.exports = {
   getAdverById,
   getAdvertiser,
   deleteAdver,
+  acceptAdver,
 };

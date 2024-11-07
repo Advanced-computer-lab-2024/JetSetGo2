@@ -106,4 +106,36 @@ const deleteTGuide = async (req, res) => {
   }
 };
 
-module.exports = { getuser, updateUser, getUserById, deleteTGuide };
+const acceptTourguide = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the seller by ID and delete it
+    const acceptTourguide = await TourModel.findByIdAndUpdate(id, {
+      Admin_Acceptance: true,
+    });
+
+    if (!acceptTourguide) {
+      return res.status(404).json({ message: "Seller is accepted/rejected" });
+    }
+
+    // Respond with a success message
+    res.status(200).json({
+      message: "Tourguide deleted successfully",
+      seller: acceptTourguide,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting Tourguide",
+      error,
+    });
+  }
+};
+
+module.exports = {
+  getuser,
+  updateUser,
+  getUserById,
+  deleteTGuide,
+  acceptTourguide,
+};

@@ -215,9 +215,9 @@ const TourGuidePage = () => {
         {isEditing ? (
           <form onSubmit={handleSubmit}>
             <div style={styles.formGroup}>
-              <label>Name:</label>
+              <label>UserName:</label>
               <input
-                name="Name"
+                name="UserName"
                 value={formData.UserName}
                 onChange={handleChange}
                 style={styles.inputStyle}
@@ -314,7 +314,7 @@ const TourGuidePage = () => {
         ) : (
           <ul>
             <li>
-              <strong>Name:</strong> {tourGuide.UserName}
+              <strong>UserName:</strong> {tourGuide.UserName}
             </li>
             
             <li>

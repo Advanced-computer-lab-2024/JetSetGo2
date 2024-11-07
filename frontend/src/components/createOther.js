@@ -13,14 +13,17 @@ const OtherSignup = () => {
     IDDocument: null,
     Certificates: null,
     TaxationRegistryCard: null,
+    acceptTerms: false,
   });
 
   const [error, setError] = useState(""); // State for error messages
   const [fileErrors, setFileErrors] = useState({}); // State for file error messages
+  const [termsError, setTermsError] = useState(""); // State for Terms and Conditions error
+  const [termsVisible, setTermsVisible] = useState(false); // State for dialog visibility
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
     if (
       name === "IDDocument" ||
@@ -38,6 +41,8 @@ const OtherSignup = () => {
       }
       setFileErrors((prev) => ({ ...prev, [name]: null })); // Reset error if valid
       setFormData({ ...formData, [name]: file });
+    } else if (type === "checkbox") {
+      setFormData({ ...formData, [name]: checked }); // Handle checkbox input
     } else {
       setFormData({ ...formData, [name]: value });
       setError(""); // Clear error on input change
@@ -46,6 +51,12 @@ const OtherSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.acceptTerms) {
+      setTermsError("You must accept the Terms and Conditions.");
+      return;
+    }
+    setTermsError(""); // Clear error if accepted
 
     const data = new FormData();
     data.append("Email", formData.Email);
@@ -181,10 +192,57 @@ const OtherSignup = () => {
           </div>
         )}
 
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>
+            <input
+              type="checkbox"
+              name="acceptTerms"
+              checked={formData.acceptTerms}
+              onChange={handleChange}
+              required
+            />
+            &nbsp; I accept the{" "}
+            <span
+              style={{ color: "blue", cursor: "pointer" }}
+              onClick={() => setTermsVisible(true)} // Open the dialog on click
+            >
+              Terms and Conditions
+            </span>
+          </label>
+          {termsError && <p style={styles.error}>{termsError}</p>}
+        </div>
+
         <button type="submit" style={styles.button}>
           Sign Up
         </button>
       </form>
+      {/* Terms and Conditions Dialog */}
+      {termsVisible && (
+        <dialog open style={styles.dialog}>
+          <h3>Terms and Conditions</h3>
+          <p>
+            By signing up and using our platform, you agree to the following
+            terms and conditions. Your personal information, including but not
+            limited to your name, email address, and any uploaded documents,
+            will be stored and processed securely in accordance with our privacy
+            policy. You are responsible for maintaining the accuracy and
+            confidentiality of your account details. Any content you upload,
+            including documents and images, must comply with legal and ethical
+            standards, and you agree not to misuse our platform for any
+            unauthorized or harmful activities. We reserve the right to update
+            or modify these terms at any time, and it is your responsibility to
+            review them periodically. Continued use of the platform following
+            any changes signifies your acceptance of the updated terms. If you
+            do not agree to these terms, please refrain from using our services.
+          </p>
+          <button
+            style={styles.closeButton}
+            onClick={() => setTermsVisible(false)}
+          >
+            Close
+          </button>
+        </dialog>
+      )}
     </div>
   );
 };
@@ -214,43 +272,50 @@ const styles = {
     padding: "40px",
     borderRadius: "10px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    width: "300px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    width: "400px",
   },
   inputGroup: {
-    width: "100%",
-    marginBottom: "15px",
+    marginBottom: "20px",
   },
   label: {
-    display: "block",
+    fontSize: "14px",
     marginBottom: "5px",
-    color: "#333",
-    fontSize: "16px",
-    fontWeight: "500",
+    display: "block",
   },
   input: {
     width: "100%",
     padding: "10px",
-    fontSize: "16px",
+    fontSize: "14px",
     borderRadius: "5px",
-    border: "1px solid #ddd",
-    outline: "none",
-    boxSizing: "border-box",
-    transition: "border-color 0.3s",
+    border: "1px solid #ccc",
   },
   button: {
-    backgroundColor: "#764ba2",
+    width: "100%",
+    padding: "10px",
+    backgroundColor: "#667eea",
     color: "#fff",
-    padding: "12px 25px",
-    borderRadius: "5px",
     border: "none",
-    fontSize: "16px",
-    fontWeight: "bold",
+    borderRadius: "5px",
     cursor: "pointer",
-    marginTop: "15px",
-    transition: "background-color 0.3s ease",
+    fontSize: "16px",
+  },
+  dialog: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    width: "500px",
+    textAlign: "center",
+  },
+  closeButton: {
+    padding: "10px 20px",
+    backgroundColor: "#667eea",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "16px",
+    marginTop: "10px",
   },
 };
 

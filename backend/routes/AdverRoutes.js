@@ -8,6 +8,7 @@ const {
   getAdverById,
   getAdvertiser,
   deleteAdver,
+  acceptAdver,
 } = require("../controllers/AdverCONT");
 
 router.get("/", (req, res) => {
@@ -19,5 +20,6 @@ router.put("/updateadver/:id", upload.single("logoFile"), updateAdver);
 router.get("/getTourist/:id", getAdverById);
 router.get("/get", getAdvertiser);
 router.delete("/delete/:id", deleteAdver);
+router.put("/acceptAdver/:id", acceptAdver);
 
 module.exports = router;

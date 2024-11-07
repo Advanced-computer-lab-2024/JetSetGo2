@@ -10,6 +10,7 @@ const UpdateSeller = () => {
     Type_Of_Products: "",
     Previous_Work: "",
     Age: "",
+    logoFile: null, // State to hold the logo file
   });
 
   const [logo, setLogo] = useState(null); // State to store the selected logo file
@@ -36,13 +37,6 @@ const UpdateSeller = () => {
             Previous_Work: seller.Previous_Work || "",
             Age: seller.Age || "",
           });
-
-          // Set existing logo URL
-          if (seller.logo) {
-            setExistingLogo(
-              `http://localhost:8000/uploads/sellerLogo/${seller.logo}`
-            );
-          }
         })
         .catch((error) => {
           console.error("Error fetching seller data:", error);
@@ -56,7 +50,7 @@ const UpdateSeller = () => {
   };
 
   const handleFileChange = (e) => {
-    setLogo(e.target.files[0]); // Store the selected logo file in state
+    setFormData({ ...formData, logoFile: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {

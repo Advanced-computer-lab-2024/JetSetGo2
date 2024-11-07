@@ -12,13 +12,15 @@ const UpdateAdvertiser = () => {
     Loc: "",
     CompanyDes: "",
     Services: "",
+    logoFile: null, // State to hold the logo file
   });
 
-  const [profileImage, setProfileImage] = useState(null); // State to store the selected profile image file
-  const [existingProfileImage, setExistingProfileImage] = useState(""); // State for existing profile image URL
+  const [existingLogo, setExistingLogo] = useState(""); // State for existing logo URL
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Fetch existing advertiser data when component loads
   useEffect(() => {
     const adverId = localStorage.getItem("userId"); // Assuming advertiser ID is stored in local storage
 
@@ -41,10 +43,10 @@ const UpdateAdvertiser = () => {
             Services: advertiser.Services || "",
           });
 
-          // Set existing profile image URL
-          if (advertiser.Profile) {
-            setExistingProfileImage(
-              `http://localhost:8000/uploads/adverImages/${advertiser.Profile}`
+          // Set existing logo URL if it exists
+          if (advertiser.logo) {
+            setExistingLogo(
+              `http://localhost:8000/uploads/adverImages/${advertiser.logo}`
             );
           }
         })
@@ -60,33 +62,40 @@ const UpdateAdvertiser = () => {
   };
 
   const handleFileChange = (e) => {
-    setProfileImage(e.target.files[0]); // Store the selected profile image file in state
+    const file = e.target.files[0];
+    setFormData({ ...formData, logoFile: file }); // Set the logo file
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const adverId = localStorage.getItem("userId"); // Get advertiser ID from local storage
-    console.log("Updating advertiser with ID:", adverId);
 
-    const formDataWithImage = new FormData(); // Use FormData to handle both text fields and file upload
+    if (!adverId) {
+      alert("Advertiser ID is missing.");
+      return;
+    }
+
+    setLoading(true); // Set loading state while the request is being processed
+
+    const formDataWithLogo = new FormData(); // Use FormData to handle both text fields and file upload
 
     // Append text fields
     for (const key in formData) {
-      formDataWithImage.append(key, formData[key]);
-    }
-
-    // Append the profile image if it's been uploaded
-    if (profileImage) {
-      formDataWithImage.append("Profile", profileImage); // Add profile image to form data
+      formDataWithLogo.append(key, formData[key]);
     }
 
     // Append Profile_Completed field to true
-    formDataWithImage.append("Profile_Completed", true);
+    formDataWithLogo.append("Profile_Completed", true);
+
+    // Append the logo file if a new one has been uploaded
+    if (formData.logoFile) {
+      formDataWithLogo.append("logoFile", formData.logoFile);
+    }
 
     try {
       const response = await axios.put(
         `http://localhost:8000/home/adver/updateadver/${adverId}`,
-        formDataWithImage,
+        formDataWithLogo,
         {
           headers: {
             "Content-Type": "multipart/form-data", // Ensure the request is sent as multipart/form-data
@@ -96,6 +105,14 @@ const UpdateAdvertiser = () => {
 
       if (response.status === 200) {
         setSuccessMessage("Advertiser updated successfully!");
+
+        // If logo is updated, set the new logo
+        if (response.data.logo) {
+          setExistingLogo(
+            `http://localhost:8000/uploads/adverImages/${response.data.logo}`
+          );
+        }
+
         setTimeout(() => navigate("/list", { state: { id: adverId } }), 2000); // Redirect after a short delay
       }
     } catch (error) {
@@ -104,6 +121,8 @@ const UpdateAdvertiser = () => {
         "Error updating advertiser: " +
           (error.response ? error.response.data.error : error.message)
       );
+    } finally {
+      setLoading(false); // Reset loading state after request completion
     }
   };
 
@@ -115,38 +134,43 @@ const UpdateAdvertiser = () => {
         <h2>Update Advertiser Profile</h2>
 
         {/* Render each form field based on formData keys */}
-        {Object.keys(formData).map((key) => (
-          <div key={key}>
-            <label>{key.replace(/_/g, " ")}:</label>
-            <input
-              type="text"
-              name={key}
-              value={formData[key]}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        ))}
+        {Object.keys(formData).map(
+          (key) =>
+            key !== "logoFile" && (
+              <div key={key}>
+                <label>{key.replace(/_/g, " ")}:</label>
+                <input
+                  type={key === "Hotline" ? "number" : "text"} // For Hotline, use number input type
+                  name={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            )
+        )}
 
-        {/* Profile image file input */}
-        <div>
-          <label>Profile Image:</label>
+        {/* Logo file input */}
+        {/* <div>
+          <label>Logo:</label>
           <input type="file" accept="image/*" onChange={handleFileChange} />
-        </div>
+        </div> */}
 
-        {/* Display existing profile image if available */}
-        {existingProfileImage && (
+        {/* Display existing logo if available */}
+        {/* {existingLogo && (
           <div>
-            <h4>Current Profile Image:</h4>
+            <h4>Current Logo:</h4>
             <img
-              src={existingProfileImage}
-              alt="Current Advertiser Profile Image"
+              src={existingLogo}
+              alt="Current Advertiser Logo"
               style={{ width: "100px", height: "auto" }}
             />
           </div>
-        )}
+        )} */}
 
-        <button type="submit">Update</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Updating..." : "Update"}
+        </button>
       </form>
 
       {successMessage && (

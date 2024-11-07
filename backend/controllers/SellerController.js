@@ -25,7 +25,7 @@ const readSeller = async (req, res) => {
 // Update a seller by the MongoDB `_id`
 const updateSeller = async (req, res) => {
   const { id } = req.params; // Get the 'id' from the request parameters
-  const { Name, Password,PickUp_Location, Type_Of_Products, Previous_Work, Age } =
+  const { UserName, Password,PickUp_Location, Type_Of_Products, Previous_Work, Age } =
     req.body;
   const logo = req.file ? req.file.filename.split("/").pop() : null; // Get just the filename if uploaded
 
@@ -103,10 +103,37 @@ const deleteSeller = async (req, res) => {
   }
 };
 
+const acceptSeller = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the seller by ID and delete it
+    const acceptSeller = await SellerModel.findByIdAndUpdate(id, {
+      Admin_Acceptance: true,
+    });
+
+    if (!acceptSeller) {
+      return res.status(404).json({ message: "Seller is accepted/rejected" });
+    }
+
+    // Respond with a success message
+    res.status(200).json({
+      message: "Seller accepted successfully",
+      seller: acceptSeller,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting seller",
+      error,
+    });
+  }
+};
+
 module.exports = {
   readSeller,
   updateSeller,
   getSeller,
   deleteSeller,
   deleteAllSellers,
+  acceptSeller,
 };
