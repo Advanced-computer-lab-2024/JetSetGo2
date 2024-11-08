@@ -4,6 +4,7 @@ const SellerModel = require("../models/Seller.js");
 const AdverModel = require("../models/AdverMODEL.js");
 const TourModel = require("../models/TGuide.js");
 const TouristModel = require("../models/Tourist.js");
+const AdminModel = require("../models/admin.js");
 
 // Login controller
 const loginUser = async (req, res) => {
@@ -28,6 +29,11 @@ const loginUser = async (req, res) => {
     if (!user) {
       user = await TouristModel.findOne({ Email });
       AccountType = "Tourist";
+    }
+
+    if (!user) {
+      user = await AdminModel.findOne({ Email });
+      AccountType = "Admin";
     }
 
     // If user is not found in any model

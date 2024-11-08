@@ -54,6 +54,7 @@ const createTourist = async (req, res) => {
       Nationality,
       DateOfBirth,
       Job,
+      Admin_Acceptance: true,
     });
     res.status(200).json(tourist);
   } catch (error) {

@@ -17,15 +17,6 @@ const HomePage = () => {
         <button style={styles.button} onClick={() => navigate("/other-signup")}>
           Other Signup
         </button>
-        <button
-          style={styles.button}
-          onClick={() => navigate("/adminCapabilities")}
-        >
-          Admin
-        </button>
-        <button style={styles.button} onClick={() => navigate("/tourismGovernorPage")}>
-          Tourism Governor
-        </button>
         <button style={styles.button} onClick={() => navigate("/login")}>
           Login
         </button>
