@@ -1,8 +1,34 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminCapabilities = () => {
   const navigate = useNavigate();
+  const [newPassword, setNewPassword] = useState("");
+
+  const handlePasswordChange = async () => {
+    const adminId = localStorage.getItem("userId");
+    console.log("Admin ID:", adminId); // Log adminId to ensure it's not null or undefined
+  
+    if (!adminId) {
+      alert("Admin ID is missing. Please check.");
+      return;
+    }
+  
+    try {
+      await axios.put(`http://localhost:8000/admin/update-password/${adminId}`, {
+        newPassword,
+      });
+      alert("Password updated successfully");
+    } catch (error) {
+      console.error("Error updating password:", error);
+      alert("Failed to update password");
+    }
+  };
+  
+  
+
 
   const buttonStyle = {
     margin: '10px',
@@ -83,6 +109,14 @@ const AdminCapabilities = () => {
               {button.label}
             </button>
           ))}
+          <h3>Change Password</h3>
+      <input
+        type="password"
+        placeholder="New Password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
+      <button onClick={handlePasswordChange}>Change Password</button>
         </div>
       </div>
     </div>

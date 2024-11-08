@@ -1,4 +1,6 @@
 const adminModel = require("../models/admin"); // Adjust the path if necessary
+const bcrypt = require("bcrypt");
+
 
 // Create Admin
 const createAdmin = async (req, res) => {
@@ -97,6 +99,41 @@ const deleteAdmin = async (req, res) => {
     });
   }
 };
+const updatePassword = async (req, res) => {
+  try {
+    console.log("Endpoint hit - updatePassword");
+    console.log("Request params:", req.params);
+    console.log("Request body:", req.body);
+
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required." });
+    }
+
+    const updatedPassword = newPassword;
+
+    const updatedAdmin = await adminModel.findByIdAndUpdate(
+      id,
+      { Password: updatedPassword },
+      { new: true }
+    );
+
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: "Admin not found." });
+    }
+
+    res.status(200).json({ message: "Password updated successfully." });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({
+      message: "Error updating password.",
+      error: error.message,
+    });
+  }
+};
+
 
 // Export the controller methods
 module.exports = {
@@ -104,4 +141,5 @@ module.exports = {
   getAdmins,
   getAdminById,
   deleteAdmin,
+  updatePassword,
 };

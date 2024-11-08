@@ -89,6 +89,7 @@ function App() {
           <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
           <Route path="/DeleteUsers" element={<DeleteUsers />} />
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
+          
           <Route
             path="/tourismGovernorPage"
             element={<TourismGovernorPage />}
