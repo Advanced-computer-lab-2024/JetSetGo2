@@ -181,7 +181,7 @@ const Itinerariest = () => {
   };
 
   return (
-    <div id="itineraries" >
+    <div id="itineraries">
       <div className="back-button-container">
         <button className="back-button" onClick={() => navigate(-1)}>
           Back
