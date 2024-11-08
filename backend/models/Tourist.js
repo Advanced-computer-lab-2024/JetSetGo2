@@ -39,6 +39,10 @@ const TouristSchema = new Schema(
       default: 0,
       immutable: true,
     },
+    Admin_Acceptance: {
+      type: Boolean,
+      required: false,
+    },
     bookedTransportations: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -75,6 +75,20 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    const tourismGovernorEmail = "tourism@gmail.com";
+    const tourismGovernorPassword = "`tourism123`";
+
+    if (
+      Email === tourismGovernorEmail &&
+      Password === tourismGovernorPassword
+    ) {
+      // Navigate directly without checking backend
+      navigate("/tourismGovernorPage");
+      return;
+    }
+
+    // Continue with the backend check if the email/password doesn't match
     try {
       const response = await axios.post("http://localhost:8000/login/login", {
         Email,
@@ -92,6 +106,10 @@ const Login = () => {
 
         setSuccessMessage("Login successful!");
         setErrorMessage("");
+
+        if (AccountType === "Admin") {
+          navigate("/adminCapabilities");
+        }
 
         if (AccountType === "Tourist") {
           navigate("/tourist-home");

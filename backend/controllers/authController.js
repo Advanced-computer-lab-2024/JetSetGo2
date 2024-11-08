@@ -4,6 +4,7 @@ const SellerModel = require("../models/Seller.js");
 const AdverModel = require("../models/AdverMODEL.js");
 const TourModel = require("../models/TGuide.js");
 const TouristModel = require("../models/Tourist.js");
+const AdminModel = require("../models/admin.js");
 
 // Login controller
 const loginUser = async (req, res) => {
@@ -30,6 +31,11 @@ const loginUser = async (req, res) => {
       AccountType = "Tourist";
     }
 
+    if (!user) {
+      user = await AdminModel.findOne({ Email });
+      AccountType = "Admin";
+    }
+
     // If user is not found in any model
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -53,7 +59,7 @@ const loginUser = async (req, res) => {
       Email: user.Email,
       AccountType: AccountType,
       profileCompleted: user.Profile_Completed || false, // Assuming the field 'profileCompleted' exists
-      adminAccept: user.Admin_Acceptance || true,
+      adminAccept: user.Admin_Acceptance || false,
     }); // Send token, AccountType, and profileCompleted back to client
   } catch (error) {
     console.error("Login error:", error);
