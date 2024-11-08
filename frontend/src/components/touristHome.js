@@ -38,7 +38,7 @@ const TouristHome = () => {
   const navigate = useNavigate();
   const handleFlightSearchClick = () => {
     navigate('/flight-search'); // Redirect to the Flight Search page
-};
+  };
 
   const touristId = localStorage.getItem("userId");
 
@@ -62,14 +62,14 @@ const TouristHome = () => {
         console.error("Error fetching booked flights:", error);
       }
     };
-    
+
     if (touristId) {
       fetchTouristData();
-      fetchBookedFlights(touristId); 
+      fetchBookedFlights(touristId);
     }
   }, [touristId]);
-  
-  
+
+
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -125,7 +125,9 @@ const TouristHome = () => {
       </div>
     );
   }
-
+  const handleFileComplaintClick = () => {
+    navigate("/file-complaint", { state: { touristId } });
+  };
   return (
     <div style={styles.container}>
       {/* Tourist Profile Section */}
@@ -147,8 +149,8 @@ const TouristHome = () => {
       {/* Main Content */}
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Welcome to Your Dashboard</h1>
-         {/* Booked Flights Section */}
-         <div style={styles.bookedFlightsSection}>
+        {/* Booked Flights Section */}
+        <div style={styles.bookedFlightsSection}>
           <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
           {bookedFlights.length > 0 ? (
             <ul style={styles.bookedFlightsList}>
@@ -194,7 +196,7 @@ const TouristHome = () => {
         <nav style={styles.navbar}>
           <button onClick={() => navigate("/p")}>View Products</button>
           <button onClick={handleFlightSearchClick}>Search Flights</button>
-        <button
+          <button
             onClick={() =>
               navigate("/upcoming-activitiest", {
                 state: { touristId: touristId },
@@ -224,15 +226,16 @@ const TouristHome = () => {
           <Link to="/transportationBooking" style={styles.navLink}>
             Book Transportation
           </Link>
+          <button onClick={handleFileComplaintClick} style={styles.navLink}>File a Complaint</button>
         </nav>
 
         {/* Search Results Section */}
         <div style={styles.resultsContainer}>
           <h3 style={styles.resultsHeader}>Search Results:</h3>
           {searchResults.Museums.length > 0 ||
-          searchResults.HistoricalPlace.length > 0 ||
-          searchResults.activities.length > 0 ||
-          searchResults.itinaries.length > 0 ? (
+            searchResults.HistoricalPlace.length > 0 ||
+            searchResults.activities.length > 0 ||
+            searchResults.itinaries.length > 0 ? (
             <ul style={styles.resultsList}>
               {/* Museums */}
               {searchResults.Museums.map((museum, index) => (
