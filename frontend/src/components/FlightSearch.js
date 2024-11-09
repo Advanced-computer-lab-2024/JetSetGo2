@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import axios from 'axios';
 
 const FlightSearch = () => {
@@ -10,6 +12,8 @@ const FlightSearch = () => {
     const [error, setError] = useState(null);
     const [airlineCode, setAirlineCode] = useState('');
 const [departureTime, setDepartureTime] = useState('');
+const navigate = useNavigate();
+
 
 
     const getBearerToken = async () => {
@@ -126,6 +130,9 @@ const [departureTime, setDepartureTime] = useState('');
 
     return (
         <div >
+            <button className="back-button" onClick={() => navigate(-1)}>
+          Back
+        </button>
             <h1>Flight Search</h1>
             <div>
                 <label htmlFor="origin">Origin (e.g., CAI)</label>
