@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getActivity, getCategories } from "../../services/ActivityService";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
 import axios from "axios";
-
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -42,6 +41,7 @@ const Activitiest = () => {
   const [sortBy, setSortBy] = useState("price"); // Added state for sorting by price or rating
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [searchLocation, setSearchLocation] = useState("");
+  const [error, setError] = useState(null);
 
   const [filters, setFilters] = useState({
     date: "",
@@ -91,16 +91,14 @@ const Activitiest = () => {
 
   const fetchActivities = async () => {
     try {
-      const data = await getActivity();
-      const upcomingActivities = data.filter((activity) => {
-        const activityDate = new Date(activity.date);
-        const currentDate = new Date();
-        return activityDate >= currentDate;
-      });
-      setActivities(upcomingActivities);
-      setFilteredActivities(upcomingActivities);
+      const response = await axios.get("http://localhost:8000/activity/get");
+      const data = response.data;
+      const nonFlaggedActivities = data.filter(activity => !activity.flagged);
+      setActivities(nonFlaggedActivities);
+      setFilteredActivities(nonFlaggedActivities);
     } catch (error) {
-      console.error("Error fetching activities", error);
+      console.error("Error fetching Activities:", error);
+      setError("Failed to load Activities.");
     }
   };
 
@@ -162,7 +160,7 @@ const Activitiest = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [filters, sortOrder, sortBy]); // Add sortOrder and sortBy to the dependency array
+  }, [activities, filters, sortOrder, sortBy]); // Add sortOrder and sortBy to the dependency array
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -303,7 +301,7 @@ const Activitiest = () => {
                 <strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}
               </p>
               <p>
-                <strong>Time:</strong> {new Date(activity.time).toLocaleTimeString()}
+              <p><strong>Time:</strong> {activity.time}</p>
               </p>
               <p>
                 <strong>Location:</strong> {activity.location}

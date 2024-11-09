@@ -206,6 +206,27 @@ const upcomingactivity = async (req, res) => {
   }
 };
 
+const flagActivity = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Update the 'flagged' status to true
+    const updatedActivity = await Activity.findByIdAndUpdate(
+      id,
+      { flagged: true },
+      { new: true }
+    );
+
+    if (!updatedActivity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    res.status(200).json(updatedActivity);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createActivity,
   getActivity,
@@ -214,5 +235,6 @@ module.exports = {
   deleteAllActivities,
   upcomingactivity,
   readAdverActivites,
-  bookactivity
+  bookactivity,
+  flagActivity
 };

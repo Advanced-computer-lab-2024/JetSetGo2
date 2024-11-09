@@ -44,7 +44,7 @@ import ItinerariesAdmin from "./components/ItinerariesAdmin";
 import TransportationPage from "./components/TransportationCRUD";
 import TransportationBooking from "./components/BookTransportation";
 import FileComplaint from "./components/FileComplaint";
-
+import ManageActivities from "./components/ActivitiesAdmin";
 function App() {
 
   
@@ -91,6 +91,7 @@ function App() {
           <Route path="/DeleteUsers" element={<DeleteUsers />} />
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
           <Route path="/file-complaint" element={<FileComplaint />} />
+          <Route path="/ActivitiesAdmin" element={<ManageActivities />} />
           <Route
             path="/tourismGovernorPage"
             element={<TourismGovernorPage />}
