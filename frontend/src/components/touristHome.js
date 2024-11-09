@@ -23,6 +23,7 @@ const TouristHome = () => {
     },
   ];
   const [bookedFlights, setBookedFlights] = useState([]);
+  const [complaints, setComplaints] = useState([]);
   const [touristData, setTouristData] = useState({
     UserName: "",
     wallet: 0,
@@ -38,7 +39,7 @@ const TouristHome = () => {
   const navigate = useNavigate();
   const handleFlightSearchClick = () => {
     navigate('/flight-search'); // Redirect to the Flight Search page
-};
+  };
 
   const touristId = localStorage.getItem("userId");
 
@@ -62,14 +63,23 @@ const TouristHome = () => {
         console.error("Error fetching booked flights:", error);
       }
     };
-    
+    const fetchComplaints = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/complaint/complaints/${touristId}`);
+        setComplaints(response.data);
+      } catch (error) {
+        console.error("Error fetching complaints:", error);
+      }
+    };
+
     if (touristId) {
       fetchTouristData();
-      fetchBookedFlights(touristId); 
+      fetchBookedFlights(touristId);
+      fetchComplaints();
     }
   }, [touristId]);
-  
-  
+
+
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -125,7 +135,9 @@ const TouristHome = () => {
       </div>
     );
   }
-
+  const handleFileComplaintClick = () => {
+    navigate("/file-complaint", { state: { touristId } });
+  };
   return (
     <div style={styles.container}>
       {/* Tourist Profile Section */}
@@ -147,8 +159,8 @@ const TouristHome = () => {
       {/* Main Content */}
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Welcome to Your Dashboard</h1>
-         {/* Booked Flights Section */}
-         <div style={styles.bookedFlightsSection}>
+        {/* Booked Flights Section */}
+        <div style={styles.bookedFlightsSection}>
           <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
           {bookedFlights.length > 0 ? (
             <ul style={styles.bookedFlightsList}>
@@ -166,6 +178,27 @@ const TouristHome = () => {
             <p style={styles.noFlightsText}>You have no booked flights.</p>
           )}
         </div>
+        <div style={styles.complaintsSection}>
+  <h3>Your Complaints</h3>
+  {complaints.length > 0 ? (
+    <ul style={styles.complaintsList}>
+      {complaints.map((complaint, index) => (
+        <li key={index} style={styles.complaintItem}>
+          <p><strong>Title:</strong> {complaint.title}</p>
+          <p><strong>Body:</strong> {complaint.body}</p>
+          <p><strong>Date:</strong> {new Date(complaint.date).toLocaleDateString()}</p>
+          <p><strong>Status:</strong> {complaint.status}</p>
+          {complaint.reply && (
+            <p><strong>Reply:</strong> {complaint.reply}</p>
+          )}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No complaints found.</p>
+  )}
+</div>
+
 
         {/* Search Bar Section */}
         <div style={styles.searchSection}>
@@ -194,7 +227,7 @@ const TouristHome = () => {
         <nav style={styles.navbar}>
           <button onClick={() => navigate("/p")}>View Products</button>
           <button onClick={handleFlightSearchClick}>Search Flights</button>
-        <button
+          <button
             onClick={() =>
               navigate("/upcoming-activitiest", {
                 state: { touristId: touristId },
@@ -224,15 +257,16 @@ const TouristHome = () => {
           <Link to="/transportationBooking" style={styles.navLink}>
             Book Transportation
           </Link>
+          <button onClick={handleFileComplaintClick} style={styles.navLink}>File a Complaint</button>
         </nav>
 
         {/* Search Results Section */}
         <div style={styles.resultsContainer}>
           <h3 style={styles.resultsHeader}>Search Results:</h3>
           {searchResults.Museums.length > 0 ||
-          searchResults.HistoricalPlace.length > 0 ||
-          searchResults.activities.length > 0 ||
-          searchResults.itinaries.length > 0 ? (
+            searchResults.HistoricalPlace.length > 0 ||
+            searchResults.activities.length > 0 ||
+            searchResults.itinaries.length > 0 ? (
             <ul style={styles.resultsList}>
               {/* Museums */}
               {searchResults.Museums.map((museum, index) => (
@@ -434,6 +468,19 @@ const styles = {
   noResultsText: {
     fontSize: "18px",
     color: "#999",
+  },
+  complaintsSection: {
+    marginTop: "20px",
+  },
+  complaintsList: {
+    listStyleType: "none",
+    padding: 0,
+  },
+  complaintItem: {
+    padding: "10px",
+    margin: "10px 0",
+    border: "1px solid #ccc",
+    borderRadius: "5px",
   },
 };
 

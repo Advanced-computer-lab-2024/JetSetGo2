@@ -28,9 +28,7 @@ const Itineraries = () => {
   const fetchItineraries = async () => {
     try {
       const response = await getItineraries();
-      // Filter out flagged itineraries
-      const availableItineraries = response.filter(itinerary => !itinerary.flagged);
-      setItineraries(availableItineraries);
+      setItineraries(response); // Store both flagged and unflagged itineraries
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");

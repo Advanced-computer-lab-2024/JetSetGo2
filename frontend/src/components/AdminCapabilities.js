@@ -1,11 +1,35 @@
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminCapabilities = () => {
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
+  const [complaints, setComplaints] = useState([]);
+  const [replyText, setReplyText] = useState({});
+  const [statusFilter, setStatusFilter] = useState("all");
+const [sortOrder, setSortOrder] = useState("desc");
+
+  useEffect(() => {
+    fetchComplaints();
+  }, []);
+  const fetchComplaints = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/complaint/get");
+      setComplaints(response.data);
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+    }
+  };
+  const handleResolveComplaint = async (complaintId) => {
+    try {
+      await axios.put(`http://localhost:8000/complaint/resolve/${complaintId}`);
+      fetchComplaints(); // Refresh complaints after resolving
+    } catch (error) {
+      console.error("Error resolving complaint:", error);
+    }
+  };
 
   const handlePasswordChange = async () => {
     const adminId = localStorage.getItem("userId");
@@ -26,8 +50,31 @@ const AdminCapabilities = () => {
       alert("Failed to update password");
     }
   };
+
   
-  
+  const handleReplyChange = (id, value) => {
+    setReplyText({ ...replyText, [id]: value });
+  };
+
+  const handleReplySubmit = async (complaintId) => {
+    try {
+      await axios.put(`http://localhost:8000/complaint/reply/${complaintId}`, {
+        reply: replyText[complaintId]
+      });
+      fetchComplaints(); // Refresh complaints after reply is added
+      setReplyText({ ...replyText, [complaintId]: "" }); // Clear reply input
+    } catch (error) {
+      console.error("Error replying to complaint:", error);
+    }
+  };
+  const filteredAndSortedComplaints = complaints
+  .filter((complaint) => statusFilter === "all" || complaint.status === statusFilter)
+  .sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+  });
+
 
 
   const buttonStyle = {
@@ -66,6 +113,7 @@ const AdminCapabilities = () => {
 
   return (
     <div style={styles.container}>
+
       {/* Sidebar with Profile */}
       <div style={styles.sidebar}>
         <div style={styles.profileContainer}>
@@ -86,6 +134,59 @@ const AdminCapabilities = () => {
       {/* Main Content */}
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Admin Capabilities</h1>
+        <div>
+  <label>Filter by Status: </label>
+  <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+    <option value="all">All</option>
+    <option value="pending">Pending</option>
+    <option value="resolved">Resolved</option>
+  </select>
+
+  <label>Sort by Date: </label>
+  <button onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+    {sortOrder === "asc" ? "Oldest First" : "Newest First"}
+  </button>
+</div>
+
+        <h2>Complaints</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+  {filteredAndSortedComplaints.map((complaint) => (
+    <tr key={complaint._id}>
+      <td>{complaint.title}</td>
+      <td>{complaint.body}</td>
+      <td>{complaint.status}</td>
+      <td>{new Date(complaint.date).toLocaleDateString()}</td>
+      <td>
+        {complaint.status === "pending" && (
+          <button onClick={() => handleResolveComplaint(complaint._id)}>Resolve</button>
+        )}
+      </td>
+      <td>
+        <input
+          type="text"
+          placeholder="Reply here..."
+          value={replyText[complaint._id] || ""}
+          onChange={(e) => handleReplyChange(complaint._id, e.target.value)}
+        />
+        <button onClick={() => handleReplySubmit(complaint._id)}>Send Reply</button>
+        {complaint.reply && <p>Reply: {complaint.reply}</p>}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
+      </table>
+      
 
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
@@ -120,6 +221,7 @@ const AdminCapabilities = () => {
         </div>
       </div>
     </div>
+    
   );
 };
 

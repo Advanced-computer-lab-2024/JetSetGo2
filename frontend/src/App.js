@@ -43,6 +43,7 @@ import FlightSearch from "./components/FlightSearch";
 import ItinerariesAdmin from "./components/ItinerariesAdmin";
 import TransportationPage from "./components/TransportationCRUD";
 import TransportationBooking from "./components/BookTransportation";
+import FileComplaint from "./components/FileComplaint";
 
 function App() {
 
@@ -89,6 +90,7 @@ function App() {
           <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
           <Route path="/DeleteUsers" element={<DeleteUsers />} />
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
+          <Route path="/file-complaint" element={<FileComplaint />} />
           
           <Route
             path="/tourismGovernorPage"
