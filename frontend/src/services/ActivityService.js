@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8000";
 
-// Get all activities
+// Get all activitiesx
 export const getActivity = async () => {
   try {
     const response = await axios.get(`${API_URL}/activity/get`);
@@ -11,6 +11,13 @@ export const getActivity = async () => {
     console.error("Error fetching activities:", error);
     throw error;
   }
+};
+
+
+
+export const getActById = async (activityId) => {
+  const response = await axios.get(`${API_URL}/activity/getID/${activityId}`);
+  return response.data; // Return the specific activity
 };
 
 // Get activity by advertiser ID
@@ -25,6 +32,7 @@ export const getActivityById = async ({ selectedAdverId }) => {
     throw error;
   }
 };
+
 
 // Create a new activity
 export const createActivity = async (activityData) => {

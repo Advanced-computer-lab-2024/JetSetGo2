@@ -46,6 +46,20 @@ const getMuseum = async (req, res) => {
   }
 };
 
+// Fetch a single Museum by ID with populated tourismGovernerTags
+const getMuseumById = async (req, res) => {
+  const { id } = req.params; // Extract the museum ID from request parameters
+  try {
+    const museum = await Museum.findById(id).populate('tourismGovernerTags', 'name type');
+    if (!museum) {
+      return res.status(404).json({ error: 'Museum not found' });
+    }
+    res.status(200).json(museum);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 
 // Update a Museum (including tourismGovernerTags if provided)
 const updateMuseum = async (req, res) => {
@@ -119,4 +133,5 @@ module.exports = {
   updateMuseum,
   deleteMuseum,
   deleteAllMuseums,
+  getMuseumById
 };

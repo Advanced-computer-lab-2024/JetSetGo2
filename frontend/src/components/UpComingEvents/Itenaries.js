@@ -2,18 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Service method to fetch itineraries
-const getItineraries = async () => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8000/itinerary/readTourId`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching itineraries:", error);
-    throw error;
-  }
-};
+
 
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
@@ -31,6 +20,9 @@ const Itineraries = () => {
   const [activities, setActivities] = useState([]);
 
   const navigate = useNavigate();
+
+
+
 
   const fetchItineraries = async () => {
     try {
@@ -143,6 +135,8 @@ const Itineraries = () => {
     }
     setFilteredItineraries(sortedItineraries);
   };
+
+
 
   return (
     <div id="itineraries">
@@ -261,6 +255,7 @@ const Itineraries = () => {
               <p>
                 <strong>Bookings:</strong> {itinerary.bookings}
               </p>
+             
             </li>
           ))}
         </ul>

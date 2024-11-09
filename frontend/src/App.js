@@ -24,6 +24,7 @@ import SellerDetails from "./components/SellerDetails";
 import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
 import Activities from "./components/UpComingEvents/Activities";
 import Activitiest from "./components/UpComingEvents/Activitiest";
+import ActivityDetails from './components/ActivityDetails';
 
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
@@ -39,6 +40,9 @@ import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
+import HPdetails from "./components/HPDetails";
+import MDetails from "./components/MDetails";
+import ItinerariesDetails from "./components/ITdetails";
 
 
 function App() {
@@ -119,9 +123,13 @@ function App() {
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
           <Route path="/Upcoming-activities" element={<Activities />} />
           <Route path="/Upcoming-activitiest" element={<Activitiest />} />
+          <Route path="/activities/:id" element={<ActivityDetails />} />
 
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
+          <Route path="/HP/:id" element={<HPdetails/>} />
           <Route path="/all-museums" element={<Museums />} />
+          <Route path="/M/:id" element={<MDetails />} />
+          <Route path="/IT/:id" element={<ItinerariesDetails />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />
           <Route path="/Upcoming-itinerariest" element={<Itinerariest />} />
 

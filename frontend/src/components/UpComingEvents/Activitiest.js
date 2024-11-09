@@ -72,6 +72,33 @@ const Activitiest = () => {
       alert("already booked");
     }
   };
+  const handleShare = (activity) => {
+    const activityLink = `http://localhost:3001/activities/${activity._id}`;
+    const shareText = `Check out this activity: ${activity.category.name}!\n\n` +
+      `📅 Date: ${new Date(activity.date).toLocaleDateString()}\n` +
+      `📍 Location: ${activity.location}\n` +
+      `💵 Price: $${activity.price}\n` +
+      `⭐ Rating: ${activity.rating}\n\n` +
+      `🔗 Link: ${activityLink}`;
+  
+    if (navigator.share) {
+      navigator
+        .share({
+          title: activity.category.name,
+          text: shareText,
+          url: activityLink,
+        })
+        .then(() => console.log("Activity shared successfully!"))
+        .catch((error) => console.error("Error sharing activity", error));
+    } else {
+      const mailtoLink = `mailto:?subject=${encodeURIComponent(
+        `Activity: ${activity.category.name}`
+      )}&body=${encodeURIComponent(shareText)}`;
+      window.location.href = mailtoLink;
+    }
+  };
+  
+  
 
   const fetchActivities = async () => {
     try {
@@ -160,6 +187,16 @@ const Activitiest = () => {
   const handleSortByChange = (e) => {
     setSortBy(e.target.value); // Update sorting by price or rating
   };
+  const handleViewActivity = (activityId) => {
+  navigate(`/activities/${activityId}`, { state: { activityId } });
+};
+const handleCopy = (activity) => {
+  const shareUrl = `http://localhost:3001/activities/${activity._id}`;
+  navigator.clipboard.writeText(shareUrl)
+    .then(() => alert("Link copied to clipboard"))
+    .catch(error => console.error("Error copying link:", error));
+};
+
 
   return (
     <div id="activities">
@@ -296,6 +333,8 @@ const Activitiest = () => {
                   <p>
                     <strong>Rating:</strong> {activity.rating}
                   </p>
+                  <button onClick={() => handleCopy(activity)}>Share via copy Link</button>
+                  <button onClick={() => handleShare(activity)}>Share via mail </button>
                   {mapSrc && (
                     <iframe
                       title={`Map for ${activity.location}`}

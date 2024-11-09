@@ -13,6 +13,18 @@ export const getHistoricalPlace = async () => {
    }
 };
 
+
+// Get a historical place by ID
+export const getHistoricalPlaceById = async (id) => {
+   try {
+      const response = await axios.get(`${API_URL}/historicalPlace/getbyid/${id}`);
+      return response.data;
+   } catch (error) {
+      console.error(`Error fetching historicalPlace with ID ${id}:`, error);
+      throw error;
+   }
+};
+
 // Create a new activity
 export const createHistoricalPlace = async (activityData) => {
    try {
