@@ -14,10 +14,11 @@ export const getActivity = async () => {
 };
 
 // Get activity by advertiser ID
-export const getActivityById = async ({ selectedAdverId }) => {
+export const getActivityById = async () => {
+  const userId = localStorage.getItem("userId");
   try {
     const response = await axios.get(
-      `${API_URL}/activity/getAdverAct?userId=${selectedAdverId}`
+      `${API_URL}/activity/getAdverAct?userId=${userId}`
     );
     return response.data;
   } catch (error) {

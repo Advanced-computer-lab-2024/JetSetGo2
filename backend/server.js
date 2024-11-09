@@ -1,4 +1,5 @@
 const express = require("express");
+
 const cors = require("cors");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -10,7 +11,6 @@ const MongoURI = process.env.MONGO_URI;
 
 // Import models
 const Tourist = require("./models/Tourist");
-const Other = require("./models/Other");
 const TourGouvnerTagSearch = require("./models/tourismGovernerTags.js");
 const Museum = require("./models/MuseumCRUD.js");
 const HistoricalPlace = require("./models/HistoricalPlaceCRUD.js");
@@ -35,10 +35,12 @@ const sellerRoutes = require("./routes/SellerRoute");
 const tourismGovernorRoutes = require("./routes/tourismGovernorRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const AdvertiserRoutes = require("./routes/AdverRoutes.js");
-const login = require("./routes/auth.js");
+const loginRoutes = require("./routes/authRoutes.js");
+const transportationRoutes = require("./routes/TransportationCRUDroute.js");
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || "8000";
 
@@ -79,16 +81,46 @@ app.post("/api/auth/login", async (req, res) => {
     }
 
     // Generate a token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // token expires in 1 hour
-    });
+    const token = jwt.sign(
+      { id: user._id, AccountType: user.AccountType },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h", // token expires in 1 hour
+      }
+    );
 
     // Send response
-    res.status(200).json({ message: "Login successful!", token, userType: user.AccountType });
+    res.status(200).json({
+      message: "Login successful!",
+      token,
+      userType: user.AccountType,
+    });
   } catch (error) {
     console.error("Login error:", error); // Log the error
     res.status(500).json({ message: "Server error", error: error.message }); // Send error message in response
   }
+});
+
+// Middleware for authenticating JWT
+const authMiddleware = (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1]; // Get token from Authorization header
+  if (!token)
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided." });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.id; // Store the user ID for later use
+    next();
+  } catch (ex) {
+    res.status(400).json({ message: "Invalid token." });
+  }
+};
+
+// Example protected route
+app.get("/api/protected", authMiddleware, (req, res) => {
+  res.json({ message: "Welcome to the protected route!", userId: req.userId });
 });
 
 // Define your routes here
@@ -107,12 +139,13 @@ app.use("/TourismTags", tourismGovernorTagsRoutes);
 app.use("/Seller", sellerRoutes);
 app.use("/tourism", tourismGovernorRoutes);
 app.use("/admin", adminRoutes);
-app.use("/login", login);
+app.use("/login", loginRoutes);
+app.use("/transportation", transportationRoutes);
 
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Search endpoint
+// Search
 app.get("/search", async (req, res) => {
   const { searchword, searchType } = req.query; // Add searchType to query parameters
 

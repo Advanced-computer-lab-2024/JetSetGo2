@@ -4,8 +4,6 @@ const multer = require("multer");
 const upload = require("../middleware/uploadDocuments"); // Adjust the path based on your structure
 const {
   createOther,
-  getOther,
-  deleteAllOthers,
 } = require("../controllers/otherController");
 
 // Health check endpoint
@@ -24,10 +22,5 @@ router.post(
   createOther
 );
 
-// Get all users
-router.get("/getOther", getOther);
-
-// Delete all users
-router.delete("/deleteAllOther", deleteAllOthers);
 
 module.exports = router;

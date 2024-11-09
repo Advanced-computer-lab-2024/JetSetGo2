@@ -15,11 +15,24 @@ const schema = new mongoose.Schema(
     accessibility: [{ type: String, required: true }],
     pickUpLoc: [{ type: String, required: true }],
     DropOffLoc: [{ type: String, required: true }],
-    bookings: { type: Number, default: 0 },
-    bookedUsers: { type: [mongoose.Schema.Types.ObjectId], ref: 'User', default: [] },
-    tourGuide: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
-    Tags: { type: mongoose.Schema.Types.ObjectId, ref: 'PreferenceTag', required: true },
+    bookings: { type: Number, default: 0 }, // Tracks the number of bookings
+    bookedUsers: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
+    tourGuide: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tour",
+      required: true,
+    },
+    Tags: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PreferenceTag",
+      required: true,
+    },
     rating: { type: Number, required: true },
+    flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
     reviews: [
       { 
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

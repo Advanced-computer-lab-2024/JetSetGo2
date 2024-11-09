@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
-const TouristHome = ({ selectedTouristId }) => {
+const TouristHome = () => {
   const predefinedLocations = [
     { name: "Cairo, Egypt", coordinates: "31.2357,30.0444,31.2557,30.0644" },
     {
@@ -22,6 +22,7 @@ const TouristHome = ({ selectedTouristId }) => {
       coordinates: "31.4015,30.0254,31.4215,30.0454",
     },
   ];
+  const [bookedFlights, setBookedFlights] = useState([]);
   const [touristData, setTouristData] = useState({
     UserName: "",
     wallet: 0,
@@ -35,23 +36,41 @@ const TouristHome = ({ selectedTouristId }) => {
   });
   const [searchMethod, setSearchMethod] = useState("name");
   const navigate = useNavigate();
+  const handleFlightSearchClick = () => {
+    navigate('/flight-search'); // Redirect to the Flight Search page
+};
+
+  const touristId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchTouristData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/home/tourist/getTourist/${selectedTouristId}`
+          `http://localhost:8000/home/tourist/getTourist/${touristId}`
         );
         setTouristData(response.data);
       } catch (error) {
         console.error("Error fetching tourist data:", error);
       }
     };
+    const fetchBookedFlights = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/home/tourist/bookedFlights/${touristId}`
+        );
+        setBookedFlights(response.data); // Set booked flights data
+      } catch (error) {
+        console.error("Error fetching booked flights:", error);
+      }
+    };
 
-    if (selectedTouristId) {
+    if (touristId) {
       fetchTouristData();
+      fetchBookedFlights(); 
     }
-  }, [selectedTouristId]);
+  }, [touristId]);
+  
+  
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -67,7 +86,7 @@ const TouristHome = ({ selectedTouristId }) => {
       );
       console.log("Search Results:", response.data); // Log results for debugging
       setSearchResults(response.data);
-      console.log('datata = ' , response.data);
+      console.log("datata = ", response.data);
     } catch (error) {
       console.error("Error fetching search results:", error);
       setSearchResults({
@@ -91,7 +110,7 @@ const TouristHome = ({ selectedTouristId }) => {
     setSearchQuery(e.target.value);
   };
   const generateMapSrc = (coordinates) => {
-    const [long1, lat1, long2, lat2] = coordinates.split(",");
+    const [long1, lat1] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
 
@@ -124,9 +143,13 @@ const TouristHome = ({ selectedTouristId }) => {
             Update Profile
           </button>
           
-          <button    onClick={() => navigate("/mi", { state: { touristId: selectedTouristId } })}
+          <button    onClick={() => navigate("/mi", { state: { touristId: touristId } })}
   >
            My Itenaries    
+               </button>
+               <button    onClick={() => navigate("/myactivity", { state: { touristId: touristId } })}
+  >
+           My Activities    
                </button>
         </div>
       </div>
@@ -134,6 +157,25 @@ const TouristHome = ({ selectedTouristId }) => {
       {/* Main Content */}
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Welcome to Your Dashboard</h1>
+         {/* Booked Flights Section */}
+         <div style={styles.bookedFlightsSection}>
+          <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
+          {bookedFlights.length > 0 ? (
+            <ul style={styles.bookedFlightsList}>
+              {bookedFlights.map((flight, index) => (
+                <li key={index} style={styles.flightItem}>
+                  <p><strong>Flight Number:</strong> {flight.flightNumber}</p>
+                  <p><strong>Departure:</strong> {flight.departure}</p>
+                  <p><strong>Arrival:</strong> {flight.arrival}</p>
+                  <p><strong>Date:</strong> {flight.date}</p>
+                  <p><strong>Price:</strong> ${flight.price}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={styles.noFlightsText}>You have no booked flights.</p>
+          )}
+        </div>
 
         {/* Search Bar Section */}
         <div style={styles.searchSection}>
@@ -160,22 +202,29 @@ const TouristHome = ({ selectedTouristId }) => {
 
         {/* Navigation Links */}
         <nav style={styles.navbar}>
-        <button  onClick={() => navigate("/p")}>
-          View Products
-        </button>
-        <button 
-    onClick={() => navigate("/upcoming-activitiest", { state: { touristId: selectedTouristId } })}
-    style={styles.navLink}
-  >
-    Activities
-  </button>
-  <button 
-    onClick={() => navigate("/upcoming-itinerariest", { state: { touristId: selectedTouristId } })}
-    style={styles.navLink}
-  >
-    Itineraries
-  </button>
-          
+          <button onClick={() => navigate("/p")}>View Products</button>
+          <button onClick={handleFlightSearchClick}>Search Flights</button>
+        <button
+            onClick={() =>
+              navigate("/upcoming-activitiest", {
+                state: { touristId: touristId },
+              })
+            }
+            style={styles.navLink}
+          >
+            Activities
+          </button>
+          <button
+            onClick={() =>
+              navigate("/upcoming-itinerariest", {
+                state: { touristId: touristId },
+              })
+            }
+            style={styles.navLink}
+          >
+            Itineraries
+          </button>
+
           <Link to="/all-historicalplaces" style={styles.navLink}>
             Historical Places
           </Link>
@@ -254,7 +303,6 @@ const TouristHome = ({ selectedTouristId }) => {
                 <li key={index} style={styles.resultItem}>
                   <h4>{itinerary.name}</h4>
                   <p>{itinerary.activities.date}</p>
-                  
                 </li>
               ))}
             </ul>

@@ -14,7 +14,15 @@ const createTourist = async (req, res) => {
   } = req.body;
 
   // Validation checks
-  if (!Email || !UserName || !Password || !MobileNumber || !Nationality || !DateOfBirth || !Job) {
+  if (
+    !Email ||
+    !UserName ||
+    !Password ||
+    !MobileNumber ||
+    !Nationality ||
+    !DateOfBirth ||
+    !Job
+  ) {
     return res.status(400).json({ error: "All fields are required." });
   }
 
@@ -26,7 +34,9 @@ const createTourist = async (req, res) => {
 
   // Example: Validate MobileNumber (it should be a number and not less than 10 digits)
   if (isNaN(MobileNumber) || MobileNumber.toString().length < 10) {
-    return res.status(400).json({ error: "Mobile number must be at least 10 digits." });
+    return res
+      .status(400)
+      .json({ error: "Mobile number must be at least 10 digits." });
   }
 
   // Example: Validate DateOfBirth (it should be a valid date)
@@ -50,7 +60,6 @@ const createTourist = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
 
 const updateTourist = async (req, res) => {
   const { id } = req.params;
@@ -95,6 +104,7 @@ const getTouristById = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 const deleteTourist = async (req, res) => {
   console.log("Request to delete Tourist :", req.params.id); // Log the ID
   try {

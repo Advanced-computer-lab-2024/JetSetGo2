@@ -26,7 +26,8 @@ const styles = {
   }
 };
 
-const SchemaTourFront = ({ selectedTourGuideId }) => {
+const SchemaTourFront = () => {
+  const userId = localStorage.getItem("userId");
   const [itineraries, setItineraries] = useState([]);
   const [activities, setActivities] = useState([]);
   const [Tags, setTags] = useState([]);
@@ -51,7 +52,8 @@ const SchemaTourFront = ({ selectedTourGuideId }) => {
 
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/itinerary/readTour?userId=${selectedTourGuideId}`);
+      console.log(userId);
+      const response = await axios.get(`http://localhost:8000/itinerary/readTourId?userId=${userId}`);
       setItineraries(response.data);
       console.log('Itineraries:', response.data);
     } catch (error) {
@@ -127,7 +129,7 @@ const SchemaTourFront = ({ selectedTourGuideId }) => {
       ...formData,
       activities: [formData.selectedActivity],
       Tags: [formData.Tags],
-      tourGuide: selectedTourGuideId,
+      tourGuide: userId,
     };
 
     try {
@@ -148,12 +150,13 @@ const SchemaTourFront = ({ selectedTourGuideId }) => {
         accessibility: '',
         pickUpLoc: '',
         DropOffLoc: '',
-        tourGuide: selectedTourGuideId,
+        tourGuide: userId,
         Tags: '',
         rating: 0,
       });
       setEditId(null);
     } catch (error) {
+      console.error('Error submitting form:', error);
       console.error('Error submitting form:', error);
     }
   };

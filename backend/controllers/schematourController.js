@@ -1,7 +1,6 @@
 const Schema = require("../models/schematour.js");
 const { default: mongoose } = require("mongoose");
 
-// Create Guide
 const createGuide = async (req, res) => {
   const {
     name,
@@ -45,8 +44,6 @@ const createGuide = async (req, res) => {
   }
 };
 
-// Read Guide
-// Read Guide with User ID
 const readGuide = async (req, res) => {
   try {
     // Log the entire request query to check its contents
@@ -86,67 +83,10 @@ const readGuide = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// Controller function for submitting an itinerary review
-const submitReview = async (req, res) => {
-  const { userId, rating, comment } = req.body;
-  const { itineraryId } = req.params;
 
-  try {
-    // Find the itinerary by its ID
-    const itinerary = await Schema.findById(itineraryId);
-
-    if (!itinerary) {
-      return res.status(404).json({ message: 'Itinerary not found' });
-    }
-
-    // Add the review to the itinerary
-    itinerary.reviews.push({ userId, rating, comment });
-
-    // Calculate the new average rating for the itinerary
-    const totalRatings = itinerary.reviews.reduce((sum, review) => sum + review.rating, 0);
-    itinerary.rating = totalRatings / itinerary.reviews.length;
-
-    // Save the updated itinerary
-    await itinerary.save();
-
-    return res.status(200).json({ message: 'Review submitted successfully' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Server error' });
-  }
-};
-
-// Get Booked Itineraries by Tourist ID
-const getBookedItineraries = async (req, res) => {
-  try {
-    const { touristId } = req.query;
-
-    // Validate touristId
-    if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
-      return res.status(400).json({ message: "Invalid or missing Tourist ID." });
-    }
-
-    // Find all itineraries that the tourist has booked
-    const bookedItineraries = await Schema.find({
-      bookedUsers: touristId.trim(),
-    })
-      .populate("activities")
-      .populate("Tags", "name");
-
-    // Respond with the list of booked itineraries
-    res.status(200).json(bookedItineraries);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-
-
-
-// Book Tour
 const bookTour = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.body.userId;
+  const { id } = req.params; // Extract the tour ID from the URL parameters
+  const userId = req.body.userId; // Get userId from the request body (can come from the frontend or authenticated session)
 
   try {
     const schema = await Schema.findById(id);
@@ -157,7 +97,9 @@ const bookTour = async (req, res) => {
     // Increment the bookings count if the user has not booked this tour before
     await schema.incrementBookings(userId);
 
-    res.status(200).json({ message: "Booking successful", bookings: schema.bookings });
+    res
+      .status(200)
+      .json({ message: "Booking successful", bookings: schema.bookings });
   } catch (error) {
     if (error.message === "User has already booked this tour.") {
       return res.status(409).json({ message: error.message });  // Handle duplicate booking
@@ -168,6 +110,19 @@ const bookTour = async (req, res) => {
 
 // Read Guide by ID
 const readGuideID = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const schemas = await Schema.find({
+      tourGuide: new mongoose.Types.ObjectId(userId),
+    })
+      .populate("activities")
+      .populate("Tags", "name");
+    res.status(200).json(schemas);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const getIteneraries = async (req, res) => {
   try {
     const schema = await Schema.find()
       .populate("activities")
@@ -210,7 +165,6 @@ const updateGuide = async (req, res) => {
   }
 };
 
-// Delete Guide
 const deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {
@@ -287,6 +241,67 @@ const cancelBooking = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const submitReview = async (req, res) => {
+  const { userId, rating, comment } = req.body;
+  const { itineraryId } = req.params;
+  try {
+    // Find the itinerary by its ID
+    const itinerary = await Schema.findById(itineraryId);
+    if (!itinerary) {
+      return res.status(404).json({ message: 'Itinerary not found' });
+    }
+    // Add the review to the itinerary
+    itinerary.reviews.push({ userId, rating, comment });
+    // Calculate the new average rating for the itinerary
+    const totalRatings = itinerary.reviews.reduce((sum, review) => sum + review.rating, 0);
+    itinerary.rating = totalRatings / itinerary.reviews.length;
+    // Save the updated itinerary
+    await itinerary.save();
+    return res.status(200).json({ message: 'Review submitted successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+const getBookedItineraries = async (req, res) => {
+  try {
+    const { touristId } = req.query;
+    // Validate touristId
+    if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
+      return res.status(400).json({ message: "Invalid or missing Tourist ID." });
+    }
+    // Find all itineraries that the tourist has booked
+    const bookedItineraries = await Schema.find({
+      bookedUsers: touristId.trim(),
+    })
+      .populate("activities")
+      .populate("Tags", "name");
+    // Respond with the list of booked itineraries
+    res.status(200).json(bookedItineraries);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const flagItinerary = async (req, res) => {
+  const { id } = req.params; // Extract the itinerary ID from the URL
+
+  try {
+    // Find the itinerary by ID and update the 'flagged' status to true automatically
+    const updatedSchema = await Schema.findByIdAndUpdate(
+      id,
+      { flagged: true }, // Automatically set 'flagged' to true
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedSchema) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    res.status(200).json(updatedSchema);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 
@@ -298,8 +313,10 @@ module.exports = {
   updateGuide,
   deleteGuide,
   bookTour,
+  flagItinerary,
   toggleActivation,
   cancelBooking,
   submitReview,
-  getBookedItineraries
+  getBookedItineraries,
+  getIteneraries,
 };

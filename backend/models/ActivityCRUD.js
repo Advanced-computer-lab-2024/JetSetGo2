@@ -46,6 +46,13 @@ const activitySchema = new Schema(
       type: Number, 
       default: 0,  
     },
+    reviews: [
+      { 
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        rating: { type: Number, min: 1, max: 5 },
+        comment: { type: String }
+      }
+    ],
     bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },       rating: {
       type: Number,
       required: true,

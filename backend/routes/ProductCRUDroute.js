@@ -5,7 +5,9 @@ const {
   getProducts,
   updateProduct,
   deleteProduct,
-  deleteAllProducts
+  deleteAllProducts,
+  archiveProduct,
+  unarchiveProduct
 } = require('../controllers/ProductCRUDcontroller'); // Adjust the path if needed
 
 
@@ -15,5 +17,8 @@ router.get('/get', getProducts);
 router.put('/update/:id', updateProduct);
 router.delete('/delete/:id', deleteProduct);
 router.delete('/deleteall', deleteAllProducts);
+// New routes for archiving/unarchiving
+router.patch('/archive/:id', archiveProduct);
+router.patch('/unarchive/:id', unarchiveProduct);
 
 module.exports = router;

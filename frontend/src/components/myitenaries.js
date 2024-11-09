@@ -8,6 +8,7 @@ const ItinerariesPage = () => {
   const [submittedReviews, setSubmittedReviews] = useState(
     JSON.parse(localStorage.getItem("submittedReviews")) || {}
   );
+  const [submittedGuideReviews, setSubmittedGuideReviews] = useState({});
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,7 +23,16 @@ const ItinerariesPage = () => {
     const fetchItineraries = async () => {
       try {
         const bookedItineraries = await getBookedItineraries(touristId);
-        setItineraries(bookedItineraries);
+        // Get today's date
+        const today = new Date();
+
+        // Filter itineraries that have dates before today
+        const filteredItineraries = bookedItineraries.filter((itinerary) => {
+          // Assuming availableDates is an array and each date is a string in ISO format
+          return itinerary.availableDates.some((date) => new Date(date) < today);
+        });
+
+        setItineraries(filteredItineraries);
       } catch (error) {
         console.error("Error fetching itineraries:", error);
         setError("Failed to load itineraries.");
@@ -41,7 +51,7 @@ const ItinerariesPage = () => {
       console.log("Fetching itineraries for touristId:", touristId);
 
       const response = await axios.get(
-        `http://localhost:8000/itinerary/getBookedItineraries`,
+        "http://localhost:8000/itinerary/getBookedItineraries",
         { params: { touristId } }
       );
       return response.data;
@@ -60,7 +70,6 @@ const ItinerariesPage = () => {
       });
       alert("Itinerary review submitted!");
 
-      // Update the submitted reviews state and localStorage
       const updatedSubmittedReviews = { ...submittedReviews, [itineraryId]: true };
       setSubmittedReviews(updatedSubmittedReviews);
       localStorage.setItem("submittedReviews", JSON.stringify(updatedSubmittedReviews));
@@ -77,6 +86,9 @@ const ItinerariesPage = () => {
         comment: guideComment,
       });
       alert("Tour guide review submitted!");
+
+      const updatedSubmittedGuideReviews = { ...submittedGuideReviews, [tourGuideId]: true };
+      setSubmittedGuideReviews(updatedSubmittedGuideReviews);
     } catch (error) {
       console.error("Error submitting tour guide review:", error);
     }
@@ -134,32 +146,34 @@ const ItinerariesPage = () => {
               )}
 
               {/* Tour Guide Review Form */}
-              <div className="review-section">
-                <h4>Rate and Comment on the Tour Guide:</h4>
-                <div>
-                  <label htmlFor="guide-rating">Rating (1-5):</label>
-                  <input
-                    type="number"
-                    id="guide-rating"
-                    value={guideRating}
-                    min="1"
-                    max="5"
-                    onChange={(e) => setGuideRating(e.target.value)}
-                  />
+              {!submittedGuideReviews[itinerary.tourGuide] && (
+                <div className="review-section">
+                  <h4>Rate and Comment on the Tour Guide:</h4>
+                  <div>
+                    <label htmlFor="guide-rating">Rating (1-5):</label>
+                    <input
+                      type="number"
+                      id="guide-rating"
+                      value={guideRating}
+                      min="1"
+                      max="5"
+                      onChange={(e) => setGuideRating(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="guide-comment">Comment:</label>
+                    <textarea
+                      id="guide-comment"
+                      value={guideComment}
+                      onChange={(e) => setGuideComment(e.target.value)}
+                      placeholder="Write your comment here"
+                    />
+                  </div>
+                  <button onClick={() => handleTourGuideReview(itinerary.tourGuide)}>
+                    Submit Tour Guide Review
+                  </button>
                 </div>
-                <div>
-                  <label htmlFor="guide-comment">Comment:</label>
-                  <textarea
-                    id="guide-comment"
-                    value={guideComment}
-                    onChange={(e) => setGuideComment(e.target.value)}
-                    placeholder="Write your comment here"
-                  />
-                </div>
-                <button onClick={() => handleTourGuideReview(itinerary.tourGuide)}>
-                  Submit Tour Guide Review
-                </button>
-              </div>
+              )}
             </li>
           ))}
         </ul>

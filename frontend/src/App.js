@@ -26,6 +26,8 @@ import Activities from "./components/UpComingEvents/Activities";
 import Activitiest from "./components/UpComingEvents/Activitiest";
 
 import ItinerariesPage from "./components/myitenaries";
+import MyActivities from "./components/myactivities";
+
 
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
@@ -33,7 +35,7 @@ import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import Itinerariest from "./components/UpComingEvents/Itenariest";
 import Itinerariestg from "./components/UpComingEvents/Itenariestg";
-
+import OthersListPage from "./components/FetchDocuments";
 import ProductList from "./components/ProductList";
 import AddAdmin from "./components/AddAdmin";
 import AddTourismGovernor from "./components/AddTourismGovernor";
@@ -42,74 +44,61 @@ import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
 import Login from "./components/login";
-
+import FlightSearch from "./components/FlightSearch";
+import ItinerariesAdmin from "./components/ItinerariesAdmin";
 
 function App() {
-  const [selectedTouristId, setSelectedTouristId] = useState(null);
-  const [selectedTourGuideId, setselectedTourGuideId] = useState(null);
-  const [selectedAdverId, setselectedAdverId] = useState(null);
+
+  
 
   return (
     <Router>
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login />} /> {/* Login Route */}
-          <Route
-            path="/tourist-signup"
-            element={
-              <TouristSignup setSelectedTouristId={setSelectedTouristId} />
-            }
-          />
-          <Route
-            path="/tourist-home"
-            element={<TouristHome selectedTouristId={selectedTouristId} />}
-          />
-          <Route
-            path="/tourist-update"
-            element={
-              <UpdateTouristPage selectedTouristId={selectedTouristId} />
-            }
-          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/tourist-signup" element={<TouristSignup />} />
+          <Route path="/tourist-home" element={<TouristHome />} />
+          <Route path="/tourist-update" element={<UpdateTouristPage />} />
           <Route
             path="/AdvirtiserMain"
-            element={<AdvertiserForm setselectedAdverId={setselectedAdverId} />}
+            element={<AdvertiserForm  />}
           />
           <Route
             path="/list"
-            element={<AdvertiserManagement selectedAdverId={selectedAdverId} />}
+            element={<AdvertiserManagement  />}
           />
           <Route
             path="/CreateTourGuide"
             element={
               <CreateTourGuide
-                setselectedTourGuideId={setselectedTourGuideId}
+                
               />
             }
           />
           <Route
             path="/editTourGuide"
             element={
-              <EditTourGuide selectedTourGuideId={selectedTourGuideId} />
+              <EditTourGuide />
             }
           />
           <Route
             path="/tour-guide"
             element={
-              <TourGuideDetails selectedTourGuideId={selectedTourGuideId} />
+              <TourGuideDetails  />
             }
           />
           <Route path="/other-signup" element={<OtherSignup />} />
           <Route
             path="/activities"
-            element={<ActivityCRUD selectedAdverId={selectedAdverId} />}
+            element={<ActivityCRUD  />}
           />
           <Route path="/historicalplaces" element={<HistoricalplaceCRUD />} />
           <Route path="/museums" element={<MuseumCRUD />} />
           <Route
             path="/SchemaTourFront"
             element={
-              <SchemaTourFront selectedTourGuideId={selectedTourGuideId} />
+              <SchemaTourFront />
             }
           />
           <Route path="/TagsManagement" element={<TagsManagement />} />
@@ -123,6 +112,8 @@ function App() {
           <Route path="/Upcoming-activities" element={<Activities />} />
           <Route path="/Upcoming-activitiest" element={<Activitiest />} />
           <Route path="/mi" element={<ItinerariesPage />} />
+          <Route path="/myactivity" element={<MyActivities />} />
+
 
           
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
@@ -136,7 +127,18 @@ function App() {
           <Route path="/AddTourismGovernor" element={<AddTourismGovernor />} />
           <Route path="/DeleteUsers" element={<DeleteUsers />} />
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
-          <Route path="/tourismGovernorPage" element={<TourismGovernorPage />} />
+          <Route
+            path="/tourismGovernorPage"
+            element={<TourismGovernorPage />}
+          />
+          <Route
+            path="/tourismGovernorPage"
+            element={<TourismGovernorPage />}
+          />
+          <Route path="/fetchdocuments" element={<OthersListPage />} />
+          <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
+          
+          <Route path="/flight-search" element={<FlightSearch />} />
         </Routes>
       </div>
     </Router>

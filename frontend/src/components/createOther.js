@@ -16,10 +16,12 @@ const OtherSignup = () => {
   });
 
   const [error, setError] = useState(""); // State for error messages
+  const [fileErrors, setFileErrors] = useState({}); // State for file error messages
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (
       name === "IDDocument" ||
       name === "Certificates" ||
@@ -28,12 +30,17 @@ const OtherSignup = () => {
       const file = e.target.files[0];
       // Validate file size
       if (file && file.size > MAX_FILE_SIZE) {
-        alert("File size exceeds 2 MB limit.");
+        setFileErrors((prev) => ({
+          ...prev,
+          [name]: "File size exceeds 2 MB limit.",
+        }));
         return;
       }
+      setFileErrors((prev) => ({ ...prev, [name]: null })); // Reset error if valid
       setFormData({ ...formData, [name]: file });
     } else {
       setFormData({ ...formData, [name]: value });
+      setError(""); // Clear error on input change
     }
   };
 
@@ -54,7 +61,7 @@ const OtherSignup = () => {
     try {
       console.log("Form Data before submit:", formData); // Debug log
       const response = await axios.post(
-        "http://localhost:8000/home/other/addOther",
+        "http://localhost:8000/home/other/addOther", // Adjust the URL if necessary
         data,
         {
           headers: {
@@ -63,9 +70,7 @@ const OtherSignup = () => {
         }
       );
       console.log("Signup successful:", response.data);
-      
-        navigate("/login");
-      
+      navigate("/login");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Signup failed. Please try again."); // Set error message
@@ -121,7 +126,7 @@ const OtherSignup = () => {
           >
             <option value="">Select Account Type</option>
             <option value="Advertiser">Advertiser</option>
-            <option value="TourGuide">Tour Guide</option> {/* Corrected here */}
+            <option value="TourGuide">Tour Guide</option>
             <option value="Seller">Seller</option>
           </select>
         </div>
@@ -135,25 +140,13 @@ const OtherSignup = () => {
             accept=".jpg, .jpeg, .png, .pdf"
             required
           />
+          {fileErrors.IDDocument && (
+            <p style={styles.error}>{fileErrors.IDDocument}</p>
+          )}
         </div>
 
-        {/* Conditional rendering for file uploads */}
-        {formData.AccountType === "Advertiser" ||
-        formData.AccountType === "Seller" ? (
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Tax Registry:</label>
-            <input
-              type="file"
-              name="TaxationRegistryCard"
-              onChange={handleChange}
-              style={styles.input}
-              accept=".jpg, .jpeg, .png, .pdf"
-              required
-            />
-          </div>
-        ) : null}
-
-        {formData.AccountType === "TourGuide" ? (
+        {/* Conditional rendering for Certificates and TaxationRegistryCard */}
+        {formData.AccountType === "TourGuide" && (
           <div style={styles.inputGroup}>
             <label style={styles.label}>Certificates:</label>
             <input
@@ -164,8 +157,29 @@ const OtherSignup = () => {
               accept=".jpg, .jpeg, .png, .pdf"
               required
             />
+            {fileErrors.Certificates && (
+              <p style={styles.error}>{fileErrors.Certificates}</p>
+            )}
           </div>
-        ) : null}
+        )}
+
+        {(formData.AccountType === "Advertiser" ||
+          formData.AccountType === "Seller") && (
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Taxation Registry Card:</label>
+            <input
+              type="file"
+              name="TaxationRegistryCard"
+              onChange={handleChange}
+              style={styles.input}
+              accept=".jpg, .jpeg, .png, .pdf"
+              required
+            />
+            {fileErrors.TaxationRegistryCard && (
+              <p style={styles.error}>{fileErrors.TaxationRegistryCard}</p>
+            )}
+          </div>
+        )}
 
         <button type="submit" style={styles.button}>
           Sign Up
@@ -174,7 +188,6 @@ const OtherSignup = () => {
     </div>
   );
 };
-
 
 const styles = {
   container: {

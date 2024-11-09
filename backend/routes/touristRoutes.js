@@ -17,6 +17,7 @@ router.post("/addTourist", createTourist);
 router.put("/updateTourist/:id", updateTourist);
 router.get("/getTourist", getTourist);
 router.get("/get", getTourist);
+router.get("/get", getTourist);
 router.get("/getTourist/:id", getTouristById);
 router.delete("/delete/:id", deleteTourist);
 router.delete("/deleteAllTourist", deleteAllTourist);

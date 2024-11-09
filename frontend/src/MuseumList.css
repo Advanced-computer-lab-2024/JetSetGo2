@@ -1,0 +1,28 @@
+.museum-list {
+    padding: 20px;
+}
+
+.museum-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    /* Space between museum boxes */
+}
+
+.museum-box {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    width: calc(30% - 20px);
+    /* Adjust width as needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.museum-box h2 {
+    margin-top: 0;
+}
+
+.museum-box p {
+    margin: 5px 0;
+}
