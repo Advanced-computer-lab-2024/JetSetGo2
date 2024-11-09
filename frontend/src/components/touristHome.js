@@ -40,6 +40,11 @@ const TouristHome = () => {
     navigate('/flight-search'); // Redirect to the Flight Search page
 };
 
+const handleHotelSearchClick = () => {
+  navigate('/hotelSearch'); // Redirect to the Flight Search page
+};
+
+
   const touristId = localStorage.getItem("userId");
 
   useEffect(() => {
@@ -194,6 +199,7 @@ const TouristHome = () => {
         <nav style={styles.navbar}>
           <button onClick={() => navigate("/p")}>View Products</button>
           <button onClick={handleFlightSearchClick}>Search Flights</button>
+          <button onClick={handleHotelSearchClick}>Search Hotels</button>
         <button
             onClick={() =>
               navigate("/upcoming-activitiest", {

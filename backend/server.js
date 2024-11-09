@@ -37,6 +37,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const AdvertiserRoutes = require("./routes/AdverRoutes.js");
 const loginRoutes = require("./routes/authRoutes.js");
 const transportationRoutes = require("./routes/TransportationCRUDroute.js");
+const hotelSearch = require("./routes/HotelSearchAPIroute.js");
 
 const app = express();
 app.use(express.json());
@@ -182,6 +183,7 @@ app.use("/tourism", tourismGovernorRoutes);
 app.use("/admin", adminRoutes);
 app.use("/login", loginRoutes);
 app.use("/transportation", transportationRoutes);
+app.use("/hotelapi",hotelSearch);
 
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
