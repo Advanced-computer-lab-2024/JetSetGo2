@@ -303,7 +303,8 @@ const Activitiest = () => {
                 <strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}
               </p>
               <p>
-                <strong>Time:</strong> {new Date(activity.time).toLocaleTimeString()}
+              <p><strong>Time:</strong> {activity.time ? new Date(activity.time).toLocaleTimeString() : "Time not available"}</p>
+                
               </p>
               <p>
                 <strong>Location:</strong> {activity.location}
