@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from "react-router-dom";
 import axios from 'axios';
 
 const HotelSearch = () => {
@@ -9,7 +10,9 @@ const HotelSearch = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
   const [selectedHotelId, setSelectedHotelId] = useState(null);
+  const navigate = useNavigate();
 
   // Get Bearer Token from Amadeus API
   const getBearerToken = async () => {
@@ -33,10 +36,29 @@ const HotelSearch = () => {
     }
   };
 
+  const handleBookOffer = async (offer, hotelName) => {
+    setSuccessMessage(''); // Clear previous success message
+    const touristId = localStorage.getItem("userId"); // Retrieve tourist ID from local storage
+
+    try {
+      const response = await axios.post(`http://localhost:8000/home/tourist/${touristId}/bookHotel`, { offer, hotelName });
+      console.log("offer ", offer, "hotelName", hotelName);
+
+      if (response.status === 200) {
+        setSuccessMessage('Booked successfully!');
+      }
+    } catch (error) {
+      console.error('Error booking offer:', error);
+      setError('Booking failed. Please try again.');
+    }
+};
+
+
   // Search Hotels by City Code
   const searchHotels = async () => {
     setLoading(true);
     setError(null);
+    setSuccessMessage(null);
     setHotels([]);
     setOffers([]);
     setSelectedHotelId(null);
@@ -80,7 +102,7 @@ const HotelSearch = () => {
       const token = await getBearerToken();
 
       const response = await axios.get(
-        `https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=${hotelId}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`,
+        `https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=["${hotelId}"]&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -93,7 +115,7 @@ const HotelSearch = () => {
       }
     } catch (error) {
       console.error('Error fetching hotel offers:', error);
-      setError('An error occurred. Please try again.');
+      setError('No offers available for the selected dates.');
     } finally {
       setLoading(false);
     }
@@ -187,13 +209,32 @@ const HotelSearch = () => {
         color: 'red',
         textAlign: 'center',
       },
+      successMessage: {
+        color: 'green',
+        textAlign: 'center',
+        margin: '10px 0',
+      },
       loading: {
         textAlign: 'center',
+      },
+      backButton: {
+        position: 'absolute',
+        top: '20px',
+        left: '20px',
+        backgroundColor: '#1D72B8',
+        color: '#fff',
+        padding: '8px 15px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
       },
   };
 
   return (
     <div style={styles.container}>
+      <button onClick={() => navigate('/tourist-home')} style={styles.backButton}>
+        Back to Tourist Home
+      </button>
       <h1 style={styles.header}>Hotel Search</h1>
       <div style={styles.inputContainer}>
         <label htmlFor="cityCode">City Code (e.g., NYC)</label>
@@ -230,6 +271,8 @@ const HotelSearch = () => {
 
       {error && <p style={styles.error}>{error}</p>}
 
+      {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
+
       {hotels.length > 0 && !selectedHotelId && (
         <div>
           <h2>Hotel Results</h2>
@@ -252,7 +295,7 @@ const HotelSearch = () => {
 
       {selectedHotelId && (
         <>
-          <button onClick={handleBackToHotels} style={styles.backButton}>
+          <button onClick={handleBackToHotels}>
             Back to Hotels
           </button>
           {offers.length === 0 ? (
@@ -288,7 +331,10 @@ const HotelSearch = () => {
                           ? `Free cancellation before ${individualOffer.policies.cancellations[0].deadline}`
                           : "No free cancellation"}
                       </p>
-                      <button style={styles.button}>Book Now</button>
+                      <button onClick={() => handleBookOffer(individualOffer, offer.hotel.name)} style={styles.button}>
+  Book Now
+</button>
+
                     </div>
                   ))}
                 </div>
