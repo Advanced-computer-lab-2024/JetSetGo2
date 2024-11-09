@@ -17,7 +17,8 @@ const updateUser = async (req, res) => {
     LanguagesSpoken,
     Email,
   } = req.body;
-  const imageFile = req.file ? req.file.filename.split("/").pop() : null; // Store the full path of the uploaded file
+  const base64Image = req.body.pictures.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
+  const Photo = base64Image // Get just the filename if uploaded
 
   try {
     const updateFields = {};
@@ -29,7 +30,7 @@ const updateUser = async (req, res) => {
     if (YearsOfExperience) updateFields.YearsOfExperience = YearsOfExperience;
     if (LanguagesSpoken) updateFields.LanguagesSpoken = LanguagesSpoken;
     if (Email) updateFields.Email = Email;
-    if (imageFile) updateFields.Photo = imageFile; // Save the full path of the photo if uploaded
+    if (Photo) updateFields.Photo = Photo; // Update logo if provided, saving only the filename
 
     const updatedTourGuide = await TourModel.findByIdAndUpdate(
       id,

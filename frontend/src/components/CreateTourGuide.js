@@ -61,6 +61,25 @@ const UpdateTourGuide = () => {
     setPhoto(e.target.files[0]); // Store the selected photo file in state
   };
 
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        //setImagePreview(reader.result);
+        //console.log(imagePreview);
+        
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const tourGuideId = localStorage.getItem("userId"); // Get tour guide ID from local storage
@@ -128,8 +147,13 @@ const UpdateTourGuide = () => {
 
         {/* Photo file input */}
         <div>
-          <label>Photo:</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+        <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => handleImageUpload(e, setFormData)}
+  required
+/>
         </div>
 
         {/* Display existing photo if available */}

@@ -29,6 +29,7 @@ const createOther = async (req, res) => {
         TaxationRegistryCard,
         Profile_Completed: false,
         Admin_Acceptance: false,
+        
       });
     }
 

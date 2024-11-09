@@ -57,7 +57,7 @@ const AdvertiserDetails = () => {
     Loc: "",
     CompanyDes: "",
     Services: "",
-    logoFile: null, // State to hold the logo file
+    logoFile: "", // State to hold the logo file
   });
   const [activityFormData, setActivityFormData] = useState({
     date: "",
@@ -82,6 +82,7 @@ const AdvertiserDetails = () => {
           );
           setAdvertiser(response.data);
           setAdvertiserFormData(response.data); // Populate form with fetched data
+          console.log(advertiserFormData);
         } else {
           setError("No advertiser ID found in local storage.");
         }
@@ -174,6 +175,7 @@ const AdvertiserDetails = () => {
         }
       );
       setAdvertiser(response.data);
+
       setIsEditingAdvertiser(false);
       console.log("Advertiser updated:", response.data);
     } catch (error) {
@@ -299,14 +301,11 @@ const AdvertiserDetails = () => {
       {/* Sidebar */}
       <div style={sidebarStyle}>
         <h3>Welcome</h3>
-        <img
-          src={
-            `http://localhost:8000/uploads/adverLogo/${advertiser.logo}` ||
-            "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-          } // Fallback profile image
-          alt="Profile"
-          style={profileImage}
-        />
+        <img 
+                          src={`data:image/png;base64,${advertiser.logo}`} 
+                          alt="Product" 
+                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                        />
         <button
           onClick={() => setShowDetails(!showDetails)}
           style={buttonStyle}

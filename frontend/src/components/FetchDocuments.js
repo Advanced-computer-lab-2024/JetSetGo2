@@ -138,12 +138,13 @@ const OthersListPage = () => {
                 <td>
                   {user.IDDocument ? (
                     <a
-                      href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View ID Document
-                    </a>
+                    href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View ID Document
+                  </a>
+                  
                   ) : (
                     "No document"
                   )}

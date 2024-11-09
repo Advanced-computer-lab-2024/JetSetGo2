@@ -236,14 +236,11 @@ const SellerDetails = () => {
       {Seller.logo && (
         <li style={listItemStyle}>
           <strong>Logo:</strong>{" "}
-          <img
-            src={
-              `http://localhost:8000/uploads/sellerLogo/${Seller.logo}` ||
-              "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-            } // Use the actual logo field from the seller object
-            alt="Logo"
-            style={{ width: "100px", height: "auto" }}
-          />
+          <img 
+                          src={`data:image/png;base64,${Seller.logo}`} 
+                          alt="Product" 
+                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                        />
         </li>
       )}
     </ul>
@@ -356,14 +353,11 @@ const SellerDetails = () => {
   return (
     <div style={containerStyle}>
       <div style={sidebarStyle}>
-        <img
-          src={
-            `http://localhost:8000/uploads/sellerLogo/${Seller.logo}` ||
-            "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-          }
-          alt="Logo"
-          style={avatarStyle}
-        />
+      <img 
+                          src={`data:image/png;base64,${Seller.logo}`} 
+                          alt="Product" 
+                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                        />
         <h2>{Seller.UserName}</h2>
         <button
           style={buttonStyle}
