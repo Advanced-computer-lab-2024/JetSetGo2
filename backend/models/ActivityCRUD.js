@@ -20,8 +20,8 @@ const activitySchema = new Schema(
       required: true,
     },
     category: {
-      type: Schema.Types.ObjectId, 
-      ref: "Category", 
+      type: Schema.Types.ObjectId,
+      ref: "Category",
       required: true,
     },
     tags: {
@@ -38,18 +38,19 @@ const activitySchema = new Schema(
       required: true,
     },
     advertiser: {
-      type: Schema.Types.ObjectId, 
-      ref: "adver", 
+      type: Schema.Types.ObjectId,
+      ref: "adver",
       required: true,
     },
-    bookings: { 
-      type: Number, 
-      default: 0,  
+    bookings: {
+      type: Number,
+      default: 0,
     },
-    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },       rating: {
+    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] }, rating: {
       type: Number,
       required: true,
     },
+    flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
   },
   { timestamps: true }
 );
@@ -59,7 +60,7 @@ activitySchema.methods.incrementBookings = async function (userId) {
   const userObjectId = new mongoose.Types.ObjectId(userId);
 
   // Check if the user has already booked
-  const alreadyBooked = this.bookedUsers.some(bookedUserId => 
+  const alreadyBooked = this.bookedUsers.some(bookedUserId =>
     bookedUserId.equals(userObjectId)
   );
 

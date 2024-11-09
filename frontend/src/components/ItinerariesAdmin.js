@@ -67,8 +67,9 @@ const Itineraries = () => {
               <button
                 className="flag-button"
                 onClick={() => handleFlagItinerary(itinerary._id)}
+                disabled={itinerary.flagged} // Disable button if already flagged
               >
-                Flag as Unavailable
+                {itinerary.flagged ? "Unavailable" : "Flag as Unavailable"}
               </button>
             </li>
           ))}
