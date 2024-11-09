@@ -13,6 +13,16 @@ export const getMuseum = async () => {
    }
 };
 
+// Get museum by ID
+export const getMuseumById = async (id) => {
+   try {
+      const response = await axios.get(`${API_URL}/museum/museum/${id}`);
+      return response.data;
+   } catch (error) {
+      console.error("Error fetching Museum by ID:", error);
+      throw error;
+   }
+};
 // Create a new activity
 export const createMuseum = async (activityData) => {
    try {

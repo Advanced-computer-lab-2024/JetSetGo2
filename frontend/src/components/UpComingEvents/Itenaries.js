@@ -32,6 +32,9 @@ const Itineraries = () => {
 
   const navigate = useNavigate();
 
+
+
+
   const fetchItineraries = async () => {
     try {
       const response = await axios.get(
@@ -149,6 +152,8 @@ const Itineraries = () => {
     setFilteredItineraries(sortedItineraries);
   };
 
+
+
   return (
     <div id="itineraries">
       <div className="back-button-container">
@@ -262,6 +267,9 @@ const Itineraries = () => {
               <p>
                 <strong>Drop Off Location:</strong>{" "}
                 {itinerary.dropOffLoc ? itinerary.dropOffLoc.join(", ") : "No drop-off location"}
+              </p>
+              <p>
+                <strong>Bookings:</strong> {itinerary.bookings}
               </p>
             </li>
           ))}

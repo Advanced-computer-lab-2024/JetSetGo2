@@ -45,6 +45,22 @@ const getHistoricalPlace = async (req, res) => {
   }
 };
 
+const getHistoricalPlaceById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Find the historical place by ID and populate the tourismGovernerTags field
+    const historicalPlace = await HistoricalPlace.findById(id).populate('tourismGovernerTags', 'name type');
+
+    if (!historicalPlace) {
+      return res.status(404).json({ error: "Historical place not found" });
+    }
+
+    res.status(200).json(historicalPlace);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 // Update a Historical Place (including tourismGovernerTags if provided)
 const updateHistoricalPlace = async (req, res) => {
   const { id } = req.params; // Extract id from the request parameters
@@ -117,4 +133,5 @@ module.exports = {
   updateHistoricalPlace,
   deleteHistoricalPlace,
   deleteAllHistoricalPlaces,
+  getHistoricalPlaceById
 };

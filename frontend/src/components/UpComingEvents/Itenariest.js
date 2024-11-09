@@ -57,6 +57,7 @@ const Itinerariest = () => {
     }
   };
 
+
   const fetchActivities = async () => {
     try {
       const response = await axios.get("http://localhost:8000/activity/get");
@@ -81,6 +82,7 @@ const Itinerariest = () => {
     fetchItineraries();
     fetchTags();
     fetchActivities();
+    
   }, []);
 
   // Filter itineraries based on selected filters
@@ -156,6 +158,36 @@ const Itinerariest = () => {
     setFilteredItineraries(sortedItineraries);
   };
 
+  const handleCopyLink = async (id) => {
+    const link = `http://localhost:3000/IT/${id}`;
+    navigator.clipboard.writeText(link).then(
+      () => alert("Link copied to clipboard!"),
+      (err) => alert("Failed to copy the link.")
+    );
+  };
+
+  
+  const handleShareByEmail = (itinerary) => {
+    // Prepare the mailto link
+    const subject = encodeURIComponent(`Check out this itinerary: ${itinerary.name}`);
+    const body = encodeURIComponent(`
+      Here are the details of the itinerary:
+      - Name: ${itinerary.name}
+      - Tour Price: ${itinerary.TourPrice.join(", ")}
+      - Available Dates: ${itinerary.availableDates.map(date => new Date(date).toLocaleDateString()).join(", ")}
+      - Rating: ${itinerary.rating}
+      
+      You can view more details here: http://localhost:3000/IT/${itinerary._id}
+    `);
+    
+    // Construct the mailto link
+    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+    
+    // Open the email client
+    window.location.href = mailtoLink;
+  };
+  
+  
   // Function to handle booking the tour
   const handleBookTour = async (id) => {
     try {
@@ -294,6 +326,8 @@ const Itinerariest = () => {
               <button onClick={() => handleBookTour(itinerary._id)}>
                 Book Tour
               </button>
+              <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
+              <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
             </li>
           ))}
         </ul>

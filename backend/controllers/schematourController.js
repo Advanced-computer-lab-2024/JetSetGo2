@@ -44,6 +44,25 @@ const createGuide = async (req, res) => {
   }
 };
 
+
+const getItineraryById = async (req, res) => {
+  const { id } = req.params; // Extract the itinerary ID from the request parameters
+  try {
+    console.log("Itenray id",id);
+    const itinerary = await Schema.findById(id)
+      .populate("activities")
+      .populate("Tags", "name");
+      
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    res.status(200).json(itinerary); // Send the found itinerary
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const readGuide = async (req, res) => {
   try {
     // Log the entire request query to check its contents
@@ -248,6 +267,7 @@ module.exports = {
   updateGuide,
   deleteGuide,
   bookTour,
+  getItineraryById,
   flagItinerary,
   toggleActivation,
   getIteneraries,

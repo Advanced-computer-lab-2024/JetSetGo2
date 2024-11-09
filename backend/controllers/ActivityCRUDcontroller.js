@@ -53,6 +53,22 @@ const getActivity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+// Get a specific Activity by ID with populated category, advertiser, and tags
+const getActivityById = async (req, res) => {
+  const { id } = req.params; // Extract the activity ID from the URL parameters
+  try {
+    const activity = await Activity.findById(id)
+      .populate("category", "name") // Populate 'category' with only 'name'
+      .populate("advertiser", "Name") // Populate 'advertiser' with only 'Name'
+      .populate("tags"); // Populate 'tags' with all fields
+    res.status(200).json(activity); // Send the found activity as a response
+  } catch (error) {
+    res.status(500).json({ error: error.message }); // Handle server errors
+  }
+};
+
+
+
 
 // Update Activity
 const updateActivity = async (req, res) => {
@@ -236,5 +252,6 @@ module.exports = {
   upcomingactivity,
   readAdverActivites,
   bookactivity,
+  getActivityById,
   flagActivity
 };
