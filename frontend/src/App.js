@@ -43,6 +43,7 @@ import FlightSearch from "./components/FlightSearch";
 import ItinerariesAdmin from "./components/ItinerariesAdmin";
 import TransportationPage from "./components/TransportationCRUD";
 import TransportationBooking from "./components/BookTransportation";
+import HotelSearch from "./components/HotelSearch";
 import FileComplaint from "./components/FileComplaint";
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/tourist-signup" element={<TouristSignup />} />
           <Route path="/tourist-home" element={<TouristHome />} />
+          <Route path="/hotelSearch" element={<HotelSearch />} />
           <Route path="/tourist-update" element={<UpdateTouristPage />} />
           <Route path="/transportation" element={<TransportationPage />} />
           <Route path="/transportationBooking" element={<TransportationBooking />} />

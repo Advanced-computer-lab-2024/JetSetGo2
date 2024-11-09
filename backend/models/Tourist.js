@@ -50,6 +50,7 @@ const TouristSchema = new Schema(
       },
     ],
     bookedFlights: [Object],
+    bookedHotels: [Object],
   },
   { timestamps: true }
 );

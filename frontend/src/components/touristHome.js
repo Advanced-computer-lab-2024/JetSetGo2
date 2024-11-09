@@ -23,6 +23,7 @@ const TouristHome = () => {
     },
   ];
   const [bookedFlights, setBookedFlights] = useState([]);
+  const [bookedHotels, setBookedHotels] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [touristData, setTouristData] = useState({
     UserName: "",
@@ -39,7 +40,12 @@ const TouristHome = () => {
   const navigate = useNavigate();
   const handleFlightSearchClick = () => {
     navigate('/flight-search'); // Redirect to the Flight Search page
-  };
+};
+
+const handleHotelSearchClick = () => {
+  navigate('/hotelSearch'); // Redirect to the Flight Search page
+};
+
 
   const touristId = localStorage.getItem("userId");
 
@@ -63,6 +69,16 @@ const TouristHome = () => {
         console.error("Error fetching booked flights:", error);
       }
     };
+
+    const fetchBookedHotels = async (touristId) => {
+      try {
+        const response = await axios.get(`http://localhost:8000/home/tourist/bookedHotels/${touristId}`);
+        console.log("Booked hotels:", response.data);
+        setBookedHotels(response.data); // Update state with the fetched data
+      } catch (error) {
+        console.error("Error fetching booked hotels:", error);
+      }
+    };
     const fetchComplaints = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/complaint/complaints/${touristId}`);
@@ -75,6 +91,7 @@ const TouristHome = () => {
     if (touristId) {
       fetchTouristData();
       fetchBookedFlights(touristId);
+      fetchBookedHotels(touristId) ;
       fetchComplaints();
     }
   }, [touristId]);
@@ -159,8 +176,44 @@ const TouristHome = () => {
       {/* Main Content */}
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Welcome to Your Dashboard</h1>
-        {/* Booked Flights Section */}
-        <div style={styles.bookedFlightsSection}>
+        <nav style={styles.navbar}>
+          <button onClick={() => navigate("/p")}>View Products</button>
+          <button onClick={handleFlightSearchClick}>Search Flights</button>
+          <button onClick={handleHotelSearchClick}>Search Hotels</button>
+        <button
+            onClick={() =>
+              navigate("/upcoming-activitiest", {
+                state: { touristId: touristId },
+              })
+            }
+            style={styles.navLink}
+          >
+            Activities
+          </button>
+          <button
+            onClick={() =>
+              navigate("/upcoming-itinerariest", {
+                state: { touristId: touristId },
+              })
+            }
+            style={styles.navLink}
+          >
+            Itineraries
+          </button>
+
+          <Link to="/all-historicalplaces" style={styles.navLink}>
+            Historical Places
+          </Link>
+          <Link to="/all-museums" style={styles.navLink}>
+            Museums
+          </Link>
+          <Link to="/transportationBooking" style={styles.navLink}>
+            Book Transportation
+          </Link>
+          <button onClick={handleFileComplaintClick} style={styles.navLink}>File a Complaint</button>
+        </nav>
+         {/* Booked Flights Section */}
+         <div style={styles.bookedFlightsSection}>
           <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
           {bookedFlights.length > 0 ? (
             <ul style={styles.bookedFlightsList}>
@@ -176,6 +229,26 @@ const TouristHome = () => {
             </ul>
           ) : (
             <p style={styles.noFlightsText}>You have no booked flights.</p>
+          )}
+        </div>
+
+        <div style={styles.bookedHotelsSection}>
+          <h3 style={styles.sectionHeader}>Your Booked Hotels</h3>
+          {bookedHotels.length > 0 ? (
+            <ul style={styles.bookedHotelsList}>
+              {bookedHotels.map((hotel, index) => (
+                <li key={index} style={styles.flightItem}>
+                  <p><strong>Hotel Name:</strong> {hotel.hotelName}</p>
+                  <p><strong>Check In Date:</strong> {hotel.offer.checkInDate}</p>
+                  <p><strong>Check Out Date:</strong> {hotel.offer.checkOutDate}</p>
+                  <p><strong>Guests:</strong> {hotel.offer.guests.adults}</p>
+                  <p><strong>price:</strong>{hotel.offer.price.currency} {hotel.offer.price.total}</p>
+                  <p><strong>Room:</strong> {hotel.offer.room.type}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={styles.noFlightsText}>You have no booked Hotels.</p>
           )}
         </div>
         <div style={styles.complaintsSection}>
@@ -223,42 +296,7 @@ const TouristHome = () => {
           </button>
         </div>
 
-        {/* Navigation Links */}
-        <nav style={styles.navbar}>
-          <button onClick={() => navigate("/p")}>View Products</button>
-          <button onClick={handleFlightSearchClick}>Search Flights</button>
-          <button
-            onClick={() =>
-              navigate("/upcoming-activitiest", {
-                state: { touristId: touristId },
-              })
-            }
-            style={styles.navLink}
-          >
-            Activities
-          </button>
-          <button
-            onClick={() =>
-              navigate("/upcoming-itinerariest", {
-                state: { touristId: touristId },
-              })
-            }
-            style={styles.navLink}
-          >
-            Itineraries
-          </button>
-
-          <Link to="/all-historicalplaces" style={styles.navLink}>
-            Historical Places
-          </Link>
-          <Link to="/all-museums" style={styles.navLink}>
-            Museums
-          </Link>
-          <Link to="/transportationBooking" style={styles.navLink}>
-            Book Transportation
-          </Link>
-          <button onClick={handleFileComplaintClick} style={styles.navLink}>File a Complaint</button>
-        </nav>
+       
 
         {/* Search Results Section */}
         <div style={styles.resultsContainer}>

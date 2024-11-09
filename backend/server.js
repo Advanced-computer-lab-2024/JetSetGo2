@@ -189,6 +189,46 @@ app.use("/complaint", complaintRoutes);
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+//const Tourist = require('../models/Tourist'); 
+
+app.post('/home/tourist/:touristId/bookHotel', async (req, res) => {
+  const { touristId } = req.params;
+  const { offer, hotelName } = req.body; // Destructure hotelName from the request body
+
+  try {
+    const tourist = await Tourist.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const bookedData = { hotelName, offer }; // Combine hotelName with the offer
+    tourist.bookedHotels.push(bookedData); // Add the combined data to bookedHotels
+    await tourist.save();
+
+    res.status(200).json({ message: 'Booking successful!' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error saving booking', error });
+  }
+});
+
+
+app.get('/home/tourist/bookedHotels/:touristId', async (req, res) => {
+  try {
+      const { touristId } = req.params;
+
+      // Assuming you have a Tourist model
+      const tourist = await Tourist.findById(touristId).select('bookedHotels');
+      if (!tourist) {
+          return res.status(404).json({ message: "Tourist not found" });
+      }
+
+      res.status(200).json(tourist.bookedHotels);
+  } catch (error) {
+      console.error("Error fetching booked hotels:", error);
+      res.status(500).json({ message: "Error fetching booked hotels" });
+  }
+});
+
 // Search
 app.get("/search", async (req, res) => {
   const { searchword, searchType } = req.query; // Add searchType to query parameters
