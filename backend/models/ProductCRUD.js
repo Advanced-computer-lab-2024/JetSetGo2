@@ -20,11 +20,11 @@ const productSchema = new Schema({
       },
       rating: {
         type: Number,
-        required: true,
+        required: false,
       },
       reviews: {
         type: String,
-        required: true,
+        required: false,
       },
       availableQuantity: {
         type: Number,

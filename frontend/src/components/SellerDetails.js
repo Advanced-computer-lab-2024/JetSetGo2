@@ -40,15 +40,14 @@ const SellerDetails = () => {
   };
 
   const avatarStyle = {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    border: "2px solid #fff",
-    position: "absolute",
-    top: "20px",
-    left: "20px",
-    objectFit: "cover",
+    width: "100px", // Adjust width as needed
+    height: "100px", // Adjust height as needed
+    borderRadius: "50%", // Make it circular
+    marginBottom: "20px", // Adds space below the image
   };
+  const usernameStyle = {
+  marginTop: "20px", // Adds space above the username (alternative to marginBottom in avatarStyle)
+};
 
   const mainContentStyle = {
     flex: 1,
