@@ -355,7 +355,7 @@ const ProductCRUD = () => {
                 name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
                 <option value="">Select a Seller</option>
                 {sellers.map(seller => (
-                  <option key={seller._id} value={seller._id}>{seller.UserName}</option>
+                  <option key={seller._id} value={seller._id}>{seller.Name}</option>
                 ))}
               </select>
 
