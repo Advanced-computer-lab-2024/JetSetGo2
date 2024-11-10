@@ -1,4 +1,5 @@
 const Schema = require("../models/schematour.js");
+const User = require("../models/Tourist.js");
 const { default: mongoose } = require("mongoose");
 
 const createGuide = async (req, res) => {
@@ -52,7 +53,7 @@ const readGuide = async (req, res) => {
     let userId = req.query.userId;
 
     // Log the received User ID
-    console.log("Received User ID:", userId); 
+    console.log("Received User ID:", userId);
 
     // Validate userId
     if (!userId || !mongoose.isValidObjectId(userId.trim())) {
@@ -66,14 +67,14 @@ const readGuide = async (req, res) => {
     const schemas = await Schema.find({
       $or: [
         { isActive: true }, // Active tours
-        { bookedUsers: userId },  // Tours booked by the user
+        { bookedUsers: userId }, // Tours booked by the user
       ],
     })
       .populate("activities")
       .populate("Tags", "name");
 
     // Add booking status for each tour
-    const toursWithBookingStatus = schemas.map(tour => ({
+    const toursWithBookingStatus = schemas.map((tour) => ({
       ...tour.toObject(),
       isBooked: tour.bookedUsers.includes(userId), // Check if the user has booked this tour
     }));
@@ -83,6 +84,21 @@ const readGuide = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+function calculateLoyaltyPoints(level, price) {
+  let points = 0;
+
+  if (level === 1) {
+    points = price * 0.5;
+  } else if (level === 2) {
+    points = price * 1;
+  } else if (level === 3) {
+    points = price * 1.5;
+  }
+
+  console.log(`Points calculated for level ${level}: ${points}`); // Log calculated points
+  return points;
+}
 
 const bookTour = async (req, res) => {
   const { id } = req.params; // Extract the tour ID from the URL parameters
@@ -97,12 +113,45 @@ const bookTour = async (req, res) => {
     // Increment the bookings count if the user has not booked this tour before
     await schema.incrementBookings(userId);
 
-    res
-      .status(200)
-      .json({ message: "Booking successful", bookings: schema.bookings });
+    // Retrieve the user from the database using the userId
+    const user = await User.findById(userId); // Assuming you have a User model
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Use the existing calculateLoyaltyPoints function
+    const loyaltyPoints = calculateLoyaltyPoints(
+      user.Loyalty_Level,
+      schema.TourPrice
+    );
+
+    // Add loyalty points to the user's account
+    user.Loyalty_Points += loyaltyPoints;
+
+    if (user.Loyalty_Points >= 500000) {
+      user.Loyalty_Level = 3;
+    } else if (user.Loyalty_Points >= 100000) {
+      if (user.Loyalty_Level <= 2) {
+        user.Loyalty_Level = 2;
+      }
+    } else {
+      if (user.Loyalty_Level <= 1) {
+        user.Loyalty_Level = 1;
+      }
+    }
+    // Save the updated user record
+    await user.save();
+
+    res.status(200).json({
+      message: "Booking successful",
+      bookings: schema.bookings,
+      earnedPoints: loyaltyPoints, // Include the points earned in the response
+      totalLoyaltyPoints: user.Loyalty_Points, // Include total points in the response
+    });
   } catch (error) {
     if (error.message === "User has already booked this tour.") {
-      return res.status(409).json({ message: error.message });  // Handle duplicate booking
+      return res.status(409).json({ message: error.message }); // Handle duplicate booking
     }
     res.status(500).json({ message: error.message });
   }
@@ -122,6 +171,7 @@ const readGuideID = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 const getIteneraries = async (req, res) => {
   try {
     const schema = await Schema.find()
@@ -143,10 +193,12 @@ const updateGuide = async (req, res) => {
   if (req.body.activities) updateData.activities = req.body.activities;
   if (req.body.locations) updateData.locations = req.body.locations;
   if (req.body.timeline) updateData.timeline = req.body.timeline;
-  if (req.body.durationActivity) updateData.durationActivity = req.body.durationActivity;
+  if (req.body.durationActivity)
+    updateData.durationActivity = req.body.durationActivity;
   if (req.body.tourLanguage) updateData.tourLanguage = req.body.tourLanguage;
   if (req.body.TourPrice) updateData.TourPrice = req.body.TourPrice;
-  if (req.body.availableDates) updateData.availableDates = req.body.availableDates;
+  if (req.body.availableDates)
+    updateData.availableDates = req.body.availableDates;
   if (req.body.accessibility) updateData.accessibility = req.body.accessibility;
   if (req.body.pickUpLoc) updateData.pickUpLoc = req.body.pickUpLoc;
   if (req.body.DropOffLoc) updateData.DropOffLoc = req.body.DropOffLoc;
@@ -181,6 +233,7 @@ const deleteGuide = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 const flagItinerary = async (req, res) => {
   const { id } = req.params; // Extract the itinerary ID from the URL
 
@@ -202,11 +255,6 @@ const flagItinerary = async (req, res) => {
   }
 };
 
-
-
-// Toggle Activation
-// Toggle Activation
-// Toggle Activation
 // Toggle Activation
 const toggleActivation = async (req, res) => {
   try {
@@ -220,9 +268,9 @@ const toggleActivation = async (req, res) => {
 
     // Prevent deactivation if it is active and has no bookings
     if (itinerary.isActive && itinerary.bookings === 0) {
-      return res
-        .status(400)
-        .json({ message: "Itinerary cannot be deactivated because it has no bookings." });
+      return res.status(400).json({
+        message: "Itinerary cannot be deactivated because it has no bookings.",
+      });
     }
 
     // Toggle the activation status
@@ -230,16 +278,18 @@ const toggleActivation = async (req, res) => {
     await itinerary.save();
 
     if (itinerary.isActive) {
-      return res.status(200).json({ message: "Itinerary activated", itinerary });
+      return res
+        .status(200)
+        .json({ message: "Itinerary activated", itinerary });
     } else {
-      return res.status(200).json({ message: "Itinerary deactivated", itinerary });
+      return res
+        .status(200)
+        .json({ message: "Itinerary deactivated", itinerary });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 module.exports = {
   createGuide,

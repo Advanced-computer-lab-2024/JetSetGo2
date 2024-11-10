@@ -132,7 +132,6 @@ const deleteTourist = async (req, res) => {
   }
 };
 
-
 const bookTransportation = async (req, res) => {
   const { touristId, transportationId } = req.params;
 
@@ -144,7 +143,9 @@ const bookTransportation = async (req, res) => {
     }
 
     if (!transportation.isBookingOpen) {
-      return res.status(400).json({ error: "Booking is closed for this transportation." });
+      return res
+        .status(400)
+        .json({ error: "Booking is closed for this transportation." });
     }
 
     if (transportation.seatsAvailable <= 0) {
@@ -189,29 +190,37 @@ const getBookedTransportations = async (req, res) => {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    console.log("Booked Transportations before population:", tourist.bookedTransportations); // Log the IDs to see if they are correct
+    console.log(
+      "Booked Transportations before population:",
+      tourist.bookedTransportations
+    ); // Log the IDs to see if they are correct
 
     // Now populate the booked transportations
     const populatedTourist = await touristModel
       .findById(touristId)
-      .populate('bookedTransportations');
+      .populate("bookedTransportations");
 
-    console.log("Populated Booked Transportations:", populatedTourist.bookedTransportations); // Log after population
+    console.log(
+      "Populated Booked Transportations:",
+      populatedTourist.bookedTransportations
+    ); // Log after population
 
     // Loop through the transportations and close the bookings for past dates
     const currentDate = new Date(); // Get the current date
 
-    const updatedTransportations = populatedTourist.bookedTransportations.map((transport) => {
-      // Check if the transportation's date has passed
-      const transportDate = new Date(transport.date); // Assuming transport.date is in a valid format
+    const updatedTransportations = populatedTourist.bookedTransportations.map(
+      (transport) => {
+        // Check if the transportation's date has passed
+        const transportDate = new Date(transport.date); // Assuming transport.date is in a valid format
 
-      // If the transportation's date has passed, close the booking
-      if (transportDate < currentDate) {
-        transport.isBookingOpen = false; // Close the booking
+        // If the transportation's date has passed, close the booking
+        if (transportDate < currentDate) {
+          transport.isBookingOpen = false; // Close the booking
+        }
+
+        return transport;
       }
-
-      return transport;
-    });
+    );
 
     // Return the updated transportations (now with booking statuses updated)
     res.status(200).json(updatedTransportations);
@@ -220,8 +229,6 @@ const getBookedTransportations = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const getTouristNationality = async (req, res) => {
   const { touristId } = req.params;
@@ -244,14 +251,46 @@ const getTouristNationality = async (req, res) => {
   }
 };
 
-
-
 const deleteAllTourist = async (req, res) => {
   try {
     await touristModel.deleteMany({});
     res.status(200).json({ message: "All tourist have been deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+const redeemPointsToCash = async (req, res) => {
+  const userId = req.params.id; // Get userId from request parameters
+
+  try {
+    // Fetch the tourist (user) by ID
+    const tourist = await touristModel.findById(userId);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const pointsToRedeem = tourist.Loyalty_Points; // Get the number of points to redeem from the request body
+
+    const conversionRate = 10000; // 10,000 points = 100 EGP
+    const cashEquivalent = (pointsToRedeem / conversionRate) * 100; // Calculate the cash equivalent
+
+    // Deduct the points from the user's loyalty points
+    tourist.Loyalty_Points -= pointsToRedeem;
+
+    // Add the cash equivalent to the user's wallet
+    tourist.Wallet += tourist.Wallet + Math.floor(cashEquivalent);
+
+    // Save the updated tourist
+    await tourist.save();
+
+    res.status(200).json({
+      message: `Successfully redeemed ${pointsToRedeem} points for ${cashEquivalent} EGP`,
+      wallet: tourist.Wallet,
+      loyaltyPointsRemaining: tourist.Loyalty_Points,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -265,4 +304,5 @@ module.exports = {
   bookTransportation,
   getBookedTransportations,
   getTouristNationality,
+  redeemPointsToCash,
 };

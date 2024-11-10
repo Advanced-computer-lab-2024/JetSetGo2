@@ -37,7 +37,6 @@ const TouristSchema = new Schema(
     Wallet: {
       type: Number,
       default: 0,
-      immutable: true,
     },
     Admin_Acceptance: {
       type: Boolean,
@@ -50,6 +49,14 @@ const TouristSchema = new Schema(
       },
     ],
     bookedFlights: [Object],
+    Loyalty_Points: {
+      type: Number,
+      default: 0,
+    },
+    Loyalty_Level: {
+      type: Number,
+      default: 1,
+    },
   },
   { timestamps: true }
 );
