@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const FileComplaint = () => {
     const location = useLocation();
-    const touristId = location.state?.touristId; // Access the passed touristId
+    const touristId = location.state?.touristId; 
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [date, setDate] = useState("");
+    const navigate = useNavigate();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,6 +30,9 @@ const FileComplaint = () => {
 
     return (
         <div style={styles.container}>
+            <button className="back-button" onClick={() => navigate(-1)}>
+          Back
+        </button>
             <h2 style={styles.header}>File a Complaint</h2>
             <form onSubmit={handleSubmit} style={styles.form}>
                 <input
