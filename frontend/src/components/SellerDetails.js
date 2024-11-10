@@ -211,6 +211,30 @@ const SellerDetails = () => {
       setIsEditing(false); // Reset editing state for other sections
     }
   };
+  // Function to handle account deletion
+  const handleDeleteAccount = async () => {
+    const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
+
+    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(`http://localhost:8000/Seller/deletMyAccount/${userId}`);
+        
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
 
   const renderDetails = () => (
     <ul style={listStyle}>
@@ -402,6 +426,9 @@ const SellerDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
+        <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
+        Delete Account
+      </button>
       </div>
       <div style={mainContentStyle}>
         <h1 style={headerStyle}>
