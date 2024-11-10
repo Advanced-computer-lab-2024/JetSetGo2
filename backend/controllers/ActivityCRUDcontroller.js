@@ -68,6 +68,27 @@ const getActivityById = async (req, res) => {
 
 
 
+const getBookedactivities = async (req, res) => {
+  try {
+    const { touristId } = req.query;
+    // Validate touristId
+    if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
+      return res.status(400).json({ message: "Invalid or missing Tourist ID." });
+    }
+    // Find all itineraries that the tourist has booked
+    const bookedActivities = await Activity.find({
+      bookedUsers: touristId.trim(),
+    })
+    .populate("category", "name") // Populate the 'category' field with the 'name'
+    .populate("advertiser", "Name")
+    .populate("tags"); // Populate the 'advertiser' field with the 'name'
+
+    // Respond with the list of booked itineraries
+    res.status(200).json(bookedActivities);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // Update Activity
 const updateActivity = async (req, res) => {
@@ -130,6 +151,37 @@ const updateActivity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+const submitReview = async (req, res) => {
+  const { userId, rating, comment } = req.body;
+  const { activityId } = req.params;
+
+  console.log("Received activityId:", activityId); // Debugging line
+
+  try {
+    // Find the activity by its ID
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      console.log("Activity not found"); // Debugging line
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    // Add the review to the activity
+    activity.reviews.push({ userId, rating, comment });
+
+    // Calculate the new average rating for the activity
+    const totalRatings = activity.reviews.reduce((sum, review) => sum + review.rating, 0);
+    activity.rating = totalRatings / activity.reviews.length;
+
+    // Save the updated activity
+    await activity.save();
+
+    return res.status(200).json({ message: 'Review submitted successfully' });
+  } catch (error) {
+    console.error("Error while submitting review:", error); // Debugging line
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 // Other methods remain unchanged
 const deleteActivity = async (req, res) => {
@@ -274,6 +326,34 @@ const upcomingactivity = async (req, res) => {
     res.status(500).json({ message: "Error fetching upcoming activities." });
   }
 };
+const cancelactivity = async (req, res) => {
+  let { id } = req.params;
+  const userId = req.body.userId;
+
+  // Trim and validate the id parameter
+  id = id.trim();
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid itinerary ID format" });
+  }
+
+  try {
+    const activity = await Activity.findById(id);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    // Attempt to cancel the booking
+    await activity.cancelBooking(userId);
+
+    res.status(200).json({ message: "Booking canceled successfully", bookings: activity.bookings });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 
 const flagActivity = async (req, res) => {
   const { id } = req.params;
@@ -306,5 +386,8 @@ module.exports = {
   readAdverActivites,
   bookactivity,
   getActivityById,
-  flagActivity
+  flagActivity,
+  cancelactivity,
+  getBookedactivities,
+  submitReview,
 };

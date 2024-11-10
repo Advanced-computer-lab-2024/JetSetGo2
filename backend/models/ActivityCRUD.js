@@ -46,7 +46,14 @@ const activitySchema = new Schema(
       type: Number,
       default: 0,
     },
-    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] }, rating: {
+    reviews: [
+      { 
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        rating: { type: Number, min: 1, max: 5 },
+        comment: { type: String }
+      }
+    ],
+    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },       rating: {
       type: Number,
       required: true,
     },
@@ -74,5 +81,33 @@ activitySchema.methods.incrementBookings = async function (userId) {
 
   await this.save();  // Save the updated activity
 };
+activitySchema.methods.cancelBooking = async function (userId) {
+  // Check if the user has booked this itinerary
+  if (!this.bookedUsers.some(bookedUserId => bookedUserId.equals(userId))) {
+    throw new Error("User has not booked this activity.");
+  }
+
+  // Parse the activity date
+  const activityDate = new Date(this.date);
+  if (isNaN(activityDate)) {
+    throw new Error("Activity date is invalid.");
+  }
+
+  // Calculate the time difference in hours
+  const hoursDifference = (activityDate - Date.now()) / (1000 * 60 * 60);
+  if (hoursDifference < 48) {
+    throw new Error("Cancellations are allowed only 48 hours before the activity date.");
+  }
+
+  // Remove the booking and decrement the count
+  this.bookedUsers = this.bookedUsers.filter(
+    bookedUserId => !bookedUserId.equals(userId)
+  );
+  this.bookings -= 1;
+
+  await this.save();
+};
+
+
 const Activity = mongoose.model("Activity", activitySchema);
 module.exports = Activity;

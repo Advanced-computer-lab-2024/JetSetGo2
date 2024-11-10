@@ -9,8 +9,8 @@ const getItineraries = async (touristId) => {
       `http://localhost:8000/itinerary/readTour`,
       {
         params: {
-          userId:touristId // Pass userId to filter itineraries
-        }
+          userId: touristId, // Pass userId to filter itineraries
+        },
       }
     );
     return response.data;
@@ -18,6 +18,12 @@ const getItineraries = async (touristId) => {
     console.error("Error fetching itineraries:", error);
     throw error;
   }
+};
+
+const currencyRates = {
+  EUR: 1, // Base currency (assumed for conversion)
+  USD: 1, // Example conversion rate
+  EGP: 30, // Example conversion rate
 };
 
 const Itinerariest = () => {
@@ -31,6 +37,7 @@ const Itinerariest = () => {
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
 
   const [Tags, setTags] = useState([]);
   const [activities, setActivities] = useState([]);
@@ -206,7 +213,7 @@ const Itinerariest = () => {
         setFilteredItineraries((prevItineraries) =>
           prevItineraries.map((itinerary) =>
             itinerary._id === id
-              ? { ...itinerary, bookings: itinerary.bookings + 1 }
+              ? { ...itinerary, isBooked: true, bookings: itinerary.bookings + 1 }
               : itinerary
           )
         );
@@ -216,6 +223,36 @@ const Itinerariest = () => {
       console.error("Error booking tour:", error);
       alert("Error booking tour. Please try again.");
     }
+  };
+
+  const handleCancelBooking = async (itineraryId, availableDate) => {
+    try {
+      const hoursUntilTour = (new Date(availableDate) - new Date()) / (1000 * 60 * 60);
+
+      if (hoursUntilTour < 48) {
+        alert("Cancellation is only allowed at least 48 hours before the itinerary date.");
+        return;
+      }
+
+      await axios.post(`http://localhost:8000/itinerary/cancelBooking/${itineraryId}`, {
+        userId: touristId,
+      });
+
+      setFilteredItineraries((prevItineraries) =>
+        prevItineraries.map((itinerary) =>
+          itinerary._id === itineraryId
+            ? { ...itinerary, isBooked: false, bookings: itinerary.bookings - 1 }
+            : itinerary
+        )
+      );
+      alert("Booking canceled successfully.");
+    } catch (error) {
+      console.error("Error canceling booking:", error);
+    }
+  };
+
+  const convertPrice = (price) => {
+    return (price * currencyRates[selectedCurrency]).toFixed(2);
   };
 
   return (
@@ -238,6 +275,20 @@ const Itinerariest = () => {
           placeholder="Enter tag"
         />
 
+        {/* Currency Selection */}
+        <div className="filter-container">
+          <label htmlFor="currencySelect">Choose Currency:</label>
+          <select
+            id="currencySelect"
+            value={selectedCurrency}
+            onChange={(e) => setSelectedCurrency(e.target.value)}
+          >
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="EGP">EGP</option>
+          </select>
+        </div>
+        
         <label htmlFor="filterPrice">Filter by Max Price:</label>
         <input
           type="number"
@@ -259,7 +310,7 @@ const Itinerariest = () => {
       {/* Sort by Price */}
       <div className="sort-container">
         <label htmlFor="sortPrice">Sort by Price:</label>
-        <select id="sortPrice" value={sortOrder} onChange={handleSortChange}>
+        <select id="sortPrice" onChange={handleSortChange}>
           <option value="">Select</option>
           <option value="asc">Lowest to Highest</option>
           <option value="desc">Highest to Lowest</option>
@@ -267,11 +318,7 @@ const Itinerariest = () => {
 
         {/* Sort by Rating */}
         <label htmlFor="sortRating">Sort by Rating:</label>
-        <select
-          id="sortRating"
-          value={sortRating}
-          onChange={handleSortRatingChange}
-        >
+        <select id="sortRating" onChange={handleSortRatingChange}>
           <option value="">Select</option>
           <option value="asc">Lowest to Highest</option>
           <option value="desc">Highest to Lowest</option>
@@ -280,14 +327,13 @@ const Itinerariest = () => {
 
       {/* Display itineraries */}
       {error && <p className="error">{error}</p>}
-
       {filteredItineraries.length > 0 ? (
         <ul className="itinerary-list">
           {filteredItineraries.map((itinerary) => (
             <li key={itinerary._id} className="itinerary-item">
               <h3>{itinerary.name}</h3>
               <p>
-                <strong>Tour Price:</strong> ${itinerary.TourPrice.join(", ")}
+                <strong>Tour Price:</strong> ${convertPrice(itinerary.TourPrice.join(", "))} {selectedCurrency}
               </p>
               <p>
                 <strong>Duration of Activities:</strong>{" "}
@@ -295,9 +341,7 @@ const Itinerariest = () => {
               </p>
               <p>
                 <strong>Available Dates:</strong>{" "}
-                {itinerary.availableDates
-                  .map((date) => new Date(date).toLocaleDateString())
-                  .join(", ")}
+                {itinerary.availableDates.map((date) => new Date(date).toLocaleDateString()).join(", ")}
               </p>
               <p>
                 <strong>Activities:</strong>{" "}
@@ -320,14 +364,24 @@ const Itinerariest = () => {
               <p>
                 <strong>Rating:</strong> {itinerary.rating}
               </p>
+             
               <p>
                 <strong>Bookings:</strong> {itinerary.bookings}
               </p>
+
               <button onClick={() => handleBookTour(itinerary._id)}>
                 Book Tour
               </button>
               <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
               <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
+
+              {itinerary.isBooked ? (
+                <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
+                  Cancel Booking
+                </button>
+              ) : (
+                <button onClick={() => handleBookTour(itinerary._id)}>Book Tour</button>
+              )}
             </li>
           ))}
         </ul>
