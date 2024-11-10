@@ -304,8 +304,9 @@ const ProductCRUD = () => {
               name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
               <option value="">Select a Seller</option>
               {sellers.map(seller => (
-                <option key={seller.id} value={seller.id}>{seller.name}</option>
-              ))}
+  <option key={seller._id} value={seller._id}>{seller.UserName}</option>
+))}
+
             </select>
 
             <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
