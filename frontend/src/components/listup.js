@@ -242,6 +242,33 @@ const AdvertiserDetails = () => {
     }
   };
 
+  // Function to handle account deletion
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/home/adver/deletMyAccount/${adverId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
+
   const generateMapSrc = (coordinates) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
@@ -358,6 +385,17 @@ const AdvertiserDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
+        <button
+          onClick={handleDeleteAccount}
+          style={{
+            color: "red",
+            background: "lightgrey",
+            padding: "10px",
+            marginTop: "20px",
+          }}
+        >
+          Delete Account
+        </button>
       </div>
 
       {/* Main Content */}
@@ -368,7 +406,7 @@ const AdvertiserDetails = () => {
             <p>
               <strong>UserName:</strong> {advertiser.UserName}
             </p>
-            
+
             <p>
               <strong>Link:</strong> {advertiser.Link}
             </p>
@@ -415,7 +453,7 @@ const AdvertiserDetails = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label>Link:</label>
                 <input

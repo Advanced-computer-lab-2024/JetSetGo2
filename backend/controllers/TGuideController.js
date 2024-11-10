@@ -1,8 +1,8 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
-const Tour = require("../models/TGuide");
 const TourModel = require("../models/TGuide.js");
+const ItenModel = require("../models/schematour.js");
 const { ProfilingLevel } = require("mongodb");
 
 const updateUser = async (req, res) => {
@@ -55,14 +55,14 @@ const getuser = async (req, res) => {
 
     if (id) {
       // If an ID is provided, find that specific tour guide
-      tourGuide = await Tour.findById(id);
+      tourGuide = await TourModel.findById(id);
 
       if (!tourGuide) {
         return res.status(404).json({ error: "Tour guide not found" });
       }
     } else {
       // If no ID is provided, find all tour guides
-      tourGuide = await Tour.find(); // Retrieve all tour guides
+      tourGuide = await TourModel.find(); // Retrieve all tour guides
     }
 
     res.status(200).json(tourGuide); // Send back the data
@@ -132,10 +132,39 @@ const acceptTourguide = async (req, res) => {
   }
 };
 
+const reqAccountToBeDeleted = async (req, res) => {
+  const { id } = req.params;
+  const currentDate = new Date();
+
+  try {
+    const itineraries = await ItenModel.find({
+      tourGuide: id,
+      availableDates: { $gt: currentDate }, // Date is greater than the current date
+      bookings: { $gt: 0 },
+    }).populate("tourGuide");
+
+    if (itineraries.length == 0) {
+      const tourguide = await TourModel.findByIdAndDelete(id);
+      const deleteditenaries = await ItenModel.deleteMany({ tourGuide: id });
+    } else {
+      return res.status(400).json({
+        message: "cannot be deleted there are upcoming itenaries booked",
+      });
+    }
+
+    res.status(200).json({
+      message: "tourguide deleted succesfully along with its itenaries",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching itineraries", error });
+  }
+};
+
 module.exports = {
   getuser,
   updateUser,
   getUserById,
   deleteTGuide,
   acceptTourguide,
+  reqAccountToBeDeleted,
 };

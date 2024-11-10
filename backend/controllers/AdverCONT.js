@@ -1,4 +1,5 @@
 const adverModel = require("../models/AdverMODEL.js");
+const activityModel = require("../models/ActivityCRUD.js");
 const { default: mongoose } = require("mongoose");
 
 const getAdver = async (req, res) => {
@@ -29,7 +30,6 @@ const getAdverById = async (req, res) => {
     res.status(400).json({ error: error.messege });
   }
 };
-
 
 const updateAdver = async (req, res) => {
   const { id } = req.params; // Extract id from the request body
@@ -116,6 +116,43 @@ const acceptAdver = async (req, res) => {
   }
 };
 
+const reqAccountToBeDeleted = async (req, res) => {
+  const { id } = req.params;
+  const currentDate = new Date();
+
+  try {
+    const activities = await activityModel
+      .find({
+        advertiser: id,
+        bookings: { $gt: 0 },
+      })
+      .populate("advertiser");
+
+    const upcomingactivity = activities.filter((activity) => {
+      const activitydate = new Date(activity.date); // Convert the string date to Date object
+      return activitydate >= currentDate;
+    });
+
+    if (upcomingactivity.length == 0) {
+      const advertiser = await adverModel.findByIdAndDelete(id);
+      const deleteactivities = await activityModel.deleteMany({
+        advertiser: id,
+      });
+    } else {
+      return res.status(400).json({
+        message:
+          "advertiser cannot be deleted there are upcoming activities booked",
+      });
+    }
+
+    res.status(200).json({
+      message: "advertiser deleted succefully along with it's activties",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching itineraries", error });
+  }
+};
+
 // Export the router
 module.exports = {
   getAdver,
@@ -124,4 +161,5 @@ module.exports = {
   getAdvertiser,
   deleteAdver,
   acceptAdver,
+  reqAccountToBeDeleted,
 };
