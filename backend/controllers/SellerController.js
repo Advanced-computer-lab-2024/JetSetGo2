@@ -1,5 +1,6 @@
 const express = require("express");
 const SellerModel = require("../models/Seller.js");
+const ProductModel = require("../models/ProductCRUD.js");
 
 // Read a seller by the MongoDB `_id`
 const readSeller = async (req, res) => {
@@ -135,6 +136,25 @@ const acceptSeller = async (req, res) => {
   }
 };
 
+const reqAccountToBeDeleted = async (req, res) => {
+  const { id } = req.params;
+  const currentDate = new Date();
+
+  try {
+    const seller = await SellerModel.findByIdAndDelete(id);
+    const deleteProduct = await ProductModel.deleteMany({ seller: id });
+
+    res.status(200).json({
+      message: "seller deleted succesfully along with its products",
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "seller cannot be deleted",
+      error,
+    });
+  }
+};
+
 module.exports = {
   readSeller,
   updateSeller,
@@ -142,4 +162,5 @@ module.exports = {
   deleteSeller,
   deleteAllSellers,
   acceptSeller,
+  reqAccountToBeDeleted,
 };
