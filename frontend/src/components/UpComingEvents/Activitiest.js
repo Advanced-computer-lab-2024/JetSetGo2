@@ -32,7 +32,11 @@ const predefinedLocations = [
     coordinates: "31.4015,30.0254,31.4215,30.0454",
   },
 ];
-
+const currencyRates = {
+  EUR: 1,    // Base currency (assumed for conversion)
+  USD: 1,  // Example conversion rate
+  EGP: 30,   // Example conversion rate
+};
 const Activitiest = () => {
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
@@ -42,7 +46,7 @@ const Activitiest = () => {
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [searchLocation, setSearchLocation] = useState("");
   const [error, setError] = useState(null);
-
+  const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
   const [filters, setFilters] = useState({
     date: "",
     category: "",
@@ -50,6 +54,7 @@ const Activitiest = () => {
     maxPrice: "",
     rating: "",
   });
+  const [bookedActivities, setBookedActivities] = useState([]); // Track booked activities
 
   const navigate = useNavigate(); // Initialize useNavigate hook
   const location = useLocation(); // Use useLocation to access the state
@@ -58,6 +63,7 @@ const Activitiest = () => {
   useEffect(() => {
     fetchActivities();
     fetchCategories();
+    fetchActivities1();
   }, []);
 
   const handleBookTour = async (id) => {
@@ -74,17 +80,11 @@ const Activitiest = () => {
 
       if (response.status === 200) {
         // Update the bookings count in the UI
-        setFilteredActivities((upcomingActivities) =>
-          upcomingActivities.map((activity) =>
-            activity._id === id
-              ? { ...activity, bookings: activity.bookings + 1 }
-              : activity
-          )
-        );
-        alert("Tour booked successfully!");
+        setBookedActivities((prev) => [...prev, id]); // Mark activity as booked
+        alert("activity booked successfully!");
       }
     } catch (error) {
-      console.error("Error booking tour:", error);
+      console.error("Error booking activity:", error);
       alert("already booked");
     }
   };
@@ -117,6 +117,26 @@ const Activitiest = () => {
   
 
   const fetchActivities = async () => {
+    try {
+      const data = await getActivity();
+      const upcomingActivities = data.filter((activity) => {
+        const activityDate = new Date(activity.date);
+        return activityDate >= new Date();
+      });
+      setActivities(upcomingActivities);
+      setFilteredActivities(upcomingActivities);
+
+      // Check each activity if it’s already booked by the current user
+      const bookedIds = upcomingActivities
+        .filter((activity) => activity.bookedUsers.includes(touristId))
+        .map((activity) => activity._id);
+      setBookedActivities(bookedIds);
+    } catch (error) {
+      console.error("Error fetching activities", error);
+    }
+  };
+
+  const fetchActivities1 = async () => {
     try {
       const response = await axios.get("http://localhost:8000/activity/get");
       const data = response.data;
@@ -193,6 +213,43 @@ const Activitiest = () => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
+  const handleCancelBooking = async (id) => {
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      // Find the activity that is being canceled
+      const activityToCancel = activities.find(activity => activity._id === id);
+      if (!activityToCancel) {
+        throw new Error("Activity not found.");
+      }
+  
+      const activityDate = new Date(activityToCancel.date); // Convert to Date object
+  
+      // Calculate the difference in hours
+      const hoursDifference = (activityDate - Date.now()) / (1000 * 60 * 60);
+      if (hoursDifference < 48) {
+        throw new Error("Cancellations are allowed only 48 hours before the activity date.");
+      }
+  
+      // Proceed to cancel the booking only if the 48-hour rule is met
+      const response = await axios.post(
+        `http://localhost:8000/activity/cancelBooking/${id}`,
+        { userId: touristId }
+      );
+  
+      if (response.status === 200) {
+        setBookedActivities((prev) => prev.filter((activityId) => activityId !== id)); // Remove activity from booked list
+        alert("Booking canceled successfully!");
+      }
+    } catch (error) {
+      console.error("Error canceling booking:", error);
+      alert(error.message || "An error occurred while canceling the booking.");
+    }
+  };
+  
 
   const handleSortChange = (e) => {
     setSortOrder(e.target.value); // Update sort order state
@@ -200,6 +257,9 @@ const Activitiest = () => {
 
   const handleSortByChange = (e) => {
     setSortBy(e.target.value); // Update sorting by price or rating
+  };
+  const convertPrice = (price) => {
+    return (price * currencyRates[selectedCurrency]).toFixed(2);
   };
   const handleViewActivity = (activityId) => {
   navigate(`/activities/${activityId}`, { state: { activityId } });
@@ -259,6 +319,18 @@ const handleCopy = (activity) => {
               ))}
             </select>
           </div>
+          <div className="filter-container">
+        <label htmlFor="currencySelect">Choose Currency:</label>
+        <select
+          id="currencySelect"
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+        >
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="EGP">EGP</option>
+        </select>
+      </div>
           <div className="price-range">
             <label>Price Range:</label>
             <input
@@ -378,6 +450,11 @@ const handleCopy = (activity) => {
               style={{ border: 'none' }}
               title={`Map of ${activity.location}`}
             ></iframe>
+            {bookedActivities.includes(activity._id) ? (
+                    <button onClick={() => handleCancelBooking(activity._id)}>Cancel Booking</button>
+                  ) : (
+                    <button onClick={() => handleBookTour(activity._id)}>Book Now</button>
+                  )}
           </li>
         );
       })}

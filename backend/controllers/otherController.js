@@ -1,4 +1,3 @@
-
 const SellerModel = require("../models/Seller.js");
 const TourModel = require("../models/TGuide.js");
 const AdverModel = require("../models/AdverMODEL.js");

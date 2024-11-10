@@ -216,6 +216,15 @@ const handleHotelSearchClick = () => {
             Redeem All Points
           </button>
           {message && <p>{message}</p>}
+          
+          <button    onClick={() => navigate("/mi", { state: { touristId: touristId } })}
+  >
+           My Itenaries    
+               </button>
+               <button    onClick={() => navigate("/myactivity", { state: { touristId: touristId } })}
+  >
+           My Activities    
+               </button>
         </div>
       </div>
 

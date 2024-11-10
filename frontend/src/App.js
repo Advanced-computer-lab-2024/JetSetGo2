@@ -25,6 +25,10 @@ import Activities from "./components/UpComingEvents/Activities";
 import Activitiest from "./components/UpComingEvents/Activitiest";
 import ActivityDetails from './components/ActivityDetails';
 
+import ItinerariesPage from "./components/myitenaries";
+import MyActivities from "./components/myactivities";
+
+
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
@@ -89,7 +93,11 @@ function App() {
           <Route path="/Upcoming-activities" element={<Activities />} />
           <Route path="/Upcoming-activitiest" element={<Activitiest />} />
           <Route path="/activities/:id" element={<ActivityDetails />} />
+          <Route path="/mi" element={<ItinerariesPage />} />
+          <Route path="/myactivity" element={<MyActivities />} />
 
+
+          
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/HP/:id" element={<HPdetails/>} />
           <Route path="/all-museums" element={<Museums />} />
