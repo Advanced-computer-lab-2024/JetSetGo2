@@ -162,6 +162,33 @@ const TourGuidePage = () => {
     }
   };
 
+  // Function to handle account deletion
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/TourGuide/deletMyAccount/${userId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
+
   const handleCancel = () => {
     setIsEditing(false); // Exit edit mode without saving changes
   };
@@ -189,6 +216,17 @@ const TourGuidePage = () => {
           </button>
           <button onClick={handleSchemaTourFrontPage} style={styles.button}>
             Create/View Itinerary
+          </button>
+          <button
+            onClick={handleDeleteAccount}
+            style={{
+              color: "red",
+              background: "lightgrey",
+              padding: "10px",
+              marginTop: "20px",
+            }}
+          >
+            Delete Account
           </button>
         </div>
       </div>
@@ -316,7 +354,7 @@ const TourGuidePage = () => {
             <li>
               <strong>UserName:</strong> {tourGuide.UserName}
             </li>
-            
+
             <li>
               <strong>Email:</strong> {tourGuide.Email}
             </li>

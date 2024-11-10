@@ -57,7 +57,10 @@ const activitySchema = new Schema(
       type: Number,
       required: true,
     },
-    flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
+    flagged: {
+      type: Boolean,
+      default: false,
+    }, // Add flagged attribute with default value
   },
   { timestamps: true }
 );
@@ -67,7 +70,7 @@ activitySchema.methods.incrementBookings = async function (userId) {
   const userObjectId = new mongoose.Types.ObjectId(userId);
 
   // Check if the user has already booked
-  const alreadyBooked = this.bookedUsers.some(bookedUserId =>
+  const alreadyBooked = this.bookedUsers.some((bookedUserId) =>
     bookedUserId.equals(userObjectId)
   );
 
@@ -79,7 +82,7 @@ activitySchema.methods.incrementBookings = async function (userId) {
   this.bookings += 1;
   this.bookedUsers.push(userObjectId);
 
-  await this.save();  // Save the updated activity
+  await this.save(); // Save the updated activity
 };
 activitySchema.methods.cancelBooking = async function (userId) {
   // Check if the user has booked this itinerary
