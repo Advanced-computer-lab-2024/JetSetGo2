@@ -25,8 +25,14 @@ const TouristHome = () => {
   const [bookedFlights, setBookedFlights] = useState([]);
   const [bookedHotels, setBookedHotels] = useState([]);
   const [complaints, setComplaints] = useState([]);
+  const [points, setPoints] = useState(0);
+  const [wallet, setWallet] = useState(0);
+  const [message, setMessage] = useState(""); // For success/error messages
+
   const [touristData, setTouristData] = useState({
     UserName: "",
+    Loyalty_Level: 0,
+    Loyalty_Points: 0,
     wallet: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,13 +62,18 @@ const handleHotelSearchClick = () => {
           `http://localhost:8000/home/tourist/getTourist/${touristId}`
         );
         setTouristData(response.data);
+        setPoints(response.data.Loyalty_Points);
+        setWallet(response.data.wallet);
+        console.log("Tourist data response:", response.data);
       } catch (error) {
         console.error("Error fetching tourist data:", error);
       }
     };
     const fetchBookedFlights = async (touristId) => {
       try {
-        const response = await axios.get(`http://localhost:8000/home/tourist/bookedFlights/${touristId}`);
+        const response = await axios.get(
+          `http://localhost:8000/home/tourist/bookedFlights/${touristId}`
+        );
         console.log("Booked flights:", response.data);
         setBookedFlights(response.data); // Update state with the fetched data
       } catch (error) {
@@ -124,6 +135,33 @@ const handleHotelSearchClick = () => {
     }
   };
 
+  const handleRedeemPoints = async () => {
+    // if (points <= 0) {
+    //   setMessage("You don't have enough points to redeem.");
+    //   return;
+    // }
+
+    try {
+      // Make the PUT request to redeem points
+      const response = await axios.put(
+        `http://localhost:8000/home/tourist/redeempoints/${touristId}`
+      );
+
+      // Update the state with the response data (wallet balance and remaining points)
+      setMessage(response.data.message);
+      // setTouristData((prevData) => ({
+      //   ...prevData,
+      //   wallet: response.data.wallet,
+      //   Loyalty_Points: response.data.loyaltyPointsRemaining,
+      // }));
+      setWallet(response.data.wallet);
+      setPoints(response.data.loyaltyPointsRemaining);
+    } catch (error) {
+      console.error("Error redeeming points:", error);
+      setMessage("Error redeeming points, please try again.");
+    }
+  };
+
   const handleUpdateClick = () => {
     navigate("/tourist-update");
   };
@@ -166,10 +204,18 @@ const handleHotelSearchClick = () => {
             style={styles.profileImage}
           />
           <h2 style={styles.profileName}>{touristData.UserName}</h2>
-          <p style={styles.walletText}>Wallet: ${touristData.wallet}</p>
+          <p style={styles.walletText}>
+            Loyalty Level: {touristData.Loyalty_Level}
+          </p>
+          <p style={styles.walletText}>Loyalty Points: {points}</p>
+          <p style={styles.walletText}>Wallet: EGP{wallet}</p>
           <button onClick={handleUpdateClick} style={styles.button}>
             Update Profile
           </button>
+          <button onClick={handleRedeemPoints} style={styles.redeemButton}>
+            Redeem All Points
+          </button>
+          {message && <p>{message}</p>}
         </div>
       </div>
 
@@ -219,11 +265,21 @@ const handleHotelSearchClick = () => {
             <ul style={styles.bookedFlightsList}>
               {bookedFlights.map((flight, index) => (
                 <li key={index} style={styles.flightItem}>
-                  <p><strong>Flight Number:</strong> {flight.flightNumber}</p>
-                  <p><strong>Departure:</strong> {flight.departure}</p>
-                  <p><strong>Arrival:</strong> {flight.arrival}</p>
-                  <p><strong>Date:</strong> {flight.date}</p>
-                  <p><strong>Price:</strong> ${flight.price}</p>
+                  <p>
+                    <strong>Flight Number:</strong> {flight.flightNumber}
+                  </p>
+                  <p>
+                    <strong>Departure:</strong> {flight.departure}
+                  </p>
+                  <p>
+                    <strong>Arrival:</strong> {flight.arrival}
+                  </p>
+                  <p>
+                    <strong>Date:</strong> {flight.date}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> ${flight.price}
+                  </p>
                 </li>
               ))}
             </ul>

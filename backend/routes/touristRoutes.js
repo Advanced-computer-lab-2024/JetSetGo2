@@ -10,6 +10,7 @@ const {
   bookTransportation,
   getBookedTransportations,
   getTouristNationality,
+  redeemPointsToCash,
 } = require("../controllers/touristController");
 
 router.get("/", (req, res) => {
@@ -17,15 +18,19 @@ router.get("/", (req, res) => {
 });
 
 router.post("/addTourist", createTourist);
-router.post("/bookTransportation/:touristId/:transportationId", bookTransportation);
+router.post(
+  "/bookTransportation/:touristId/:transportationId",
+  bookTransportation
+);
 router.put("/updateTourist/:id", updateTourist);
 router.get("/getTourist", getTourist);
 router.get("/get", getTourist);
 router.get("/get", getTourist);
 router.get("/getTourist/:id", getTouristById);
 router.get("/getBookedTransportations/:touristId", getBookedTransportations);
-router.get("/getNat/:touristId",getTouristNationality);
+router.get("/getNat/:touristId", getTouristNationality);
 router.delete("/delete/:id", deleteTourist);
 router.delete("/deleteAllTourist", deleteAllTourist);
+router.put("/redeempoints/:id", redeemPointsToCash);
 
 module.exports = router;
