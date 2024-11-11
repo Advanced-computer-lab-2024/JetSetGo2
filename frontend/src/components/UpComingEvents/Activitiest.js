@@ -410,8 +410,7 @@ const handleCopy = (activity) => {
                 <strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}
               </p>
               <p>
-              <p><strong>Time:</strong> {activity.time ? new Date(activity.time).toLocaleTimeString() : "Time not available"}</p>
-                
+                <strong>Time:</strong> {activity.time}
               </p>
               <p>
                 <strong>Location:</strong> {activity.location}
@@ -420,7 +419,7 @@ const handleCopy = (activity) => {
                 <strong>Price:</strong> ${activity.price}
               </p>
               <p>
-                <strong>Tags:</strong> {activity.tags ? activity.tags.type : "No Tags"}
+                <strong>Tags:</strong> {activity.tags ? activity.tags.name : "No Tags"}
               </p>
               <p>
                 <strong>Special Discount:</strong> {activity.specialDiscount}%

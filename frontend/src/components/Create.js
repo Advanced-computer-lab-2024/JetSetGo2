@@ -12,13 +12,15 @@ const UpdateAdvertiser = () => {
     Loc: "",
     CompanyDes: "",
     Services: "",
-    logoFile: null, // State to hold the logo file
+    logoFile: "", // State to hold the logo file
   });
 
   const [existingLogo, setExistingLogo] = useState(""); // State for existing logo URL
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [imagePreview, setImagePreview] = useState(null); // For image preview
+  //const fileInputRef = useRef(null);
 
   // Fetch existing advertiser data when component loads
   useEffect(() => {
@@ -59,6 +61,25 @@ const UpdateAdvertiser = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        setImagePreview(reader.result);
+        console.log(imagePreview);
+        
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
   };
 
   const handleFileChange = (e) => {
@@ -146,9 +167,17 @@ const UpdateAdvertiser = () => {
                   onChange={handleChange}
                   required
                 />
+                
               </div>
             )
         )}
+        <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => handleImageUpload(e, setFormData)}
+  required
+/>
 
         {/* Logo file input */}
         {/* <div>

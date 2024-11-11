@@ -86,7 +86,7 @@ const TourGuidePage = () => {
     MobileNumber: "",
     YearsOfExperience: "",
     PreviousWork: "",
-    Photo: null, // State to hold the photo file
+    Photo: "", // State to hold the photo file
   });
   const [notification, setNotification] = useState("");
 
@@ -201,15 +201,11 @@ const TourGuidePage = () => {
       {/* Sidebar */}
       <div style={styles.sidebar}>
         <div style={styles.profileContainer}>
-          <img
-            src={
-              tourGuide.Photo
-                ? `http://localhost:8000/uploads/tourguidePhoto/${tourGuide.Photo}`
-                : "https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg" // Fallback profile image
-            }
-            alt="Profile"
-            style={styles.profileImage}
-          />
+        <img 
+                          src={`data:image/png;base64,${tourGuide.Photo}`} 
+                          alt="Product" 
+                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                        />
           <p style={styles.profileName}>{tourGuide.UserName}</p>
           <button onClick={() => setIsEditing(true)} style={styles.button}>
             Edit

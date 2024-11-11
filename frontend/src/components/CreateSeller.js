@@ -10,7 +10,7 @@ const UpdateSeller = () => {
     Type_Of_Products: "",
     Previous_Work: "",
     Age: "",
-    logoFile: null, // State to hold the logo file
+    logoFile: "", // State to hold the logo file
   });
 
   const [logo, setLogo] = useState(null); // State to store the selected logo file
@@ -47,6 +47,25 @@ const UpdateSeller = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        //setImagePreview(reader.result);
+        //console.log(imagePreview);
+        
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
   };
 
   const handleFileChange = (e) => {
@@ -123,8 +142,13 @@ const UpdateSeller = () => {
 
         {/* Logo file input */}
         <div>
-          <label>Logo:</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+        <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => handleImageUpload(e, setFormData)}
+  required
+/>
         </div>
 
         {/* Display existing logo if available */}
