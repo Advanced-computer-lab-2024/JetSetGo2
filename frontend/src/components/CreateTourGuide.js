@@ -128,21 +128,80 @@ const UpdateTourGuide = () => {
       style={{ backgroundColor: "#fff", minHeight: "100vh", padding: "20px" }}
     >
       <form onSubmit={handleSubmit}>
-        <h2>Create Tour Guide Profile</h2>
+        <h2>Create Profile</h2>
 
-        {/* Render each form field based on formData keys */}
-        {Object.keys(formData).map((key) => (
-          <div key={key}>
-            <label>{key.replace(/_/g, " ")}:</label>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>User Name:</label>
             <input
-              type={key === "Age" ? "number" : "text"} // For Age, use number input type
-              name={key}
-              value={formData[key]}
+              type="text"
+              name="UserName"
+              value={formData.UserName}
               onChange={handleChange}
               required
             />
           </div>
-        ))}
+          <div>
+            <label>Email:</label>
+            <input
+              type="email"
+              name="Email"
+              value={formData.Email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Age:</label>
+            <input
+              type="number"
+              name="Age"
+              value={formData.Age}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Languages Spoken:</label>
+            <input
+              type="text"
+              name="LanguagesSpoken"
+              value={formData.LanguagesSpoken}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Mobile Number:</label>
+            <input
+              type="text"
+              name="MobileNumber"
+              value={formData.MobileNumber}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Years Of Experience:</label>
+            <input
+              type="number"
+              name="YearsOfExperience"
+              value={formData.YearsOfExperience}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Previous Work:</label>
+            <input
+              type="text"
+              name="PreviousWork"
+              value={formData.PreviousWork}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </form>
 
         {/* Photo file input */}
         <div>
@@ -171,18 +230,6 @@ const UpdateTourGuide = () => {
 
         <button type="submit">Create</button>
       </form>
-
-      {successMessage && (
-        <div>
-          <p>{successMessage}</p>
-          <Link
-            to={`/tour-guide`}
-            state={{ id: localStorage.getItem("userId") }}
-          >
-            View Tour Guide Details
-          </Link>
-        </div>
-      )}
     </div>
   );
 };

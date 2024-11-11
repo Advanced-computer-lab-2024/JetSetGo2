@@ -226,11 +226,11 @@ const TourGuidePage = () => {
       {/* Sidebar */}
       <div style={styles.sidebar}>
         <div style={styles.profileContainer}>
-        <img 
-                          src={`data:image/png;base64,${tourGuide.Photo}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
+          <img
+            src={`data:image/png;base64,${tourGuide.Photo}`}
+            alt="Product"
+            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+          />
           <p style={styles.profileName}>{tourGuide.UserName}</p>
           <button onClick={() => setIsEditing(true)} style={styles.button}>
             Edit

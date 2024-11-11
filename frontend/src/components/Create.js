@@ -12,7 +12,6 @@ const UpdateAdvertiser = () => {
     Loc: "",
     CompanyDes: "",
     Services: "",
-    logoFile: "", // State to hold the logo file
   });
 
   const [existingLogo, setExistingLogo] = useState(""); // State for existing logo URL
@@ -76,7 +75,6 @@ const UpdateAdvertiser = () => {
         }));
         setImagePreview(reader.result);
         console.log(imagePreview);
-        
       };
       reader.readAsDataURL(file); // Convert file to base64 URL
     }
@@ -152,67 +150,112 @@ const UpdateAdvertiser = () => {
       style={{ backgroundColor: "#fff", minHeight: "100vh", padding: "20px" }}
     >
       <form onSubmit={handleSubmit}>
-        <h2>Create Advertiser Profile</h2>
+        <h2>Create Profile</h2>
 
-        {/* Render each form field based on formData keys */}
-        {Object.keys(formData).map(
-          (key) =>
-            key !== "logoFile" && (
-              <div key={key}>
-                <label>{key.replace(/_/g, " ")}:</label>
-                <input
-                  type={key === "Hotline" ? "number" : "text"} // For Hotline, use number input type
-                  name={key}
-                  value={formData[key]}
-                  onChange={handleChange}
-                  required
-                />
-                
-              </div>
-            )
-        )}
-        <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
-            <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setFormData)}
-  required
-/>
-
-        {/* Logo file input */}
-        {/* <div>
-          <label>Logo:</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-        </div> */}
-
-        {/* Display existing logo if available */}
-        {/* {existingLogo && (
+        <form onSubmit={handleSubmit}>
           <div>
-            <h4>Current Logo:</h4>
-            <img
-              src={existingLogo}
-              alt="Current Advertiser Logo"
-              style={{ width: "100px", height: "auto" }}
+            <label>User Name:</label>
+            <input
+              type="text"
+              name="UserName"
+              value={formData.UserName}
+              onChange={handleChange}
+              required
             />
           </div>
-        )} */}
+
+          <div>
+            <label>Email:</label>
+            <input
+              type="email"
+              name="Email"
+              value={formData.Email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label>Link:</label>
+            <input
+              type="text"
+              name="Link"
+              value={formData.Link}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label>Hotline:</label>
+            <input
+              type="number"
+              name="Hotline"
+              value={formData.Hotline}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label>Profile:</label>
+            <input
+              type="text"
+              name="Profile"
+              value={formData.Profile}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label>Location:</label>
+            <input
+              type="text"
+              name="Loc"
+              value={formData.Loc}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label>Company Description:</label>
+            <input
+              type="text"
+              name="CompanyDes"
+              value={formData.CompanyDes}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label>Services:</label>
+            <input
+              type="text"
+              name="Services"
+              value={formData.Services}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </form>
+
+        <label style={{ display: "block", marginBottom: "10px" }}>
+          Picture:
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleImageUpload(e, setFormData)}
+          required
+        />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Updating..." : "Update"}
+          {loading ? "Creating..." : "Create"}
         </button>
       </form>
-
-      {successMessage && (
-        <div>
-          <p>{successMessage}</p>
-          <Link
-            to={`/advertiser-details`}
-            state={{ id: localStorage.getItem("userId") }}
-          >
-            View Advertiser Details
-          </Link>
-        </div>
-      )}
     </div>
   );
 };
