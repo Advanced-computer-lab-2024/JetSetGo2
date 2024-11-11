@@ -66,9 +66,6 @@ const getActivityById = async (req, res) => {
   }
 };
 
-
-
-
 // Update Activity
 const updateActivity = async (req, res) => {
   const { id } = req.params; // Get the activity ID from the request params
@@ -306,5 +303,5 @@ module.exports = {
   readAdverActivites,
   bookactivity,
   getActivityById,
-  flagActivity
+  flagActivity,
 };
