@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/product'; // Adjust the base URL as needed
 const API_URL2 = 'http://localhost:8000/Seller';
+const API_URL3 = 'http://localhost:8000/home/tourist';
 
 // Get all products
 export const getProducts = async () => {
@@ -50,6 +51,16 @@ export const updateProduct = async (id, updateData) => {
 export const deleteProduct = async (id) => {
    try {
       const response = await axios.delete(`${API_URL}/delete/${id}`);
+      return response.data;
+   } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+   }
+};
+
+export const buyProduct = async (touristId,productId) => {
+   try {
+      const response = await axios.delete(`${API_URL}/buyProduct/${touristId}/${productId}`);
       return response.data;
    } catch (error) {
       console.error("Error deleting product:", error);

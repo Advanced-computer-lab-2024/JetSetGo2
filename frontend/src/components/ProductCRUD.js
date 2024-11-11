@@ -75,6 +75,7 @@ const ProductCRUD = () => {
     try {
       const data = await getSellers();
       setSellers(data);
+      console.log(sellers);
     } catch (error) {
       console.error("Error fetching sellers", error);
     }
@@ -304,7 +305,7 @@ const ProductCRUD = () => {
               name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
               <option value="">Select a Seller</option>
               {sellers.map(seller => (
-                <option key={seller.id} value={seller.id}>{seller.name}</option>
+                <option key={seller._id} value={seller._id}>{seller.UserName}</option>
               ))}
             </select>
 
@@ -355,7 +356,7 @@ const ProductCRUD = () => {
                 name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
                 <option value="">Select a Seller</option>
                 {sellers.map(seller => (
-                  <option key={seller._id} value={seller._id}>{seller.Name}</option>
+                  <option key={seller._id} value={seller._id}>{seller.UserName}</option>
                 ))}
               </select>
 
@@ -454,7 +455,7 @@ const ProductCRUD = () => {
             ${product.price}
           </p>
           <p style={{ fontSize: '14px', color: '#6c757d', margin: '5px 0' }}>
-            Seller: {product.seller?.Name || 'N/A'}
+            Seller: {product.seller?.UserName || 'N/A'}
           </p>
           <p style={{ fontSize: '14px', color: '#ffc107', margin: '5px 0' }}>
             Rating: {product.rating || 'No rating'}

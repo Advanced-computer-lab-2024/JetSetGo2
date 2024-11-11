@@ -49,6 +49,12 @@ const TouristSchema = new Schema(
         ref: "Transportation",
       },
     ],
+    purchasedProducts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
     bookedFlights: [Object],
     bookedHotels: [Object],
   },

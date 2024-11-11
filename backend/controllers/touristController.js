@@ -1,5 +1,6 @@
 const touristModel = require("../models/Tourist.js");
 const transportationModel = require("../models/TransportationCRUD.js");
+const productModel = require("../models/ProductCRUD.js");
 const { default: mongoose } = require("mongoose");
 
 const createTourist = async (req, res) => {
@@ -178,6 +179,48 @@ const bookTransportation = async (req, res) => {
   }
 };
 
+
+const buyProduct = async (req, res) => {
+  const { touristId, productId } = req.params;
+
+  try {
+    const product = await productModel.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "product not found" });
+    }
+
+    if (product.availableQuantity <= 0) {
+      return res.status(400).json({ error: "No available seats." });
+    }
+
+    const tourist = await touristModel.findById(touristId);
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    // Decrement seat and close booking if seats reach 0
+    product.availableQuantity -= 1;
+    product.sales += 1;
+    
+    await product.save();
+
+    // Add the booked transportation to the tourist's bookings
+    tourist.purchasedProducts.push(product._id);
+    await tourist.save();
+
+    res.status(200).json({
+      message: "Transportation booked successfully",
+      product,
+      tourist,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 const getBookedTransportations = async (req, res) => {
   const { touristId } = req.params;
 
@@ -221,6 +264,39 @@ const getBookedTransportations = async (req, res) => {
   }
 };
 
+const getPurchasedProducts = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+    // Find the tourist and ensure the tourist exists
+    const tourist = await touristModel.findById(touristId);
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    console.log("Purchased products before population:", tourist.purchasedProducts);
+
+    // Populate the purchased products
+    const populatedTourist = await touristModel
+      .findById(touristId)
+      .populate('purchasedProducts'); // Ensure 'purchasedProducts' matches the field name in schema
+
+    console.log("Populated Purchased Products:", populatedTourist.purchasedProducts);
+
+    // Check if the population was successful
+    if (!populatedTourist.purchasedProducts || populatedTourist.purchasedProducts.length === 0) {
+      return res.status(200).json({ message: "No purchased products found for this tourist." });
+    }
+
+    // Send the populated purchased products as a response
+    res.status(200).json(populatedTourist.purchasedProducts);
+  } catch (error) {
+    console.error("Error fetching purchased products:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 
 const getTouristNationality = async (req, res) => {
@@ -255,6 +331,62 @@ const deleteAllTourist = async (req, res) => {
   }
 };
 
+// Method to add a rating
+const addRating = async (req, res) => {
+  const { rating } = req.body;  // Get rating from the request body
+  const { productId } = req.params;  // Get productId from the URL parameter
+
+  try {
+    // Find the product by ID
+    const product = await productModel.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Add the rating to the ratings array
+    product.ratings.push(rating);
+
+    // Recalculate the average rating
+    const totalRatings = product.ratings.length;
+    const sumOfRatings = product.ratings.reduce((sum, rate) => sum + rate, 0);
+    product.avgRating = sumOfRatings / totalRatings;
+
+    // Save the updated product
+    await product.save();
+
+    return res.status(200).json(product);  // Return the updated product
+  } catch (error) {
+    console.error('Error adding rating:', error.message);
+    return res.status(500).json({ error: error.message });  // Return error response
+  }
+};
+
+// Method to add a review
+const addReview = async (req, res) => {
+  const { review } = req.body;  // Get review from the request body
+  const { productId } = req.params;  // Get productId from the URL parameter
+
+  try {
+    // Find the product by ID
+    const product = await productModel.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Add the review to the reviews array
+    product.reviewsText.push(review);
+
+    // Save the updated product
+    await product.save();
+
+    return res.status(200).json(product);  // Return the updated product
+  } catch (error) {
+    console.error('Error adding review:', error.message);
+    return res.status(500).json({ error: error.message });  // Return error response
+  }
+};
 module.exports = {
   createTourist,
   updateTourist,
@@ -265,4 +397,8 @@ module.exports = {
   bookTransportation,
   getBookedTransportations,
   getTouristNationality,
+  buyProduct,
+  getPurchasedProducts,
+  addRating,
+  addReview,
 };
