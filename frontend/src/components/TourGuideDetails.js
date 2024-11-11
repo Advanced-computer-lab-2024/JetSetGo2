@@ -162,6 +162,24 @@ const TourGuidePage = () => {
     }
   };
 
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        //setImagePreview(reader.result);
+        //console.log(imagePreview);
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
+  };
+
   // Function to handle account deletion
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm(
@@ -201,11 +219,11 @@ const TourGuidePage = () => {
       {/* Sidebar */}
       <div style={styles.sidebar}>
         <div style={styles.profileContainer}>
-        <img 
-                          src={`data:image/png;base64,${tourGuide.Photo}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
+          <img
+            src={`data:image/png;base64,${tourGuide.Photo}`}
+            alt="Product"
+            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+          />
           <p style={styles.profileName}>{tourGuide.UserName}</p>
           <button onClick={() => setIsEditing(true)} style={styles.button}>
             Edit
@@ -332,9 +350,8 @@ const TourGuidePage = () => {
               <input
                 type="file"
                 accept="image/*"
-                name="Photo"
-                onChange={handleImageChange}
-                style={styles.inputStyle}
+                onChange={(e) => handleImageUpload(e, setFormData)}
+                required
               />
             </div>
 

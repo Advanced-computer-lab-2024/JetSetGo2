@@ -8,14 +8,14 @@ const { ProfilingLevel } = require("mongodb");
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const {
-    Name,
-    Password,
-    MobileNumber,
-    Age,
-    PreviousWork,
-    YearsOfExperience,
-    LanguagesSpoken,
+    UserName,
     Email,
+    Password,
+    Age,
+    LanguagesSpoken,
+    MobileNumber,
+    YearsOfExperience,
+    PreviousWork,
   } = req.body;
   const base64Image = req.body.pictures.replace(
     /^data:image\/[a-zA-Z]+;base64,/,
@@ -25,14 +25,14 @@ const updateUser = async (req, res) => {
 
   try {
     const updateFields = {};
-    if (Name) updateFields.Name = Name;
+    if (UserName) updateFields.UserName = UserName;
     if (Password) updateFields.Password = Password;
-    if (MobileNumber) updateFields.MobileNumber = MobileNumber;
-    if (Age) updateFields.Age = Age;
-    if (PreviousWork) updateFields.PreviousWork = PreviousWork;
-    if (YearsOfExperience) updateFields.YearsOfExperience = YearsOfExperience;
-    if (LanguagesSpoken) updateFields.LanguagesSpoken = LanguagesSpoken;
     if (Email) updateFields.Email = Email;
+    if (Age) updateFields.Age = Age;
+    if (LanguagesSpoken) updateFields.LanguagesSpoken = LanguagesSpoken;
+    if (MobileNumber) updateFields.MobileNumber = MobileNumber;
+    if (YearsOfExperience) updateFields.YearsOfExperience = YearsOfExperience;
+    if (PreviousWork) updateFields.PreviousWork = PreviousWork;
     if (Photo) updateFields.Photo = Photo; // Update logo if provided, saving only the filename
 
     const updatedTourGuide = await TourModel.findByIdAndUpdate(

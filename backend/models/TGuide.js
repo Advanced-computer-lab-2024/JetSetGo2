@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const reviewSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   rating: { type: Number, min: 1, max: 5 },
-  comment: { type: String }
+  comment: { type: String },
 });
 const TGuidechema = new Schema(
   {

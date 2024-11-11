@@ -35,9 +35,13 @@ const getAdverById = async (req, res) => {
 
 const updateAdver = async (req, res) => {
   const { id } = req.params; // Extract id from the request body
-  const { UserName, Email, Link, Hotline, Profile, Loc, CompanyDes, Services } = req.body; // Extract data from the
-  const base64Image = req.body.pictures.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
-  const logo = base64Image // Get just the filename if uploaded
+  const { UserName, Email, Link, Hotline, Profile, Loc, CompanyDes, Services } =
+    req.body; // Extract data from the
+  const base64Image = req.body.pictures.replace(
+    /^data:image\/[a-zA-Z]+;base64,/,
+    ""
+  );
+  const logo = base64Image; // Get just the filename if uploaded
 
   try {
     const UpdateAdver = {};

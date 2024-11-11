@@ -1,7 +1,6 @@
 const adminModel = require("../models/admin"); // Adjust the path if necessary
 const bcrypt = require("bcrypt");
 
-
 // Create Admin
 const createAdmin = async (req, res) => {
   try {
@@ -99,6 +98,7 @@ const deleteAdmin = async (req, res) => {
     });
   }
 };
+
 const updatePassword = async (req, res) => {
   try {
     console.log("Endpoint hit - updatePassword");
@@ -133,7 +133,6 @@ const updatePassword = async (req, res) => {
     });
   }
 };
-
 
 // Export the controller methods
 module.exports = {
