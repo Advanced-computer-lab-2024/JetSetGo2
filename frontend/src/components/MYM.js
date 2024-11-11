@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "axios";
 
@@ -16,6 +15,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
+
 
 const predefinedLocations = [
   {
@@ -40,33 +40,31 @@ const predefinedLocations = [
   },
   // Add more locations as needed
 ];
+const currencyRates = {
+  EUR: 1,    // Base currency (assumed for conversion)
+  USD: 1,  // Example conversion rate
+  EGP: 30,   // Example conversion rate
+};
 
-const Museums = () => {
+const Mai = () => {
   const [museums, setMuseums] = useState([]);
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [bookedHP, setBookedHP] = useState([]); // Track booked activities
-  const convertPrice = (price) => {
-    return (price * currencyRates[selectedCurrency]).toFixed(2);
-  };
-  const currencyRates = {
-    EUR: 1,    // Base currency (assumed for conversion)
-    USD: 1,  // Example conversion rate
-    EGP: 30,   // Example conversion rate
-  };
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
-  const touristId = localStorage.getItem("userId");
 
+  const [submittedReviews, setSubmittedReviews] = useState(
+    JSON.parse(localStorage.getItem("submittedReviews")) || {}
+  );
+  const [itineraryRating, setItineraryRating] = useState(0);
+  const [itineraryComment, setItineraryComment] = useState("");
+  const touristId = localStorage.getItem("userId");
   // Fetch museums when the component mounts
   useEffect(() => {
     fetchMuseums();
-    // Load booked activities from localStorage when the component mounts
-    const storedBookings = JSON.parse(localStorage.getItem("bookedHP")) || [];
-    setBookedHP(storedBookings);
   }, []);
-  
 
   useEffect(() => {
     if (selectedTag) {
@@ -83,19 +81,29 @@ const Museums = () => {
   }, [selectedTag, museums]); // Trigger filtering when selectedTag or museums change
 
   const navigate = useNavigate(); // Initialize useNavigate hook
-
-  const fetchMuseums = async () => {
+  const getBookedhp = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/museum/get");
-      const data = response.data;
-      const nonFlaggedMuseums = data.filter(place => !place.flagged);
-      setMuseums(nonFlaggedMuseums);
-      setFilteredMuseums(nonFlaggedMuseums);
+    
+      const response = await axios.get(
+        "http://localhost:8000/museum/getbookedHP",
+        { params: { touristId } }
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error fetching Museums:", error);
-      setError("Failed to load Museums.");
+      console.error("Error fetching activities:", error);
+      throw error;
     }
   };
+  const fetchMuseums = async () => {
+    try {
+      const data = await getBookedhp();
+      setMuseums(data);
+    } catch (error) {
+      console.error("Error fetching museums:", error);
+      setError("Could not fetch museums. Please try again later.");
+    }
+  };
+  
 
   const generateMapSrc = (coordinates) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
@@ -109,7 +117,9 @@ const Museums = () => {
       .then(() => alert("Link copied to clipboard!"))
       .catch(() => alert("Failed to copy link."));
   };
-
+  const convertPrice = (price) => {
+    return (price * currencyRates[selectedCurrency]).toFixed(2);
+  };
   // Share via email
   const handleShare = (place) => {
     const subject = encodeURIComponent(`Check out this historical place: ${place.tourismGovernerTags?.name || place.location}`);
@@ -138,11 +148,7 @@ const Museums = () => {
 
       if (response.status === 200) {
         // Update the bookings count in the UI
-        setBookedHP((prev) => {
-          const updatedBookedHP = [...prev, id];
-          localStorage.setItem("bookedHP", JSON.stringify(updatedBookedHP)); // Persist to localStorage
-          return updatedBookedHP; // Return updated state
-        })
+        setBookedHP((prev) => [...prev, id]); // Mark activity as booked
         alert("activity booked successfully!");
       }
     } catch (error) {
@@ -178,11 +184,7 @@ const Museums = () => {
       );
   
       if (response.status === 200) {
-        setBookedHP((prev) => {
-          const updatedBookedHP = prev.filter((HPId) => HPId !== id);
-          localStorage.setItem("bookedHP", JSON.stringify(updatedBookedHP)); // Update in localStorage
-          return updatedBookedHP; // Return updated state
-        });
+        setBookedHP((prev) => prev.filter((HPId) => HPId !== id)); // Remove activity from booked list
         alert("Booking canceled successfully!");
       }
     } catch (error) {
@@ -191,18 +193,50 @@ const Museums = () => {
     }
   };
 
+  const handleItineraryReview = async (itineraryId) => {
+    try {
+      await axios.post(`http://localhost:8000/museum/submitReview/${itineraryId}`, {
+        userId: touristId,
+        rating: itineraryRating,
+        comment: itineraryComment,
+      });
+      alert("Itinerary review submitted!");
+  
+      // Clear review inputs after submission
+      setItineraryRating(0);
+      setItineraryComment("");
+  
+      // Update the submitted reviews state
+      const updatedSubmittedReviews = { ...submittedReviews, [itineraryId]: true };
+      setSubmittedReviews(updatedSubmittedReviews);
+      localStorage.setItem("submittedReviews", JSON.stringify(updatedSubmittedReviews));
+    } catch (error) {
+      console.error("Error submitting itinerary review:", error);
+    }
+  };
+  
+  
+
+
   return (
     <div id="museums" style={styles.museumsContainer}>
       <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
+        <button className="back-button" onClick={() => navigate(-1)}>
           Back
         </button>
-
       </div>
-      
+       <div className="filter-container">
+        <label htmlFor="currencySelect">Choose Currency:</label>
+        <select
+          id="currencySelect"
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+        >
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="EGP">EGP</option>
+        </select>
+      </div>
       <style>{`
         .museum-card {
           background: white;
@@ -240,7 +274,7 @@ const Museums = () => {
           text-align: center;
         }
       `}</style>
-
+  
       <h2
         style={{
           color: "#FF4500",
@@ -251,20 +285,8 @@ const Museums = () => {
       >
         Museums
       </h2>
-      <div className="filter-container">
-        <label htmlFor="currencySelect">Choose Currency:</label>
-        <select
-          id="currencySelect"
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="EGP">EGP</option>
-        </select>
-      </div>
       {error && <p className="error">{error}</p>}
-
+  
       {/* Filter by Tag */}
       <div className="filter-container">
         <label htmlFor="tagFilter">Filter by Tourism Governor Tag:</label>
@@ -286,30 +308,29 @@ const Museums = () => {
             ))}
         </select>
       </div>
-
+  
       {filteredMuseums.length > 0 ? (
-  <div className="museum-cards">
-    {filteredMuseums.map((place) => {
-      // Extract latitude and longitude from the location string
-      const locationCoords = place.location.split(",");
-      const latitude = locationCoords[0];
-      const longitude = locationCoords[1];
-      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
-
-      return (
-        <div key={place._id} className="museum-card">
-          <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
-          <p>
-            <strong>Description:</strong> {place.description}
-          </p>
-          <p>
-            <strong>Location:</strong> {place.location}
-          </p>
-          <p>
-            <strong>Opening Hours:</strong> {place.openingHours}
-          </p>
-          <p>
-          <p>
+        <div className="museum-cards">
+          {filteredMuseums.map((place) => {
+            // Extract latitude and longitude from the location string
+            const locationCoords = place.location.split(",");
+            const latitude = locationCoords[0];
+            const longitude = locationCoords[1];
+            const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  
+            return (
+              <div key={place._id} className="museum-card">
+                <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
+                <p>
+                  <strong>Description:</strong> {place.description}
+                </p>
+                <p>
+                  <strong>Location:</strong> {place.location}
+                </p>
+                <p>
+                  <strong>Opening Hours:</strong> {place.openingHours}
+                </p>
+                <p>
                   <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
                 </p>
                 <p>
@@ -318,47 +339,69 @@ const Museums = () => {
                 <p>
                   <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
                   </p>
-          <p style={styles.cardText}>
-           {place.ticketPrice}
-          </p>          </p>
-          <div className="museum-image">
-            <img
-              src={place.pictures}
-              alt={`Picture of ${place.description}`}
-            />
-          </div>
-          <p>
-            <strong>Tourism Governor Tags:</strong>{" "}
-            {place.tourismGovernerTags?.type || "None"}
-          </p>
-          {/* Map iframe */}
-          {mapSrc && (
-            <iframe
-              title={`Map for ${place.location}`}
-              src={mapSrc}
-              width="300"
-              height="200"
-              style={{ border: "none" }}
-            ></iframe>
-          )}
-          {bookedHP.includes(place._id) ? (
-                    <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
-                  ) : (
-                    <button onClick={() => handleBookTour(place._id)}>Book Now</button>
-                  )}
-          <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
-          <button onClick={() => handleShare(place)}>Share via mail </button>
+                  <p>
+                  <strong>Rating:</strong> {place.rating}
+                  </p>
+                <div className="museum-image">
+                  <img
+                    src={place.pictures}
+                    alt={`Picture of ${place.description}`}
+                  />
+                </div>
+                <p>
+                  <strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags?.type || "None"}
+                </p>
+                {/* Map iframe */}
+                {mapSrc && (
+                  <iframe
+                    title={`Map for ${place.location}`}
+                    src={mapSrc}
+                    width="300"
+                    height="200"
+                    style={{ border: "none" }}
+                  ></iframe>
+                )}
+  
+                {/* Conditional Rendering: Show review section if not submitted */}
+                {submittedReviews[place._id] ? (
+                  <p>Your review has been submitted!</p>
+                ) : (
+                  <>
+                    <div>
+                      <label htmlFor="rating">Rating (1-5):</label>
+                      <input
+                        type="number"
+                        id="itinerary-rating"
+                        value={itineraryRating}
+                        min="1"
+                        max="5"
+                        onChange={(e) => setItineraryRating(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="comment">Comment:</label>
+                      <textarea
+                        id="itinerary-comment"
+                        value={itineraryComment}
+                        onChange={(e) => setItineraryComment(e.target.value)}
+                        placeholder="Write your comment here"
+                      />
+                    </div>
+                    <button onClick={() => handleItineraryReview(place._id)}>
+                      Submit Itinerary Review
+                    </button>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-  </div>
-) : (
-  <p>No Museums available.</p>
-)}
-
+      ) : (
+        <p>No Museums available.</p>
+      )}
     </div>
   );
-};
+};  
 
 const styles = {
   museumsContainer: {
@@ -367,4 +410,4 @@ const styles = {
   },
 };
 
-export default Museums;
+export default Mai;

@@ -17,6 +17,8 @@ import CategoryCRUD from "./components/CategoryCRUD";
 import ProductCRUD from "./components/ProductCRUD";
 import CreateTag from "./components/CreateTag";
 import AdvertiserForm from "./components/Create";
+import Mai from "./components/MYM";
+
 import AdvertiserManagement from "./components/listup";
 import CreateSeller from "./components/CreateSeller";
 import SellerDetails from "./components/SellerDetails";
@@ -98,6 +100,7 @@ function App() {
           <Route path="/product" element={<ProductCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
           <Route path="/myhp" element={<MYHPT />} />
+          <Route path="/mymp" element={<Mai />} />
 
           <Route path="/CreateSeller" element={<CreateSeller />} />
           <Route path="/seller-details" element={<SellerDetails />} />

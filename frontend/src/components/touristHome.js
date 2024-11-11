@@ -262,6 +262,10 @@ const handleDeleteAccount = async () => {
   >
            My HistoricalPlaces    
                </button>
+               <button    onClick={() => navigate("/mymp", { state: { touristId: touristId } })}
+  >
+           My Museums    
+               </button>
 
                <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
         Delete Account
