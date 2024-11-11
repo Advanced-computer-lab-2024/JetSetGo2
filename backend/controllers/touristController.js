@@ -279,7 +279,7 @@ const redeemPointsToCash = async (req, res) => {
     tourist.Loyalty_Points -= pointsToRedeem;
 
     // Add the cash equivalent to the user's wallet
-    tourist.Wallet += tourist.Wallet + Math.floor(cashEquivalent);
+    tourist.Wallet += Math.floor(cashEquivalent); // Update wallet balance correctly
 
     // Save the updated tourist
     await tourist.save();

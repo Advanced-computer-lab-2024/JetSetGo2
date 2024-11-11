@@ -105,6 +105,7 @@ const navigate = useNavigate();
         try {
             const touristId = localStorage.getItem("userId");
             const response = await axios.post(`http://localhost:8000/home/tourist/bookFlight`, {
+                
                 touristId,
                 flight: {
                     flightNumber: flight.id,
