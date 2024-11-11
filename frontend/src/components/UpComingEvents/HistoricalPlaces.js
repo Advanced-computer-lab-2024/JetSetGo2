@@ -89,27 +89,7 @@ const HistoricalPlaces = () => {
   const convertPrice = (price) => {
     return (price * currencyRates[selectedCurrency]).toFixed(2);
   };
-  // Share by copying the link
-  const handleCopybylink = (place) => {
-    const link = `http://localhost:3000/HP/${place._id}`;
-    navigator.clipboard.writeText(link)
-      .then(() => alert("Link copied to clipboard!"))
-      .catch(() => alert("Failed to copy link."));
-  };
-
-  // Share via email
-  const handleShare = (place) => {
-    const subject = encodeURIComponent(`Check out this historical place: ${place.tourismGovernerTags?.name || place.location}`);
-    const body = encodeURIComponent(`
-      Here are the details of the historical place:
-      - Location: ${place.location}
-      - Description: ${place.description}
-      - Opening Hours: ${place.openingHours}
-      - Ticket Price: $${place.ticketPrice}
-      You can view more details here: http://localhost:3000/HP/${place._id}
-    `);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  };
+ 
 
   const LocationMarker = () => {
     useMapEvents({
@@ -222,8 +202,6 @@ const HistoricalPlaces = () => {
               style={styles.map}
             ></iframe>
           )}
-          <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
-          <button onClick={() => handleShare(place)}>Share via mail </button>
         </div>
         
       );
