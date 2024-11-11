@@ -211,6 +211,25 @@ const SellerDetails = () => {
       setIsEditing(false); // Reset editing state for other sections
     }
   };
+
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        //setImagePreview(reader.result);
+        //console.log(imagePreview);
+        
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
+  };
   // Function to handle account deletion
   const handleDeleteAccount = async () => {
     const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
@@ -346,11 +365,11 @@ const SellerDetails = () => {
       <div style={formGroupStyle}>
         <label style={labelStyle}>Logo:</label>
         <input
-          style={inputStyle}
-          type="file"
-          accept="image/*"
-          onChange={handleLogoChange}
-        />
+  type="file"
+  accept="image/*"
+  onChange={(e) => handleImageUpload(e, setFormData)}
+  required
+/>
       </div>
       <button style={buttonStyle} type="submit">
         Save Changes
