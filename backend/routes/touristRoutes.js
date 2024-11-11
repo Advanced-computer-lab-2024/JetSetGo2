@@ -11,6 +11,7 @@ const {
   getBookedTransportations,
   getTouristNationality,
   redeemPointsToCash,
+  reqAccountToBeDeleted,
 } = require("../controllers/touristController");
 
 router.get("/", (req, res) => {
@@ -32,5 +33,6 @@ router.get("/getNat/:touristId", getTouristNationality);
 router.delete("/delete/:id", deleteTourist);
 router.delete("/deleteAllTourist", deleteAllTourist);
 router.put("/redeempoints/:id", redeemPointsToCash);
+router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
 
 module.exports = router;

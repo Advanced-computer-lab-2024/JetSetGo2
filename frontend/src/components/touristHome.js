@@ -26,14 +26,14 @@ const TouristHome = () => {
   const [bookedHotels, setBookedHotels] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [points, setPoints] = useState(0);
-  const [wallet, setWallet] = useState(0);
+  const [Wallet, setWallet] = useState(0);
   const [message, setMessage] = useState(""); // For success/error messages
 
   const [touristData, setTouristData] = useState({
     UserName: "",
     Loyalty_Level: 0,
     Loyalty_Points: 0,
-    wallet: 0,
+    Wallet: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState({
@@ -45,13 +45,12 @@ const TouristHome = () => {
   const [searchMethod, setSearchMethod] = useState("name");
   const navigate = useNavigate();
   const handleFlightSearchClick = () => {
-    navigate('/flight-search'); // Redirect to the Flight Search page
-};
+    navigate("/flight-search"); // Redirect to the Flight Search page
+  };
 
-const handleHotelSearchClick = () => {
-  navigate('/hotelSearch'); // Redirect to the Flight Search page
-};
-
+  const handleHotelSearchClick = () => {
+    navigate("/hotelSearch"); // Redirect to the Flight Search page
+  };
 
   const touristId = localStorage.getItem("userId");
 
@@ -62,8 +61,8 @@ const handleHotelSearchClick = () => {
           `http://localhost:8000/home/tourist/getTourist/${touristId}`
         );
         setTouristData(response.data);
+        setWallet(response.data.wallet); // Set wallet initially from fetched data
         setPoints(response.data.Loyalty_Points);
-        setWallet(response.data.wallet);
         console.log("Tourist data response:", response.data);
       } catch (error) {
         console.error("Error fetching tourist data:", error);
@@ -83,7 +82,9 @@ const handleHotelSearchClick = () => {
 
     const fetchBookedHotels = async (touristId) => {
       try {
-        const response = await axios.get(`http://localhost:8000/home/tourist/bookedHotels/${touristId}`);
+        const response = await axios.get(
+          `http://localhost:8000/home/tourist/bookedHotels/${touristId}`
+        );
         console.log("Booked hotels:", response.data);
         setBookedHotels(response.data); // Update state with the fetched data
       } catch (error) {
@@ -92,7 +93,9 @@ const handleHotelSearchClick = () => {
     };
     const fetchComplaints = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/complaint/complaints/${touristId}`);
+        const response = await axios.get(
+          `http://localhost:8000/complaint/complaints/${touristId}`
+        );
         setComplaints(response.data);
       } catch (error) {
         console.error("Error fetching complaints:", error);
@@ -102,12 +105,10 @@ const handleHotelSearchClick = () => {
     if (touristId) {
       fetchTouristData();
       fetchBookedFlights(touristId);
-      fetchBookedHotels(touristId) ;
+      fetchBookedHotels(touristId);
       fetchComplaints();
     }
   }, [touristId]);
-
-
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -156,6 +157,11 @@ const handleHotelSearchClick = () => {
       // }));
       setWallet(response.data.wallet);
       setPoints(response.data.loyaltyPointsRemaining);
+      setTouristData((prevData) => ({
+        ...prevData,
+        wallet: response.data.wallet, // Update touristData wallet
+        Loyalty_Points: response.data.loyaltyPointsRemaining // Update touristData points
+      }));
     } catch (error) {
       console.error("Error redeeming points:", error);
       setMessage("Error redeeming points, please try again.");
@@ -193,6 +199,30 @@ const handleHotelSearchClick = () => {
   const handleFileComplaintClick = () => {
     navigate("/file-complaint", { state: { touristId } });
   };
+
+// Function to handle account deletion
+const handleDeleteAccount = async () => {
+  const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+  
+  if (confirmDelete) {
+    try {
+      const response = await axios.delete(`http://localhost:8000/home/tourist/deletMyAccount/${touristId}`);
+      
+      if (response.status === 200) {
+        alert(response.data.message); // Display success message
+        navigate("/login"); // Redirect to homepage or login after deletion
+      }
+    } catch (error) {
+      // Handle errors, such as when there are upcoming booked itineraries
+      if (error.response && error.response.data.message) {
+        alert(error.response.data.message); // Display error message from backend
+      } else {
+        alert("An error occurred while deleting the account.");
+      }
+    }
+  }
+};
+
   return (
     <div style={styles.container}>
       {/* Tourist Profile Section */}
@@ -204,11 +234,9 @@ const handleHotelSearchClick = () => {
             style={styles.profileImage}
           />
           <h2 style={styles.profileName}>{touristData.UserName}</h2>
-          <p style={styles.walletText}>
-            Loyalty Level: {touristData.Loyalty_Level}
-          </p>
+          <p style={styles.walletText}>Loyalty Level: {touristData.Loyalty_Level}</p>
           <p style={styles.walletText}>Loyalty Points: {points}</p>
-          <p style={styles.walletText}>Wallet: EGP{wallet}</p>
+          <p style={styles.walletText}>Wallet: EGP {Wallet}</p> {/* Display updated wallet */}
           <button onClick={handleUpdateClick} style={styles.button}>
             Update Profile
           </button>
@@ -225,6 +253,10 @@ const handleHotelSearchClick = () => {
   >
            My Activities    
                </button>
+
+               <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
+        Delete Account
+      </button>
         </div>
       </div>
 
@@ -235,7 +267,7 @@ const handleHotelSearchClick = () => {
           <button onClick={() => navigate("/p")}>View Products</button>
           <button onClick={handleFlightSearchClick}>Search Flights</button>
           <button onClick={handleHotelSearchClick}>Search Hotels</button>
-        <button
+          <button
             onClick={() =>
               navigate("/upcoming-activitiest", {
                 state: { touristId: touristId },
@@ -265,10 +297,12 @@ const handleHotelSearchClick = () => {
           <Link to="/transportationBooking" style={styles.navLink}>
             Book Transportation
           </Link>
-          <button onClick={handleFileComplaintClick} style={styles.navLink}>File a Complaint</button>
+          <button onClick={handleFileComplaintClick} style={styles.navLink}>
+            File a Complaint
+          </button>
         </nav>
-         {/* Booked Flights Section */}
-         <div style={styles.bookedFlightsSection}>
+        {/* Booked Flights Section */}
+        <div style={styles.bookedFlightsSection}>
           <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
           {bookedFlights.length > 0 ? (
             <ul style={styles.bookedFlightsList}>
@@ -303,12 +337,25 @@ const handleHotelSearchClick = () => {
             <ul style={styles.bookedHotelsList}>
               {bookedHotels.map((hotel, index) => (
                 <li key={index} style={styles.flightItem}>
-                  <p><strong>Hotel Name:</strong> {hotel.hotelName}</p>
-                  <p><strong>Check In Date:</strong> {hotel.offer.checkInDate}</p>
-                  <p><strong>Check Out Date:</strong> {hotel.offer.checkOutDate}</p>
-                  <p><strong>Guests:</strong> {hotel.offer.guests.adults}</p>
-                  <p><strong>price:</strong>{hotel.offer.price.currency} {hotel.offer.price.total}</p>
-                  <p><strong>Room:</strong> {hotel.offer.room.type}</p>
+                  <p>
+                    <strong>Hotel Name:</strong> {hotel.hotelName}
+                  </p>
+                  <p>
+                    <strong>Check In Date:</strong> {hotel.offer.checkInDate}
+                  </p>
+                  <p>
+                    <strong>Check Out Date:</strong> {hotel.offer.checkOutDate}
+                  </p>
+                  <p>
+                    <strong>Guests:</strong> {hotel.offer.guests.adults}
+                  </p>
+                  <p>
+                    <strong>price:</strong>
+                    {hotel.offer.price.currency} {hotel.offer.price.total}
+                  </p>
+                  <p>
+                    <strong>Room:</strong> {hotel.offer.room.type}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -317,26 +364,36 @@ const handleHotelSearchClick = () => {
           )}
         </div>
         <div style={styles.complaintsSection}>
-  <h3>Your Complaints</h3>
-  {complaints.length > 0 ? (
-    <ul style={styles.complaintsList}>
-      {complaints.map((complaint, index) => (
-        <li key={index} style={styles.complaintItem}>
-          <p><strong>Title:</strong> {complaint.title}</p>
-          <p><strong>Body:</strong> {complaint.body}</p>
-          <p><strong>Date:</strong> {new Date(complaint.date).toLocaleDateString()}</p>
-          <p><strong>Status:</strong> {complaint.status}</p>
-          {complaint.reply && (
-            <p><strong>Reply:</strong> {complaint.reply}</p>
+          <h3>Your Complaints</h3>
+          {complaints.length > 0 ? (
+            <ul style={styles.complaintsList}>
+              {complaints.map((complaint, index) => (
+                <li key={index} style={styles.complaintItem}>
+                  <p>
+                    <strong>Title:</strong> {complaint.title}
+                  </p>
+                  <p>
+                    <strong>Body:</strong> {complaint.body}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {new Date(complaint.date).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {complaint.status}
+                  </p>
+                  {complaint.reply && (
+                    <p>
+                      <strong>Reply:</strong> {complaint.reply}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No complaints found.</p>
           )}
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p>No complaints found.</p>
-  )}
-</div>
-
+        </div>
 
         {/* Search Bar Section */}
         <div style={styles.searchSection}>
@@ -361,15 +418,13 @@ const handleHotelSearchClick = () => {
           </button>
         </div>
 
-       
-
         {/* Search Results Section */}
         <div style={styles.resultsContainer}>
           <h3 style={styles.resultsHeader}>Search Results:</h3>
           {searchResults.Museums.length > 0 ||
-            searchResults.HistoricalPlace.length > 0 ||
-            searchResults.activities.length > 0 ||
-            searchResults.itinaries.length > 0 ? (
+          searchResults.HistoricalPlace.length > 0 ||
+          searchResults.activities.length > 0 ||
+          searchResults.itinaries.length > 0 ? (
             <ul style={styles.resultsList}>
               {/* Museums */}
               {searchResults.Museums.map((museum, index) => (

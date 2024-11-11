@@ -1,4 +1,6 @@
 const touristModel = require("../models/Tourist.js");
+const ItenModel = require("../models/schematour.js");
+const ActivityModel = require("../models/ActivityCRUD.js");
 const transportationModel = require("../models/TransportationCRUD.js");
 const { default: mongoose } = require("mongoose");
 
@@ -294,6 +296,94 @@ const redeemPointsToCash = async (req, res) => {
   }
 };
 
+const reqAccountToBeDeleted = async (req, res) => {
+  const { id } = req.params;
+  const currentDate = new Date();
+
+  try {
+    const bookeditineraries = await ItenModel.find({
+      availableDates: { $gt: currentDate }, // Date is greater than the current date
+      bookings: { $gt: 0 },
+      bookedUsers: { $in: [id] },
+    });
+
+    if (bookeditineraries.length != 0) {
+      return res.status(400).json({
+        message:
+          "Tourist cannot be deleted there are booked upcoming itenaries",
+      });
+    }
+
+    const bookedactivities = await ActivityModel.find({
+      date: { $gt: currentDate }, // Date is greater than the current date
+      bookings: { $gt: 0 },
+      bookedUsers: { $in: [id] },
+    });
+
+    if (bookedactivities.length != 0) {
+      return res.status(400).json({
+        message:
+          "Tourist cannot be deleted there are booked upcoming activities",
+      });
+    }
+
+    const trousittransportation = await touristModel.findById(id).populate({
+      path: "bookedTransportations",
+    });
+
+    const bookedtransportation =
+      trousittransportation.bookedTransportations.filter((transportaion) => {
+        const transportaiondate = new Date(transportaion.date); // Convert the string date to Date object
+        return transportaiondate >= currentDate;
+      });
+
+    if (bookedtransportation != 0) {
+      return res.status(400).json({
+        message:
+          "Tourist cannot be deleted there are booked upcoming transportation",
+      });
+    }
+
+    const touristflights = await touristModel.findById(id);
+
+    // Filter the flights to only include upcoming ones
+    const upcomingFlights = touristflights.bookedFlights.filter((flight) => {
+      const departureDate = new Date(flight.date);
+      return departureDate > currentDate;
+    });
+
+    if (upcomingFlights != 0) {
+      return res.status(400).json({
+        message: "Tourist cannot be deleted there are booked upcoming flights",
+      });
+    }
+
+    const touristhotels = await touristModel
+      .findById(id)
+      .populate("bookedHotels");
+
+    // Filter the hotels to only include those with a future check-in date
+    const upcomingHotels = touristhotels.bookedHotels.filter((hotel) => {
+      const checkinDate = new Date(hotel.offer.checkInDate);
+      return checkinDate > currentDate;
+    });
+
+    if (upcomingHotels != 0) {
+      return res.status(400).json({
+        message: "Tourist cannot be deleted there are booked upcoming hotels",
+      });
+    }
+
+    await touristModel.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: "tourist deleted succesfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching itineraries", error });
+  }
+};
+
 module.exports = {
   createTourist,
   updateTourist,
@@ -305,4 +395,5 @@ module.exports = {
   getBookedTransportations,
   getTouristNationality,
   redeemPointsToCash,
+  reqAccountToBeDeleted,
 };
