@@ -1,12 +1,13 @@
 import React, { useState, useEffect,useRef } from 'react';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
-import { getProducts, createProduct, updateProduct, deleteProduct, getSellers } from '../services/ProductService';
+import { getProducts, createProduct, updateProduct, deleteProduct, getSellers, getAdmins } from '../services/ProductService';
 import axios from 'axios';
 
 const ProductCRUD = () => {
   const [products, setProducts] = useState([]);
   const [sellers, setSellers] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     description: '',
@@ -28,7 +29,10 @@ const ProductCRUD = () => {
   useEffect(() => {
     fetchProducts();
     fetchSellers();
+    fetchAdmins();
   }, []);
+
+  const userId = localStorage.getItem('userId');
 
   // Archive a product
   const handleArchive = async (id) => {
@@ -61,6 +65,19 @@ const ProductCRUD = () => {
     }));
   };
 
+  const determineSeller = () => {
+    const seller = sellers.find(seller => seller._id === userId);
+    const admin = admins.find(admin => admin._id === userId);
+
+    if (seller) {
+      return seller._id;
+    } else if (admin) {
+      const adminSeller = sellers.find(s => s.UserName === 'Admin'); // Find seller with username "admin"
+      return adminSeller ? adminSeller._id : '';
+    }
+    return '';
+  };
+
   // Fetch all products
   const fetchProducts = async () => {
     try {
@@ -81,6 +98,16 @@ const ProductCRUD = () => {
     }
   };
 
+  const fetchAdmins = async () => {
+    try {
+      const data = await getAdmins();
+      setAdmins(data);
+      console.log(admins);
+    } catch (error) {
+      console.error("Error fetching admins", error);
+    }
+  };
+
   // Handle form input change
   const handleChange = (e, setData) => {
     const { name, value } = e.target;
@@ -93,21 +120,24 @@ const ProductCRUD = () => {
   // Handle form submission for creating a new product
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+
+    // Set the seller ID based on user role
+    const sellerId = determineSeller();
+    if (!sellerId) {
+      setMessage('Error: Seller ID could not be determined.');
+      return;
+    }
+
     try {
-      await createProduct(formData);
+      await createProduct({ ...formData, seller: sellerId });
       setMessage('Product created successfully!');
       resetCreateForm();
       fetchProducts();
-      // Clear the file input
-      
       setImagePreview(null);
-      console.log(formData); // Logging formData
     } catch (error) {
-      // Handle any errors during the product creation
       const errorMessage = error.response ? error.response.data.error : 'Error occurred while creating the product';
       setMessage(errorMessage);
       console.error('Error:', error);
-      console.log(formData); // Logging formData
     }
   };
 
@@ -300,14 +330,14 @@ const ProductCRUD = () => {
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               type="number" name="price" value={formData.price} onChange={(e) => handleChange(e, setFormData)} required />
 
-            <label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
+            {/*<label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
             <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
               name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
               <option value="">Select a Seller</option>
               {sellers.map(seller => (
                 <option key={seller._id} value={seller._id}>{seller.UserName}</option>
               ))}
-            </select>
+            </select>*/}
 
             <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
             <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
@@ -351,23 +381,14 @@ const ProductCRUD = () => {
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 type="number" name="price" value={editData.price} onChange={(e) => handleChange(e, setEditData)} required />
 
-              <label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
+              {/*<label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
               <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
                 <option value="">Select a Seller</option>
                 {sellers.map(seller => (
                   <option key={seller._id} value={seller._id}>{seller.UserName}</option>
                 ))}
-              </select>
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Rating:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="range" min="0" max="5" step="0.1" value={editData.rating} onChange={(e) => handleRatingChange(e, setEditData)} />
-              <span>{editData.rating.toFixed(1)}</span>
-
-              <label style={{ display: 'block', marginBottom: '10px' }}>Reviews:</label>
-              <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                type="text" name="reviews" value={editData.reviews} onChange={(e) => handleChange(e, setEditData)} required />
+              </select>*/}
 
               <label style={{ display: 'block', marginBottom: '10px' }}>Available Quantity:</label>
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
@@ -447,55 +468,83 @@ const ProductCRUD = () => {
 </div>
 
         {/* Product Details */}
-        <div style={{ padding: '15px' }}>
-          <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#2d3e50' }}>
-            {product.description}
-          </h3>
-          <p style={{ fontSize: '16px', color: '#28a745', margin: '5px 0' }}>
-            ${product.price}
-          </p>
-          <p style={{ fontSize: '14px', color: '#6c757d', margin: '5px 0' }}>
-            Seller: {product.seller?.UserName || 'N/A'}
-          </p>
-          <p style={{ fontSize: '14px', color: '#ffc107', margin: '5px 0' }}>
-            Rating: {product.rating || 'No rating'}
-          </p>
-          {/* Action Buttons */}
-          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
-            <button
-              onClick={() => handleEdit(product)}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: '#2d3e50',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1b2838'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2d3e50'}
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(product._id)}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: '#ff6348',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5533b'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ff6348'}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+<div style={{ padding: '15px' }}>
+  <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#2d3e50' }}>
+    {product.description}
+  </h3>
+  <p style={{ fontSize: '16px', color: '#28a745', margin: '5px 0' }}>
+    ${product.price}
+  </p>
+  <p style={{ fontSize: '14px', color: '#6c757d', margin: '5px 0' }}>
+    Seller: {product.seller?.Name || 'N/A'}
+  </p>
+  <p style={{ fontSize: '14px', color: '#ffc107', margin: '5px 0' }}>
+    Rating: {product.avgRating || 'No rating'}
+  </p>
+
+  {/* Product Reviews */}
+  <div style={{ marginTop: '10px' }}>
+    <h4 style={{ fontSize: '16px', color: '#2d3e50', marginBottom: '5px' }}>Reviews:</h4>
+    {product.reviewsText && product.reviewsText.length > 0 ? (
+      <ul style={{ listStyleType: 'none', padding: 0 }}>
+        {product.reviewsText.map((review, index) => (
+          <li
+            key={index}
+            style={{
+              fontSize: '14px',
+              color: '#6c757d',
+              backgroundColor: '#f8f9fa',
+              padding: '8px',
+              borderRadius: '5px',
+              marginBottom: '5px',
+            }}
+          >
+            {review}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p style={{ fontSize: '14px', color: '#6c757d' }}>No reviews yet.</p>
+    )}
+  </div>
+
+  {/* Action Buttons */}
+  <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
+    <button
+      onClick={() => handleEdit(product)}
+      style={{
+        padding: '8px 12px',
+        backgroundColor: '#2d3e50',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s',
+      }}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1b2838'}
+      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2d3e50'}
+    >
+      Edit
+    </button>
+    <button
+      onClick={() => handleDelete(product._id)}
+      style={{
+        padding: '8px 12px',
+        backgroundColor: '#ff6348',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s',
+      }}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5533b'}
+      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ff6348'}
+    >
+      Delete
+    </button>
+  </div>
+</div>
+
       </div>
     ))}
   </div>

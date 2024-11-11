@@ -3,11 +3,22 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8000/product'; // Adjust the base URL as needed
 const API_URL2 = 'http://localhost:8000/Seller';
 const API_URL3 = 'http://localhost:8000/home/tourist';
+const API_URL4 = 'http://localhost:8000/admin';
 
 // Get all products
 export const getProducts = async () => {
    try {
       const response = await axios.get(`${API_URL}/get`);
+      return response.data;
+   } catch (error) {
+      console.error("Error fetching products:", error);
+      throw error;
+   }
+};
+
+export const getAdmins = async () => {
+   try {
+      const response = await axios.get(`${API_URL4}/get`);
       return response.data;
    } catch (error) {
       console.error("Error fetching products:", error);
@@ -67,6 +78,8 @@ export const buyProduct = async (touristId,productId) => {
       throw error;
    }
 };
+
+
 
 
 

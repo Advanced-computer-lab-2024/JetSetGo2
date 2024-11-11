@@ -99,6 +99,7 @@ const Activitiest = () => {
       });
       setActivities(upcomingActivities);
       setFilteredActivities(upcomingActivities);
+      console.log(upcomingActivities);
     } catch (error) {
       console.error("Error fetching activities", error);
     }
@@ -303,7 +304,7 @@ const Activitiest = () => {
                 <strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}
               </p>
               <p>
-                <strong>Time:</strong> {new Date(activity.time).toLocaleTimeString()}
+                <strong>Time:</strong> {activity.time}
               </p>
               <p>
                 <strong>Location:</strong> {activity.location}
@@ -312,7 +313,7 @@ const Activitiest = () => {
                 <strong>Price:</strong> ${activity.price}
               </p>
               <p>
-                <strong>Tags:</strong> {activity.tags ? activity.tags.type : "No Tags"}
+                <strong>Tags:</strong> {activity.tags ? activity.tags.name : "No Tags"}
               </p>
               <p>
                 <strong>Special Discount:</strong> {activity.specialDiscount}%

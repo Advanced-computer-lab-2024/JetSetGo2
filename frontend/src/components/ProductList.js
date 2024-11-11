@@ -153,77 +153,95 @@ const ProductList = () => {
         </div>
 
         <section>
-          <h2 style={{ fontSize: '24px', marginBottom: '20px', color: '#333' }}>Product List</h2>
-          <table style={{
-            width: '100%', borderCollapse: 'collapse', marginTop: '20px', borderRadius: '10px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-          }}>
-            <thead style={{ backgroundColor: '#343a40', color: '#fff' }}>
-              <tr>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Picture</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Description</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Price</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Seller</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Rating</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Available Quantity</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Sales</th>
-                <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Actions</th> {/* New Actions column */}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map(product => (
-                  <tr key={product._id} style={{ textAlign: 'center' }}>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                      {product.pictures && product.pictures.length > 0 ? (
-                        <img 
-                          src={`data:image/png;base64,${product.pictures}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
-                      ) : (
-                        'No Image'
-                      )}
-                    </td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.price} $</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                      {product.seller && product.seller.Name ? product.seller.name : 'Unknown Seller'}
-                    </td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.rating}</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.availableQuantity}</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.sales}</td>
-                    <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                      {product.isArchived ? (
-                        <button onClick={() => handleUnarchive(product._id)} style={{
-                          padding: '5px 10px',
-                          backgroundColor: '#ffc107',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}>Unarchive</button>
-                      ) : (
-                        <button onClick={() => handleArchive(product._id)} style={{
-                          padding: '5px 10px',
-                          backgroundColor: '#ffc107',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}>Archive</button>
-                      )}
-                    </td>
-                  </tr>
-                ))
+  <h2 style={{ fontSize: '24px', marginBottom: '20px', color: '#333' }}>Product List</h2>
+  <table style={{
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginTop: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+  }}>
+    <thead style={{ backgroundColor: '#343a40', color: '#fff' }}>
+      <tr>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Picture</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Description</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Price</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Seller</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Rating</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Available Quantity</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Sales</th>
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Reviews</th> {/* New Reviews column */}
+        <th style={{ padding: '10px', border: '1px solid #dee2e6' }}>Actions</th> {/* Actions column */}
+      </tr>
+    </thead>
+    <tbody>
+      {filteredProducts.length > 0 ? (
+        filteredProducts.map(product => (
+          <tr key={product._id} style={{ textAlign: 'center' }}>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
+              {product.pictures && product.pictures.length > 0 ? (
+                <img 
+                  src={`data:image/png;base64,${product.pictures}`} 
+                  alt="Product" 
+                  style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
+                />
               ) : (
-                <tr>
-                  <td colSpan="5" style={{ padding: '20px', textAlign: 'center' }}>No products available</td>
-                </tr>
+                'No Image'
               )}
-            </tbody>
-          </table>
-        </section>
+            </td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.price} $</td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
+              {product.seller && product.seller.Name ? product.seller.Name : 'Unknown Seller'}
+            </td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.avgRating || 'No rating'}</td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.availableQuantity}</td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.sales}</td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6', textAlign: 'left' }}>
+              {product.reviewsText && product.reviewsText.length > 0 ? (
+                <ul style={{ listStyleType: 'none', padding: 0 }}>
+                  {product.reviewsText.map((review, index) => (
+                    <li key={index} style={{ marginBottom: '5px' }}>
+                      - {review}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                'No reviews available'
+              )}
+            </td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
+              {product.isArchived ? (
+                <button onClick={() => handleUnarchive(product._id)} style={{
+                  padding: '5px 10px',
+                  backgroundColor: '#ffc107',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}>Unarchive</button>
+              ) : (
+                <button onClick={() => handleArchive(product._id)} style={{
+                  padding: '5px 10px',
+                  backgroundColor: '#ffc107',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}>Archive</button>
+              )}
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="9" style={{ padding: '20px', textAlign: 'center' }}>No products available</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</section>
+
       </div>
     </div>
   );
