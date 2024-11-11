@@ -23,7 +23,13 @@ import SellerDetails from "./components/SellerDetails";
 import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
 import Activities from "./components/UpComingEvents/Activities";
 import Activitiest from "./components/UpComingEvents/Activitiest";
+import Museumst from "./components/UpComingEvents/Museumst";
 import ActivityDetails from './components/ActivityDetails';
+import MYHPT from './components/myhp';
+
+import HPT from './components/UpComingEvents/historicalplacest';
+
+
 
 import ItinerariesPage from "./components/myitenaries";
 import MyActivities from "./components/myactivities";
@@ -31,6 +37,7 @@ import MyActivities from "./components/myactivities";
 
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
+
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import Itinerariest from "./components/UpComingEvents/Itenariest";
@@ -57,6 +64,7 @@ import FileComplaint from "./components/FileComplaint";
 import ManageActivities from "./components/ActivitiesAdmin";
 import ManageHistoricalPlaces from "./components/HistoricalPlacesAdmin";
 import ManageMuseums from "./components/MuseumsAdmin";
+
 
 function App() {
 
@@ -89,6 +97,8 @@ function App() {
           <Route path="/category" element={<CategoryCRUD />} />
           <Route path="/product" element={<ProductCRUD />} />
           <Route path="/CreateTag" element={<CreateTag />} />
+          <Route path="/myhp" element={<MYHPT />} />
+
           <Route path="/CreateSeller" element={<CreateSeller />} />
           <Route path="/seller-details" element={<SellerDetails />} />
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
@@ -97,12 +107,14 @@ function App() {
           <Route path="/activities/:id" element={<ActivityDetails />} />
           <Route path="/mi" element={<ItinerariesPage />} />
           <Route path="/myactivity" element={<MyActivities />} />
+          <Route path="/HPT" element={<HPT />} />
 
 
           
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/HP/:id" element={<HPdetails/>} />
           <Route path="/all-museums" element={<Museums />} />
+          <Route path="/museusemst" element={<Museumst />} />
           <Route path="/M/:id" element={<MDetails />} />
           <Route path="/IT/:id" element={<ItinerariesDetails />} />
           <Route path="/Upcoming-itineraries" element={<Itineraries />} />

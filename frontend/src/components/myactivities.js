@@ -29,7 +29,11 @@ const MyActivities = () => {
     try {
       const data = await getBookedactivities(touristId);
       const bookedActivities = data.filter((activity) => {
-        return activity.bookedUsers.includes(touristId);
+        // Get today's date
+        const today = new Date();
+        const activityDate = new Date(activity.date);
+        // Filter activities that are before today
+        return activity.bookedUsers.includes(touristId) && activityDate < today;
       });
       setActivities(bookedActivities);
       setBookedActivities(bookedActivities.map((activity) => activity._id));

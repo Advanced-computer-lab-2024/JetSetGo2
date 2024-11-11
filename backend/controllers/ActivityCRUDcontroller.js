@@ -151,6 +151,8 @@ const updateActivity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
 const submitReview = async (req, res) => {
   const { userId, rating, comment } = req.body;
   const { activityId } = req.params;

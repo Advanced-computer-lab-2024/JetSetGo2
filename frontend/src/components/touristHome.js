@@ -258,6 +258,10 @@ const handleDeleteAccount = async () => {
   >
            My Activities    
                </button>
+               <button    onClick={() => navigate("/myhp", { state: { touristId: touristId } })}
+  >
+           My HistoricalPlaces    
+               </button>
 
                <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
         Delete Account
@@ -296,10 +300,10 @@ const handleDeleteAccount = async () => {
             Itineraries
           </button>
 
-          <Link to="/all-historicalplaces" style={styles.navLink}>
+          <Link to="/HPT" style={styles.navLink}>
             Historical Places
           </Link>
-          <Link to="/all-museums" style={styles.navLink}>
+          <Link to="/museusemst" style={styles.navLink}>
             Museums
           </Link>
           <Link to="/transportationBooking" style={styles.navLink}>

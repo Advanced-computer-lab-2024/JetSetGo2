@@ -67,6 +67,8 @@ const Activitiest = () => {
   }, []);
 
   const handleBookTour = async (id) => {
+    console.log("tourist ID:", touristId);
+    console.log("hp ID:", id);
     try {
       if (!touristId) {
         alert("Tourist ID not found. Please log in.");
@@ -416,8 +418,7 @@ const handleCopy = (activity) => {
                 <strong>Location:</strong> {activity.location}
               </p>
               <p>
-                <strong>Price:</strong> ${activity.price}
-              </p>
+              <strong>Price:</strong> ${convertPrice(activity.price)} {selectedCurrency}              </p>
               <p>
                 <strong>Tags:</strong> {activity.tags ? activity.tags.name : "No Tags"}
               </p>
@@ -434,9 +435,11 @@ const handleCopy = (activity) => {
                 <strong>Rating:</strong> {activity.rating}
               </p>
               {/* Add a "Book Now" button */}
-              <button onClick={() => handleBookTour(activity._id)}>
-                Book Now
-              </button>
+              {bookedActivities.includes(activity._id) ? (
+                    <button onClick={() => handleCancelBooking(activity._id)}>Cancel Booking</button>
+                  ) : (
+                    <button onClick={() => handleBookTour(activity._id)}>Book Now</button>
+                  )}
               <button onClick={() => handleCopy(activity)}>Share via copy Link</button>
                   <button onClick={() => handleShare(activity)}>Share via mail </button>
             </div>
@@ -449,11 +452,11 @@ const handleCopy = (activity) => {
               style={{ border: 'none' }}
               title={`Map of ${activity.location}`}
             ></iframe>
-            {bookedActivities.includes(activity._id) ? (
+            {/* {bookedActivities.includes(activity._id) ? (
                     <button onClick={() => handleCancelBooking(activity._id)}>Cancel Booking</button>
                   ) : (
                     <button onClick={() => handleBookTour(activity._id)}>Book Now</button>
-                  )}
+                  )} */}
           </li>
         );
       })}

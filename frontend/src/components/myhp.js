@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
-import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
+import axios from "axios";
 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+
 
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -33,38 +34,131 @@ const predefinedLocations = [
     coordinates: "31.4015,30.0254,31.4215,30.0454",
   },
 ];
+
 const currencyRates = {
   EUR: 1,    // Base currency (assumed for conversion)
   USD: 1,  // Example conversion rate
   EGP: 30,   // Example conversion rate
 };
 
-const HistoricalPlaces = () => {
+const MYHPT = () => {
+    
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [error, setError] = useState(null);
-  const [selectedTag, setSelectedTag] = useState("");
-  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]);
-
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
+  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
+  const [bookedHP, setBookedHP] = useState([]); // Track booked activities
+  const navigate = useNavigate(); // Initialize useNavigate hook
+  const location = useLocation(); // Use useLocation to access the state
 
-  // Fetch historical places
+  //const touristId = location.state?.touristId || ""; // Extract touristId from the location state
+  const touristId = localStorage.getItem("userId");
+
+  
+  // Fetch historical places when the component mounts
   useEffect(() => {
     fetchHistoricalPlaces();
   }, []);
 
+  // Filter the places based on the selected tag
+  useEffect(() => {
+    if (selectedTag) {
+      setFilteredPlaces(
+        historicalPlaces.filter(
+          (place) => place.tourismGovernerTags?.type === selectedTag
+        )
+      );
+    } else {
+      setFilteredPlaces(historicalPlaces);
+    }
+  }, [selectedTag, historicalPlaces]);
+
+  
+
+
+  const handleBookTour = async (id) => {
+    try {
+      console.log("tourist ID:", touristId);
+      console.log("hp ID:", id);
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+      const response = await axios.patch(
+        `http://localhost:8000/historicalPlace/book/${id}`,
+        { userId: touristId } // Send touristId in the request body
+      );
+
+      if (response.status === 200) {
+        // Update the bookings count in the UI
+        setBookedHP((prev) => [...prev, id]); // Mark activity as booked
+        alert("activity booked successfully!");
+      }
+    } catch (error) {
+      console.error("Error booking activity:", error);
+      alert("already booked");
+    }
+  };
+  const handleCancelBooking = async (id) => {
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      // Find the activity that is being canceled
+      const HPToCancel = historicalPlaces.find(Historicalplace => Historicalplace._id=== id);
+      if (!HPToCancel) {
+        throw new Error("Activity not found.");
+      }
+  
+      const HPDate = new Date(HPToCancel.date); // Convert to Date object
+  
+      // Calculate the difference in hours
+      const hoursDifference = (HPDate - Date.now()) / (1000 * 60 * 60);
+      if (hoursDifference < 48) {
+        throw new Error("Cancellations are allowed only 48 hours before the activity date.");
+      }
+  
+      // Proceed to cancel the booking only if the 48-hour rule is met
+      const response = await axios.post(
+        `http://localhost:8000/historicalPlace/cancelHP/${id}`,
+        { userId: touristId }
+      );
+  
+      if (response.status === 200) {
+        setBookedHP((prev) => prev.filter((HPId) => HPId !== id)); // Remove activity from booked list
+        alert("Booking canceled successfully!");
+      }
+    } catch (error) {
+      console.error("Error canceling booking:", error);
+      alert(error.message || "An error occurred while canceling the booking.");
+    }
+  };
+  const getBookedhp = async () => {
+    try {
+    
+      const response = await axios.get(
+        "http://localhost:8000/historicalPlace/getbookedHP",
+        { params: { touristId } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      throw error;
+    }
+  };
+
   const fetchHistoricalPlaces = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/historicalPlace/get");
-      const data = response.data;
-      const nonFlaggedHistoricalPlaces = data.filter(place => !place.flagged);
-      setHistoricalPlaces(nonFlaggedHistoricalPlaces);
-      setFilteredPlaces(nonFlaggedHistoricalPlaces);
+      const data = await getBookedhp(); // Use your service method
+      setHistoricalPlaces(data);
+      setFilteredPlaces(data); // Set filtered places to all initially
     } catch (error) {
-      console.error("Error fetching HistoricalPlaces:", error);
-      setError("Failed to load HistoricalPlaces.");
+      console.error("Error fetching historical places:", error);
+      setError("Could not fetch historical places. Please try again later.");
     }
   };
 
@@ -79,7 +173,27 @@ const HistoricalPlaces = () => {
   const convertPrice = (price) => {
     return (price * currencyRates[selectedCurrency]).toFixed(2);
   };
- 
+  // Share by copying the link
+  const handleCopybylink = (place) => {
+    const link = `http://localhost:3000/HP/${place._id}`;
+    navigator.clipboard.writeText(link)
+      .then(() => alert("Link copied to clipboard!"))
+      .catch(() => alert("Failed to copy link."));
+  };
+
+  // Share via email
+  const handleShare = (place) => {
+    const subject = encodeURIComponent(`Check out this historical place: ${place.tourismGovernerTags?.name || place.location}`);
+    const body = encodeURIComponent(`
+      Here are the details of the historical place:
+      - Location: ${place.location}
+      - Description: ${place.description}
+      - Opening Hours: ${place.openingHours}
+      - Ticket Price: $${place.ticketPrice}
+      You can view more details here: http://localhost:3000/HP/${place._id}
+    `);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
 
   const LocationMarker = () => {
     useMapEvents({
@@ -169,7 +283,7 @@ const HistoricalPlaces = () => {
                   <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
                   </p>
           <p style={styles.cardText}>
-            Ticket Price: ${place.ticketPrice}
+           {place.ticketPrice}
           </p>
           <div style={styles.cardImageContainer}>
             <img
@@ -192,6 +306,7 @@ const HistoricalPlaces = () => {
               style={styles.map}
             ></iframe>
           )}
+       
         </div>
         
       );
@@ -280,4 +395,4 @@ const styles = {
   },
 };
 
-export default HistoricalPlaces;
+export default MYHPT;
