@@ -55,6 +55,10 @@ const TouristSchema = new Schema(
       },
     ],
     bookedFlights: [Object],
+    Total_Loyalty_Points: {
+      type: Number,
+      default: 0,
+    },
     Loyalty_Points: {
       type: Number,
       default: 0,

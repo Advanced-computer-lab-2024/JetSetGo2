@@ -66,22 +66,22 @@ const getActivityById = async (req, res) => {
   }
 };
 
-
-
 const getBookedactivities = async (req, res) => {
   try {
     const { touristId } = req.query;
     // Validate touristId
     if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
-      return res.status(400).json({ message: "Invalid or missing Tourist ID." });
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing Tourist ID." });
     }
     // Find all itineraries that the tourist has booked
     const bookedActivities = await Activity.find({
       bookedUsers: touristId.trim(),
     })
-    .populate("category", "name") // Populate the 'category' field with the 'name'
-    .populate("advertiser", "Name")
-    .populate("tags"); // Populate the 'advertiser' field with the 'name'
+      .populate("category", "name") // Populate the 'category' field with the 'name'
+      .populate("advertiser", "Name")
+      .populate("tags"); // Populate the 'advertiser' field with the 'name'
 
     // Respond with the list of booked itineraries
     res.status(200).json(bookedActivities);
@@ -152,7 +152,6 @@ const updateActivity = async (req, res) => {
   }
 };
 
-
 const submitReview = async (req, res) => {
   const { userId, rating, comment } = req.body;
   const { activityId } = req.params;
@@ -164,26 +163,28 @@ const submitReview = async (req, res) => {
     const activity = await Activity.findById(activityId);
     if (!activity) {
       console.log("Activity not found"); // Debugging line
-      return res.status(404).json({ message: 'Activity not found' });
+      return res.status(404).json({ message: "Activity not found" });
     }
 
     // Add the review to the activity
     activity.reviews.push({ userId, rating, comment });
 
     // Calculate the new average rating for the activity
-    const totalRatings = activity.reviews.reduce((sum, review) => sum + review.rating, 0);
+    const totalRatings = activity.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
     activity.rating = totalRatings / activity.reviews.length;
 
     // Save the updated activity
     await activity.save();
 
-    return res.status(200).json({ message: 'Review submitted successfully' });
+    return res.status(200).json({ message: "Review submitted successfully" });
   } catch (error) {
     console.error("Error while submitting review:", error); // Debugging line
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Other methods remain unchanged
 const deleteActivity = async (req, res) => {
@@ -218,10 +219,6 @@ const bookactivity = async (req, res) => {
   const { id } = req.params; // Extract the activity ID from the URL parameters
   const userId = req.body.userId; // Extract the user ID from the request body
 
-  // Log incoming parameters for debugging
-  console.log("Incoming ID:", id);
-  console.log("Incoming User ID:", userId);
-
   // Check if ID is a valid ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid Activity ID." });
@@ -255,18 +252,15 @@ const bookactivity = async (req, res) => {
     );
 
     // Add loyalty points to the user's account
-    user.Loyalty_Points += loyaltyPoints;
+    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
+    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
 
-    if (user.Loyalty_Points >= 500000) {
+    if (user.Total_Loyalty_Points >= 500000) {
       user.Loyalty_Level = 3;
-    } else if (user.Loyalty_Points >= 100000) {
-      if (user.Loyalty_Level <= 2) {
-        user.Loyalty_Level = 2;
-      }
+    } else if (user.Total_Loyalty_Points >= 100000) {
+      user.Loyalty_Level = 2;
     } else {
-      if (user.Loyalty_Level <= 1) {
-        user.Loyalty_Level = 1;
-      }
+      user.Loyalty_Level = 1;
     }
     // Save the updated user record
     await user.save();
@@ -328,6 +322,7 @@ const upcomingactivity = async (req, res) => {
     res.status(500).json({ message: "Error fetching upcoming activities." });
   }
 };
+
 const cancelactivity = async (req, res) => {
   let { id } = req.params;
   const userId = req.body.userId;
@@ -348,14 +343,14 @@ const cancelactivity = async (req, res) => {
     // Attempt to cancel the booking
     await activity.cancelBooking(userId);
 
-    res.status(200).json({ message: "Booking canceled successfully", bookings: activity.bookings });
+    res.status(200).json({
+      message: "Booking canceled successfully",
+      bookings: activity.bookings,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
 
 const flagActivity = async (req, res) => {
   const { id } = req.params;
