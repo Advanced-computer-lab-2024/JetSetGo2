@@ -77,7 +77,7 @@ const Login = () => {
     e.preventDefault();
 
     const tourismGovernorEmail = "tourism@gmail.com";
-    const tourismGovernorPassword = "`tourism123`";
+    const tourismGovernorPassword = "tourism123";
 
     if (
       Email === tourismGovernorEmail &&

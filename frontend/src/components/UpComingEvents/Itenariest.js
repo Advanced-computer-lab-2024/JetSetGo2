@@ -48,22 +48,15 @@ const Itinerariest = () => {
 
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/itinerary/getIteneraries`
-      );
-      const data = response.data;
-
-      // Filter out flagged itineraries
-      const nonFlaggedItineraries = data.filter(itinerary => !itinerary.flagged);
-
-      setItineraries(nonFlaggedItineraries);
-      setFilteredItineraries(nonFlaggedItineraries); // Initially set filtered to all non-flagged itineraries
+      const itinerariesData = await getItineraries(touristId);
+      setItineraries(itinerariesData);
+      setFilteredItineraries(itinerariesData); // Initially set filtered to all itineraries
+      console.log("Fetched Itineraries:", itinerariesData); // Log fetched itineraries
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");
     }
   };
-
 
   const fetchActivities = async () => {
     try {
@@ -89,7 +82,6 @@ const Itinerariest = () => {
     fetchItineraries();
     fetchTags();
     fetchActivities();
-    
   }, []);
 
   // Filter itineraries based on selected filters
@@ -165,36 +157,6 @@ const Itinerariest = () => {
     setFilteredItineraries(sortedItineraries);
   };
 
-  const handleCopyLink = async (id) => {
-    const link = `http://localhost:3000/IT/${id}`;
-    navigator.clipboard.writeText(link).then(
-      () => alert("Link copied to clipboard!"),
-      (err) => alert("Failed to copy the link.")
-    );
-  };
-
-  
-  const handleShareByEmail = (itinerary) => {
-    // Prepare the mailto link
-    const subject = encodeURIComponent(`Check out this itinerary: ${itinerary.name}`);
-    const body = encodeURIComponent(`
-      Here are the details of the itinerary:
-      - Name: ${itinerary.name}
-      - Tour Price: ${itinerary.TourPrice.join(", ")}
-      - Available Dates: ${itinerary.availableDates.map(date => new Date(date).toLocaleDateString()).join(", ")}
-      - Rating: ${itinerary.rating}
-      
-      You can view more details here: http://localhost:3000/IT/${itinerary._id}
-    `);
-    
-    // Construct the mailto link
-    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
-    
-    // Open the email client
-    window.location.href = mailtoLink;
-  };
-  
-  
   // Function to handle booking the tour
   const handleBookTour = async (id) => {
     try {
@@ -253,6 +215,35 @@ const Itinerariest = () => {
 
   const convertPrice = (price) => {
     return (price * currencyRates[selectedCurrency]).toFixed(2);
+  };
+
+  const handleCopyLink = async (id) => {
+    const link = `http://localhost:3000/IT/${id}`;
+    navigator.clipboard.writeText(link).then(
+      () => alert("Link copied to clipboard!"),
+      (err) => alert("Failed to copy the link.")
+    );
+  };
+
+  
+  const handleShareByEmail = (itinerary) => {
+    // Prepare the mailto link
+    const subject = encodeURIComponent(`Check out this itinerary: ${itinerary.name}`);
+    const body = encodeURIComponent(`
+      Here are the details of the itinerary:
+      - Name: ${itinerary.name}
+      - Tour Price: ${itinerary.TourPrice.join(", ")}
+      - Available Dates: ${itinerary.availableDates.map(date => new Date(date).toLocaleDateString()).join(", ")}
+      - Rating: ${itinerary.rating}
+      
+      You can view more details here: http://localhost:3000/IT/${itinerary._id}
+    `);
+    
+    // Construct the mailto link
+    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+    
+    // Open the email client
+    window.location.href = mailtoLink;
   };
 
   return (
@@ -368,13 +359,8 @@ const Itinerariest = () => {
               <p>
                 <strong>Bookings:</strong> {itinerary.bookings}
               </p>
-
-              <button onClick={() => handleBookTour(itinerary._id)}>
-                Book Tour
-              </button>
               <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
               <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
-
               {itinerary.isBooked ? (
                 <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
                   Cancel Booking

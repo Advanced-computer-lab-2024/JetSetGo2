@@ -256,10 +256,10 @@ const handleHotelSearchClick = () => {
             Itineraries
           </button>
 
-          <Link to="/all-historicalplaces" style={styles.navLink}>
+          <Link to="/HPT" style={styles.navLink}>
             Historical Places
           </Link>
-          <Link to="/all-museums" style={styles.navLink}>
+          <Link to="/museusemst" style={styles.navLink}>
             Museums
           </Link>
           <Link to="/transportationBooking" style={styles.navLink}>
