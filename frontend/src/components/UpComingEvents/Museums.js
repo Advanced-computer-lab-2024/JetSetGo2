@@ -65,7 +65,7 @@ const Museums = () => {
     try {
       const response = await axios.get("http://localhost:8000/museum/get");
       const data = response.data;
-      const nonFlaggedMuseums = data.filter(activity => !activity.flagged);
+      const nonFlaggedMuseums = data.filter(place => !place.flagged);
       setMuseums(nonFlaggedMuseums);
       setFilteredMuseums(nonFlaggedMuseums);
     } catch (error) {

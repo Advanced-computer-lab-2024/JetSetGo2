@@ -82,11 +82,14 @@ const Museums = () => {
 
   const fetchMuseums = async () => {
     try {
-      const data = await getMuseum();
-      setMuseums(data);
+      const response = await axios.get("http://localhost:8000/museum/get");
+      const data = response.data;
+      const nonFlaggedMuseums = data.filter(place => !place.flagged);
+      setMuseums(nonFlaggedMuseums);
+      setFilteredMuseums(nonFlaggedMuseums);
     } catch (error) {
-      console.error("Error fetching museums:", error);
-      setError("Could not fetch museums. Please try again later.");
+      console.error("Error fetching Museums:", error);
+      setError("Failed to load Museums.");
     }
   };
 

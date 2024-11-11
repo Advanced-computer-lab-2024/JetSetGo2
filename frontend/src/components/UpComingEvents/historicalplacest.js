@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
-import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
 import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate
+import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -42,6 +41,7 @@ const currencyRates = {
 };
 
 const HPT = () => {
+
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [error, setError] = useState(null);
@@ -55,7 +55,7 @@ const HPT = () => {
   //const touristId = location.state?.touristId || ""; // Extract touristId from the location state
   const touristId = localStorage.getItem("userId");
 
-  
+
   // Fetch historical places when the component mounts
   useEffect(() => {
     fetchHistoricalPlaces();
@@ -74,7 +74,7 @@ const HPT = () => {
     }
   }, [selectedTag, historicalPlaces]);
 
-  
+
 
 
   const handleBookTour = async (id) => {
@@ -106,27 +106,27 @@ const HPT = () => {
         alert("Tourist ID not found. Please log in.");
         return;
       }
-  
+
       // Find the activity that is being canceled
-      const HPToCancel = historicalPlaces.find(Historicalplace => Historicalplace._id=== id);
+      const HPToCancel = historicalPlaces.find(Historicalplace => Historicalplace._id === id);
       if (!HPToCancel) {
         throw new Error("Activity not found.");
       }
-  
+
       const HPDate = new Date(HPToCancel.date); // Convert to Date object
-  
+
       // Calculate the difference in hours
       const hoursDifference = (HPDate - Date.now()) / (1000 * 60 * 60);
       if (hoursDifference < 48) {
         throw new Error("Cancellations are allowed only 48 hours before the activity date.");
       }
-  
+
       // Proceed to cancel the booking only if the 48-hour rule is met
       const response = await axios.post(
         `http://localhost:8000/historicalPlace/cancelHP/${id}`,
         { userId: touristId }
       );
-  
+
       if (response.status === 200) {
         setBookedHP((prev) => prev.filter((HPId) => HPId !== id)); // Remove activity from booked list
         alert("Booking canceled successfully!");
@@ -136,16 +136,17 @@ const HPT = () => {
       alert(error.message || "An error occurred while canceling the booking.");
     }
   };
-  
 
   const fetchHistoricalPlaces = async () => {
     try {
-      const data = await getHistoricalPlace(); // Use your service method
-      setHistoricalPlaces(data);
-      setFilteredPlaces(data); // Set filtered places to all initially
+      const response = await axios.get("http://localhost:8000/historicalPlace/get");
+      const data = response.data;
+      const nonFlaggedHistoricalPlaces = data.filter(place => !place.flagged);
+      setHistoricalPlaces(nonFlaggedHistoricalPlaces);
+      setFilteredPlaces(nonFlaggedHistoricalPlaces);
     } catch (error) {
-      console.error("Error fetching historical places:", error);
-      setError("Could not fetch historical places. Please try again later.");
+      console.error("Error fetching HistoricalPlaces:", error);
+      setError("Failed to load HistoricalPlaces.");
     }
   };
 
@@ -242,25 +243,25 @@ const HPT = () => {
       </div>
 
       {filteredPlaces.length > 0 ? (
-  <div style={styles.cardGrid}>
-    {filteredPlaces.map((place) => {
-      // Extract latitude and longitude from the location string
-      const locationCoords = place.location.split(",");
-      const latitude = locationCoords[0];
-      const longitude = locationCoords[1];
-      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+        <div style={styles.cardGrid}>
+          {filteredPlaces.map((place) => {
+            // Extract latitude and longitude from the location string
+            const locationCoords = place.location.split(",");
+            const latitude = locationCoords[0];
+            const longitude = locationCoords[1];
+            const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-      return (
-        <div key={place._id} style={styles.card}>
-          <h3 style={styles.cardTitle}>
-            {place.tourismGovernerTags?.name || "Unnamed"}
-          </h3>
-          <p style={styles.cardText}>Description: {place.description}</p>
-          <p style={styles.cardText}>Location: {place.location}</p>
-          <p style={styles.cardText}>
-            Opening Hours: {place.openingHours}
-          </p>
-          <p>
+            return (
+              <div key={place._id} style={styles.card}>
+                <h3 style={styles.cardTitle}>
+                  {place.tourismGovernerTags?.name || "Unnamed"}
+                </h3>
+                <p style={styles.cardText}>Description: {place.description}</p>
+                <p style={styles.cardText}>Location: {place.location}</p>
+                <p style={styles.cardText}>
+                  Opening Hours: {place.openingHours}
+                </p>
+                <p>
                   <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
                 </p>
                 <p>
@@ -268,51 +269,51 @@ const HPT = () => {
                 </p>
                 <p>
                   <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
-                  </p>
-          <p style={styles.cardText}>
-           {place.ticketPrice}
-          </p>
-          <div style={styles.cardImageContainer}>
-            <img
-              src={place.pictures}
-              alt={`Picture of ${place.description}`}
-              style={styles.cardImage}
-            />
-          </div>
-          <p style={styles.cardText}>
-            Tourism Governor Tags:{" "}
-            {place.tourismGovernerTags?.type || "None"}
-          </p>
-          {/* Map iframe */}
-          {mapSrc && (
-            <iframe
-              title={`Map for ${place.location}`}
-              src={mapSrc}
-              width="100%"
-              height="200"
-              style={styles.map}
-            ></iframe>
-          )}
-           {/* Add a "Book Now" button */}
-           {/* <button onClick={() => handleBookTour(place._id)}>
+                </p>
+                <p style={styles.cardText}>
+                  {place.ticketPrice}
+                </p>
+                <div style={styles.cardImageContainer}>
+                  <img
+                    src={place.pictures}
+                    alt={`Picture of ${place.description}`}
+                    style={styles.cardImage}
+                  />
+                </div>
+                <p style={styles.cardText}>
+                  Tourism Governor Tags:{" "}
+                  {place.tourismGovernerTags?.type || "None"}
+                </p>
+                {/* Map iframe */}
+                {mapSrc && (
+                  <iframe
+                    title={`Map for ${place.location}`}
+                    src={mapSrc}
+                    width="100%"
+                    height="200"
+                    style={styles.map}
+                  ></iframe>
+                )}
+                {/* Add a "Book Now" button */}
+                {/* <button onClick={() => handleBookTour(place._id)}>
                 Book Now
               </button> */}
-              {bookedHP.includes(place._id) ? (
-                    <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
-                  ) : (
-                    <button onClick={() => handleBookTour(place._id)}>Book Now</button>
-                  )}
-          <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
-          <button onClick={() => handleShare(place)}>Share via mail </button>
+                {bookedHP.includes(place._id) ? (
+                  <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
+                ) : (
+                  <button onClick={() => handleBookTour(place._id)}>Book Now</button>
+                )}
+                <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
+                <button onClick={() => handleShare(place)}>Share via mail </button>
+              </div>
+
+            );
+
+          })}
         </div>
-        
-      );
-      
-    })}
-  </div>
-) : (
-  <p style={styles.noDataMessage}>No historical places available.</p>
-)}
+      ) : (
+        <p style={styles.noDataMessage}>No historical places available.</p>
+      )}
 
     </div>
   );
