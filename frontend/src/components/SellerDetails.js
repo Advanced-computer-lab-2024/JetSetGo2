@@ -11,14 +11,14 @@ const SellerDetails = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Fix the state definition
   const [formData, setFormData] = useState({
+    UserName: "",
+    Email: "",
     Name: "",
     Password: "",
     PickUp_Location: "",
     Type_Of_Products: "",
     Previous_Work: "",
     Age: "",
-    Email: "",
-    logoFile: null, // State to hold the logo file
   });
   const [selectedSection, setSelectedSection] = useState("details"); // Default to details
   const [notification, setNotification] = useState(""); // For success or error messages
@@ -46,8 +46,8 @@ const SellerDetails = () => {
     marginBottom: "20px", // Adds space below the image
   };
   const usernameStyle = {
-  marginTop: "20px", // Adds space above the username (alternative to marginBottom in avatarStyle)
-};
+    marginTop: "20px", // Adds space above the username (alternative to marginBottom in avatarStyle)
+  };
 
   const mainContentStyle = {
     flex: 1,
@@ -215,12 +215,16 @@ const SellerDetails = () => {
   const handleDeleteAccount = async () => {
     const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
 
-    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
     if (confirmDelete) {
       try {
-        const response = await axios.delete(`http://localhost:8000/Seller/deletMyAccount/${userId}`);
-        
+        const response = await axios.delete(
+          `http://localhost:8000/Seller/deletMyAccount/${userId}`
+        );
+
         if (response.status === 200) {
           alert(response.data.message); // Display success message
           navigate("/login"); // Redirect to homepage or login after deletion
@@ -239,6 +243,12 @@ const SellerDetails = () => {
   const renderDetails = () => (
     <ul style={listStyle}>
       <li style={listItemStyle}>
+        <strong>UserName:</strong> {Seller.UserName}
+      </li>
+      <li style={listItemStyle}>
+        <strong>Email:</strong> {Seller.Email}
+      </li>
+      <li style={listItemStyle}>
         <strong>Name:</strong> {Seller.Name}
       </li>
       <li style={listItemStyle}>
@@ -253,17 +263,14 @@ const SellerDetails = () => {
       <li style={listItemStyle}>
         <strong>Age:</strong> {Seller.Age}
       </li>
-      <li style={listItemStyle}>
-        <strong>Email:</strong> {Seller.Email}
-      </li>
       {Seller.logo && (
         <li style={listItemStyle}>
           <strong>Logo:</strong>{" "}
-          <img 
-                          src={`data:image/png;base64,${Seller.logo}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
+          <img
+            src={`data:image/png;base64,${Seller.logo}`}
+            alt="Product"
+            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+          />
         </li>
       )}
     </ul>
@@ -271,6 +278,28 @@ const SellerDetails = () => {
 
   const renderEditForm = () => (
     <form onSubmit={handleSubmit}>
+      <div style={formGroupStyle}>
+        <label style={labelStyle}>UserName:</label>
+        <input
+          style={inputStyle}
+          name="UserName"
+          value={formData.UserName}
+          onChange={handleChange}
+          type="text"
+          required
+        />
+      </div>
+      <div style={formGroupStyle}>
+        <label style={labelStyle}>Email:</label>
+        <input
+          style={inputStyle}
+          name="Email"
+          value={formData.Email}
+          onChange={handleChange}
+          type="email"
+          required
+        />
+      </div>
       <div style={formGroupStyle}>
         <label style={labelStyle}>Name:</label>
         <input
@@ -332,17 +361,7 @@ const SellerDetails = () => {
           required
         />
       </div>
-      <div style={formGroupStyle}>
-        <label style={labelStyle}>Email:</label>
-        <input
-          style={inputStyle}
-          name="Email"
-          value={formData.Email}
-          onChange={handleChange}
-          type="email"
-          required
-        />
-      </div>
+
       <div style={formGroupStyle}>
         <label style={labelStyle}>Logo:</label>
         <input
@@ -376,11 +395,11 @@ const SellerDetails = () => {
   return (
     <div style={containerStyle}>
       <div style={sidebarStyle}>
-      <img 
-                          src={`data:image/png;base64,${Seller.logo}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
+        <img
+          src={`data:image/png;base64,${Seller.logo}`}
+          alt="Product"
+          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+        />
         <h2>{Seller.UserName}</h2>
         <button
           style={buttonStyle}
@@ -420,9 +439,17 @@ const SellerDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
-        <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
-        Delete Account
-      </button>
+        <button
+          onClick={handleDeleteAccount}
+          style={{
+            color: "red",
+            background: "lightgrey",
+            padding: "10px",
+            marginTop: "20px",
+          }}
+        >
+          Delete Account
+        </button>
       </div>
       <div style={mainContentStyle}>
         <h1 style={headerStyle}>

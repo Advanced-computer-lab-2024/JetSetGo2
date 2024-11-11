@@ -74,7 +74,6 @@ const UpdateTourGuide = () => {
         }));
         //setImagePreview(reader.result);
         //console.log(imagePreview);
-        
       };
       reader.readAsDataURL(file); // Convert file to base64 URL
     }
@@ -147,13 +146,15 @@ const UpdateTourGuide = () => {
 
         {/* Photo file input */}
         <div>
-        <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
-            <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setFormData)}
-  required
-/>
+          <label style={{ display: "block", marginBottom: "10px" }}>
+            Picture:
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleImageUpload(e, setFormData)}
+            required
+          />
         </div>
 
         {/* Display existing photo if available */}

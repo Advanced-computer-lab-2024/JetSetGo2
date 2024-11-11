@@ -4,17 +4,15 @@ import { Link, useNavigate } from "react-router-dom";
 
 const UpdateSeller = () => {
   const [formData, setFormData] = useState({
+    UserName: "",
     Email: "",
     Name: "",
     PickUp_Location: "",
     Type_Of_Products: "",
     Previous_Work: "",
     Age: "",
-    logoFile: "", // State to hold the logo file
   });
 
-  const [logo, setLogo] = useState(null); // State to store the selected logo file
-  const [existingLogo, setExistingLogo] = useState(""); // State for existing logo URL
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
@@ -30,6 +28,7 @@ const UpdateSeller = () => {
 
           // Manually set the necessary fields only
           setFormData({
+            UserName: seller.UserName || "",
             Email: seller.Email || "",
             Name: seller.Name || "",
             PickUp_Location: seller.PickUp_Location || "",
@@ -62,14 +61,9 @@ const UpdateSeller = () => {
         }));
         //setImagePreview(reader.result);
         //console.log(imagePreview);
-        
       };
       reader.readAsDataURL(file); // Convert file to base64 URL
     }
-  };
-
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, logoFile: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
@@ -83,14 +77,6 @@ const UpdateSeller = () => {
     for (const key in formData) {
       formDataWithLogo.append(key, formData[key]);
     }
-
-    // Append the logo if it's been uploaded
-    if (logo) {
-      formDataWithLogo.append("logo", logo); // Add logo to form data
-    }
-
-    // Append Profile_Completed field to true
-    formDataWithLogo.append("Profile_Completed", true);
 
     try {
       const response = await axios.put(
@@ -126,47 +112,94 @@ const UpdateSeller = () => {
       <form onSubmit={handleSubmit}>
         <h2>Create Profile</h2>
 
-        {/* Render each form field based on formData keys */}
-        {Object.keys(formData).map((key) => (
-          <div key={key}>
-            <label>{key.replace(/_/g, " ")}:</label>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>User Name:</label>
             <input
-              type={key === "Age" ? "number" : "text"} // For Age, use number input type
-              name={key}
-              value={formData[key]}
+              type="text"
+              name="UserName"
+              value={formData.UserName}
               onChange={handleChange}
               required
             />
           </div>
-        ))}
+          <div>
+            <label>Email:</label>
+            <input
+              type="email"
+              name="Email"
+              value={formData.Email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Name:</label>
+            <input
+              type="text"
+              name="Name"
+              value={formData.Name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Pick Up Location:</label>
+            <input
+              type="text"
+              name="PickUp_Location"
+              value={formData.PickUp_Location}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Type Of Products:</label>
+            <input
+              type="text"
+              name="Type_Of_Products"
+              value={formData.Type_Of_Products}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Previous Work:</label>
+            <input
+              type="text"
+              name="Previous_Work"
+              value={formData.Previous_Work}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Age:</label>
+            <input
+              type="number"
+              name="Age"
+              value={formData.Age}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </form>
 
         {/* Logo file input */}
         <div>
-        <label style={{ display: 'block', marginBottom: '10px' }}>Picture:</label>
-            <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setFormData)}
-  required
-/>
+          <label style={{ display: "block", marginBottom: "10px" }}>
+            Picture:
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleImageUpload(e, setFormData)}
+            required
+          />
         </div>
-
-        {/* Display existing logo if available */}
-        {existingLogo && (
-          <div>
-            <h4>Current Logo:</h4>
-            <img
-              src={existingLogo}
-              alt="Current Seller Logo"
-              style={{ width: "100px", height: "auto" }}
-            />
-          </div>
-        )}
 
         <button type="submit">Create</button>
       </form>
-
-      
     </div>
   );
 };
