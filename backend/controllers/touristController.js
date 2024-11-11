@@ -337,7 +337,7 @@ const reqAccountToBeDeleted = async (req, res) => {
         return transportaiondate >= currentDate;
       });
 
-    if (bookedtransportation != 0) {
+    if (bookedtransportation.length != 0) {
       return res.status(400).json({
         message:
           "Tourist cannot be deleted there are booked upcoming transportation",
@@ -352,7 +352,7 @@ const reqAccountToBeDeleted = async (req, res) => {
       return departureDate > currentDate;
     });
 
-    if (upcomingFlights != 0) {
+    if (upcomingFlights.length != 0) {
       return res.status(400).json({
         message: "Tourist cannot be deleted there are booked upcoming flights",
       });
@@ -368,7 +368,7 @@ const reqAccountToBeDeleted = async (req, res) => {
       return checkinDate > currentDate;
     });
 
-    if (upcomingHotels != 0) {
+    if (upcomingHotels.length != 0) {
       return res.status(400).json({
         message: "Tourist cannot be deleted there are booked upcoming hotels",
       });

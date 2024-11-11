@@ -1,5 +1,7 @@
 const adverModel = require("../models/AdverMODEL.js");
 const activityModel = require("../models/ActivityCRUD.js");
+const TouristModel = require("../models/Tourist.js");
+const TransportaionModel = require("../models/TransportationCRUD.js");
 const { default: mongoose } = require("mongoose");
 
 const getAdver = async (req, res) => {
@@ -133,17 +135,45 @@ const reqAccountToBeDeleted = async (req, res) => {
       return activitydate >= currentDate;
     });
 
-    if (upcomingactivity.length == 0) {
-      const advertiser = await adverModel.findByIdAndDelete(id);
-      const deleteactivities = await activityModel.deleteMany({
-        advertiser: id,
-      });
-    } else {
+    if (upcomingactivity.length != 0) {
       return res.status(400).json({
         message:
           "advertiser cannot be deleted there are upcoming activities booked",
       });
     }
+
+    const advertransportation = await TransportaionModel.find({
+      advertiser: id,
+    });
+
+    const upcomingtransportaion = advertransportation.filter((transport) => {
+      const transportdate = new Date(transport.date); // Convert the string date to Date object
+      return transportdate >= currentDate;
+    });
+
+    const upcomingTransportationIds = upcomingtransportaion.map(
+      (transport) => transport._id
+    );
+
+    // Search for tourists who have booked these transportations
+    const touristsWithUpcomingTransportations = await TouristModel.find({
+      bookedTransportations: { $in: upcomingTransportationIds },
+    });
+
+    if (touristsWithUpcomingTransportations.length != 0) {
+      return res.status(400).json({
+        message:
+          "advertiser cannot be deleted there are upcoming transportaions booked",
+      });
+    }
+
+    await adverModel.findByIdAndDelete(id);
+    await activityModel.deleteMany({
+      advertiser: id,
+    });
+    await TransportaionModel.deleteMany({
+      advertiser: id,
+    });
 
     res.status(200).json({
       message: "advertiser deleted succefully along with it's activties",
