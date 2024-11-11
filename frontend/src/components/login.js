@@ -72,12 +72,15 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
+  
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     const tourismGovernorEmail = "tourism@gmail.com";
-    const tourismGovernorPassword = "tourism123";
+    const tourismGovernorPassword = localStorage.getItem("tourismGovernorPassword") || "tourism123";
+    //const tourismGovernorPassword = "tourism123";
 
     if (
       Email === tourismGovernorEmail &&
