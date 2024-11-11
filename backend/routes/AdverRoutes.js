@@ -9,6 +9,7 @@ const {
   getAdvertiser,
   deleteAdver,
   acceptAdver,
+  rejectAdver,
   reqAccountToBeDeleted,
 } = require("../controllers/AdverCONT");
 
@@ -22,6 +23,7 @@ router.get("/getTourist/:id", getAdverById);
 router.get("/get", getAdvertiser);
 router.delete("/delete/:id", deleteAdver);
 router.put("/acceptAdver/:id", acceptAdver);
+router.put("/rejectAdver/:id", rejectAdver);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
 
 module.exports = router;

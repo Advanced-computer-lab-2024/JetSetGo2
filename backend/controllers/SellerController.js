@@ -131,6 +131,33 @@ const acceptSeller = async (req, res) => {
   }
 };
 
+
+const rejectSeller = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the seller by ID and delete it
+    const acceptSeller = await SellerModel.findByIdAndUpdate(id, {
+      Admin_Acceptance: false,
+    });
+
+    if (!acceptSeller) {
+      return res.status(404).json({ message: "Seller is accepted/rejected" });
+    }
+
+    // Respond with a success message
+    res.status(200).json({
+      message: "Seller accepted successfully",
+      seller: acceptSeller,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting seller",
+      error,
+    });
+  }
+};
+
 const reqAccountToBeDeleted = async (req, res) => {
   const { id } = req.params;
   const currentDate = new Date();
@@ -158,4 +185,5 @@ module.exports = {
   deleteAllSellers,
   acceptSeller,
   reqAccountToBeDeleted,
+  rejectSeller,
 };

@@ -53,10 +53,7 @@ const SellerSchema = new Schema(
       type: Boolean,
       required: false,
     },
-    Admin_Acceptance: {
-      type: Boolean,
-      required: false,
-    },
+    Admin_Acceptance: { type: Boolean, default: null },
   },
   { timestamps: true }
 );

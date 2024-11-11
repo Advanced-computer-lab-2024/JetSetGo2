@@ -58,10 +58,7 @@ const TGuidechema = new Schema(
       required: false,
     },
     reviews: [reviewSchema], // Add reviews for the tour guide
-    Admin_Acceptance: {
-      type: Boolean,
-      required: false,
-    },
+    Admin_Acceptance: { type: Boolean, default: null },
   },
   { timestamps: true }
 );
