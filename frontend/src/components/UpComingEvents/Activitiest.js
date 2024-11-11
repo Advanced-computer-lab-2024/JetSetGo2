@@ -419,8 +419,7 @@ const handleCopy = (activity) => {
                 <strong>Location:</strong> {activity.location}
               </p>
               <p>
-                <strong>Price:</strong> ${activity.price}
-              </p>
+              <strong>Price:</strong> {convertPrice(activity.price)} {selectedCurrency}              </p>
               <p>
                 <strong>Tags:</strong> {activity.tags ? activity.tags.type : "No Tags"}
               </p>

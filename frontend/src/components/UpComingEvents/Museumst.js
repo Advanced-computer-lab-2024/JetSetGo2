@@ -2,20 +2,6 @@ import React, { useState, useEffect } from "react";
 import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import 'leaflet-control-geocoder';
-import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-
-// Fix marker icons in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
 const predefinedLocations = [
   {
     name: "Cairo, Egypt",
@@ -40,13 +26,18 @@ const predefinedLocations = [
   // Add more locations as needed
 ];
 
+const currencyRates = {
+  EUR: 1,    // Base currency (assumed for conversion)
+  USD: 1,  // Example conversion rate
+  EGP: 30,   // Example conversion rate
+};
+
 const Museums = () => {
   const [museums, setMuseums] = useState([]);
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
-  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
-
+  const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
 
   // Fetch museums when the component mounts
   useEffect(() => {
@@ -84,7 +75,9 @@ const Museums = () => {
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
   };
 
-  // Share by copying the link
+  const convertPrice = (price) => {
+    return (price * currencyRates[selectedCurrency]).toFixed(2);
+  };
   const handleCopybylink = (place) => {
     const link = `http://localhost:3000/M/${place._id}`;
     navigator.clipboard.writeText(link)
@@ -109,10 +102,7 @@ const Museums = () => {
   return (
     <div id="museums" style={styles.museumsContainer}>
       <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
+        <button className="back-button" onClick={() => navigate(-1)}>
           Back
         </button>
       </div>
@@ -154,17 +144,22 @@ const Museums = () => {
         }
       `}</style>
 
-      <h2
-        style={{
-          color: "#FF4500",
-          fontSize: "24px",
-          textAlign: "center",
-          marginBottom: "20px",
-        }}
-      >
-        Museums
-      </h2>
+      <h2 style={styles.header}>Museums</h2>
       {error && <p className="error">{error}</p>}
+
+      {/* Currency Selection */}
+      <div className="filter-container">
+        <label htmlFor="currencySelect">Choose Currency:</label>
+        <select
+          id="currencySelect"
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+        >
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="EGP">EGP</option>
+        </select>
+      </div>
 
       {/* Filter by Tag */}
       <div className="filter-container">
@@ -177,9 +172,7 @@ const Museums = () => {
           <option value="">All Tags</option>
           {museums
             .map((place) => place.tourismGovernerTags?.type)
-            .filter(
-              (value, index, self) => value && self.indexOf(value) === index
-            ) // Remove duplicates
+            .filter((value, index, self) => value && self.indexOf(value) === index)
             .map((tag) => (
               <option key={tag} value={tag}>
                 {tag}
@@ -189,59 +182,51 @@ const Museums = () => {
       </div>
 
       {filteredMuseums.length > 0 ? (
-  <div className="museum-cards">
-    {filteredMuseums.map((place) => {
+        <div className="museum-cards">
+         {filteredMuseums.map((place) => {
       // Extract latitude and longitude from the location string
       const locationCoords = place.location.split(",");
       const latitude = locationCoords[0];
       const longitude = locationCoords[1];
       const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-      return (
-        <div key={place._id} className="museum-card">
-          <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
-          <p>
-            <strong>Description:</strong> {place.description}
-          </p>
-          <p>
-            <strong>Location:</strong> {place.location}
-          </p>
-          <p>
-            <strong>Opening Hours:</strong> {place.openingHours}
-          </p>
-          <p>
-            <strong>Ticket Price:</strong> ${place.ticketPrice}
-          </p>
-          <div className="museum-image">
-            <img
-              src={place.pictures}
-              alt={`Picture of ${place.description}`}
-            />
-          </div>
-          <p>
-            <strong>Tourism Governor Tags:</strong>{" "}
-            {place.tourismGovernerTags?.type || "None"}
-          </p>
-          {/* Map iframe */}
-          {mapSrc && (
-            <iframe
-              title={`Map for ${place.location}`}
-              src={mapSrc}
-              width="300"
-              height="200"
-              style={{ border: "none" }}
-            ></iframe>
-          )}
-          <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
+            return (
+              <div key={place._id} className="museum-card">
+                <h3>{place.tourismGovernerTags.name}</h3>
+                <p><strong>Description:</strong> {place.description}</p>
+                <p><strong>Location:</strong> {place.location}</p>
+                <p><strong>Opening Hours:</strong> {place.openingHours}</p>
+                <p>
+                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
+                </p>
+                <p>
+                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
+                </p>
+                <p>
+                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
+                </p>
+                <div className="museum-image">
+                  <img src={place.pictures} alt={`Picture of ${place.description}`} />
+                </div>
+                <p><strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags.type}</p>
+                {mapSrc && (
+                  <iframe
+                    title={`Map for ${place.location}`}
+                    src={mapSrc}
+                    width="300"
+                    height="200"
+                    style={{ border: "none" }}
+                  ></iframe>
+                )}
+                <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
           <button onClick={() => handleShare(place)}>Share via mail </button>
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-  </div>
-) : (
-  <p>No Museums available.</p>
-)}
-
+      ) : (
+        <p>No Museums available.</p>
+      )}
     </div>
   );
 };
@@ -250,6 +235,12 @@ const styles = {
   museumsContainer: {
     padding: "20px",
     backgroundColor: "#f5f5f5",
+  },
+  header: {
+    color: "#FF4500",
+    fontSize: "24px",
+    textAlign: "center",
+    marginBottom: "20px",
   },
 };
 
