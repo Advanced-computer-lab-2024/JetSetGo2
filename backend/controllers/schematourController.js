@@ -45,15 +45,14 @@ const createGuide = async (req, res) => {
   }
 };
 
-
 const getItineraryById = async (req, res) => {
   const { id } = req.params; // Extract the itinerary ID from the request parameters
   try {
-    console.log("Itenray id",id);
+    console.log("Itenray id", id);
     const itinerary = await Schema.findById(id)
       .populate("activities")
       .populate("Tags", "name");
-      
+
     if (!itinerary) {
       return res.status(404).json({ message: "Itinerary not found" });
     }
@@ -146,18 +145,15 @@ const bookTour = async (req, res) => {
     );
 
     // Add loyalty points to the user's account
-    user.Loyalty_Points += loyaltyPoints;
+    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
+    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
 
-    if (user.Loyalty_Points >= 500000) {
+    if (user.Total_Loyalty_Points >= 500000) {
       user.Loyalty_Level = 3;
-    } else if (user.Loyalty_Points >= 100000) {
-      if (user.Loyalty_Level <= 2) {
-        user.Loyalty_Level = 2;
-      }
+    } else if (user.Total_Loyalty_Points >= 100000) {
+      user.Loyalty_Level = 2;
     } else {
-      if (user.Loyalty_Level <= 1) {
-        user.Loyalty_Level = 1;
-      }
+      user.Loyalty_Level = 1;
     }
     // Save the updated user record
     await user.save();
@@ -317,7 +313,7 @@ const cancelBooking = async (req, res) => {
 
   // Trim and validate the id parameter
   id = id.trim(); // Remove any extra whitespace
-  
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid itinerary ID format" });
   }
@@ -331,11 +327,42 @@ const cancelBooking = async (req, res) => {
     // Attempt to cancel the booking
     await schema.cancelBooking(userId);
 
-    res.status(200).json({ message: "Booking canceled successfully", bookings: schema.bookings });
+    // // Retrieve the user from the database using the userId
+    // const user = await User.findById(userId); // Assuming you have a User model
+
+    // if (!user) {
+    //   return res.status(404).json({ message: "User not found" });
+    // }
+
+    // // Use the existing calculateLoyaltyPoints function
+    // const loyaltyPoints = calculateLoyaltyPoints(
+    //   user.Loyalty_Level,
+    //   schema.TourPrice
+    // );
+
+    // // Add loyalty points to the user's account
+    // user.Loyalty_Points = user.Loyalty_Points - loyaltyPoints;
+    // user.Total_Loyalty_Points = user.Total_Loyalty_Points - loyaltyPoints;
+
+    // if (user.Total_Loyalty_Points >= 500000) {
+    //   user.Loyalty_Level = 3;
+    // } else if (user.Total_Loyalty_Points >= 100000) {
+    //   user.Loyalty_Level = 2;
+    // } else {
+    //   user.Loyalty_Level = 1;
+    // }
+    // // Save the updated user record
+    // await user.save();
+
+    res.status(200).json({
+      message: "Booking canceled successfully",
+      bookings: schema.bookings,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 const submitReview = async (req, res) => {
   const { userId, rating, comment } = req.body;
   const { itineraryId } = req.params;
@@ -343,27 +370,33 @@ const submitReview = async (req, res) => {
     // Find the itinerary by its ID
     const itinerary = await Schema.findById(itineraryId);
     if (!itinerary) {
-      return res.status(404).json({ message: 'Itinerary not found' });
+      return res.status(404).json({ message: "Itinerary not found" });
     }
     // Add the review to the itinerary
     itinerary.reviews.push({ userId, rating, comment });
     // Calculate the new average rating for the itinerary
-    const totalRatings = itinerary.reviews.reduce((sum, review) => sum + review.rating, 0);
+    const totalRatings = itinerary.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
     itinerary.rating = totalRatings / itinerary.reviews.length;
     // Save the updated itinerary
     await itinerary.save();
-    return res.status(200).json({ message: 'Review submitted successfully' });
+    return res.status(200).json({ message: "Review submitted successfully" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
+
 const getBookedItineraries = async (req, res) => {
   try {
     const { touristId } = req.query;
     // Validate touristId
     if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
-      return res.status(400).json({ message: "Invalid or missing Tourist ID." });
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing Tourist ID." });
     }
     // Find all itineraries that the tourist has booked
     const bookedItineraries = await Schema.find({
@@ -377,11 +410,6 @@ const getBookedItineraries = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-
-
-
-
 
 module.exports = {
   createGuide,

@@ -182,7 +182,6 @@ const bookTransportation = async (req, res) => {
   }
 };
 
-
 const buyProduct = async (req, res) => {
   const { touristId, productId } = req.params;
 
@@ -206,7 +205,7 @@ const buyProduct = async (req, res) => {
     // Decrement seat and close booking if seats reach 0
     product.availableQuantity -= 1;
     product.sales += 1;
-    
+
     await product.save();
 
     // Add the booked transportation to the tourist's bookings
@@ -222,7 +221,6 @@ const buyProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const getBookedTransportations = async (req, res) => {
   const { touristId } = req.params;
@@ -286,18 +284,29 @@ const getPurchasedProducts = async (req, res) => {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    console.log("Purchased products before population:", tourist.purchasedProducts);
+    console.log(
+      "Purchased products before population:",
+      tourist.purchasedProducts
+    );
 
     // Populate the purchased products
     const populatedTourist = await touristModel
       .findById(touristId)
-      .populate('purchasedProducts'); // Ensure 'purchasedProducts' matches the field name in schema
+      .populate("purchasedProducts"); // Ensure 'purchasedProducts' matches the field name in schema
 
-    console.log("Populated Purchased Products:", populatedTourist.purchasedProducts);
+    console.log(
+      "Populated Purchased Products:",
+      populatedTourist.purchasedProducts
+    );
 
     // Check if the population was successful
-    if (!populatedTourist.purchasedProducts || populatedTourist.purchasedProducts.length === 0) {
-      return res.status(200).json({ message: "No purchased products found for this tourist." });
+    if (
+      !populatedTourist.purchasedProducts ||
+      populatedTourist.purchasedProducts.length === 0
+    ) {
+      return res
+        .status(200)
+        .json({ message: "No purchased products found for this tourist." });
     }
 
     // Send the populated purchased products as a response
@@ -307,8 +316,6 @@ const getPurchasedProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const getTouristNationality = async (req, res) => {
   const { touristId } = req.params;
@@ -340,8 +347,6 @@ const deleteAllTourist = async (req, res) => {
   }
 };
 
-
-
 const redeemPointsToCash = async (req, res) => {
   const userId = req.params.id; // Get userId from request parameters
 
@@ -355,7 +360,7 @@ const redeemPointsToCash = async (req, res) => {
     const pointsToRedeem = tourist.Loyalty_Points; // Get the number of points to redeem from the request body
 
     const conversionRate = 10000; // 10,000 points = 100 EGP
-    const cashEquivalent = (pointsToRedeem / conversionRate) * 100; // Calculate the cash equivalent
+    const cashEquivalent = (100 * pointsToRedeem) / conversionRate; // Calculate the cash equivalent
 
     // Deduct the points from the user's loyalty points
     tourist.Loyalty_Points -= pointsToRedeem;
@@ -466,15 +471,15 @@ const reqAccountToBeDeleted = async (req, res) => {
 
 // Method to add a rating
 const addRating = async (req, res) => {
-  const { rating } = req.body;  // Get rating from the request body
-  const { productId } = req.params;  // Get productId from the URL parameter
+  const { rating } = req.body; // Get rating from the request body
+  const { productId } = req.params; // Get productId from the URL parameter
 
   try {
     // Find the product by ID
     const product = await productModel.findById(productId);
 
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: "Product not found" });
     }
 
     // Add the rating to the ratings array
@@ -488,24 +493,24 @@ const addRating = async (req, res) => {
     // Save the updated product
     await product.save();
 
-    return res.status(200).json(product);  // Return the updated product
+    return res.status(200).json(product); // Return the updated product
   } catch (error) {
-    console.error('Error adding rating:', error.message);
-    return res.status(500).json({ error: error.message });  // Return error response
+    console.error("Error adding rating:", error.message);
+    return res.status(500).json({ error: error.message }); // Return error response
   }
 };
 
 // Method to add a review
 const addReview = async (req, res) => {
-  const { review } = req.body;  // Get review from the request body
-  const { productId } = req.params;  // Get productId from the URL parameter
+  const { review } = req.body; // Get review from the request body
+  const { productId } = req.params; // Get productId from the URL parameter
 
   try {
     // Find the product by ID
     const product = await productModel.findById(productId);
 
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: "Product not found" });
     }
 
     // Add the review to the reviews array
@@ -514,10 +519,10 @@ const addReview = async (req, res) => {
     // Save the updated product
     await product.save();
 
-    return res.status(200).json(product);  // Return the updated product
+    return res.status(200).json(product); // Return the updated product
   } catch (error) {
-    console.error('Error adding review:', error.message);
-    return res.status(500).json({ error: error.message });  // Return error response
+    console.error("Error adding review:", error.message);
+    return res.status(500).json({ error: error.message }); // Return error response
   }
 };
 module.exports = {
