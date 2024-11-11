@@ -211,6 +211,11 @@ const SellerDetails = () => {
       setIsEditing(false); // Reset editing state for other sections
     }
   };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
   // Function to handle account deletion
   const handleDeleteAccount = async () => {
     const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
@@ -420,6 +425,9 @@ const SellerDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
+        <button onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
         <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
         Delete Account
       </button>

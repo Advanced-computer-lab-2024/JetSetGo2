@@ -188,6 +188,11 @@ const TourGuidePage = () => {
       }
     }
   };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
 
   const handleCancel = () => {
     setIsEditing(false); // Exit edit mode without saving changes
@@ -213,6 +218,9 @@ const TourGuidePage = () => {
           <button onClick={handleSchemaTourFrontPage} style={styles.button}>
             Create/View Itinerary
           </button>
+          <button style={styles.button} onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
           <button
             onClick={handleDeleteAccount}
             style={{

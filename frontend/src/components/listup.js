@@ -243,6 +243,11 @@ const AdvertiserDetails = () => {
       }
     }
   };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
 
   // Function to handle account deletion
   const handleDeleteAccount = async () => {
@@ -384,6 +389,9 @@ const AdvertiserDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
+        <button  onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
         <button
           onClick={handleDeleteAccount}
           style={{
