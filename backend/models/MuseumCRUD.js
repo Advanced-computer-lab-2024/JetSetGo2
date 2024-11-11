@@ -36,6 +36,7 @@ const museumSchema = new Schema(
       ref: "tourismGovernerTag", // Reference to the Category model
       required: true,
     },
+    flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
   },
   { timestamps: true }
 );

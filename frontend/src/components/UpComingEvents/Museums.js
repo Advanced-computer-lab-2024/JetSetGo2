@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
@@ -62,11 +63,14 @@ const Museums = () => {
 
   const fetchMuseums = async () => {
     try {
-      const data = await getMuseum();
-      setMuseums(data);
+      const response = await axios.get("http://localhost:8000/museum/get");
+      const data = response.data;
+      const nonFlaggedMuseums = data.filter(activity => !activity.flagged);
+      setMuseums(nonFlaggedMuseums);
+      setFilteredMuseums(nonFlaggedMuseums);
     } catch (error) {
-      console.error("Error fetching museums:", error);
-      setError("Could not fetch museums. Please try again later.");
+      console.error("Error fetching Museums:", error);
+      setError("Failed to load Museums.");
     }
   };
 

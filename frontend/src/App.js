@@ -55,6 +55,8 @@ import TransportationBooking from "./components/BookTransportation";
 import HotelSearch from "./components/HotelSearch";
 import FileComplaint from "./components/FileComplaint";
 import ManageActivities from "./components/ActivitiesAdmin";
+import ManageHistoricalPlaces from "./components/HistoricalPlacesAdmin";
+import ManageMuseums from "./components/MuseumsAdmin";
 
 function App() {
 
@@ -113,6 +115,11 @@ function App() {
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
           <Route path="/file-complaint" element={<FileComplaint />} />
           <Route path="/ActivitiesAdmin" element={<ManageActivities />} />
+          <Route path="/HistoricalPlacesAdmin" element={<ManageHistoricalPlaces />} />
+          <Route path="/HistoricalPlacesAdmin" element={<ManageHistoricalPlaces />} />
+          <Route path="/MuseumsAdmin" element={<ManageMuseums />} />
+
+          
           <Route
             path="/tourismGovernorPage"
             element={<TourismGovernorPage />}

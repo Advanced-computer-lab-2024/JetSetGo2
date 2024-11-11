@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createHistoricalPlace,getHistoricalPlace,updateHistoricalPlace,deleteHistoricalPlace, deleteAllHistoricalPlaces,getHistoricalPlaceById} = require('../controllers/HistoricalPlaceCRUDcontroller');
+const {createHistoricalPlace,getHistoricalPlace,updateHistoricalPlace,deleteHistoricalPlace, deleteAllHistoricalPlaces, flagHistoricalPlace,getHistoricalPlaceById} = require('../controllers/HistoricalPlaceCRUDcontroller');
 
 
 
@@ -11,5 +11,6 @@ router.get("/getbyid/:id", getHistoricalPlaceById);
 router.put("/update/:id", updateHistoricalPlace);
 router.delete("/delete/:id", deleteHistoricalPlace);
 router.delete('/deleteAll', deleteAllHistoricalPlaces);
+router.patch("/flag/:id", flagHistoricalPlace);
 
 module.exports = router;

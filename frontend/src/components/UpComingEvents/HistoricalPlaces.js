@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
 import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
 
@@ -42,39 +43,28 @@ const HistoricalPlaces = () => {
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [error, setError] = useState(null);
-  const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
-  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
+  const [selectedTag, setSelectedTag] = useState("");
+  const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]);
+
+  const navigate = useNavigate();
+  const location = useLocation();
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
 
-  // Fetch historical places when the component mounts
+  // Fetch historical places
   useEffect(() => {
     fetchHistoricalPlaces();
   }, []);
 
-  // Filter the places based on the selected tag
-  useEffect(() => {
-    if (selectedTag) {
-      setFilteredPlaces(
-        historicalPlaces.filter(
-          (place) => place.tourismGovernerTags?.type === selectedTag
-        )
-      );
-    } else {
-      setFilteredPlaces(historicalPlaces);
-    }
-  }, [selectedTag, historicalPlaces]);
-
-  const navigate = useNavigate(); // Initialize useNavigate hook
-  const location = useLocation(); // Use useLocation to access the state
-
   const fetchHistoricalPlaces = async () => {
     try {
-      const data = await getHistoricalPlace(); // Use your service method
-      setHistoricalPlaces(data);
-      setFilteredPlaces(data); // Set filtered places to all initially
+      const response = await axios.get("http://localhost:8000/historicalPlace/get");
+      const data = response.data;
+      const nonFlaggedHistoricalPlaces = data.filter(place => !place.flagged);
+      setHistoricalPlaces(nonFlaggedHistoricalPlaces);
+      setFilteredPlaces(nonFlaggedHistoricalPlaces);
     } catch (error) {
-      console.error("Error fetching historical places:", error);
-      setError("Could not fetch historical places. Please try again later.");
+      console.error("Error fetching HistoricalPlaces:", error);
+      setError("Failed to load HistoricalPlaces.");
     }
   };
 

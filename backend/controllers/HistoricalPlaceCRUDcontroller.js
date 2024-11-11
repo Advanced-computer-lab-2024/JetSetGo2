@@ -126,6 +126,26 @@ const deleteAllHistoricalPlaces = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const flagHistoricalPlace = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Update the 'flagged' status to true
+    const updatedHistoricalPlace = await HistoricalPlace.findByIdAndUpdate(
+      id,
+      { flagged: true },
+      { new: true }
+    );
+
+    if (!updatedHistoricalPlace) {
+      return res.status(404).json({ message: "Museum not found" });
+    }
+
+    res.status(200).json(updatedHistoricalPlace);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createHistoricalPlace,
@@ -133,5 +153,6 @@ module.exports = {
   updateHistoricalPlace,
   deleteHistoricalPlace,
   deleteAllHistoricalPlaces,
+  flagHistoricalPlace,
   getHistoricalPlaceById
 };
