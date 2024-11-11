@@ -6,8 +6,8 @@ const TourismGovernorPage = () => {
 
   const buttonStyle = {
     margin: '10px',
-    padding: '10px 20px', // Reduced padding for smaller buttons
-    fontSize: '16px', // Adjusted font size for smaller buttons
+    padding: '10px 20px',
+    fontSize: '16px',
     backgroundColor: '#2d3e50',
     color: 'white',
     border: 'none',
@@ -15,7 +15,7 @@ const TourismGovernorPage = () => {
     cursor: 'pointer',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
     transition: 'background-color 0.3s, transform 0.3s',
-    width: '180px', // Ensures all buttons have equal width
+    width: '180px',
     textAlign: 'center',
   };
 
@@ -29,11 +29,14 @@ const TourismGovernorPage = () => {
     e.target.style.transform = 'scale(1)';
   };
 
-  
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
 
   const adminData = {
     UserName: 'Tourism Governor',
-    
   };
 
   return (
@@ -48,10 +51,10 @@ const TourismGovernorPage = () => {
           />
           <h2 style={styles.profileName}>{adminData.UserName}</h2>
           <p>Tourism Governor</p>
-          <button style={styles.button} onClick={() => navigate("/")}>
-          Home
-        </button>
           
+          <button style={styles.button} onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
         </div>
       </div>
 
@@ -108,10 +111,6 @@ const styles = {
   profileName: {
     fontSize: '22px',
     fontWeight: 'bold',
-  },
-  walletText: {
-    fontSize: '18px',
-    margin: '10px 0',
   },
   button: {
     backgroundColor: '#ff6348',

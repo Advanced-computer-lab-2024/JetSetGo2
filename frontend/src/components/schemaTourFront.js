@@ -194,7 +194,7 @@ const SchemaTourFront = () => {
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       }}>
         <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>
-          Virtual Trip Planner
+          Create Itenerary
         </h2>
 
         <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>

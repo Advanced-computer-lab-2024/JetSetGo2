@@ -129,7 +129,7 @@ const UpdateTourGuide = () => {
       style={{ backgroundColor: "#fff", minHeight: "100vh", padding: "20px" }}
     >
       <form onSubmit={handleSubmit}>
-        <h2>Update Tour Guide Profile</h2>
+        <h2>Create Tour Guide Profile</h2>
 
         {/* Render each form field based on formData keys */}
         {Object.keys(formData).map((key) => (
@@ -168,7 +168,7 @@ const UpdateTourGuide = () => {
           </div>
         )}
 
-        <button type="submit">Update</button>
+        <button type="submit">Create</button>
       </form>
 
       {successMessage && (

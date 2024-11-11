@@ -51,7 +51,11 @@ const [sortOrder, setSortOrder] = useState("desc");
     }
   };
 
-  
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
   const handleReplyChange = (id, value) => {
     setReplyText({ ...replyText, [id]: value });
   };
@@ -124,9 +128,9 @@ const [sortOrder, setSortOrder] = useState("desc");
           />
           <h2 style={styles.profileName}>{adminData.UserName}</h2>
           <p>Admin</p>
-          <button style={styles.button} onClick={() => navigate("/")}>
-          Home
-        </button>
+          <button style={styles.button} onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
           
         </div>
       </div>

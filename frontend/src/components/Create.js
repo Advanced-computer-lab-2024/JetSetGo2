@@ -152,7 +152,7 @@ const UpdateAdvertiser = () => {
       style={{ backgroundColor: "#fff", minHeight: "100vh", padding: "20px" }}
     >
       <form onSubmit={handleSubmit}>
-        <h2>Update Advertiser Profile</h2>
+        <h2>Create Advertiser Profile</h2>
 
         {/* Render each form field based on formData keys */}
         {Object.keys(formData).map(

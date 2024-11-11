@@ -199,6 +199,11 @@ const TouristHome = () => {
   const handleFileComplaintClick = () => {
     navigate("/file-complaint", { state: { touristId } });
   };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
 
 // Function to handle account deletion
 const handleDeleteAccount = async () => {
@@ -257,6 +262,9 @@ const handleDeleteAccount = async () => {
                <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
         Delete Account
       </button>
+      <button style={styles.button} onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
         </div>
       </div>
 
