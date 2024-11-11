@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const TourismGovernorPage = () => {
   const navigate = useNavigate();
+  const [newPassword, setNewPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const buttonStyle = {
     margin: '10px',
@@ -35,6 +37,13 @@ const TourismGovernorPage = () => {
     navigate('/login'); // Redirect to the login page
   };
 
+  const handlePasswordChange = () => {
+    localStorage.setItem("tourismGovernorPassword", newPassword); // Store new password in localStorage
+    setNewPassword("");
+    setIsChangingPassword(false);
+    alert("Password changed successfully!");
+  };
+
   const adminData = {
     UserName: 'Tourism Governor',
   };
@@ -55,6 +64,31 @@ const TourismGovernorPage = () => {
           <button style={styles.button} onClick={handleLogout}>
             Logout
           </button> {/* Logout Button */}
+          
+          <button
+            style={{ ...styles.button, marginTop: '15px' }}
+            onClick={() => setIsChangingPassword(!isChangingPassword)}
+          >
+            Change Password
+          </button>
+          
+          {isChangingPassword && (
+            <div style={{ marginTop: '10px' }}>
+              <input
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={{ padding: '8px', width: '100%', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+              />
+              <button
+                style={styles.button}
+                onClick={handlePasswordChange}
+              >
+                Save New Password
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

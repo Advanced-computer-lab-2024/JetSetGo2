@@ -63,7 +63,7 @@ const Activitiest = () => {
   useEffect(() => {
     fetchActivities();
     fetchCategories();
-    fetchActivities1();
+    //fetchActivities1();
   }, []);
 
   const handleBookTour = async (id) => {
@@ -121,13 +121,23 @@ const Activitiest = () => {
   const fetchActivities = async () => {
     try {
       const data = await getActivity();
+      console.log(data);
+  
+      // Filter for upcoming and unflagged activities
       const upcomingActivities = data.filter((activity) => {
         const activityDate = new Date(activity.date);
-        return activityDate >= new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set today's date to midnight for accurate comparison
+  
+        return activityDate >= today && activity.flagged === false;
       });
+  
       setActivities(upcomingActivities);
       setFilteredActivities(upcomingActivities);
-
+  
+      console.log(activities);
+      console.log(filteredActivities);
+  
       // Check each activity if it’s already booked by the current user
       const bookedIds = upcomingActivities
         .filter((activity) => activity.bookedUsers.includes(touristId))
@@ -137,19 +147,22 @@ const Activitiest = () => {
       console.error("Error fetching activities", error);
     }
   };
+  
 
-  const fetchActivities1 = async () => {
+  /*const fetchActivities1 = async () => {
     try {
       const response = await axios.get("http://localhost:8000/activity/get");
       const data = response.data;
       const nonFlaggedActivities = data.filter(activity => !activity.flagged);
       setActivities(nonFlaggedActivities);
       setFilteredActivities(nonFlaggedActivities);
+      console.log(activities);
+      console.log(filteredActivities);
     } catch (error) {
       console.error("Error fetching Activities:", error);
       setError("Failed to load Activities.");
     }
-  };
+  };*/
 
   const fetchCategories = async () => {
     try {

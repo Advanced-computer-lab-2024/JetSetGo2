@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { getitenbyID } from "../services/ItenariesServices";
 
 const ItinerariesDetails = () => {
@@ -33,18 +32,39 @@ const ItinerariesDetails = () => {
       
       <p><strong>Activities:</strong></p>
       <ul>
-        {itinerary.activities.map((activity, index) => (
-          <li key={index}>
-            {activity.date} - {activity.time} - {activity.location} - ${activity.price}
-          </li>
-        ))}
+        {itinerary.activities.map((activity, index) => {
+          let mapSrc = '';
+
+          // Generate map URL if activity location is available
+          if (activity.location) {
+            const locationCoords = activity.location.split(",");
+            const latitude = locationCoords[0].trim();
+            const longitude = locationCoords[1].trim();
+            mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+          }
+
+          return (
+            <li key={index}>
+              <p>{activity.date} - {activity.time} - {activity.location} - ${activity.price}</p>
+              {mapSrc && (
+                <iframe
+                  src={mapSrc}
+                  width="250"
+                  height="200"
+                  style={{ border: 'none' }}
+                  title={`Map of ${activity.location}`}
+                ></iframe>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       <p><strong>Tags:</strong> {Array.isArray(itinerary.Tags) ? itinerary.Tags.map(tag => tag.name).join(", ") : itinerary.Tags.name}</p>
       <p><strong>Rating:</strong> {itinerary.rating}</p>
       <p><strong>Bookings:</strong> {itinerary.bookings}</p>
 
-      {/* Add additional attributes as needed */}
+      {/* Additional attributes as needed */}
       <p><strong>Description:</strong> {itinerary.description}</p>
       <p><strong>Languages Available:</strong> {itinerary.tourLanguage.join(", ")}</p>
     </div>
