@@ -174,6 +174,32 @@ const acceptTourguide = async (req, res) => {
   }
 };
 
+const rejectTourguide = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the seller by ID and delete it
+    const acceptTourguide = await TourModel.findByIdAndUpdate(id, {
+      Admin_Acceptance: false,
+    });
+
+    if (!acceptTourguide) {
+      return res.status(404).json({ message: "Seller is accepted/rejected" });
+    }
+
+    // Respond with a success message
+    res.status(200).json({
+      message: "Tourguide deleted successfully",
+      seller: acceptTourguide,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting Tourguide",
+      error,
+    });
+  }
+};
+
 const reqAccountToBeDeleted = async (req, res) => {
   const { id } = req.params;
   const currentDate = new Date();
@@ -210,4 +236,5 @@ module.exports = {
   acceptTourguide,
   reqAccountToBeDeleted,
   submitReview,
+  rejectTourguide,
 };

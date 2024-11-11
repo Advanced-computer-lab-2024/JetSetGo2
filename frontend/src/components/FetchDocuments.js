@@ -39,6 +39,46 @@ const OthersListPage = () => {
     fetchUsers();
   }, []);
 
+  const fetchSellers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/Seller/get");
+      if (!response.ok) {
+        throw new Error("Failed to fetch sellers");
+      }
+      const sellers = await response.json();
+      setSellers(sellers); // assuming you have setSellers as a state hook for sellers
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
+  const fetchAdvertisers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/home/adver/get");
+      if (!response.ok) {
+        throw new Error("Failed to fetch advertisers");
+      }
+      const advertisers = await response.json();
+      setAdvertisers(advertisers); // assuming you have setAdvertisers as a state hook for advertisers
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
+  const fetchTourGuides = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/TourGuide/get");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tour guides");
+      }
+      const tourGuides = await response.json();
+      setTourGuides(tourGuides); // assuming you have setTourGuides as a state hook for tour guides
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
+  // Updated handler functions
   const handleAcceptSeller = async (sellerId) => {
     try {
       const response = await fetch(
@@ -50,20 +90,29 @@ const OthersListPage = () => {
       if (!response.ok) {
         throw new Error("Failed to accept seller");
       }
-      setSellers((prevSellers) =>
-        prevSellers.filter((seller) => seller._id !== sellerId)
-      );
+      await fetchSellers(); // Refresh the sellers list
     } catch (err) {
       setError(err.message);
     }
   };
-
-  const handleRejectSeller = (sellerId) => {
-    setSellers((prevSellers) =>
-      prevSellers.filter((seller) => seller._id !== sellerId)
-    );
+  
+  const handleRejectSeller = async (sellerId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/Seller/rejectSeller/${sellerId}`,
+        {
+          method: "PUT",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to reject seller");
+      }
+      await fetchSellers(); // Refresh the sellers list
+    } catch (err) {
+      setError(err.message);
+    }
   };
-
+  
   const handleAcceptAdver = async (adverId) => {
     try {
       const response = await fetch(
@@ -75,20 +124,29 @@ const OthersListPage = () => {
       if (!response.ok) {
         throw new Error("Failed to accept advertiser");
       }
-      setAdvertisers((prevAdvers) =>
-        prevAdvers.filter((adver) => adver._id !== adverId)
-      );
+      await fetchAdvertisers(); // Refresh the advertisers list
     } catch (err) {
       setError(err.message);
     }
   };
-
-  const handleRejectAdver = (adverId) => {
-    setAdvertisers((prevAdvers) =>
-      prevAdvers.filter((adver) => adver._id !== adverId)
-    );
+  
+  const handleRejectAdver = async (adverId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/home/adver/rejectAdver/${adverId}`,
+        {
+          method: "PUT",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to reject advertiser");
+      }
+      await fetchAdvertisers(); // Refresh the advertisers list
+    } catch (err) {
+      setError(err.message);
+    }
   };
-
+  
   const handleAcceptTourGuide = async (tourGuideId) => {
     try {
       const response = await fetch(
@@ -100,21 +158,30 @@ const OthersListPage = () => {
       if (!response.ok) {
         throw new Error("Failed to accept tour guide");
       }
-      setTourGuides((prevTourGuides) =>
-        prevTourGuides.filter((tourGuide) => tourGuide._id !== tourGuideId)
-      );
+      await fetchTourGuides(); // Refresh the tour guides list
     } catch (err) {
       setError(err.message);
     }
   };
-
-  const handleRejectTourGuide = (tourGuideId) => {
-    setTourGuides((prevTourGuides) =>
-      prevTourGuides.filter((tourGuide) => tourGuide._id !== tourGuideId)
-    );
+  
+  const handleRejectTourGuide = async (tourGuideId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/TourGuide/rejectTourguide/${tourGuideId}`,
+        {
+          method: "PUT",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to reject tour guide");
+      }
+      await fetchTourGuides(); // Refresh the tour guides list
+    } catch (err) {
+      setError(err.message);
+    }
   };
-
-  const renderSellerAdverTable = (users, title, handleAccept, handleReject) => {
+  
+  const renderSellerTable = (users, title, handleAccept, handleReject) => {
     if (!users.length) return null;
 
     return (
@@ -128,6 +195,7 @@ const OthersListPage = () => {
               <th>ID Document</th>
               <th>Taxation Registry Card</th>
               <th>Actions</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -149,6 +217,7 @@ const OthersListPage = () => {
                     "No document"
                   )}
                 </td>
+                
                 <td>
                   {user.TaxationRegistryCard ? (
                     <a
@@ -163,19 +232,32 @@ const OthersListPage = () => {
                   )}
                 </td>
                 <td>
-                  <button
-                    onClick={() => handleAccept(user._id)}
-                    style={styles.acceptButton}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => handleReject(user._id)}
-                    style={styles.rejectButton}
-                  >
-                    Reject
-                  </button>
-                </td>
+  {user.Admin_Acceptance === null && (
+    <>
+      <button
+        onClick={() => handleAcceptSeller(user._id)}
+        style={styles.acceptButton}
+      >
+        Accept
+      </button>
+      <button
+        onClick={() => handleRejectSeller(user._id)}
+        style={styles.rejectButton}
+      >
+        Reject
+      </button>
+    </>
+  )}
+</td>
+
+<td>
+  {user.Admin_Acceptance === null
+    ? "Not Reviewed Yet"
+    : user.Admin_Acceptance
+    ? "Accepted"
+    : "Rejected"}
+</td>
+
               </tr>
             ))}
           </tbody>
@@ -198,6 +280,7 @@ const OthersListPage = () => {
               <th>ID Document</th>
               <th>Certificates</th>
               <th>Actions</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -232,19 +315,118 @@ const OthersListPage = () => {
                   )}
                 </td>
                 <td>
-                  <button
-                    onClick={() => handleAcceptTourGuide(user._id)}
-                    style={styles.acceptButton}
+  {user.Admin_Acceptance === null && (
+    <>
+      <button
+        onClick={() => handleAcceptTourGuide(user._id)}
+        style={styles.acceptButton}
+      >
+        Accept
+      </button>
+      <button
+        onClick={() => handleRejectTourGuide(user._id)}
+        style={styles.rejectButton}
+      >
+        Reject
+      </button>
+    </>
+  )}
+</td>
+
+
+<td>
+  {user.Admin_Acceptance === null
+    ? "Not Reviewed Yet"
+    : user.Admin_Acceptance
+    ? "Accepted"
+    : "Rejected"}
+</td>
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const renderAdverTable = (users, title, handleAccept, handleReject) => {
+    if (!users.length) return null;
+
+    return (
+      <div style={styles.sectionContainer}>
+        <h2 style={styles.sectionTitle}>{title}</h2>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>ID Document</th>
+              <th>Taxation Registry Card</th>
+              <th>Actions</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user._id}>
+                <td>{user.UserName || "N/A"}</td>
+                <td>{user.Email || "N/A"}</td>
+                <td>
+                  {user.IDDocument ? (
+                    <a
+                    href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => handleRejectTourGuide(user._id)}
-                    style={styles.rejectButton}
-                  >
-                    Reject
-                  </button>
+                    View ID Document
+                  </a>
+                  
+                  ) : (
+                    "No document"
+                  )}
                 </td>
+                
+                <td>
+                  {user.TaxationRegistryCard ? (
+                    <a
+                      href={`http://localhost:8000/uploads/documents/${user.TaxationRegistryCard}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Taxation Registry Card
+                    </a>
+                  ) : (
+                    "No taxation registry card"
+                  )}
+                </td>
+                <td>
+  {user.Admin_Acceptance === null && (
+    <>
+      <button
+        onClick={() => handleAcceptAdver(user._id)}
+        style={styles.acceptButton}
+      >
+        Accept
+      </button>
+      <button
+        onClick={() => handleRejectAdver(user._id)}
+        style={styles.rejectButton}
+      >
+        Reject
+      </button>
+    </>
+  )}
+</td>
+
+<td>
+  {user.Admin_Acceptance === null
+    ? "Not Reviewed Yet"
+    : user.Admin_Acceptance
+    ? "Accepted"
+    : "Rejected"}
+</td>
+
               </tr>
             ))}
           </tbody>
@@ -264,13 +446,13 @@ const OthersListPage = () => {
 
     return (
       <div style={styles.content}>
-        {renderSellerAdverTable(
+        {renderSellerTable(
           sellers,
           "Sellers",
           handleAcceptSeller,
           handleRejectSeller
         )}
-        {renderSellerAdverTable(
+        {renderAdverTable(
           advertisers,
           "Advertisers",
           handleAcceptAdver,

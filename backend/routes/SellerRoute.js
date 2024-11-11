@@ -11,6 +11,7 @@ const {
   deleteSeller,
   deleteAllSellers,
   acceptSeller,
+  rejectSeller,
   reqAccountToBeDeleted,
 } = require("../controllers/SellerController.js");
 
@@ -20,6 +21,7 @@ router.get("/get", getSeller);
 router.delete("/delete/:id", deleteSeller);
 router.delete("/deleteall", deleteAllSellers);
 router.put("/acceptSeller/:id", acceptSeller);
+router.put("/rejectSeller/:id", rejectSeller);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
 
 module.exports = router;
