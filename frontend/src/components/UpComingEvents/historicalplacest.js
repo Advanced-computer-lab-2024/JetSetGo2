@@ -59,6 +59,8 @@ const HPT = () => {
   // Fetch historical places when the component mounts
   useEffect(() => {
     fetchHistoricalPlaces();
+    const storedBookings = JSON.parse(localStorage.getItem("bookedHP")) || [];
+    setBookedHP(storedBookings);
   }, []);
 
   // Filter the places based on the selected tag
@@ -92,7 +94,11 @@ const HPT = () => {
 
       if (response.status === 200) {
         // Update the bookings count in the UI
-        setBookedHP((prev) => [...prev, id]); // Mark activity as booked
+        setBookedHP((prev) => {
+          const updatedBookedHP = [...prev, id];
+          localStorage.setItem("bookedHP", JSON.stringify(updatedBookedHP)); // Persist to localStorage
+          return updatedBookedHP; // Return updated state
+        });
         alert("activity booked successfully!");
       }
     } catch (error) {
@@ -128,7 +134,11 @@ const HPT = () => {
       );
   
       if (response.status === 200) {
-        setBookedHP((prev) => prev.filter((HPId) => HPId !== id)); // Remove activity from booked list
+        setBookedHP((prev) => {
+          const updatedBookedHP = prev.filter((HPId) => HPId !== id);
+          localStorage.setItem("bookedHP", JSON.stringify(updatedBookedHP)); // Update in localStorage
+          return updatedBookedHP; // Return updated state
+        });
         alert("Booking canceled successfully!");
       }
     } catch (error) {

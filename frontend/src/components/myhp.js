@@ -52,7 +52,11 @@ const MYHPT = () => {
   const [bookedHP, setBookedHP] = useState([]); // Track booked activities
   const navigate = useNavigate(); // Initialize useNavigate hook
   const location = useLocation(); // Use useLocation to access the state
-
+  const [itineraryRating, setItineraryRating] = useState(0);
+  const [itineraryComment, setItineraryComment] = useState("");
+  const [submittedReviews, setSubmittedReviews] = useState(
+    JSON.parse(localStorage.getItem("submittedReviews")) || {}
+  );
   //const touristId = location.state?.touristId || ""; // Extract touristId from the location state
   const touristId = localStorage.getItem("userId");
 
@@ -76,7 +80,28 @@ const MYHPT = () => {
   }, [selectedTag, historicalPlaces]);
 
   
-
+  const handleItineraryReview = async (itineraryId) => {
+    try {
+      await axios.post(`http://localhost:8000/historicalPlace/submitReview/${itineraryId}`, {
+        userId: touristId,
+        rating: itineraryRating,
+        comment: itineraryComment,
+      });
+      alert("Itinerary review submitted!");
+  
+      // Clear review inputs after submission
+      setItineraryRating(0);
+      setItineraryComment("");
+  
+      // Update the submitted reviews state
+      const updatedSubmittedReviews = { ...submittedReviews, [itineraryId]: true };
+      setSubmittedReviews(updatedSubmittedReviews);
+      localStorage.setItem("submittedReviews", JSON.stringify(updatedSubmittedReviews));
+    } catch (error) {
+      console.error("Error submitting itinerary review:", error);
+    }
+  };
+  
 
   const handleBookTour = async (id) => {
     try {
@@ -273,6 +298,9 @@ const MYHPT = () => {
           <p style={styles.cardText}>
             Opening Hours: {place.openingHours}
           </p>
+          <p style={styles.cardText}>
+            Rating :{place.rating}
+          </p>
           <p>
                   <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
                 </p>
@@ -282,6 +310,8 @@ const MYHPT = () => {
                 <p>
                   <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
                   </p>
+              
+                
           <p style={styles.cardText}>
            {place.ticketPrice}
           </p>
@@ -306,7 +336,36 @@ const MYHPT = () => {
               style={styles.map}
             ></iframe>
           )}
-       
+       {/* Conditional Rendering: Show review section if not submitted */}
+       {submittedReviews[place._id] ? (
+                  <p>Your review has been submitted!</p>
+                ) : (
+                  <>
+                    <div>
+                      <label htmlFor="rating">Rating (1-5):</label>
+                      <input
+                        type="number"
+                        id="itinerary-rating"
+                        value={itineraryRating}
+                        min="1"
+                        max="5"
+                        onChange={(e) => setItineraryRating(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="comment">Comment:</label>
+                      <textarea
+                        id="itinerary-comment"
+                        value={itineraryComment}
+                        onChange={(e) => setItineraryComment(e.target.value)}
+                        placeholder="Write your comment here"
+                      />
+                    </div>
+                    <button onClick={() => handleItineraryReview(place._id)}>
+                      Submit Itinerary Review
+                    </button>
+                  </>
+                )}
         </div>
         
       );

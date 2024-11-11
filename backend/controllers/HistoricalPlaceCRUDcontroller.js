@@ -149,7 +149,7 @@ const submitReview = async (req, res) => {
   const { userId, rating, comment } = req.body;
   const { HPId } = req.params;
 
-  console.log("Received activityId:", activityId); // Debugging line
+  console.log("Received activityId:", HPId); // Debugging line
 
   try {
     // Find the activity by its ID

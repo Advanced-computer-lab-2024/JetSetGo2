@@ -31,6 +31,9 @@ const museumSchema = new Schema(
       type: Number,
       required: true,
     },
+    rating: {
+      type: Number,
+    },
     bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },   
     reviews: [
       { 
