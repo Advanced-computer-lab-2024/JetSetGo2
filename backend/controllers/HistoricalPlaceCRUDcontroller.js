@@ -61,12 +61,9 @@ const getBookedHP = async (req, res) => {
     const bookedHP = await HistoricalPlace.find({
       bookedUsers: touristId.trim(),
     })
-    .populate("category", "name") // Populate the 'category' field with the 'name'
-    .populate("advertiser", "Name")
-    .populate("tags"); // Populate the 'advertiser' field with the 'name'
-
+   
     // Respond with the list of booked itineraries
-    res.status(200).json(bookedActivities);
+    res.status(200).json(bookedHP);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -109,7 +106,7 @@ const bookHP = async (req, res) => {
     // Use the existing calculateLoyaltyPoints function
     const loyaltyPoints = calculateLoyaltyPoints(
       user.Loyalty_Level,
-      activity.price
+      HP.foreignerTicketPrice
     );
 
     // Add loyalty points to the user's account
@@ -199,7 +196,7 @@ const cancelHP = async (req, res) => {
     // Attempt to cancel the booking
     await HP.cancelBooking(userId);
 
-    res.status(200).json({ message: "Booking canceled successfully", bookings: activity.bookings });
+    res.status(200).json({ message: "Booking canceled successfully", bookings: HistoricalPlace.bookings });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

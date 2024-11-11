@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import axios from "axios";
 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -46,7 +47,9 @@ const Museums = () => {
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
+  const [bookedHP, setBookedHP] = useState([]); // Track booked activities
 
+  const touristId = localStorage.getItem("userId");
 
   // Fetch museums when the component mounts
   useEffect(() => {
@@ -104,6 +107,65 @@ const Museums = () => {
       You can view more details here: http://localhost:3000/M/${place._id}
     `);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+  const handleBookTour = async (id) => {
+    try {
+      console.log("tourist ID:", touristId);
+      console.log("hp ID:", id);
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+      const response = await axios.patch(
+        `http://localhost:8000/museum/book/${id}`,
+        { userId: touristId } // Send touristId in the request body
+      );
+
+      if (response.status === 200) {
+        // Update the bookings count in the UI
+        setBookedHP((prev) => [...prev, id]); // Mark activity as booked
+        alert("activity booked successfully!");
+      }
+    } catch (error) {
+      console.error("Error booking activity:", error);
+      alert("already booked");
+    }
+  };
+  const handleCancelBooking = async (id) => {
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      // Find the activity that is being canceled
+      const HPToCancel = museums.find(Historicalplace => Historicalplace._id=== id);
+      if (!HPToCancel) {
+        throw new Error("Activity not found.");
+      }
+  
+      const HPDate = new Date(HPToCancel.date); // Convert to Date object
+  
+      // Calculate the difference in hours
+      const hoursDifference = (HPDate - Date.now()) / (1000 * 60 * 60);
+      if (hoursDifference < 48) {
+        throw new Error("Cancellations are allowed only 48 hours before the activity date.");
+      }
+  
+      // Proceed to cancel the booking only if the 48-hour rule is met
+      const response = await axios.post(
+        `http://localhost:8000/museum/cancelHP/${id}`,
+        { userId: touristId }
+      );
+  
+      if (response.status === 200) {
+        setBookedHP((prev) => prev.filter((HPId) => HPId !== id)); // Remove activity from booked list
+        alert("Booking canceled successfully!");
+      }
+    } catch (error) {
+      console.error("Error canceling booking:", error);
+      alert(error.message || "An error occurred while canceling the booking.");
+    }
   };
 
   return (
@@ -232,6 +294,11 @@ const Museums = () => {
               style={{ border: "none" }}
             ></iframe>
           )}
+          {bookedHP.includes(place._id) ? (
+                    <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
+                  ) : (
+                    <button onClick={() => handleBookTour(place._id)}>Book Now</button>
+                  )}
           <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
           <button onClick={() => handleShare(place)}>Share via mail </button>
         </div>

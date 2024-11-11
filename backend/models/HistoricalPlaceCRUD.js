@@ -44,12 +44,13 @@ const historicalPlaceSchema = new Schema(
       { 
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         rating: { type: Number, min: 1, max: 5 },
-        comment: { type: String }
+        comment: { type: String },
+
       }
     ],
-    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },       rating: {
+    bookedUsers: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },   
+    rating: {
       type: Number,
-      required: true,
     },
   },
   { timestamps: true }
@@ -65,7 +66,7 @@ historicalPlaceSchema.methods.incrementBookings = async function (userId) {
   );
 
   if (alreadyBooked) {
-    throw new Error("User has already booked this activity.");
+    throw new Error("User has already booked this hp.");
   }
 
   // Increment bookings and push userId to bookedUsers
@@ -81,16 +82,9 @@ historicalPlaceSchema.methods.cancelBooking = async function (userId) {
   }
 
   // Parse the activity date
-  const HPDate = new Date(this.date);
-  if (isNaN(HPDate)) {
-    throw new Error("Activity date is invalid.");
-  }
 
   // Calculate the time difference in hours
-  const hoursDifference = (HPDate - Date.now()) / (1000 * 60 * 60);
-  if (hoursDifference < 48) {
-    throw new Error("Cancellations are allowed only 48 hours before the activity date.");
-  }
+
 
   // Remove the booking and decrement the count
   this.bookedUsers = this.bookedUsers.filter(

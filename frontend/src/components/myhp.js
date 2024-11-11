@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
-import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
 import axios from "axios";
 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -35,13 +34,15 @@ const predefinedLocations = [
     coordinates: "31.4015,30.0254,31.4215,30.0454",
   },
 ];
+
 const currencyRates = {
   EUR: 1,    // Base currency (assumed for conversion)
   USD: 1,  // Example conversion rate
   EGP: 30,   // Example conversion rate
 };
 
-const HPT = () => {
+const MYHPT = () => {
+    
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [error, setError] = useState(null);
@@ -136,11 +137,23 @@ const HPT = () => {
       alert(error.message || "An error occurred while canceling the booking.");
     }
   };
-  
+  const getBookedhp = async () => {
+    try {
+    
+      const response = await axios.get(
+        "http://localhost:8000/historicalPlace/getbookedHP",
+        { params: { touristId } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      throw error;
+    }
+  };
 
   const fetchHistoricalPlaces = async () => {
     try {
-      const data = await getHistoricalPlace(); // Use your service method
+      const data = await getBookedhp(); // Use your service method
       setHistoricalPlaces(data);
       setFilteredPlaces(data); // Set filtered places to all initially
     } catch (error) {
@@ -293,17 +306,7 @@ const HPT = () => {
               style={styles.map}
             ></iframe>
           )}
-           {/* Add a "Book Now" button */}
-           {/* <button onClick={() => handleBookTour(place._id)}>
-                Book Now
-              </button> */}
-              {bookedHP.includes(place._id) ? (
-                    <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
-                  ) : (
-                    <button onClick={() => handleBookTour(place._id)}>Book Now</button>
-                  )}
-          <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
-          <button onClick={() => handleShare(place)}>Share via mail </button>
+       
         </div>
         
       );
@@ -392,4 +395,4 @@ const styles = {
   },
 };
 
-export default HPT;
+export default MYHPT;

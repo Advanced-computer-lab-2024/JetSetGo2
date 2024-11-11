@@ -225,6 +225,10 @@ const handleHotelSearchClick = () => {
   >
            My Activities    
                </button>
+               <button    onClick={() => navigate("/myhp", { state: { touristId: touristId } })}
+  >
+           My HistoricalPlaces    
+               </button>
         </div>
       </div>
 
