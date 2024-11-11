@@ -91,6 +91,9 @@ const OtherSignup = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.header}>Sign Up for Other Users</h2>
+      <button className="back-button" onClick={() => navigate('/')}>
+          Home
+        </button>
       {error && <p style={styles.error}>{error}</p>} {/* Show error message */}
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputGroup}>

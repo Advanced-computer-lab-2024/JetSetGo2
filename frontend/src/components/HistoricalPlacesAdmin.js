@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 
 // Service method to fetch historical places
@@ -24,6 +26,8 @@ const flagHistoricalPlace = async (id) => {
 const HistoricalPlaces = () => {
   const [historicalPlaces, setHistoricalPlaces] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
 
   const fetchHistoricalPlaces = async () => {
     try {
@@ -47,6 +51,9 @@ const HistoricalPlaces = () => {
 
   return (
     <div id="HistoricalPlaces">
+      <button className="back-button" onClick={() => navigate(-1)}>
+          Back
+        </button>
       <h2 className="title">Available Historical Places</h2>
 
       {error && <p className="error">{error}</p>}

@@ -147,6 +147,9 @@ const Login = () => {
 
   return (
     <LoginContainer>
+      <button className="back-button" onClick={() => navigate('/')}>
+          Home
+        </button>
       <LoginTitle>Login</LoginTitle>
       <LoginForm onSubmit={handleLogin}>
         <LoginInput

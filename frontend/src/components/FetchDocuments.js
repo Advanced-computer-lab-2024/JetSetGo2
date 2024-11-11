@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const OthersListPage = () => {
   const [sellers, setSellers] = useState([]);
@@ -6,6 +8,8 @@ const OthersListPage = () => {
   const [tourGuides, setTourGuides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -186,6 +190,9 @@ const OthersListPage = () => {
 
     return (
       <div style={styles.sectionContainer}>
+         <button className="back-button" onClick={() => navigate(-1)}>
+          Back
+        </button>
         <h2 style={styles.sectionTitle}>{title}</h2>
         <table style={styles.table}>
           <thead>
@@ -270,7 +277,9 @@ const OthersListPage = () => {
     if (!users.length) return null;
 
     return (
+      
       <div style={styles.sectionContainer}>
+       
         <h2 style={styles.sectionTitle}>Tour Guides</h2>
         <table style={styles.table}>
           <thead>

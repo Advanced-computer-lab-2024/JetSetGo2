@@ -54,7 +54,7 @@ const UpdateTouristPage = () => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://localhost:8000/home/tourist/updateTourist/${touristId}`,
+       ` http://localhost:8000/home/tourist/updateTourist/${touristId}`,
         formData
       );
       console.log("Update successful:", response.data);
@@ -111,6 +111,17 @@ const UpdateTouristPage = () => {
                 type="email"
                 name="Email"
                 value={formData.Email}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>UserName:</label>
+              <input
+                type="name"
+                name="UserName"
+                value={formData.UserName}
                 onChange={handleChange}
                 style={styles.input}
                 required

@@ -17,8 +17,11 @@ const updateUser = async (req, res) => {
     LanguagesSpoken,
     Email,
   } = req.body;
-  const base64Image = req.body.pictures.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
-  const Photo = base64Image // Get just the filename if uploaded
+  const base64Image = req.body.pictures.replace(
+    /^data:image\/[a-zA-Z]+;base64,/,
+    ""
+  );
+  const Photo = base64Image; // Get just the filename if uploaded
 
   try {
     const updateFields = {};
@@ -106,47 +109,64 @@ const deleteTGuide = async (req, res) => {
     });
   }
 };
-const createUser = async(req,res) => {
-   //add a new user to the database with 
-   //Name, Email and Age
-   const{Name,Email,Age,LanguagesSpoken,MobileNumber,YearsOfExperience,PreviousWork} =req.body;
-   try{
-      const user =await TourModel.create({Name,Email,Age,LanguagesSpoken,MobileNumber,YearsOfExperience,PreviousWork});
-      res.status(200).json(user);
-   } catch(error){
-      res.status(400).json({error: error.message});
-   }
-}
+const createUser = async (req, res) => {
+  //add a new user to the database with
+  //Name, Email and Age
+  const {
+    Name,
+    Email,
+    Age,
+    LanguagesSpoken,
+    MobileNumber,
+    YearsOfExperience,
+    PreviousWork,
+  } = req.body;
+  try {
+    const user = await TourModel.create({
+      Name,
+      Email,
+      Age,
+      LanguagesSpoken,
+      MobileNumber,
+      YearsOfExperience,
+      PreviousWork,
+    });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 const submitReview = async (req, res) => {
-   const { userId, rating, comment } = req.body;
-   const { tourGuideId } = req.params;
- 
-   try {
-     // Find the tour guide by ID and add the review directly to the reviews array
-     const tourGuide = await Tour.findById(tourGuideId);
- 
-     if (!tourGuide) {
-       return res.status(404).json({ message: 'Tour guide not found' });
-     }
- 
-     // Add review to the array
-     tourGuide.reviews.push({ userId, rating, comment });
- 
-     // Calculate the new average rating
-     const totalRatings = tourGuide.reviews.reduce((sum, review) => sum + review.rating, 0);
-     tourGuide.rating = totalRatings / tourGuide.reviews.length;
- 
-     // Save the document
-     await tourGuide.save();
- 
-     return res.status(200).json({ message: 'Review submitted successfully' });
-   } catch (error) {
-     console.error(error);
-     return res.status(500).json({ message: 'Server error' });
-   }
- };
+  const { userId, rating, comment } = req.body;
+  const { tourGuideId } = req.params;
 
-   
+  try {
+    // Find the tour guide by ID and add the review directly to the reviews array
+    const tourGuide = await Tour.findById(tourGuideId);
+
+    if (!tourGuide) {
+      return res.status(404).json({ message: "Tour guide not found" });
+    }
+
+    // Add review to the array
+    tourGuide.reviews.push({ userId, rating, comment });
+
+    // Calculate the new average rating
+    const totalRatings = tourGuide.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    tourGuide.rating = totalRatings / tourGuide.reviews.length;
+
+    // Save the document
+    await tourGuide.save();
+
+    return res.status(200).json({ message: "Review submitted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 const acceptTourguide = async (req, res) => {
   try {

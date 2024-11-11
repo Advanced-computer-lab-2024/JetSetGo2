@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 
 // Service method to fetch itineraries
@@ -24,6 +26,7 @@ const flagItinerary = async (id) => {
 const Itineraries = () => {
   const [itineraries, setItineraries] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const fetchItineraries = async () => {
     try {
@@ -48,6 +51,9 @@ const Itineraries = () => {
 
   return (
     <div id="itineraries">
+       <button className="back-button" onClick={() => navigate(-1)}>
+          Back
+        </button>
       <h2 className="title">Available Itineraries</h2>
 
       {error && <p className="error">{error}</p>}

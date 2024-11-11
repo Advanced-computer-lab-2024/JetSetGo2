@@ -40,7 +40,9 @@ const TouristSignup = () => {
 
   return (
     <div style={styles.container}>
+      
       <h2 style={styles.header}>Tourist Signup</h2>
+      
       {error && <p style={styles.error}>{error}</p>}{" "}
       {/* Display error message */}
       <form onSubmit={handleSubmit} style={styles.form}>
@@ -67,6 +69,9 @@ const TouristSignup = () => {
         ))}
         <button type="submit" style={styles.button}>
           Sign Up
+        </button>
+        <button className="back-button" onClick={() => navigate('/')}>
+          Home
         </button>
       </form>
     </div>

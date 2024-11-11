@@ -26,14 +26,27 @@ const readSeller = async (req, res) => {
 // Update a seller by the MongoDB `_id`
 const updateSeller = async (req, res) => {
   const { id } = req.params; // Get the 'id' from the request parameters
-  const { Name, Password,PickUp_Location, Type_Of_Products, Previous_Work, Age } =
-    req.body;
-    const base64Image = req.body.pictures.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
-    const logo = base64Image // Get just the filename if uploaded
+  const {
+    UserName,
+    Email,
+    Name,
+    Password,
+    PickUp_Location,
+    Type_Of_Products,
+    Previous_Work,
+    Age,
+  } = req.body;
+  const base64Image = req.body.pictures.replace(
+    /^data:image\/[a-zA-Z]+;base64,/,
+    ""
+  );
+  const logo = base64Image; // Get just the filename if uploaded
 
   try {
     // Construct an object containing only the fields that are provided
     const updateFields = {};
+    if (UserName) updateFields.UserName = UserName;
+    if (Email) updateFields.Email = Email;
     if (Name) updateFields.Name = Name;
     if (Password) updateFields.Password = Password;
     if (PickUp_Location) updateFields.PickUp_Location = PickUp_Location;
@@ -41,7 +54,7 @@ const updateSeller = async (req, res) => {
     if (Previous_Work) updateFields.Previous_Work = Previous_Work;
     if (Age) updateFields.Age = Age;
     if (logo) updateFields.logo = logo; // Update logo if provided, saving only the filename
-    
+
     // Update the seller with only the provided fields, using _id to search
     const seller = await SellerModel.findByIdAndUpdate(
       id,
