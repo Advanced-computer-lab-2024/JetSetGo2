@@ -218,14 +218,15 @@ const [sortOrder, setSortOrder] = useState("desc");
               {button.label}
             </button>
           ))}
- <button style={styles.button} onClick={() => navigate('/admin-update')}>Change Password</button>          <input
-            type="password"
-            placeholder="New Password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            style={styles.passwordInput}
-          />
- <button onClick={handlePasswordChange} style={styles.changePasswordButton}>Update Password</button>        </div>
+          <h3>Change Password</h3>
+      <input
+        type="password"
+        placeholder="New Password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
+      <button onClick={handlePasswordChange}>Change Password</button>
+        </div>
       </div>
     </div>
     
