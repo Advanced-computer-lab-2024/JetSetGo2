@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getActivity, getActById } from "../services/ActivityService";
+import { getActById } from "../services/ActivityService";
 
 const ActivityDetails = () => {
   const { id: activityId } = useParams(); // Get the activity ID from the URL parameters
@@ -44,12 +44,30 @@ const ActivityDetails = () => {
     : "No Tags"; // Extract 'name' from each tag
   const activityDescription = activity.description || "No description available.";
 
+  // Generate map URL if location is available and has latitude/longitude
+  let mapSrc = '';
+  if (activityLocation && activityLocation.includes(",")) {
+    const locationCoords = activityLocation.split(",");
+    const latitude = locationCoords[0].trim();
+    const longitude = locationCoords[1].trim();
+    mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  }
+
   return (
     <div id="activity-details">
       <h2>{categoryName} - {activityTitle}</h2>
       <p><strong>Date:</strong> {activityDate}</p>
       <p><strong>Time:</strong> {activityTime}</p>
       <p><strong>Location:</strong> {activityLocation}</p>
+      {mapSrc && (
+        <iframe
+          src={mapSrc}
+          width="250"
+          height="200"
+          style={{ border: 'none', marginTop: '10px' }}
+          title={`Map of ${activityLocation}`}
+        ></iframe>
+      )}
       <p><strong>Price:</strong> {activityPrice}</p>
       <p><strong>Special Discount:</strong> {activitySpecialDiscount}</p>
       <p><strong>Bookings:</strong> {activityBookings}</p>
