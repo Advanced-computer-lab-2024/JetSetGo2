@@ -61,31 +61,50 @@ const Museums = () => {
       {error && <p className="error">{error}</p>}
 
       {museums.length > 0 ? (
-        <ul className="museum-list">
-          {museums.map((museum) => (
-            <li key={museum._id} className="museum-item">
-              <h3>{museum.location}</h3>
-              <p><strong>Description:</strong> {museum.description}</p>
-              <p><strong>Opening Hours:</strong> {museum.openingHours}</p>
-              <p><strong>Foreigner Ticket Price:</strong> ${museum.foreignerTicketPrice}</p>
-              <p><strong>Native Ticket Price:</strong> ${museum.nativeTicketPrice}</p>
-              <p><strong>Student Ticket Price:</strong> ${museum.studentTicketPrice}</p>
-              <p><strong>Flagged:</strong> {museum.flagged ? "Yes" : "No"}</p>
+  <ul className="museum-list">
+    {museums.map((museum) => {
+      // Extract latitude and longitude from the museum location
+      const locationCoords = museum.location.split(",");
+      const latitude = locationCoords[0];
+      const longitude = locationCoords[1];
+      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-              {/* Flag button */}
-              <button
-                className="flag-button"
-                onClick={() => handleFlagMuseum(museum._id)}
-                disabled={museum.flagged} // Disable button if already flagged
-              >
-                {museum.flagged ? "Unavailable" : "Flag as Unavailable"}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No museums available.</p>
-      )}
+      return (
+        <li key={museum._id} className="museum-item">
+          <h3>{museum.description}</h3>
+
+          {/* Embedded map */}
+          <iframe
+            src={mapSrc}
+            width="250"
+            height="200"
+            style={{ border: 'none' }}
+            title={`Map of ${museum.location}`}
+          ></iframe>
+
+          <p><strong>Description:</strong> {museum.description}</p>
+          <p><strong>Opening Hours:</strong> {museum.openingHours}</p>
+          <p><strong>Foreigner Ticket Price:</strong> ${museum.foreignerTicketPrice}</p>
+          <p><strong>Native Ticket Price:</strong> ${museum.nativeTicketPrice}</p>
+          <p><strong>Student Ticket Price:</strong> ${museum.studentTicketPrice}</p>
+          <p><strong>Flagged:</strong> {museum.flagged ? "Yes" : "No"}</p>
+
+          {/* Flag button */}
+          <button
+            className="flag-button"
+            onClick={() => handleFlagMuseum(museum._id)}
+            disabled={museum.flagged} // Disable button if already flagged
+          >
+            {museum.flagged ? "Unavailable" : "Flag as Unavailable"}
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+) : (
+  <p>No museums available.</p>
+)}
+
     </div>
   );
 };

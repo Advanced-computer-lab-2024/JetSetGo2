@@ -59,31 +59,50 @@ const HistoricalPlaces = () => {
       {error && <p className="error">{error}</p>}
 
       {historicalPlaces.length > 0 ? (
-        <ul className="historical-place-list">
-          {historicalPlaces.map((place) => (
-            <li key={place._id} className="historical-place-item">
-              <h3>{place.location}</h3>
-              <p><strong>Description:</strong> {place.description}</p>
-              <p><strong>Opening Hours:</strong> {place.openingHours}</p>
-              <p><strong>Foreigner Ticket Price:</strong> ${place.foreignerTicketPrice}</p>
-              <p><strong>Native Ticket Price:</strong> ${place.nativeTicketPrice}</p>
-              <p><strong>Student Ticket Price:</strong> ${place.studentTicketPrice}</p>
-              <p><strong>Flagged:</strong> {place.flagged ? "Yes" : "No"}</p>
+  <ul className="historical-place-list">
+    {historicalPlaces.map((place) => {
+      // Extract latitude and longitude from the place location
+      const locationCoords = place.location.split(",");
+      const latitude = locationCoords[0];
+      const longitude = locationCoords[1];
+      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-              {/* Flag button */}
-              <button
-                className="flag-button"
-                onClick={() => handleFlagHistoricalPlace(place._id)}
-                disabled={place.flagged} // Disable button if already flagged
-              >
-                {place.flagged ? "Unavailable" : "Flag as Unavailable"}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No historical places available.</p>
-      )}
+      return (
+        <li key={place._id} className="historical-place-item">
+          <h3>{place.description}</h3>
+
+          {/* Embedded map */}
+          <iframe
+            src={mapSrc}
+            width="250"
+            height="200"
+            style={{ border: 'none' }}
+            title={`Map of ${place.location}`}
+          ></iframe>
+
+          <p><strong>Description:</strong> {place.description}</p>
+          <p><strong>Opening Hours:</strong> {place.openingHours}</p>
+          <p><strong>Foreigner Ticket Price:</strong> ${place.foreignerTicketPrice}</p>
+          <p><strong>Native Ticket Price:</strong> ${place.nativeTicketPrice}</p>
+          <p><strong>Student Ticket Price:</strong> ${place.studentTicketPrice}</p>
+          <p><strong>Flagged:</strong> {place.flagged ? "Yes" : "No"}</p>
+
+          {/* Flag button */}
+          <button
+            className="flag-button"
+            onClick={() => handleFlagHistoricalPlace(place._id)}
+            disabled={place.flagged} // Disable button if already flagged
+          >
+            {place.flagged ? "Unavailable" : "Flag as Unavailable"}
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+) : (
+  <p>No historical places available.</p>
+)}
+
     </div>
   );
 };
