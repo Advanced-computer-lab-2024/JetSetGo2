@@ -112,6 +112,26 @@ const deleteAllMuseums = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const flagMuseum = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Update the 'flagged' status to true
+    const updatedMuseum = await Museum.findByIdAndUpdate(
+      id,
+      { flagged: true },
+      { new: true }
+    );
+
+    if (!updatedMuseum) {
+      return res.status(404).json({ message: "Museum not found" });
+    }
+
+    res.status(200).json(updatedMuseum);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createMuseum,
@@ -119,4 +139,5 @@ module.exports = {
   updateMuseum,
   deleteMuseum,
   deleteAllMuseums,
+  flagMuseum
 };

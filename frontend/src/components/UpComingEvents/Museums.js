@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
 import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate
 
@@ -71,11 +72,14 @@ const Museums = () => {
 
   const fetchMuseums = async () => {
     try {
-      const data = await getMuseum();
-      setMuseums(data);
+      const response = await axios.get("http://localhost:8000/museum/get");
+      const data = response.data;
+      const nonFlaggedMuseums = data.filter(activity => !activity.flagged);
+      setMuseums(nonFlaggedMuseums);
+      setFilteredMuseums(nonFlaggedMuseums);
     } catch (error) {
-      console.error("Error fetching museums:", error);
-      setError("Could not fetch museums. Please try again later.");
+      console.error("Error fetching Museums:", error);
+      setError("Failed to load Museums.");
     }
   };
 
@@ -167,56 +171,56 @@ const Museums = () => {
       </div>
 
       {filteredMuseums.length > 0 ? (
-  <div className="museum-cards">
-    {filteredMuseums.map((place) => {
-      // Extract latitude and longitude from the location string
-      const locationCoords = place.location.split(",");
-      const latitude = locationCoords[0];
-      const longitude = locationCoords[1];
-      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+        <div className="museum-cards">
+          {filteredMuseums.map((place) => {
+            // Extract latitude and longitude from the location string
+            const locationCoords = place.location.split(",");
+            const latitude = locationCoords[0];
+            const longitude = locationCoords[1];
+            const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-      return (
-        <div key={place._id} className="museum-card">
-          <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
-          <p>
-            <strong>Description:</strong> {place.description}
-          </p>
-          <p>
-            <strong>Location:</strong> {place.location}
-          </p>
-          <p>
-            <strong>Opening Hours:</strong> {place.openingHours}
-          </p>
-          <p>
-            <strong>Ticket Price:</strong> ${place.ticketPrice}
-          </p>
-          <div className="museum-image">
-            <img
-              src={place.pictures}
-              alt={`Picture of ${place.description}`}
-            />
-          </div>
-          <p>
-            <strong>Tourism Governor Tags:</strong>{" "}
-            {place.tourismGovernerTags?.type || "None"}
-          </p>
-          {/* Map iframe */}
-          {mapSrc && (
-            <iframe
-              title={`Map for ${place.location}`}
-              src={mapSrc}
-              width="300"
-              height="200"
-              style={{ border: "none" }}
-            ></iframe>
-          )}
+            return (
+              <div key={place._id} className="museum-card">
+                <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
+                <p>
+                  <strong>Description:</strong> {place.description}
+                </p>
+                <p>
+                  <strong>Location:</strong> {place.location}
+                </p>
+                <p>
+                  <strong>Opening Hours:</strong> {place.openingHours}
+                </p>
+                <p>
+                  <strong>Ticket Price:</strong> ${place.ticketPrice}
+                </p>
+                <div className="museum-image">
+                  <img
+                    src={place.pictures}
+                    alt={`Picture of ${place.description}`}
+                  />
+                </div>
+                <p>
+                  <strong>Tourism Governor Tags:</strong>{" "}
+                  {place.tourismGovernerTags?.type || "None"}
+                </p>
+                {/* Map iframe */}
+                {mapSrc && (
+                  <iframe
+                    title={`Map for ${place.location}`}
+                    src={mapSrc}
+                    width="300"
+                    height="200"
+                    style={{ border: "none" }}
+                  ></iframe>
+                )}
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-  </div>
-) : (
-  <p>No Museums available.</p>
-)}
+      ) : (
+        <p>No Museums available.</p>
+      )}
 
     </div>
   );

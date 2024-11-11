@@ -72,6 +72,8 @@ const AdminCapabilities = () => {
             { label: 'Add an Admin', path: '/AddAdmin' },
             { label: 'Manage Itineraries', path: '/ItinerariesAdmin' },
             { label: 'Manage Activities', path: '/ActivitiesAdmin' },
+            { label: 'Manage Historical Places', path: '/HistoricalPlacesAdmin' },
+            { label: 'Manage Museums', path: '/MuseumsAdmin' },
             { label: 'Fetch Documents', path: '/fetchdocuments' },
             
           ].map((button) => (
