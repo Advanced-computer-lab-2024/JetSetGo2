@@ -48,10 +48,15 @@ const Itinerariest = () => {
 
   const fetchItineraries = async () => {
     try {
-      const itinerariesData = await getItineraries(touristId);
-      setItineraries(itinerariesData);
-      setFilteredItineraries(itinerariesData); // Initially set filtered to all itineraries
-      console.log("Fetched Itineraries:", itinerariesData); // Log fetched itineraries
+      const response = await axios.get(
+        `http://localhost:8000/itinerary/getIteneraries`
+      );
+      const data = response.data;
+      // Filter out flagged itineraries
+      const nonFlaggedItineraries = data.filter(itinerary => !itinerary.flagged);
+
+      setItineraries(nonFlaggedItineraries);
+      setFilteredItineraries(nonFlaggedItineraries); // Initially set filtered to all non-flagged itineraries
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");
