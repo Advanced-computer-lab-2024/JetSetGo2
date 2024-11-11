@@ -276,6 +276,25 @@ const AdvertiserDetails = () => {
     }
   };
 
+  const handleImageUpload = (event, setData) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You might need to convert the image file to a URL or base64 format
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Assuming you want to store the image as a string URL
+        setData((prevData) => ({
+          ...prevData,
+          pictures: reader.result, // Store the image URL in formData
+        }));
+        //setImagePreview(reader.result);
+        //console.log(imagePreview);
+        
+      };
+      reader.readAsDataURL(file); // Convert file to base64 URL
+    }
+  };
+
   const generateMapSrc = (coordinates) => {
     const [long1, lat1, long2, lat2] = coordinates.split(",");
     return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
@@ -527,11 +546,11 @@ const AdvertiserDetails = () => {
               <div>
                 <label>Upload New Logo:</label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  name="logoFile"
-                  onChange={handleLogoChange}
-                />
+  type="file"
+  accept="image/*"
+  onChange={(e) => handleImageUpload(e, setAdvertiserFormData)}
+  required
+/>
               </div>
               <button type="submit">Update</button>
               <button
