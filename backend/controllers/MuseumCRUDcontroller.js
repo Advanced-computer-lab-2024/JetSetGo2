@@ -227,7 +227,8 @@ const getBookedHP = async (req, res) => {
     const bookedHP = await Museum.find({
       bookedUsers: touristId.trim(),
     })
-   
+    .populate('tourismGovernerTags', 'name type');  // Populate specific fields ('name' and 'type')
+
     // Respond with the list of booked itineraries
     res.status(200).json(bookedHP);
   } catch (err) {
