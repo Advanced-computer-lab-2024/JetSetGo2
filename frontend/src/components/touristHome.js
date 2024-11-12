@@ -137,10 +137,10 @@ const TouristHome = () => {
   };
 
   const handleRedeemPoints = async () => {
-    // if (points <= 0) {
-    //   setMessage("You don't have enough points to redeem.");
-    //   return;
-    // }
+    if (points <= 0) {
+      setMessage("You don't have enough points to redeem.");
+      return;
+    }
 
     try {
       // Make the PUT request to redeem points
@@ -160,7 +160,7 @@ const TouristHome = () => {
       setTouristData((prevData) => ({
         ...prevData,
         wallet: response.data.wallet, // Update touristData wallet
-        Loyalty_Points: response.data.loyaltyPointsRemaining // Update touristData points
+        Loyalty_Points: response.data.loyaltyPointsRemaining, // Update touristData points
       }));
     } catch (error) {
       console.error("Error redeeming points:", error);
@@ -201,32 +201,36 @@ const TouristHome = () => {
   };
   const handleLogout = () => {
     // Clear user session or token if needed
-    localStorage.removeItem('userToken'); // Example: remove token from localStorage
-    navigate('/login'); // Redirect to the login page
+    localStorage.removeItem("userToken"); // Example: remove token from localStorage
+    navigate("/login"); // Redirect to the login page
   };
 
-// Function to handle account deletion
-const handleDeleteAccount = async () => {
-  const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-  
-  if (confirmDelete) {
-    try {
-      const response = await axios.delete(`http://localhost:8000/home/tourist/deletMyAccount/${touristId}`);
-      
-      if (response.status === 200) {
-        alert(response.data.message); // Display success message
-        navigate("/login"); // Redirect to homepage or login after deletion
-      }
-    } catch (error) {
-      // Handle errors, such as when there are upcoming booked itineraries
-      if (error.response && error.response.data.message) {
-        alert(error.response.data.message); // Display error message from backend
-      } else {
-        alert("An error occurred while deleting the account.");
+  // Function to handle account deletion
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/home/tourist/deletMyAccount/${touristId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
       }
     }
-  }
-};
+  };
 
   return (
     <div style={styles.container}>
@@ -239,9 +243,12 @@ const handleDeleteAccount = async () => {
             style={styles.profileImage}
           />
           <h2 style={styles.profileName}>{touristData.UserName}</h2>
-          <p style={styles.walletText}>Loyalty Level: {touristData.Loyalty_Level}</p>
+          <p style={styles.walletText}>
+            Loyalty Level: {touristData.Loyalty_Level}
+          </p>
           <p style={styles.walletText}>Loyalty Points: {points}</p>
-          <p style={styles.walletText}>Wallet: EGP {Wallet}</p> {/* Display updated wallet */}
+          <p style={styles.walletText}>Wallet: $ {Wallet}</p>{" "}
+          {/* Display updated wallet */}
           <button onClick={handleUpdateClick} style={styles.button}>
             Update Profile
           </button>
@@ -249,30 +256,47 @@ const handleDeleteAccount = async () => {
             Redeem All Points
           </button>
           {message && <p>{message}</p>}
-          
-          <button    onClick={() => navigate("/mi", { state: { touristId: touristId } })}
-  >
-           My Itenaries    
-               </button>
-               <button    onClick={() => navigate("/myactivity", { state: { touristId: touristId } })}
-  >
-           My Activities    
-               </button>
-               <button    onClick={() => navigate("/myhp", { state: { touristId: touristId } })}
-  >
-           My HistoricalPlaces    
-               </button>
-               <button    onClick={() => navigate("/mymp", { state: { touristId: touristId } })}
-  >
-           My Museums    
-               </button>
-
-               <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
-        Delete Account
-      </button>
-      <button style={styles.button} onClick={handleLogout}>
+          <button
+            onClick={() => navigate("/mi", { state: { touristId: touristId } })}
+          >
+            My Itenaries
+          </button>
+          <button
+            onClick={() =>
+              navigate("/myactivity", { state: { touristId: touristId } })
+            }
+          >
+            My Activities
+          </button>
+          <button
+            onClick={() =>
+              navigate("/myhp", { state: { touristId: touristId } })
+            }
+          >
+            My HistoricalPlaces
+          </button>
+          <button
+            onClick={() =>
+              navigate("/mymp", { state: { touristId: touristId } })
+            }
+          >
+            My Museums
+          </button>
+          <button
+            onClick={handleDeleteAccount}
+            style={{
+              color: "red",
+              background: "lightgrey",
+              padding: "10px",
+              marginTop: "20px",
+            }}
+          >
+            Delete Account
+          </button>
+          <button style={styles.button} onClick={handleLogout}>
             Logout
-          </button> {/* Logout Button */}
+          </button>{" "}
+          {/* Logout Button */}
         </div>
       </div>
 
