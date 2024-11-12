@@ -259,6 +259,7 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           <p style={styles.walletText}>Loyalty Points: {points}</p>
           <p style={styles.walletText}>Wallet: $ {Wallet}</p>{" "}
           {/* Display updated wallet */}
+          
           <img
             src={getLoyaltyImage()}
             alt="Loyalty Level"
