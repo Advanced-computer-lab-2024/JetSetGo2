@@ -54,6 +54,7 @@ const MYHPT = () => {
   const location = useLocation(); // Use useLocation to access the state
   const [itineraryRating, setItineraryRating] = useState(0);
   const [itineraryComment, setItineraryComment] = useState("");
+  const [reviews, setReviews] = useState({});
   const [submittedReviews, setSubmittedReviews] = useState(
     JSON.parse(localStorage.getItem("submittedReviews")) || {}
   );
@@ -79,8 +80,19 @@ const MYHPT = () => {
     }
   }, [selectedTag, historicalPlaces]);
 
+  const handleInputChange = (e, itineraryId, field) => {
+    const { value } = e.target;
+    setReviews((prevReviews) => ({
+      ...prevReviews,
+      [itineraryId]: {
+        ...prevReviews[itineraryId],
+        [field]: value,
+      },
+    }));
+  };
+
   
-  const handleItineraryReview = async (itineraryId) => {
+  const handleItineraryReview33 = async (itineraryId) => {
     try {
       await axios.post(`http://localhost:8000/historicalPlace/submitReview/${itineraryId}`, {
         userId: touristId,
@@ -99,6 +111,41 @@ const MYHPT = () => {
       localStorage.setItem("submittedReviews", JSON.stringify(updatedSubmittedReviews));
     } catch (error) {
       console.error("Error submitting itinerary review:", error);
+    }
+  };
+
+  const handleItineraryReview = async (itineraryId) => {
+    const { rating, comment } = reviews[itineraryId] || {};
+    
+    if (!rating || !comment) {
+      alert("Please provide a rating and a comment.");
+      return;
+    }
+
+    try {
+      // Send review data to backend
+      await axios.post(`http://localhost:8000/historicalPlace/submitReview/${itineraryId}`, {
+        userId: touristId,
+        rating,
+        comment,
+      });
+
+      alert("HP review submitted!");
+
+      // Clear review inputs after submission
+      setReviews((prevReviews) => ({
+        ...prevReviews,
+        [itineraryId]: { rating: 0, comment: "" },
+      }));
+
+      // Update the submitted reviews state and store in localStorage
+      const updatedSubmittedReviews = { ...submittedReviews, [itineraryId]: true };
+      setSubmittedReviews(updatedSubmittedReviews);
+      localStorage.setItem("submittedReviews", JSON.stringify(updatedSubmittedReviews));
+
+    } catch (error) {
+      console.error("Error submitting itinerary review:", error);
+      alert("Error submitting review. Please try again.");
     }
   };
   
@@ -326,6 +373,18 @@ const MYHPT = () => {
             Tourism Governor Tags:{" "}
             {place.tourismGovernerTags?.type || "None"}
           </p>
+          <div className="reviews">
+    <h4>Reviews:</h4>
+    {place.reviews && place.reviews.length > 0 ? (
+      place.reviews.map((review, index) => (
+        <p key={index}>
+          <strong>Comment:</strong> {review.comment}
+        </p>
+      ))
+    ) : (
+      <p>No reviews yet.</p>
+    )}
+  </div>
           {/* Map iframe */}
           {mapSrc && (
             <iframe
@@ -338,34 +397,33 @@ const MYHPT = () => {
           )}
        {/* Conditional Rendering: Show review section if not submitted */}
        {submittedReviews[place._id] ? (
-                  <p>Your review has been submitted!</p>
-                ) : (
-                  <>
-                    <div>
-                      <label htmlFor="rating">Rating (1-5):</label>
-                      <input
-                        type="number"
-                        id="itinerary-rating"
-                        value={itineraryRating}
-                        min="1"
-                        max="5"
-                        onChange={(e) => setItineraryRating(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="comment">Comment:</label>
-                      <textarea
-                        id="itinerary-comment"
-                        value={itineraryComment}
-                        onChange={(e) => setItineraryComment(e.target.value)}
-                        placeholder="Write your comment here"
-                      />
-                    </div>
-                    <button onClick={() => handleItineraryReview(place._id)}>
-                      Submit Itinerary Review
-                    </button>
-                  </>
-                )}
+            <p>Your review has been submitted!</p>
+          ) : (
+            <>
+              <div>
+                <label>Rating (1-5):</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={reviews[place._id]?.rating || 0}
+                  onChange={(e) => handleInputChange(e, place._id, "rating")}
+                  required
+                />
+              </div>
+              <div>
+                <label>Comment:</label>
+                <textarea
+                  value={reviews[place._id]?.comment || ""}
+                  onChange={(e) => handleInputChange(e, place._id, "comment")}
+                  required
+                />
+              </div>
+              <button onClick={() => handleItineraryReview(place._id)}>
+                Submit Review
+              </button>
+            </>
+          )}
         </div>
         
       );
