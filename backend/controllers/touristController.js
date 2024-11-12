@@ -3,6 +3,8 @@ const ItenModel = require("../models/schematour.js");
 const ActivityModel = require("../models/ActivityCRUD.js");
 const transportationModel = require("../models/TransportationCRUD.js");
 const productModel = require("../models/ProductCRUD.js");
+const museumModel = require("../models/MuseumCRUD.js");
+const historicalModel = require("../models/HistoricalPlaceCRUD.js");
 const { default: mongoose } = require("mongoose");
 
 const createTourist = async (req, res) => {
@@ -135,6 +137,21 @@ const deleteTourist = async (req, res) => {
   }
 };
 
+function calculateLoyaltyPoints(level, price) {
+  let points = 0;
+
+  if (level === 1) {
+    points = price * 0.5;
+  } else if (level === 2) {
+    points = price * 1;
+  } else if (level === 3) {
+    points = price * 1.5;
+  }
+
+  console.log(`Points calculated for level ${level}: ${points}`); // Log calculated points
+  return points;
+}
+
 const bookTransportation = async (req, res) => {
   const { touristId, transportationId } = req.params;
 
@@ -170,6 +187,25 @@ const bookTransportation = async (req, res) => {
 
     // Add the booked transportation to the tourist's bookings
     tourist.bookedTransportations.push(transportation._id);
+
+    // Use the existing calculateLoyaltyPoints function
+    const loyaltyPoints = calculateLoyaltyPoints(
+      tourist.Loyalty_Level,
+      transportation.price
+    );
+
+    // Add loyalty points to the user's account
+    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
+    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
+
+    if (user.Total_Loyalty_Points >= 500000) {
+      user.Loyalty_Level = 3;
+    } else if (user.Total_Loyalty_Points >= 100000) {
+      user.Loyalty_Level = 2;
+    } else {
+      user.Loyalty_Level = 1;
+    }
+
     await tourist.save();
 
     res.status(200).json({
@@ -459,6 +495,32 @@ const reqAccountToBeDeleted = async (req, res) => {
       });
     }
 
+    const bookedmuseum = await museumModel.find({
+      availableDates: { $gt: currentDate }, // Date is greater than the current date
+      bookings: { $gt: 0 },
+      bookedUsers: { $in: [id] },
+    });
+
+    if (bookedmuseum.length != 0) {
+      return res.status(400).json({
+        message:
+          "Tourist cannot be deleted there are booked upcoming events(Museum)",
+      });
+    }
+
+    const bookedhistorical = await historicalModel.find({
+      availableDates: { $gt: currentDate }, // Date is greater than the current date
+      bookings: { $gt: 0 },
+      bookedUsers: { $in: [id] },
+    });
+
+    if (bookedhistorical.length != 0) {
+      return res.status(400).json({
+        message:
+          "Tourist cannot be deleted there are booked upcoming events(historical places)",
+      });
+    }
+
     await touristModel.findByIdAndDelete(id);
 
     res.status(200).json({
@@ -525,6 +587,7 @@ const addReview = async (req, res) => {
     return res.status(500).json({ error: error.message }); // Return error response
   }
 };
+
 module.exports = {
   createTourist,
   updateTourist,

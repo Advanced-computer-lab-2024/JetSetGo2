@@ -18,7 +18,6 @@ import ProductCRUD from "./components/ProductCRUD";
 import CreateTag from "./components/CreateTag";
 import AdvertiserForm from "./components/Create";
 import Mai from "./components/MYM";
-
 import AdvertiserManagement from "./components/listup";
 import CreateSeller from "./components/CreateSeller";
 import SellerDetails from "./components/SellerDetails";
@@ -26,16 +25,13 @@ import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
 import Activities from "./components/UpComingEvents/Activities";
 import Activitiest from "./components/UpComingEvents/Activitiest";
 import Museumst from "./components/UpComingEvents/Museumst";
-import ActivityDetails from './components/ActivityDetails';
-import MYHPT from './components/myhp';
+import ActivityDetails from "./components/ActivityDetails";
+import MYHPT from "./components/myhp";
 
-import HPT from './components/UpComingEvents/historicalplacest';
-
-
+import HPT from "./components/UpComingEvents/historicalplacest";
 
 import ItinerariesPage from "./components/myitenaries";
 import MyActivities from "./components/myactivities";
-
 
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
@@ -67,11 +63,7 @@ import ManageActivities from "./components/ActivitiesAdmin";
 import ManageHistoricalPlaces from "./components/HistoricalPlacesAdmin";
 import ManageMuseums from "./components/MuseumsAdmin";
 
-
 function App() {
-
-  
-
   return (
     <Router>
       <div>
@@ -83,7 +75,10 @@ function App() {
           <Route path="/hotelSearch" element={<HotelSearch />} />
           <Route path="/tourist-update" element={<UpdateTouristPage />} />
           <Route path="/transportation" element={<TransportationPage />} />
-          <Route path="/transportationBooking" element={<TransportationBooking />} />
+          <Route
+            path="/transportationBooking"
+            element={<TransportationBooking />}
+          />
           <Route path="/AdvirtiserMain" element={<AdvertiserForm />} />
           <Route path="/list" element={<AdvertiserManagement />} />
           <Route path="/CreateTourGuide" element={<CreateTourGuide />} />
@@ -112,10 +107,8 @@ function App() {
           <Route path="/myactivity" element={<MyActivities />} />
           <Route path="/HPT" element={<HPT />} />
 
-
-          
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
-          <Route path="/HP/:id" element={<HPdetails/>} />
+          <Route path="/HP/:id" element={<HPdetails />} />
           <Route path="/all-museums" element={<Museums />} />
           <Route path="/museusemst" element={<Museumst />} />
           <Route path="/M/:id" element={<MDetails />} />
@@ -130,11 +123,16 @@ function App() {
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
           <Route path="/file-complaint" element={<FileComplaint />} />
           <Route path="/ActivitiesAdmin" element={<ManageActivities />} />
-          <Route path="/HistoricalPlacesAdmin" element={<ManageHistoricalPlaces />} />
-          <Route path="/HistoricalPlacesAdmin" element={<ManageHistoricalPlaces />} />
+          <Route
+            path="/HistoricalPlacesAdmin"
+            element={<ManageHistoricalPlaces />}
+          />
+          <Route
+            path="/HistoricalPlacesAdmin"
+            element={<ManageHistoricalPlaces />}
+          />
           <Route path="/MuseumsAdmin" element={<ManageMuseums />} />
 
-          
           <Route
             path="/tourismGovernorPage"
             element={<TourismGovernorPage />}
@@ -146,7 +144,7 @@ function App() {
           <Route path="/fetchdocuments" element={<OthersListPage />} />
           <Route path="/AdminAcceptance" element={<AdminApprovalPage />} />
           <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
-          
+
           <Route path="/flight-search" element={<FlightSearch />} />
         </Routes>
       </div>

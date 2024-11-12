@@ -79,6 +79,21 @@ app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({ message: "Welcome to the protected route!", userId: req.userId });
 });
 
+function calculateLoyaltyPoints(level, price) {
+  let points = 0;
+
+  if (level === 1) {
+    points = price * 0.5;
+  } else if (level === 2) {
+    points = price * 1;
+  } else if (level === 3) {
+    points = price * 1.5;
+  }
+
+  console.log(`Points calculated for level ${level}: ${points}`); // Log calculated points
+  return points;
+}
+
 // In your backend (e.g., Node.js/Express)
 app.post("/home/tourist/bookFlight", async (req, res) => {
   try {
@@ -93,6 +108,25 @@ app.post("/home/tourist/bookFlight", async (req, res) => {
 
     // Add the flight to the tourist's booked flights
     tourist.bookedFlights.push(flight);
+
+    // Use the existing calculateLoyaltyPoints function
+    const loyaltyPoints = calculateLoyaltyPoints(
+      tourist.Loyalty_Level,
+      flight.price
+    );
+
+    // Add loyalty points to the user's account
+    tourist.Loyalty_Points = tourist.Loyalty_Points + loyaltyPoints;
+    tourist.Total_Loyalty_Points = tourist.Total_Loyalty_Points + loyaltyPoints;
+
+    if (tourist.Total_Loyalty_Points >= 500000) {
+      tourist.Loyalty_Level = 3;
+    } else if (tourist.Total_Loyalty_Points >= 100000) {
+      tourist.Loyalty_Level = 2;
+    } else {
+      tourist.Loyalty_Level = 1;
+    }
+
     await tourist.save();
 
     res.status(200).json({ message: "Flight booked successfully" });
@@ -156,6 +190,25 @@ app.post("/home/tourist/:touristId/bookHotel", async (req, res) => {
 
     const bookedData = { hotelName, offer }; // Combine hotelName with the offer
     tourist.bookedHotels.push(bookedData); // Add the combined data to bookedHotels
+
+    // Use the existing calculateLoyaltyPoints function
+    const loyaltyPoints = calculateLoyaltyPoints(
+      tourist.Loyalty_Level,
+      bookedData.offer.price.total
+    );
+
+    // Add loyalty points to the user's account
+    tourist.Loyalty_Points = tourist.Loyalty_Points + loyaltyPoints;
+    tourist.Total_Loyalty_Points = tourist.Total_Loyalty_Points + loyaltyPoints;
+
+    if (tourist.Total_Loyalty_Points >= 500000) {
+      tourist.Loyalty_Level = 3;
+    } else if (tourist.Total_Loyalty_Points >= 100000) {
+      tourist.Loyalty_Level = 2;
+    } else {
+      tourist.Loyalty_Level = 1;
+    }
+
     await tourist.save();
 
     res.status(200).json({ message: "Booking successful!" });

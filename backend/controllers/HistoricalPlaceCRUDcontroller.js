@@ -1,20 +1,28 @@
 const { default: mongoose } = require("mongoose");
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const HistoricalPlace = require('../models/HistoricalPlaceCRUD');
-const TourismGovernerTag = require('../models/tourismGovernerTags'); // Import the tourismGovernerTag model
+const HistoricalPlace = require("../models/HistoricalPlaceCRUD");
+const TourismGovernerTag = require("../models/tourismGovernerTags"); // Import the tourismGovernerTag model
 const User = require("../models/Tourist.js");
-
 
 // Create a Historical Place with tourismGovernerTags reference
 const createHistoricalPlace = async (req, res) => {
   try {
-    const { description, pictures, location, openingHours, foreignerTicketPrice, nativeTicketPrice, studentTicketPrice, tourismGovernerTags} = req.body;
+    const {
+      description,
+      pictures,
+      location,
+      openingHours,
+      foreignerTicketPrice,
+      nativeTicketPrice,
+      studentTicketPrice,
+      tourismGovernerTags,
+    } = req.body;
 
     // Find the tourismGovernerTags (this ensures you're referencing valid tags)
     const tag = await TourismGovernerTag.findById(tourismGovernerTags);
     if (!tag) {
-      return res.status(400).json({ error: 'Invalid tourism governer tag' });
+      return res.status(400).json({ error: "Invalid tourism governer tag" });
     }
 
     // Create the historical place
@@ -26,8 +34,7 @@ const createHistoricalPlace = async (req, res) => {
       foreignerTicketPrice,
       nativeTicketPrice,
       studentTicketPrice,
-      tourismGovernerTags: tag._id ,// Reference the tourismGovernerTags by _id
-      
+      tourismGovernerTags: tag._id, // Reference the tourismGovernerTags by _id
     });
 
     res.status(201).json(historicalPlace);
@@ -35,6 +42,7 @@ const createHistoricalPlace = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 function calculateLoyaltyPoints(level, price) {
   let points = 0;
 
@@ -55,13 +63,15 @@ const getBookedHP = async (req, res) => {
     const { touristId } = req.query;
     // Validate touristId
     if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
-      return res.status(400).json({ message: "Invalid or missing Tourist ID." });
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing Tourist ID." });
     }
     // Find all itineraries that the tourist has booked
     const bookedHP = await HistoricalPlace.find({
       bookedUsers: touristId.trim(),
-    })
-   
+    });
+
     // Respond with the list of booked itineraries
     res.status(200).json(bookedHP);
   } catch (err) {
@@ -101,7 +111,6 @@ const bookHP = async (req, res) => {
     await HP.incrementBookings(userId);
 
     // Retrieve the user from the database using the userId
-    
 
     // Use the existing calculateLoyaltyPoints function
     const loyaltyPoints = calculateLoyaltyPoints(
@@ -110,18 +119,15 @@ const bookHP = async (req, res) => {
     );
 
     // Add loyalty points to the user's account
-    user.Loyalty_Points += loyaltyPoints;
+    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
+    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
 
-    if (user.Loyalty_Points >= 500000) {
+    if (user.Total_Loyalty_Points >= 500000) {
       user.Loyalty_Level = 3;
-    } else if (user.Loyalty_Points >= 100000) {
-      if (user.Loyalty_Level <= 2) {
-        user.Loyalty_Level = 2;
-      }
+    } else if (user.Total_Loyalty_Points >= 100000) {
+      user.Loyalty_Level = 2;
     } else {
-      if (user.Loyalty_Level <= 1) {
-        user.Loyalty_Level = 1;
-      }
+      user.Loyalty_Level = 1;
     }
     // Save the updated user record
     await user.save();
@@ -156,23 +162,26 @@ const submitReview = async (req, res) => {
     const HP = await HistoricalPlace.findById(HPId);
     if (!HP) {
       console.log("Activity not found"); // Debugging line
-      return res.status(404).json({ message: 'Activity not found' });
+      return res.status(404).json({ message: "Activity not found" });
     }
 
     // Add the review to the activity
     HP.reviews.push({ userId, rating, comment });
 
     // Calculate the new average rating for the activity
-    const totalRatings = HP.reviews.reduce((sum, review) => sum + review.rating, 0);
+    const totalRatings = HP.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
     HP.rating = totalRatings / HP.reviews.length;
 
     // Save the updated activity
     await HP.save();
 
-    return res.status(200).json({ message: 'Review submitted successfully' });
+    return res.status(200).json({ message: "Review submitted successfully" });
   } catch (error) {
     console.error("Error while submitting review:", error); // Debugging line
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -196,7 +205,12 @@ const cancelHP = async (req, res) => {
     // Attempt to cancel the booking
     await HP.cancelBooking(userId);
 
-    res.status(200).json({ message: "Booking canceled successfully", bookings: HistoricalPlace.bookings });
+    res
+      .status(200)
+      .json({
+        message: "Booking canceled successfully",
+        bookings: HistoricalPlace.bookings,
+      });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -206,7 +220,10 @@ const cancelHP = async (req, res) => {
 const getHistoricalPlace = async (req, res) => {
   try {
     // Use .populate to fill the tourismGovernerTags field with actual data
-    const historicalPlaces = await HistoricalPlace.find().populate('tourismGovernerTags','name type');
+    const historicalPlaces = await HistoricalPlace.find().populate(
+      "tourismGovernerTags",
+      "name type"
+    );
     res.status(200).json(historicalPlaces);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -217,7 +234,10 @@ const getHistoricalPlaceById = async (req, res) => {
   const { id } = req.params;
   try {
     // Find the historical place by ID and populate the tourismGovernerTags field
-    const historicalPlace = await HistoricalPlace.findById(id).populate('tourismGovernerTags', 'name type');
+    const historicalPlace = await HistoricalPlace.findById(id).populate(
+      "tourismGovernerTags",
+      "name type"
+    );
 
     if (!historicalPlace) {
       return res.status(404).json({ error: "Historical place not found" });
@@ -239,15 +259,18 @@ const updateHistoricalPlace = async (req, res) => {
   if (req.body.pictures) updateData.pictures = req.body.pictures;
   if (req.body.location) updateData.location = req.body.location;
   if (req.body.openingHours) updateData.openingHours = req.body.openingHours;
-  if (req.body.foreignerTicketPrice) updateData.foreignerTicketPrice = req.body.foreignerTicketPrice;
-  if (req.body.nativeTicketPrice) updateData.nativeTicketPrice = req.body.nativeTicketPrice;
-  if (req.body.studentTicketPrice) updateData.studentTicketPrice = req.body.studentTicketPrice;
+  if (req.body.foreignerTicketPrice)
+    updateData.foreignerTicketPrice = req.body.foreignerTicketPrice;
+  if (req.body.nativeTicketPrice)
+    updateData.nativeTicketPrice = req.body.nativeTicketPrice;
+  if (req.body.studentTicketPrice)
+    updateData.studentTicketPrice = req.body.studentTicketPrice;
 
   // Handle updating the tourismGovernerTags field
   if (req.body.tourismGovernerTags) {
     const tag = await TourismGovernerTag.findById(req.body.tourismGovernerTags);
     if (!tag) {
-      return res.status(400).json({ error: 'Invalid tourism governer tag' });
+      return res.status(400).json({ error: "Invalid tourism governer tag" });
     }
     updateData.tourismGovernerTags = tag._id;
   }
@@ -288,12 +311,13 @@ const deleteAllHistoricalPlaces = async (req, res) => {
     console.log("Attempting to delete all HistoricalPlaces...");
     await HistoricalPlace.deleteMany({});
     console.log("All HistoricalPlaces deleted successfully.");
-    res.status(200).json({ message: 'All HistoricalPlaces have been deleted' });
+    res.status(200).json({ message: "All HistoricalPlaces have been deleted" });
   } catch (error) {
     console.error("Error deleting HistoricalPlaces:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 const flagHistoricalPlace = async (req, res) => {
   const { id } = req.params;
 
@@ -326,5 +350,5 @@ module.exports = {
   bookHP,
   getBookedHP,
   cancelHP,
-  submitReview
+  submitReview,
 };
