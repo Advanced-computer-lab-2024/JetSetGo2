@@ -61,7 +61,7 @@ const TouristHome = () => {
           `http://localhost:8000/home/tourist/getTourist/${touristId}`
         );
         setTouristData(response.data);
-        setWallet(response.data.wallet); // Set wallet initially from fetched data
+        setWallet(response.data.Wallet); // Set wallet initially from fetched data
         setPoints(response.data.Loyalty_Points);
         console.log("Tourist data response:", response.data);
       } catch (error) {
