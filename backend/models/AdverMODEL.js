@@ -53,6 +53,10 @@ const advertiserSchema = new Schema(
       type: String,
       required: false,
     },
+    Notifications: {
+      type: [String],
+      required: false,
+    },
     Profile_Completed: {
       type: Boolean,
       required: false,

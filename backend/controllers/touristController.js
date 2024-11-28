@@ -187,25 +187,6 @@ const bookTransportation = async (req, res) => {
 
     // Add the booked transportation to the tourist's bookings
     tourist.bookedTransportations.push(transportation._id);
-
-    // Use the existing calculateLoyaltyPoints function
-    const loyaltyPoints = calculateLoyaltyPoints(
-      tourist.Loyalty_Level,
-      transportation.price
-    );
-
-    // Add loyalty points to the user's account
-    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
-    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
-
-    if (user.Total_Loyalty_Points >= 500000) {
-      user.Loyalty_Level = 3;
-    } else if (user.Total_Loyalty_Points >= 100000) {
-      user.Loyalty_Level = 2;
-    } else {
-      user.Loyalty_Level = 1;
-    }
-
     await tourist.save();
 
     res.status(200).json({

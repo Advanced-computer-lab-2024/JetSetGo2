@@ -21,8 +21,10 @@ const createTransportation = async (req, res) => {
     const currentDate = new Date();
 
     // If the transportation date has passed, set isBookingOpen to false
-    if (transportationDate < currentDate) {
+    if (transportationDate < currentDate || req.body.seatsAvailable <= 0) {
       transportationData.isBookingOpen = false;
+    } else {
+      transportationData.isBookingOpen = true;
     }
 
     // Create the transportation with the updated data
@@ -41,6 +43,23 @@ const getAllTransportations = async (req, res) => {
     const transportations = await Transportation.find().populate("advertiser", "Name");
     console.log(transportations);
 
+    res.status(200).json(transportations);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+// Fetch Transportations by Criteria
+const getTransportationsByCriteria = async (req, res) => {
+  try {
+    const { date, startLocation, endLocation, vehicleType } = req.query;
+
+    const query = { isBookingOpen: true }; // Ensure booking is open
+    if (date) query.date = date;
+    if (startLocation) query.startLocation = startLocation;
+    if (endLocation) query.endLocation = endLocation;
+    if (vehicleType) query.vehicleType = vehicleType;
+
+    const transportations = await Transportation.find(query).populate("advertiser", "Name");
     res.status(200).json(transportations);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -153,4 +172,5 @@ module.exports = {
   deleteAllTransportations,
   readAdvertiserTransportations,
   getUpcomingTransportations,
+  getTransportationsByCriteria,
 };

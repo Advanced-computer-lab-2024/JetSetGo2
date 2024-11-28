@@ -454,6 +454,18 @@ const AdvertiserDetails = () => {
             <p>
               <strong>Services:</strong> {advertiser.Services}
             </p>
+            <p>
+  <strong>Notifications:</strong>
+  {advertiser.Notifications && advertiser.Notifications.length > 0 ? (
+    <ul>
+      {advertiser.Notifications.map((notification, index) => (
+        <li key={index}>{notification}</li>
+      ))}
+    </ul>
+  ) : (
+    <p>No notifications</p>
+  )}
+</p>
           </div>
         )}
 

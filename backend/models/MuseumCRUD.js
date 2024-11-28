@@ -27,6 +27,10 @@ const museumSchema = new Schema(
       type: Number,
       required: true,
     },
+    Notifications: {
+      type: [String],
+      required: false,
+    },
     studentTicketPrice: {
       type: Number,
       required: true,

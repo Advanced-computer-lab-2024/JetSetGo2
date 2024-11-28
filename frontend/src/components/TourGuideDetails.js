@@ -397,6 +397,18 @@ const TourGuidePage = () => {
             <li>
               <strong>Previous Work:</strong> {tourGuide.PreviousWork}
             </li>
+            <li>
+  <strong>Notifications:</strong>
+  {tourGuide.Notifications && tourGuide.Notifications.length > 0 ? (
+    <ul>
+      {tourGuide.Notifications.map((notification, index) => (
+        <li key={index}>{notification}</li>
+      ))}
+    </ul>
+  ) : (
+    <p>No notifications</p>
+  )}
+</li>
           </ul>
         )}
 

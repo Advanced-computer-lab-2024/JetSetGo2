@@ -36,6 +36,10 @@ const historicalPlaceSchema = new Schema(
       ref: "tourismGovernerTag", // Reference to the Category model
       required: true,
     },
+    Notifications: {
+      type: [String],
+      required: false,
+    },
     bookings: {
       type: Number,
       default: 0,

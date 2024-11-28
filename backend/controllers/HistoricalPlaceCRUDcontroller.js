@@ -4,6 +4,7 @@ const router = express.Router();
 const HistoricalPlace = require("../models/HistoricalPlaceCRUD");
 const TourismGovernerTag = require("../models/tourismGovernerTags"); // Import the tourismGovernerTag model
 const User = require("../models/Tourist.js");
+const sendEmailFlag = require('../utils/sendEmailFlag'); // Import the sendEmailFlag function
 
 // Create a Historical Place with tourismGovernerTags reference
 const createHistoricalPlace = async (req, res) => {
@@ -318,6 +319,8 @@ const deleteAllHistoricalPlaces = async (req, res) => {
   }
 };
 
+
+
 const flagHistoricalPlace = async (req, res) => {
   const { id } = req.params;
 
@@ -333,11 +336,23 @@ const flagHistoricalPlace = async (req, res) => {
       return res.status(404).json({ message: "Museum not found" });
     }
 
+    // Send email to the specified email address
+    const recipientEmail = "marwanallam8@gmail.com";
+    const subject = "A historical place has been flagged";
+    const text = `Dear User, the historical place with ID ${id} has been flagged.`;
+
+    await sendEmailFlag(recipientEmail, subject, text);
+
+    const notificationMessage = `The historical place with Description ${updatedHistoricalPlace.description} has been flagged.`;
+    updatedHistoricalPlace.Notifications.push(notificationMessage);
+    await updatedHistoricalPlace.save();
+
     res.status(200).json(updatedHistoricalPlace);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 module.exports = {
   createHistoricalPlace,
