@@ -97,6 +97,7 @@ const deleteAdver = async (req, res) => {
 };
 
 const acceptAdver = async (req, res) => {
+  
   try {
     const { id } = req.params;
 
