@@ -15,6 +15,8 @@ const ProductListp = () => {
   const [purchasedProducts, setPurchasedProducts] = useState([]);
   const [touristData,setTouristData] = useState([]);
   const [purchasedProductDetails, setPurchasedProductDetails] = useState([]);
+  const [cart, setCart] = useState([]);
+
   const API_URL = "http://localhost:8000";
   
   const navigate = useNavigate(); // Initialize useNavigate
@@ -24,6 +26,7 @@ const ProductListp = () => {
     fetchProducts();
     fetchTouristData();
     fetchPurchasedProducts();
+    fetchCart();
   }, []);
 
   const fetchProducts = async () => {
@@ -38,6 +41,34 @@ const ProductListp = () => {
       console.error("Error fetching products", error);
     }
   };
+  const fetchCart = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    try {
+        const response = await axios.get(`${API_URL}/cart/${userId}`);
+        setCart(response.data);
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+    }
+};
+const handleAddToCart = async (productId) => {
+  const userId = localStorage.getItem("userId");
+  if (!userId) {
+      setMessage("Please log in to add items to your cart.");
+      return;
+  }
+
+  try {
+      const response = await axios.post(`${API_URL}/cart/add/${userId}/${productId}`);
+      setCart(response.data.cart); // Update the cart state
+      setMessage("Product added to cart successfully!");
+  } catch (error) {
+      console.error("Error adding to cart:", error);
+      setMessage("Failed to add product to cart.");
+  }
+};
+
 
   const handleBuyProduct = async (userId,productId) => {
     try {
@@ -434,6 +465,22 @@ const handleSubmitReview = async (productId) => {
                 'No Image'
               )}
             </td>
+            <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
+    <button
+        onClick={() => handleAddToCart(product._id)}
+        style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+        }}
+    >
+        Add to Cart
+    </button>
+</td>
+
             <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.description}</td>
             <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>${product.price}</td>
             <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{product.seller && product.seller.Name ? product.seller.Name : 'No Seller'}</td>
@@ -462,6 +509,7 @@ const handleSubmitReview = async (productId) => {
                 >
                   Buy Now
                 </button>
+                
               ) : (
                 <button 
                   disabled 
@@ -479,6 +527,7 @@ const handleSubmitReview = async (productId) => {
               )}
             </td>
           </tr>
+          
         ))
       ) : (
         <tr>
@@ -487,6 +536,7 @@ const handleSubmitReview = async (productId) => {
       )}
     </tbody>
   </table>
+  
   
   {/* Section to display reviews in a visually attractive way */}
   <section style={{ marginTop: '40px' }}>
@@ -592,6 +642,8 @@ const handleSubmitReview = async (productId) => {
                 cursor: 'pointer'
               }}
             >Submit Rating</button>
+            <button onClick={() => navigate("/cart")}>View Cart</button>
+
             <textarea 
               placeholder="Write your review here..." 
               value={product.newReview || ''} 

@@ -275,15 +275,17 @@ const Museums = () => {
         >
           <option value="">All Tags</option>
           {museums
-            .map((place) => place.tourismGovernerTags?.type)
-            .filter(
-              (value, index, self) => value && self.indexOf(value) === index
-            ) // Remove duplicates
-            .map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
+  .map((place) => place.tourismGovernerTags?.type || "Unknown") // Provide fallback value
+  .filter(
+    (value, index, self) => value && self.indexOf(value) === index
+  ) // Remove duplicates
+  .map((tag) => (
+    <option key={tag} value={tag}>
+      {tag}
+    </option>
+  ))}
+
+            
         </select>
       </div>
 
@@ -298,7 +300,8 @@ const Museums = () => {
 
       return (
         <div key={place._id} className="museum-card">
-          <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
+          <h3>{place.tourismGovernerTags?.name || "Unnamed"}</h3>
+
           <p>
             <strong>Description:</strong> {place.description}
           </p>

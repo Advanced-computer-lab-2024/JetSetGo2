@@ -16,7 +16,14 @@ const {
   addReview,
   redeemPointsToCash,
   reqAccountToBeDeleted,
+  addToCart,
+  getCart,
+  removeFromCart,
 } = require("../controllers/touristController");
+router.post("/cart/add/:touristId/:productId", addToCart);
+router.get("/cart/:touristId", getCart);
+router.delete("/cart/remove/:touristId/:productId", removeFromCart);
+
 
 router.get("/", (req, res) => {
   res.status(200).send("You have everything installed!");

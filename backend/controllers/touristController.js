@@ -587,6 +587,58 @@ const addReview = async (req, res) => {
     return res.status(500).json({ error: error.message }); // Return error response
   }
 };
+const addToCart = async (req, res) => {
+  const { touristId, productId } = req.params;
+
+  try {
+      const tourist = await touristModel.findById(touristId);
+      const product = await productModel.findById(productId);
+
+      if (!tourist || !product) {
+          return res.status(404).json({ error: "Tourist or Product not found" });
+      }
+
+      if (!tourist.cart.includes(productId)) {
+          tourist.cart.push(productId);
+          await tourist.save();
+          return res.status(200).json({ message: "Product added to cart", cart: tourist.cart });
+      } else {
+          return res.status(400).json({ message: "Product already in cart" });
+      }
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+const getCart = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+      const tourist = await touristModel.findById(touristId).populate("cart");
+      if (!tourist) {
+          return res.status(404).json({ error: "Tourist not found" });
+      }
+      res.status(200).json(tourist.cart);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+const removeFromCart = async (req, res) => {
+  const { touristId, productId } = req.params;
+
+  try {
+      const tourist = await touristModel.findById(touristId);
+      if (!tourist) {
+          return res.status(404).json({ error: "Tourist not found" });
+      }
+
+      tourist.cart = tourist.cart.filter((item) => item.toString() !== productId);
+      await tourist.save();
+      res.status(200).json({ message: "Product removed from cart", cart: tourist.cart });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+
 
 module.exports = {
   createTourist,
@@ -604,4 +656,7 @@ module.exports = {
   addReview,
   redeemPointsToCash,
   reqAccountToBeDeleted,
+  addToCart,
+  getCart,
+  removeFromCart,
 };
