@@ -2,24 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
-// Service method to fetch itineraries
-const getItineraries = async (touristId) => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8000/itinerary/readTour`,
-      {
-        params: {
-          userId: touristId, // Pass userId to filter itineraries
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching itineraries:", error);
-    throw error;
-  }
-};
-
 const currencyRates = {
   EUR: 1, // Base currency (assumed for conversion)
   USD: 1, // Example conversion rate
@@ -30,7 +12,8 @@ const Itinerariest = () => {
   const [itineraries, setItineraries] = useState([]);
   const [filteredItineraries, setFilteredItineraries] = useState([]);
   const [error, setError] = useState(null);
-
+  const [bookmarkedItineraries, setBookmarkedItineraries] = useState([]);
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
   const [sortRating, setSortRating] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
@@ -48,13 +31,23 @@ const Itinerariest = () => {
 
   const fetchItineraries = async () => {
     try {
+      if (!touristId) {
+        console.error("Tourist ID is missing");
+        return;
+      }
+  
       const response = await axios.get(
-        `http://localhost:8000/itinerary/getIteneraries`
+        `http://localhost:8000/itinerary/readTour`,
+        {
+          params: { userId: touristId }, // Send touristId as a query parameter
+        }
       );
+  
       const data = response.data;
+  
       // Filter out flagged itineraries
       const nonFlaggedItineraries = data.filter(itinerary => !itinerary.flagged);
-
+  
       setItineraries(nonFlaggedItineraries);
       setFilteredItineraries(nonFlaggedItineraries); // Initially set filtered to all non-flagged itineraries
     } catch (error) {
@@ -131,7 +124,102 @@ const Itinerariest = () => {
     setFilteredItineraries(filtered);
     console.log("Filtered Itineraries:", filtered); // Log filtered itineraries
   }, [itineraries, selectedTag, selectedPrice, selectedDate, selectedLanguage]);
+  // Fetch all itineraries initially
+useEffect(() => {
+  const fetchItineraries = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/allItineraries"); // Replace with your endpoint
+      setItineraries(response.data);
+      setFilteredItineraries(response.data);
+    } catch (error) {
+      console.error("Error fetching itineraries:", error);
+    }
+  };
 
+  fetchItineraries();
+}, []);
+
+// View all itineraries
+const viewAllItineraries = () => {
+  setFilteredItineraries(itineraries);
+  setShowOnlyBookmarked(false);
+};
+// Handle bookmarking an itinerary
+const handleBookmark = async (itineraryId) => {
+  console.log("Tourist ID:", touristId);
+  console.log("Itinerary ID:", itineraryId);
+
+  try {
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+
+    const response = await axios.post(
+      `http://localhost:8000/bookmarkItinerary/${touristId}/${itineraryId}`
+    );
+
+    if (response.status === 200) {
+      setBookmarkedItineraries(response.data.bookmarkedItineraries); // Update local state
+      alert(
+        response.data.message || "Itinerary bookmark toggled successfully!"
+      );
+    }
+  } catch (error) {
+    console.error("Error toggling itinerary bookmark:", error);
+    alert("Failed to toggle bookmark. Please try again.");
+  }
+};
+useEffect(() => {
+  const fetchBookmarkedItineraries = async () => {
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+
+      const response = await axios.get(
+        `http://localhost:8000/bookmarkItinerary/${touristId}`
+      );
+
+      if (response.status === 200) {
+        setBookmarkedItineraries(response.data.bookmarkedItineraries);
+      }
+    } catch (error) {
+      console.error("Error fetching bookmarked itineraries:", error);
+      alert("Failed to load bookmarked itineraries.");
+    }
+  };
+
+  fetchBookmarkedItineraries();
+}, [touristId]);
+
+const viewBookmarkedItineraries = async () => {
+  if (!touristId) {
+    alert("Tourist ID not found. Please log in.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/bookmarkItinerary/${touristId}`
+    );
+
+    if (response.status === 200) {
+      const bookmarked = response.data.bookmarkedItineraries;
+      if (bookmarked.length > 0) {
+        setFilteredItineraries(bookmarked); // Set the filtered activities to the bookmarked itineraries
+        setShowOnlyBookmarked(true);
+      } else {
+        alert("No bookmarked itineraries to display.");
+        setFilteredItineraries([]); // Clear the filtered activities
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching bookmarked itineraries:", error);
+    alert("Failed to fetch bookmarked itineraries. Please try again.");
+  }
+};
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortOrder(value);
@@ -311,6 +399,10 @@ const Itinerariest = () => {
           <option value="asc">Lowest to Highest</option>
           <option value="desc">Highest to Lowest</option>
         </select>
+        <div>
+        <button onClick={viewAllItineraries}>View All Itineraries</button>
+        <button onClick={viewBookmarkedItineraries}>View Bookmarked Itineraries</button>
+      </div>
 
         {/* Sort by Rating */}
         <label htmlFor="sortRating">Sort by Rating:</label>
@@ -364,8 +456,20 @@ const Itinerariest = () => {
               <p>
                 <strong>Bookings:</strong> {itinerary.bookings}
               </p>
+              <button
+              onClick={() => handleBookmark(itinerary._id)}
+              style={{
+                backgroundColor: bookmarkedItineraries.includes(itinerary._id)
+                  ? "gold"
+                  : "white",
+                color: bookmarkedItineraries.includes(itinerary._id) ? "black" : "gray",
+              }}
+            >
+              {bookmarkedItineraries.includes(itinerary._id) ? "Unbookmark" : "Bookmark"}
+            </button>
               <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
               <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
+              
               {itinerary.isBooked ? (
                 <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
                   Cancel Booking

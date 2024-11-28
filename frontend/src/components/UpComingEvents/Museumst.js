@@ -43,6 +43,9 @@ const predefinedLocations = [
 
 const Museums = () => {
   const [museums, setMuseums] = useState([]);
+  const [bookmarkedMuseums, setBookmarkedMuseums] = useState([]); 
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
@@ -96,11 +99,65 @@ const Museums = () => {
       setError("Failed to load Museums.");
     }
   };
+// Fetch bookmarked museums
+const fetchBookmarkedMuseums = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/bookmarkMuseum/${touristId}`
+    );
+    setBookmarkedMuseums(response.data.map((museum) => museum._id));
+  } catch (error) {
+    console.error("Error fetching bookmarked museums:", error);
+  }
+};
 
-  const generateMapSrc = (coordinates) => {
-    const [long1, lat1, long2, lat2] = coordinates.split(",");
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
-  };
+const handleBookmarkToggle = async (museumId) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:8000/bookmarkMuseum/${touristId}/${museumId}`
+    );
+
+    if (response.status === 200) {
+      console.log("Bookmark toggled:", response.data);
+      fetchMuseums(); // Refresh museums to reflect bookmark status
+    }
+  } catch (error) {
+    console.error("Error toggling bookmark:", error);
+    alert("Failed to toggle bookmark. Please try again.");
+  }
+};
+
+const viewBookmarkedMuseums = async () => {
+  if (!touristId) {
+    alert("Tourist ID not found. Please log in.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/bookmarkMuseum/${touristId}`
+    );
+
+    if (response.status === 200) {
+      const bookmarked = response.data.bookmarkedMuseums;
+      if (bookmarked.length > 0) {
+        setFilteredMuseums(bookmarked); // Set the filtered museums to the bookmarked ones
+        setShowOnlyBookmarked(true);
+      } else {
+        alert("No bookmarked museums to display.");
+        setFilteredMuseums([]); // Clear filtered museums if no bookmarks exist
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching bookmarked museums:", error);
+    alert("Failed to fetch bookmarked museums. Please try again.");
+  }
+};
+
+
+const viewAllMuseums = () => {
+  setFilteredMuseums(museums);
+};
 
   // Share by copying the link
   const handleCopybylink = (place) => {
@@ -200,7 +257,10 @@ const Museums = () => {
         >
           Back
         </button>
-
+        <button onClick={viewAllMuseums}>View All Museums</button>
+        <button onClick={viewBookmarkedMuseums}>View Bookmarked Museums</button>
+        
+        
       </div>
       
       <style>{`
@@ -275,15 +335,17 @@ const Museums = () => {
         >
           <option value="">All Tags</option>
           {museums
-            .map((place) => place.tourismGovernerTags?.type)
-            .filter(
-              (value, index, self) => value && self.indexOf(value) === index
-            ) // Remove duplicates
-            .map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
+  .map((place) => place.tourismGovernerTags?.type || "Unknown") // Provide fallback value
+  .filter(
+    (value, index, self) => value && self.indexOf(value) === index
+  ) // Remove duplicates
+  .map((tag) => (
+    <option key={tag} value={tag}>
+      {tag}
+    </option>
+  ))}
+
+            
         </select>
       </div>
 
@@ -298,7 +360,8 @@ const Museums = () => {
 
       return (
         <div key={place._id} className="museum-card">
-          <h3>{place.tourismGovernerTags.name || "Unnamed"}</h3>
+          <h3>{place.tourismGovernerTags?.name || "Unnamed"}</h3>
+
           <p>
             <strong>Description:</strong> {place.description}
           </p>
@@ -346,8 +409,22 @@ const Museums = () => {
                   ) : (
                     <button onClick={() => handleBookTour(place._id)}>Book Now</button>
                   )}
+                  
           <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
           <button onClick={() => handleShare(place)}>Share via mail </button>
+          <button
+              onClick={() => handleBookmarkToggle(place._id)}
+              style={{
+                Color: bookmarkedMuseums.includes(place._id)
+                  ? "gold"
+                  : "white",
+              }}
+            >
+              {bookmarkedMuseums.includes(place._id)
+                ? "Unbookmark"
+                : "Bookmark"}
+            </button>
+            
         </div>
       );
     })}
@@ -361,9 +438,9 @@ const Museums = () => {
 };
 
 const styles = {
-  museumsContainer: {
+  container: {
     padding: "20px",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f7f8f9",
   },
 };
 

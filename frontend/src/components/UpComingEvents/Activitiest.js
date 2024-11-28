@@ -46,6 +46,8 @@ const Activitiest = () => {
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [searchLocation, setSearchLocation] = useState("");
   const [error, setError] = useState(null);
+  const [bookmarkedActivities, setBookmarkedActivities] = useState([]);
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
   const [filters, setFilters] = useState({
     date: "",
@@ -163,6 +165,113 @@ const Activitiest = () => {
       setError("Failed to load Activities.");
     }
   };*/
+ 
+  
+  const handleBookmark = async (activityId) => {
+    console.log("Tourist ID:", touristId);
+    console.log("Activity ID:", activityId);
+  
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      const response = await axios.post(
+        `http://localhost:8000/bookmarkActivity/${touristId}/${activityId}`,
+        { userId: touristId } // Send touristId in the request body
+      );
+  
+      if (response.status === 200) {
+        // Update the bookmarked activities based on the response
+        setBookmarkedActivities(response.data.bookmarkedActivities);
+        alert(
+          response.data.message || 
+          "Bookmark toggled successfully!"
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      alert("Failed to toggle bookmark. Please try again.");
+    }
+  };
+  
+  useEffect(() => {
+    localStorage.setItem(
+      "bookmarkedActivities",
+      JSON.stringify(bookmarkedActivities)
+    );
+  }, [bookmarkedActivities]);
+  useEffect(() => {
+    const savedBookmarks = JSON.parse(localStorage.getItem("bookmarkedActivities")) || [];
+    console.log("Loaded bookmarks from localStorage:", savedBookmarks);
+    setBookmarkedActivities(savedBookmarks);
+  }, []);
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/tourists/${touristId}/bookmarks`);
+        setBookmarkedActivities(response.data.bookmarkedActivities);
+  
+        const activitiesResponse = await getActivity();
+        setActivities(activitiesResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    if (touristId) {
+      fetchInitialData();
+    }
+  }, [touristId]);
+    
+ 
+  // View all activities
+  const viewAllActivities = () => {
+    setFilteredActivities(activities); // Reset to show all activities
+    setShowOnlyBookmarked(false);
+  };
+
+  const viewBookmarkedActivities = async () => {
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+  
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/bookmarkActivity/${touristId}`
+      );
+  
+      if (response.status === 200) {
+        const bookmarked = response.data.bookmarkedActivities;
+        if (bookmarked.length > 0) {
+          setFilteredActivities(bookmarked); // Set filtered activities to the bookmarked ones
+          setShowOnlyBookmarked(true);
+        } else {
+          alert("No bookmarked activities to display.");
+          setFilteredActivities([]); // Clear filtered activities if no bookmarks exist
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching bookmarked activities:", error);
+      alert("Failed to fetch bookmarked activities. Please try again.");
+    }
+  };
+  
+  
+  useEffect(() => {
+    const savedBookmarks = JSON.parse(localStorage.getItem('bookmarkedActivities')) || [];
+    setBookmarkedActivities(savedBookmarks);
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem('bookmarkedActivities', JSON.stringify(bookmarkedActivities));
+  }, [bookmarkedActivities]);
+     // Initialize filteredActivities with all activities
+  useEffect(() => {
+    setFilteredActivities(activities);
+  }, [activities]);
 
   const fetchCategories = async () => {
     try {
@@ -387,6 +496,8 @@ const handleCopy = (activity) => {
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
             </select>
+            <button onClick={viewBookmarkedActivities}>View Bookmarked Activities</button>
+            <button onClick={viewAllActivities}>View All Activities</button>
           </div>
         </div>
       </section>
@@ -447,6 +558,19 @@ const handleCopy = (activity) => {
               <p>
                 <strong>Rating:</strong> {activity.rating}
               </p>
+              <button
+  onClick={() => handleBookmark(activity._id)}
+  style={{
+    backgroundColor: bookmarkedActivities.includes(activity._id)
+      ? "gold"
+      : "white",
+    color: bookmarkedActivities.includes(activity._id) ? "black" : "gray",
+  }}
+>
+  {bookmarkedActivities.includes(activity._id) ? "Unbookmark" : "Bookmark"}
+</button>
+
+
               {/* Add a "Book Now" button */}
               {bookedActivities.includes(activity._id) ? (
                     <button onClick={() => handleCancelBooking(activity._id)}>Cancel Booking</button>

@@ -79,6 +79,8 @@ app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({ message: "Welcome to the protected route!", userId: req.userId });
 });
 
+app.use("/", touristRoutes);
+
 function calculateLoyaltyPoints(level, price) {
   let points = 0;
 
