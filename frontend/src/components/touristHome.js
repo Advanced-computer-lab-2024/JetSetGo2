@@ -356,6 +356,17 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           <button onClick={handleFileComplaintClick} style={styles.navLink}>
             File a Complaint
           </button>
+          <button
+            onClick={() =>
+              navigate("/Select-Perefrence", {
+                state: { touristId: touristId },
+              })
+            }
+            style={styles.navLink}
+          >
+            Select Preferences
+          </button>
+          
         </nav>
         {/* Booked Flights Section */}
         <div style={styles.bookedFlightsSection}>

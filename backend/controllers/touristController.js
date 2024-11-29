@@ -5,6 +5,7 @@ const transportationModel = require("../models/TransportationCRUD.js");
 const productModel = require("../models/ProductCRUD.js");
 const museumModel = require("../models/MuseumCRUD.js");
 const historicalModel = require("../models/HistoricalPlaceCRUD.js");
+const PreferenceTag = require("../models/preferanceTagsCRUD.js");
 const { default: mongoose } = require("mongoose");
 
 const createTourist = async (req, res) => {
@@ -639,6 +640,38 @@ const removeFromCart = async (req, res) => {
   }
 };
 
+const addPereferenceTags = async (req, res) => {
+  const { id } = req.params; // Tourist ID
+  const { tags } = req.body; // Array of tag IDs
+
+  // Validate tags input
+  if (!Array.isArray(tags)) {
+    return res.status(400).json({ error: "Tags must be an array of IDs." });
+  }
+
+  try {
+    // Validate if the tourist exists
+    const tourist = await touristModel.findById(id);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+
+    // Validate if all tags exist
+    const validTags = await PreferenceTag.find({ _id: { $in: tags } });
+    if (validTags.length !== tags.length) {
+      return res.status(400).json({ error: "One or more tags are invalid." });
+    }
+
+    // Update preference tags
+    tourist.preferenceTags = tags;
+    await tourist.save();
+
+    res.status(200).json({ message: "Preference tags updated successfully.", tourist });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update preference tags." });
+  }
+};
 
 module.exports = {
   createTourist,
@@ -659,4 +692,5 @@ module.exports = {
   addToCart,
   getCart,
   removeFromCart,
+  addPereferenceTags,
 };

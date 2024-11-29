@@ -62,6 +62,7 @@ import FileComplaint from "./components/FileComplaint";
 import ManageActivities from "./components/ActivitiesAdmin";
 import ManageHistoricalPlaces from "./components/HistoricalPlacesAdmin";
 import ManageMuseums from "./components/MuseumsAdmin";
+import Perefrences from "./components/Perefrences";
 
 function App() {
   return (
@@ -146,6 +147,8 @@ function App() {
           <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
 
           <Route path="/flight-search" element={<FlightSearch />} />
+          <Route path="/Select-Perefrence" element={<Perefrences />} />
+          
         </Routes>
       </div>
     </Router>

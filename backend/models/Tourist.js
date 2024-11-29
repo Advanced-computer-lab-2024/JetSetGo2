@@ -68,11 +68,19 @@ const TouristSchema = new Schema(
       default: 1,
     },
     bookedHotels: [Object],
+    
     cart: [
       {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
       },
+  ],
+  preferenceTags: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PreferenceTag",
+      default: [],
+    },
   ],
   },
   { timestamps: true }
