@@ -638,6 +638,108 @@ const removeFromCart = async (req, res) => {
       res.status(500).json({ error: error.message });
   }
 };
+const updateCartQuantity = async (req, res) => {
+  const { touristId, productId, quantity } = req.body;
+
+  try {
+    // Fetch the tourist
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    // Fetch the product
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Validate the requested quantity
+    if (quantity > product.availableQuantity) {
+      return res.status(400).json({
+        error: `Requested quantity exceeds available stock. Only ${product.availableQuantity} left.`,
+      });
+    }
+
+    if (quantity < 1) {
+      return res.status(400).json({
+        error: "Quantity must be at least 1.",
+      });
+    }
+
+    // Ensure tourist.cart exists and is an array
+    if (!tourist.cart || !Array.isArray(tourist.cart)) {
+      return res.status(400).json({ error: "Cart is not initialized or invalid." });
+    }
+    if (!tourist.cart || tourist.cart.length === 0) {
+      return res.status(404).json({ error: "Cart is empty or not initialized" });
+    }
+    
+
+    // Find the cart item
+    const cartItem = tourist.cart.find(
+      (item) => item.toString() === productId // Compare directly if it's a reference
+    );
+    
+
+    if (!cartItem) {
+      return res.status(404).json({ error: "Item not found in cart" });
+    }
+
+    // Update the quantity
+    cartItem.quantity = quantity;
+
+    // Save the updated tourist
+    await tourist.save();
+
+    res.status(200).json({ message: "Cart quantity updated successfully", cart: tourist.cart });
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const addDeliveryAddress = async (req, res) => {
+  const { touristId } = req.params;
+  const { address, city, state, postalCode, country } = req.body;
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    const newAddress = { address, city, state, postalCode, country };
+    tourist.deliveryAddresses.push(newAddress);
+
+    await tourist.save();
+
+    res.status(200).json({ message: "Address added successfully", addresses: tourist.deliveryAddresses });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getTouristAddresses = async (req, res) => {
+  const { userId } = req.params; // Get the user ID from the request parameters
+
+  try {
+    // Fetch the tourist by ID
+    const tourist = await touristModel.findById(userId);
+
+    // Check if the tourist exists
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    // Return the deliveryAddresses field
+    res.status(200).json(tourist.deliveryAddresses || []); // Return an empty array if no addresses exist
+  } catch (error) {
+    console.error("Error fetching addresses:", error.message);
+    res.status(500).json({ error: "Failed to fetch addresses" });
+  }
+};
+
+
+
 
 
 module.exports = {
@@ -659,4 +761,7 @@ module.exports = {
   addToCart,
   getCart,
   removeFromCart,
+  updateCartQuantity,
+  addDeliveryAddress,
+  getTouristAddresses,
 };

@@ -71,8 +71,17 @@ const TouristSchema = new Schema(
     cart: [
       {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          ref: "Product",quantity: { type: Number, default: 1 },
       },
+  ],
+  deliveryAddresses: [
+    {
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
   ],
   },
   { timestamps: true }

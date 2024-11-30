@@ -19,10 +19,19 @@ const {
   addToCart,
   getCart,
   removeFromCart,
+  updateCartQuantity,
+  addDeliveryAddress,
+  getTouristAddresses,
 } = require("../controllers/touristController");
-router.post("/cart/add/:touristId/:productId", addToCart);
+router.post("/add/:touristId/:productId", addToCart);
 router.get("/cart/:touristId", getCart);
-router.delete("/cart/remove/:touristId/:productId", removeFromCart);
+router.delete("/remove/:touristId/:productId", removeFromCart);
+router.put("/updateq", updateCartQuantity);
+router.post("/address/:touristId", addDeliveryAddress);
+router.get("/geta/:userId", getTouristAddresses);
+
+
+
 
 
 router.get("/", (req, res) => {

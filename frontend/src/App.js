@@ -62,6 +62,11 @@ import FileComplaint from "./components/FileComplaint";
 import ManageActivities from "./components/ActivitiesAdmin";
 import ManageHistoricalPlaces from "./components/HistoricalPlacesAdmin";
 import ManageMuseums from "./components/MuseumsAdmin";
+import CartPage from './components/CartPage';
+import CheckoutPage from './components/CheckoutPage';
+import PaymentOptionsPage from "./components/PaymentOptionsPage";
+
+
 
 function App() {
   return (
@@ -146,6 +151,11 @@ function App() {
           <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
 
           <Route path="/flight-search" element={<FlightSearch />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />;
+          <Route path="/payment-options" element={<PaymentOptionsPage />} />
+
         </Routes>
       </div>
     </Router>

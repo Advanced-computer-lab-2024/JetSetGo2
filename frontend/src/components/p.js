@@ -46,7 +46,7 @@ const ProductListp = () => {
     if (!userId) return;
 
     try {
-        const response = await axios.get(`${API_URL}/cart/${userId}`);
+        const response = await axios.get(`${API_URL}/home/tourist/cart/${userId}`);
         setCart(response.data);
     } catch (error) {
         console.error("Error fetching cart:", error);
@@ -60,7 +60,7 @@ const handleAddToCart = async (productId) => {
   }
 
   try {
-      const response = await axios.post(`${API_URL}/cart/add/${userId}/${productId}`);
+      const response = await axios.post(`${API_URL}/home/tourist/add/${userId}/${productId}`);
       setCart(response.data.cart); // Update the cart state
       setMessage("Product added to cart successfully!");
   } catch (error) {
