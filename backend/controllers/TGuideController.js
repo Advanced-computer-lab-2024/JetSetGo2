@@ -171,6 +171,7 @@ const submitReview = async (req, res) => {
 };
 
 const acceptTourguide = async (req, res) => {
+ 
   try {
     const { id } = req.params;
 

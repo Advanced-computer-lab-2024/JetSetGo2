@@ -1,8 +1,11 @@
 const touristModel = require("../models/Tourist.js");
 const ItenModel = require("../models/schematour.js");
 const ActivityModel = require("../models/ActivityCRUD.js");
+const AdminModel = require("../models/admin.js");
+const SellerModel = require("../models/Seller.js");
 const transportationModel = require("../models/TransportationCRUD.js");
 const productModel = require("../models/ProductCRUD.js");
+const { sendEmailToSeller } = require('../utils/prodoutstockmail'); // Import the email sending function
 const museumModel = require("../models/MuseumCRUD.js");
 const historicalModel = require("../models/HistoricalPlaceCRUD.js");
 const { default: mongoose } = require("mongoose");
@@ -224,12 +227,15 @@ const buyProduct = async (req, res) => {
   try {
     const product = await productModel.findById(productId);
 
-    if (!product) {
-      return res.status(404).json({ error: "product not found" });
+    const seller = await SellerModel.findById(product.seller);
+
+    if (!seller){
+      seller = await AdminModel.findById(product.seller);
     }
 
-    if (product.availableQuantity <= 0) {
-      return res.status(400).json({ error: "No available seats." });
+
+    if (!product) {
+      return res.status(404).json({ error: "product not found" });
     }
 
     const tourist = await touristModel.findById(touristId);
@@ -247,6 +253,18 @@ const buyProduct = async (req, res) => {
     // Add the booked transportation to the tourist's bookings
     tourist.purchasedProducts.push(product._id);
     await tourist.save();
+
+    if (product.availableQuantity <= 0) {
+      // Assuming the seller's email is in the product's seller field
+      console.log(seller.Email);
+      const sellerEmail = seller.Email; // Ensure this is populated or get the seller data
+      
+      // Send email to the seller
+      sendEmailToSeller(sellerEmail,product.description);
+    
+
+  return res.status(400).json({ error: "No available seats." });
+}
 
     res.status(200).json({
       message: "Transportation booked successfully",

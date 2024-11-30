@@ -8,12 +8,17 @@ const AdminCapabilities = () => {
   const [newPassword, setNewPassword] = useState("");
   const [complaints, setComplaints] = useState([]);
   const [replyText, setReplyText] = useState({});
+  const [totalUsers, setTotalUsers] = useState(0);  // State to hold total users count
+  const [currentMonth, setCurrentMonth] = useState(null);
+  const [newUsersThisMonth, setNewUsersThisMonth] = useState(0); // State for new users this month
   const [statusFilter, setStatusFilter] = useState("all");
 const [sortOrder, setSortOrder] = useState("desc");
 
-  useEffect(() => {
-    fetchComplaints();
-  }, []);
+useEffect(() => {
+  fetchComplaints();
+  fetchUserStatistics();
+}, []);
+
   const fetchComplaints = async () => {
     try {
       const response = await axios.get("http://localhost:8000/complaint/get");
@@ -22,6 +27,28 @@ const [sortOrder, setSortOrder] = useState("desc");
       console.error("Error fetching complaints:", error);
     }
   };
+  const fetchUserStatistics = async () => {
+    try {
+      // Fetch total users (existing request)
+      const totalUsersResponse = await axios.get("http://localhost:8000/admin/total-users");
+      setTotalUsers(totalUsersResponse.data.totalUsers);
+
+      // Fetch data for the current month's users
+      const response = await axios.get("http://localhost:8000/admin/monthly-users");
+
+      // Destructure the response to get currentMonth and totalAcceptedUsersThisMonth
+      const { currentMonth, totalAcceptedUsersThisMonth } = response.data;
+
+      // Set the state with the current month and the total number of accepted users
+      setCurrentMonth(currentMonth);  // Store the current month (1-12)
+      setNewUsersThisMonth(totalAcceptedUsersThisMonth);  // Store the total new users for the current month
+
+    } catch (error) {
+      console.error("Error fetching user statistics:", error);
+    }
+  };
+
+  
   const handleResolveComplaint = async (complaintId) => {
     try {
       await axios.put(`http://localhost:8000/complaint/resolve/${complaintId}`);
@@ -151,7 +178,16 @@ const [sortOrder, setSortOrder] = useState("desc");
     {sortOrder === "asc" ? "Oldest First" : "Newest First"}
   </button>
 </div>
-
+<div>
+            <h1>Admin Dashboard</h1>
+            {/* Display total users count above complaints section */}
+            <div>
+                <h2>Total Users: {totalUsers}</h2>
+                
+      <h3>Total Users for Month {currentMonth} : {newUsersThisMonth}</h3>
+            </div>
+            {/* You can place your complaints section here */}
+        </div>
 <h2>Complaints</h2>
         <table style={styles.table}>
           <thead>
