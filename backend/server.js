@@ -40,6 +40,7 @@ const transportationRoutes = require("./routes/TransportationCRUDroute.js");
 const complaintRoutes = require("./routes/complaintRoutes.js");
 const otpRoutes = require("./routes/otpRoutes.js");
 const promoCodeRoutes = require("./routes/promoCodeRoutes");
+const notificationRoutes = require("./routes/notificationRoutes.js");
 
 const app = express();
 app.use(express.json());
@@ -179,6 +180,7 @@ app.use("/transportation", transportationRoutes);
 app.use("/complaint", complaintRoutes);
 app.use("/otp", otpRoutes);
 app.use("/promo", promoCodeRoutes);
+app.use("/notifications", notificationRoutes);
 
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

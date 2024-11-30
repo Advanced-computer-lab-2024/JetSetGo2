@@ -8,6 +8,7 @@ const productModel = require("../models/ProductCRUD.js");
 const { sendEmailToSeller } = require("../utils/prodoutstockmail"); // Import the email sending function
 const museumModel = require("../models/MuseumCRUD.js");
 const historicalModel = require("../models/HistoricalPlaceCRUD.js");
+const Notification = require("../models/Notification.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
 
@@ -259,9 +260,18 @@ const buyProduct = async (req, res) => {
     if (product.availableQuantity <= 0) {
       // Assuming the seller's email is in the product's seller field
       const sellerEmail = seller.Email; // Ensure this is populated or get the seller data
-
       // Send email to the seller
       sendEmailToSeller(sellerEmail, product.description);
+
+      const notificationMessage = `Your product "${product.description}" is out of stock.`;
+
+      await Notification.create({
+        receiverId: product.sellerId,
+        message: notificationMessage,
+      });
+
+      product.outOfStockNotified = true;
+      await product.save();
     }
 
     res.status(200).json({

@@ -121,6 +121,10 @@ const updateProduct = async (req, res) => {
   if (req.body.availableQuantity)
     updateData.availableQuantity = req.body.availableQuantity;
 
+  if (req.body.availableQuantity > 0) {
+    updateData.outOfStockNotified = false;
+  }
+
   try {
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,

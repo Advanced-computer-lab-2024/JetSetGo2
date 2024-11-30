@@ -63,6 +63,7 @@ import VerifyOtp from "./components/VerifyOtp";
 import ChangePassword from "./components/ChangePassword";
 import PromoCodeManager from "./components/PromoCodeManager";
 import Wishlist from "./components/Wishlist";
+import Notifications from "./components/Notifications";
 
 function App() {
   return (
@@ -148,6 +149,7 @@ function App() {
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/create-promocode" element={<PromoCodeManager />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </div>
     </Router>
