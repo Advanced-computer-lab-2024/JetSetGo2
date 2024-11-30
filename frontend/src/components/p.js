@@ -514,9 +514,7 @@ const ProductListp = () => {
                     <td
                       style={{ padding: "10px", border: "1px solid #dee2e6" }}
                     >
-                      {product.seller && product.seller.Name
-                        ? product.seller.Name
-                        : "No Seller"}
+                      {product.sellerDetails?.name || "Unknown"}
                     </td>
                     <td
                       style={{ padding: "10px", border: "1px solid #dee2e6" }}
@@ -704,7 +702,10 @@ const ProductListp = () => {
                     ${product.price}
                   </p>
                   <p style={{ fontSize: "16px", color: "#555" }}>
-                    Seller: {product.seller?.name || "Unknown"}
+                    Seller:{" "}
+                    {product.sellerDetails?.name
+                      ? `${product.sellerDetails.name}`
+                      : "N/A"}
                   </p>
                   <div
                     style={{

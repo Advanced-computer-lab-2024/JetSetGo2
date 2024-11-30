@@ -5,10 +5,11 @@ const AdminModel = require("../models/admin.js");
 const SellerModel = require("../models/Seller.js");
 const transportationModel = require("../models/TransportationCRUD.js");
 const productModel = require("../models/ProductCRUD.js");
-const { sendEmailToSeller } = require('../utils/prodoutstockmail'); // Import the email sending function
+const { sendEmailToSeller } = require("../utils/prodoutstockmail"); // Import the email sending function
 const museumModel = require("../models/MuseumCRUD.js");
 const historicalModel = require("../models/HistoricalPlaceCRUD.js");
 const { default: mongoose } = require("mongoose");
+const { json } = require("express");
 
 const createTourist = async (req, res) => {
   // create a tourist after sign up
@@ -227,16 +228,17 @@ const buyProduct = async (req, res) => {
   try {
     const product = await productModel.findById(productId);
 
-    const seller = await SellerModel.findById(product.seller);
-
-    if (!seller){
-      seller = await AdminModel.findById(product.seller);
-    }
-
-
     if (!product) {
       return res.status(404).json({ error: "product not found" });
     }
+
+    if (product.availableQuantity <= 0) {
+      res.status(400), json({ error: "No available product" });
+    }
+
+    const seller =
+      (await SellerModel.findById(product.sellerId)) ||
+      (await AdminModel.findById(product.sellerId));
 
     const tourist = await touristModel.findById(touristId);
 
@@ -256,18 +258,14 @@ const buyProduct = async (req, res) => {
 
     if (product.availableQuantity <= 0) {
       // Assuming the seller's email is in the product's seller field
-      console.log(seller.Email);
       const sellerEmail = seller.Email; // Ensure this is populated or get the seller data
-      
-      // Send email to the seller
-      sendEmailToSeller(sellerEmail,product.description);
-    
 
-  return res.status(400).json({ error: "No available seats." });
-}
+      // Send email to the seller
+      sendEmailToSeller(sellerEmail, product.description);
+    }
 
     res.status(200).json({
-      message: "Transportation booked successfully",
+      message: "product bought successfully",
       product,
       tourist,
     });
@@ -331,40 +329,52 @@ const getPurchasedProducts = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    // Find the tourist and ensure the tourist exists
+    // Find the tourist
     const tourist = await touristModel.findById(touristId);
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    console.log(
-      "Purchased products before population:",
-      tourist.purchasedProducts
+    // Fetch and populate purchased products
+    const populatedProducts = await Promise.all(
+      tourist.purchasedProducts.map(async (productId) => {
+        // Fetch the product by ID
+        const product = await productModel.findById(productId);
+
+        if (!product) {
+          return null; // Skip if product not found
+        }
+
+        // Check if seller exists in Seller or Admin collection
+        const seller = await SellerModel.findById(product.sellerId);
+        const admin = await AdminModel.findById(product.sellerId);
+
+        // Attach seller name and role to the product
+        return {
+          ...product.toObject(), // Convert Mongoose document to plain object
+          sellerDetails: seller
+            ? { name: seller.Name, role: "Seller" }
+            : admin
+            ? { name: admin.Username, role: "Admin" }
+            : null, // If no match found
+        };
+      })
     );
 
-    // Populate the purchased products
-    const populatedTourist = await touristModel
-      .findById(touristId)
-      .populate("purchasedProducts"); // Ensure 'purchasedProducts' matches the field name in schema
-
-    console.log(
-      "Populated Purchased Products:",
-      populatedTourist.purchasedProducts
+    // Filter out null values (e.g., products not found)
+    const validProducts = populatedProducts.filter(
+      (product) => product !== null
     );
 
-    // Check if the population was successful
-    if (
-      !populatedTourist.purchasedProducts ||
-      populatedTourist.purchasedProducts.length === 0
-    ) {
+    if (validProducts.length === 0) {
       return res
         .status(200)
         .json({ message: "No purchased products found for this tourist." });
     }
 
-    // Send the populated purchased products as a response
-    res.status(200).json(populatedTourist.purchasedProducts);
+    // Send the populated products
+    res.status(200).json(validProducts);
   } catch (error) {
     console.error("Error fetching purchased products:", error);
     res.status(500).json({ error: error.message });

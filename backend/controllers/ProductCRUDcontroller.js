@@ -2,15 +2,30 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/ProductCRUD"); // Adjust the path if needed
 const Seller = require("../models/Seller");
+const Admin = require("../models/admin");
 
-// Create a new product
 // Create a new product
 const createProduct = async (req, res) => {
   try {
-    // Check if the provided seller ID is valid
-    const sellerExists = await Seller.findById(req.body.seller);
+    const { sellerId, description, pictures, price, availableQuantity } =
+      req.body;
+
+    // Validate required fields
+    if (
+      !sellerId ||
+      !description ||
+      !pictures ||
+      !price ||
+      !availableQuantity
+    ) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Check if seller ID exists in Seller or Admin collections
+    const sellerExists =
+      (await Seller.findById(sellerId)) || (await Admin.findById(sellerId));
     if (!sellerExists) {
-      return res.status(400).json({ error: "Invalid seller ID" });
+      return res.status(400).json({ error: "Invalid seller ID." });
     }
 
     // Check if the pictures field is a valid base64 string
@@ -30,6 +45,7 @@ const createProduct = async (req, res) => {
     };
 
     const product = await Product.create(productData);
+
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -39,9 +55,31 @@ const createProduct = async (req, res) => {
 // Get all products and populate seller information
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("seller", "Name"); // Populate seller info
-    res.status(200).json(products);
+    // Fetch all products
+    const products = await Product.find();
+
+    // Populate seller information dynamically
+    const populatedProducts = await Promise.all(
+      products.map(async (product) => {
+        // Check if seller exists in Seller or Admin collection
+        const seller = await Seller.findById(product.sellerId);
+        const admin = await Admin.findById(product.sellerId);
+
+        // Attach seller name and role to the product
+        return {
+          ...product.toObject(), // Convert Mongoose document to plain object
+          sellerDetails: seller
+            ? { name: seller.Name, role: "Seller" }
+            : admin
+            ? { name: admin.Username, role: "Admin" }
+            : null, // If no match found
+        };
+      })
+    );
+
+    res.status(200).json(populatedProducts);
   } catch (error) {
+    console.error("Error fetching products:", error);
     res.status(400).json({ error: error.message });
   }
 };
