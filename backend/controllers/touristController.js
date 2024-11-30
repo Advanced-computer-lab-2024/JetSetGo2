@@ -588,6 +588,73 @@ const addReview = async (req, res) => {
   }
 };
 
+const addToWishlist = async (req, res) => {
+  const { productId } = req.body;
+  const { userId } = req.params; // Get user ID from the request params
+
+  try {
+    const tourist = await touristModel.findById(userId);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    // Check if the product already exists in the wishlist
+    if (tourist.wishlist.includes(productId)) {
+      return res.status(400).json({ message: "Product already in wishlist" });
+    }
+
+    tourist.wishlist.push(productId);
+    await tourist.save();
+
+    res.status(200).json({
+      message: "Product added to wishlist",
+      wishlist: tourist.wishlist,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getWishlist = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(userId).populate("wishlist"); // Populate wishlist with product details
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    res.status(200).json({ wishlist: tourist.wishlist });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const removeFromWishlist = async (req, res) => {
+  const { productId } = req.body;
+  const { userId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(userId);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    // Remove product from wishlist
+    tourist.wishlist = tourist.wishlist.filter(
+      (id) => id.toString() !== productId
+    );
+    await tourist.save();
+
+    res.status(200).json({
+      message: "Product removed from wishlist",
+      wishlist: tourist.wishlist,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createTourist,
   updateTourist,
@@ -604,4 +671,7 @@ module.exports = {
   addReview,
   redeemPointsToCash,
   reqAccountToBeDeleted,
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
 };

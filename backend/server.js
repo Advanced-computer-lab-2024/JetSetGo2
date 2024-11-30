@@ -1,11 +1,11 @@
 const express = require("express");
-
 const cors = require("cors");
 const mongoose = require("mongoose");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const scheduleBirthdayEmails = require("./birthdayScheduler");
 
 const MongoURI = process.env.MONGO_URI;
 
@@ -38,6 +38,8 @@ const AdvertiserRoutes = require("./routes/AdverRoutes.js");
 const loginRoutes = require("./routes/authRoutes.js");
 const transportationRoutes = require("./routes/TransportationCRUDroute.js");
 const complaintRoutes = require("./routes/complaintRoutes.js");
+const otpRoutes = require("./routes/otpRoutes.js");
+const promoCodeRoutes = require("./routes/promoCodeRoutes");
 
 const app = express();
 app.use(express.json());
@@ -50,6 +52,9 @@ mongoose
   .connect(MongoURI)
   .then(() => {
     console.log("MongoDB is now connected!");
+    // Start the birthday scheduler
+    scheduleBirthdayEmails();
+
     // Start server
     app.listen(port, () => {
       console.log(`Listening to requests on http://localhost:${port}`);
@@ -172,6 +177,8 @@ app.use("/admin", adminRoutes);
 app.use("/login", loginRoutes);
 app.use("/transportation", transportationRoutes);
 app.use("/complaint", complaintRoutes);
+app.use("/otp", otpRoutes);
+app.use("/promo", promoCodeRoutes);
 
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

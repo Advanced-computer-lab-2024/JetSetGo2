@@ -27,15 +27,11 @@ import Activitiest from "./components/UpComingEvents/Activitiest";
 import Museumst from "./components/UpComingEvents/Museumst";
 import ActivityDetails from "./components/ActivityDetails";
 import MYHPT from "./components/myhp";
-
 import HPT from "./components/UpComingEvents/historicalplacest";
-
 import ItinerariesPage from "./components/myitenaries";
 import MyActivities from "./components/myactivities";
-
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
-
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
 import Itineraries from "./components/UpComingEvents/Itenaries";
 import Itinerariest from "./components/UpComingEvents/Itenariest";
@@ -62,6 +58,11 @@ import FileComplaint from "./components/FileComplaint";
 import ManageActivities from "./components/ActivitiesAdmin";
 import ManageHistoricalPlaces from "./components/HistoricalPlacesAdmin";
 import ManageMuseums from "./components/MuseumsAdmin";
+import RequestOtp from "./components/RequestOtp";
+import VerifyOtp from "./components/VerifyOtp";
+import ChangePassword from "./components/ChangePassword";
+import PromoCodeManager from "./components/PromoCodeManager";
+import Wishlist from "./components/Wishlist";
 
 function App() {
   return (
@@ -96,7 +97,6 @@ function App() {
           <Route path="/CreateTag" element={<CreateTag />} />
           <Route path="/myhp" element={<MYHPT />} />
           <Route path="/mymp" element={<Mai />} />
-
           <Route path="/CreateSeller" element={<CreateSeller />} />
           <Route path="/seller-details" element={<SellerDetails />} />
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
@@ -106,7 +106,6 @@ function App() {
           <Route path="/mi" element={<ItinerariesPage />} />
           <Route path="/myactivity" element={<MyActivities />} />
           <Route path="/HPT" element={<HPT />} />
-
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />
           <Route path="/HP/:id" element={<HPdetails />} />
           <Route path="/all-museums" element={<Museums />} />
@@ -132,7 +131,6 @@ function App() {
             element={<ManageHistoricalPlaces />}
           />
           <Route path="/MuseumsAdmin" element={<ManageMuseums />} />
-
           <Route
             path="/tourismGovernorPage"
             element={<TourismGovernorPage />}
@@ -144,8 +142,12 @@ function App() {
           <Route path="/fetchdocuments" element={<OthersListPage />} />
           <Route path="/AdminAcceptance" element={<AdminApprovalPage />} />
           <Route path="/ItinerariesAdmin" element={<ItinerariesAdmin />} />
-
           <Route path="/flight-search" element={<FlightSearch />} />
+          <Route path="/request-otp" element={<RequestOtp />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/create-promocode" element={<PromoCodeManager />} />
+          <Route path="/wishlist" element={<Wishlist />} />
         </Routes>
       </div>
     </Router>

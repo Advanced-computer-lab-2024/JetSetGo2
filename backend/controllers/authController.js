@@ -16,7 +16,7 @@ const loginUser = async (req, res) => {
 
     // If not found in Seller, search in Adver
     if (!user) {
-      user = await AdverModel.findOne({ Email });
+      user = await AdverModel.findOne({ email: Email });
       AccountType = "Advertiser";
     }
 
@@ -65,7 +65,6 @@ const loginUser = async (req, res) => {
     console.error("Login error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
-  
 };
 
 module.exports = { loginUser };
