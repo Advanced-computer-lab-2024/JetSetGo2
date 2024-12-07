@@ -21,6 +21,7 @@ const createTourist = async (req, res) => {
     Nationality,
     DateOfBirth,
     Job,
+    cart: [],
   } = req.body;
 
   // Validation checks
@@ -660,37 +661,42 @@ const addToCart = async (req, res) => {
   const { touristId, productId } = req.params;
 
   try {
-    const tourist = await touristModel.findById(touristId);
-    const product = await productModel.findById(productId);
+      const tourist = await touristModel.findById(touristId);
+      if (!tourist) {
+          return res.status(404).json({ error: "Tourist not found" });
+      }
 
-    if (!tourist || !product) {
-      return res.status(404).json({ error: "Tourist or Product not found" });
-    }
+      // Ensure `cart` is initialized
+      if (!Array.isArray(tourist.cart)) {
+          tourist.cart = [];
+      }
 
-    // Check if product is out of stock
-    if (product.availableQuantity <= 0) {
-      return res
-        .status(400)
-        .json({ error: `Product '${product.description}' is out of stock.` });
-    }
+      const product = await productModel.findById(productId);
+      if (!product) {
+          return res.status(404).json({ error: "Product not found" });
+      }
 
-    // Add to cart only if not already present
-    if (!tourist.cart.includes(productId)) {
-      tourist.cart.push(productId);
-      await tourist.save();
-      return res
-        .status(200)
-        .json({ message: "Product added to cart", cart: tourist.cart });
-    } else {
-      return res
-        .status(400)
-        .json({ message: "Product is already in the cart" });
-    }
+      // Check if product is out of stock
+      if (product.availableQuantity <= 0) {
+          return res.status(400).json({ error: `Product '${product.description}' is out of stock.` });
+      }
+
+      // Add to cart only if not already present
+      if (!tourist.cart.includes(productId)) {
+          tourist.cart.push(productId);
+          await tourist.save();
+          return res.status(200).json({ message: "Product added to cart", cart: tourist.cart });
+      } else {
+          return res.status(400).json({ message: "Product is already in the cart" });
+      }
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    res.status(500).json({ error: error.message });
+      console.error("Error adding to cart:", error);
+      res.status(500).json({ error: error.message });
   }
 };
+
+
+
 
 const getCart = async (req, res) => {
   const { touristId } = req.params;

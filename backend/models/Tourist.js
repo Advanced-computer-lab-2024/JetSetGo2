@@ -77,9 +77,11 @@ const TouristSchema = new Schema(
     cart: [
       {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",quantity: { type: Number, default: 1 },
+          ref: "Product", quantity: { type: Number, default: 1 },
       },
   ],
+  
+ 
   deliveryAddresses: [
     {
       address: { type: String, required: true },
