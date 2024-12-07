@@ -85,7 +85,7 @@ const [sortOrder, setSortOrder] = useState("desc");
     margin: '10px',
     padding: '10px 20px', // Reduced padding for smaller buttons
     fontSize: '16px', // Adjusted font size for smaller buttons
-    backgroundColor: '#2d3e50',
+    //backgroundColor: '#2d3e50',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
@@ -236,7 +236,7 @@ const [sortOrder, setSortOrder] = useState("desc");
 // Styles
 const styles = {
   container: { display: 'flex', minHeight: '100vh', backgroundColor: '#f7f8fa', padding: '20px' },
-  sidebar: { width: '250px', backgroundColor: '#2d3e50', padding: '20px', borderRadius: '10px', color: '#fff' },
+  sidebar: { width: '250px', padding: '20px', borderRadius: '10px', color: '#fff' },
   profileContainer: { textAlign: 'center' },
   profileImage: { width: '80px', height: '80px', borderRadius: '50%', marginBottom: '15px', border: '3px solid #fff' },
   profileName: { fontSize: '22px', fontWeight: 'bold' },

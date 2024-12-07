@@ -242,7 +242,7 @@ const ProductCRUD = () => {
       <div style={{
         width: '250px',
         padding: '20px',
-        backgroundColor: '#2d3e50',
+        //backgroundColor: '#2d3e50',
         borderRadius: '10px',
         color: '#fff',
       }}>
@@ -394,7 +394,7 @@ const ProductCRUD = () => {
               <input style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
                 type="number" name="availableQuantity" value={editData.availableQuantity} onChange={(e) => handleChange(e, setEditData)} required />
 
-              <button style={{ padding: '10px 20px', backgroundColor: '#2d3e50', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+              <button style={{ padding: '10px 20px', backgroundColor: '#ffffff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
                 Update Product
               </button>
 
@@ -469,7 +469,7 @@ const ProductCRUD = () => {
 
         {/* Product Details */}
 <div style={{ padding: '15px' }}>
-  <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#2d3e50' }}>
+  <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#ffffff' }}>
     {product.description}
   </h3>
   <p style={{ fontSize: '16px', color: '#28a745', margin: '5px 0' }}>
@@ -484,7 +484,7 @@ const ProductCRUD = () => {
 
   {/* Product Reviews */}
   <div style={{ marginTop: '10px' }}>
-    <h4 style={{ fontSize: '16px', color: '#2d3e50', marginBottom: '5px' }}>Reviews:</h4>
+    <h4 style={{ fontSize: '16px', color: '#ffffff', marginBottom: '5px' }}>Reviews:</h4>
     {product.reviewsText && product.reviewsText.length > 0 ? (
       <ul style={{ listStyleType: 'none', padding: 0 }}>
         {product.reviewsText.map((review, index) => (
@@ -514,7 +514,7 @@ const ProductCRUD = () => {
       onClick={() => handleEdit(product)}
       style={{
         padding: '8px 12px',
-        backgroundColor: '#2d3e50',
+        //backgroundColor: '#2d3e50',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
@@ -522,7 +522,7 @@ const ProductCRUD = () => {
         transition: 'background-color 0.2s',
       }}
       onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1b2838'}
-      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2d3e50'}
+      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
     >
       Edit
     </button>

@@ -85,7 +85,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundColor: "#2d3e50", // Dark background color
+    //backgroundColor: "#2d3e50", // Dark background color
     fontFamily: "'Poppins', sans-serif",
     margin: 0, // Remove any margin
     padding: 0, // Remove any padding
@@ -148,6 +148,6 @@ const styles = {
 
 // Set global styles in the body
 document.body.style.margin = "0"; // Remove any margin from body
-document.body.style.backgroundColor = "#2d3e50"; // Set dark background color for the entire page
+document.body.style.backgroundColor = "#ffffff"; // Set dark background color for the entire page
 
 export default TouristSignup;
