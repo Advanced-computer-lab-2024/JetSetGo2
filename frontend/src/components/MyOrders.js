@@ -3,26 +3,30 @@ import axios from "axios";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [pastOrders, setPastOrders] = useState([]);
   const [upcomingOrders, setUpcomingOrders] = useState([]);
-  const [shippedOrders, setShippedOrders] = useState([]);
-  const [deliveredOrders, setDeliveredOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       const touristId = localStorage.getItem("userId");
 
       if (!touristId) {
-        console.error("User ID not found.");
+        console.error("User ID not found. Please log in.");
         return;
       }
 
       try {
-        const response = await axios.get(`/home/tourist/getPurchasedProducts/${touristId}`);
-        const orders = response.data;
+        const response = await axios.get(
+          `http://localhost:8000/home/tourist/getPurchasedProducts/${touristId}`
+        );
 
-        setUpcomingOrders(orders.filter((order) => order.status === "Upcoming"));
-        setShippedOrders(orders.filter((order) => order.status === "Shipped"));
-        setDeliveredOrders(orders.filter((order) => order.status === "Delivered"));
+        const allOrders = response.data;
+
+        // Separate past and upcoming orders
+        setPastOrders(allOrders.filter((order) => order.status === "Shipped"));
+        setUpcomingOrders(
+          allOrders.filter((order) => order.status === "Upcoming")
+        );
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
