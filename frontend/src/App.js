@@ -70,6 +70,7 @@ import MyOrders from "./components/MyOrders";
 
 
 
+import Notifications from "./components/Notifications";
 
 function App() {
   return (
@@ -161,6 +162,7 @@ function App() {
           <Route path="/payment-options" element={<PaymentOptionsPage />} />
           <Route path="/my-orders" element={<MyOrders />} />
 
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </div>
     </Router>

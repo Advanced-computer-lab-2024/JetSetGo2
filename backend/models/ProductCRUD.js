@@ -49,6 +49,10 @@ const productSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    outOfStockNotified: {
+      type: Boolean,
+      default: false,
+    }, // Tracks notification sent
   },
   { timestamps: true }
 );

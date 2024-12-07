@@ -8,6 +8,7 @@ const productModel = require("../models/ProductCRUD.js");
 const { sendEmailToSeller } = require("../utils/prodoutstockmail"); // Import the email sending function
 const museumModel = require("../models/MuseumCRUD.js");
 const historicalModel = require("../models/HistoricalPlaceCRUD.js");
+const Notification = require("../models/Notification.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
 
