@@ -1,32 +1,33 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const PaymentOptionsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { addressId, productId } = location.state; // Get the product ID and address from location state
+  const { addressId } = location.state; // Address ID passed from the previous page
   const [showPopup, setShowPopup] = useState(false);
   const [cartItems, setCartItems] = useState([]);
-  const [message, setMessage] = useState('');
-  const API_URL = 'http://localhost:8000';
+  const [message, setMessage] = useState("");
+  const API_URL = "http://localhost:8000";
+
   useEffect(() => {
     fetchCart();
   }, []);
 
   const fetchCart = async () => {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (!userId) {
-      setMessage('Please log in to view your cart.');
+      setMessage("Please log in to view your cart.");
       return;
     }
 
     try {
       const response = await axios.get(`${API_URL}/home/tourist/cart/${userId}`);
-      setCartItems(response.data);
+      setCartItems(response.data); // Assuming backend returns populated cart with product and quantity
     } catch (error) {
-      console.error('Error fetching cart:', error);
-      setMessage('Failed to load cart items.');
+      console.error("Error fetching cart:", error);
+      setMessage("Failed to load cart items.");
     }
   };
 
@@ -35,34 +36,37 @@ const PaymentOptionsPage = () => {
       setShowPopup(true); // Show confirmation popup for cash on delivery
     } else {
       console.log(`Selected payment method: ${method}, Address ID: ${addressId}`);
-      // Handle other payment methods
+      // Handle other payment methods (e.g., wallet, credit card)
     }
   };
 
   const confirmOrder = async () => {
     const touristId = localStorage.getItem("userId"); // Get tourist ID from local storage
-  
+
     if (!touristId) {
       alert("User ID is missing. Please log in.");
       return;
     }
-  
-    // Extract product IDs from cartItems
-    const productIds = cartItems.map((item) => item._id);
-  
-    if (productIds.length === 0) {
+
+    // Map cartItems to the new schema format
+    const cartData = cartItems.map((item) => ({
+      product: item.product._id, // Assuming `product` contains the populated product details
+      quantity: item.quantity, // Quantity of the product in the cart
+    }));
+
+    if (cartData.length === 0) {
       alert("Cart is empty. Please add items to your cart.");
       return;
     }
-  
+
     try {
-      // Send product IDs, tourist ID, and address ID to the backend
+      // Send cart data, tourist ID, and address ID to the backend
       const response = await axios.post(`${API_URL}/home/tourist/buyProducts`, {
         touristId,
-        productIds,
-        addressId, // Include address ID if needed
+        addressId,
+        cart: cartData, // Pass cart data
       });
-  
+
       alert("Order confirmed! Your products are on the way.");
       setShowPopup(false); // Close the popup
       navigate("/my-orders"); // Redirect to "My Orders" page
@@ -71,7 +75,6 @@ const PaymentOptionsPage = () => {
       alert("Failed to confirm order. Please try again.");
     }
   };
-  
 
   return (
     <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#f7f8fa" }}>
@@ -136,7 +139,7 @@ const PaymentOptionsPage = () => {
           }}
         >
           <h3>Confirm Your Order</h3>
-          <p>Your product will be delivered soon. Do you want to confirm the order?</p>
+          <p>Your products will be delivered soon. Do you want to confirm the order?</p>
           <button
             onClick={confirmOrder}
             style={{
@@ -171,4 +174,3 @@ const PaymentOptionsPage = () => {
 };
 
 export default PaymentOptionsPage;
-  

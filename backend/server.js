@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const scheduleBirthdayEmails = require("./birthdayScheduler");
+const cron = require("node-cron");
 
 const MongoURI = process.env.MONGO_URI;
 
@@ -47,6 +48,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || "8000";
+
+const updateOrderStatuses = async () => {
+  try {
+    const tourists = await Tourist.find({});
+    const currentDate = new Date();
+
+    for (const tourist of tourists) {
+      for (const order of tourist.purchasedProducts) {
+        if (order.status === "Upcoming" && order.shippingDate && new Date(order.shippingDate) <= currentDate) {
+          order.status = "Shipped"; // Update to shipped if the shipping date has passed
+        }
+        if (order.status === "Shipped" && order.deliveredDate && new Date(order.deliveredDate) <= currentDate) {
+          order.status = "Delivered"; // Update to delivered if the delivery date has passed
+        }
+      }
+      await tourist.save(); // Save the updated tourist document
+    }
+
+    console.log("Order statuses updated successfully.");
+  } catch (error) {
+    console.error("Error updating order statuses:", error);
+  }
+};
+
+// Schedule the job to run daily at midnight
+cron.schedule("0 0 * * *", updateOrderStatuses);
 
 // Connect to MongoDB
 mongoose

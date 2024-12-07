@@ -70,18 +70,27 @@ const TouristSchema = new Schema(
     bookedHotels: [Object],
     wishlist: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type:  mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ], // Array of product IDs
     cart: [
       {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product", quantity: { type: Number, default: 1 },
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        quantity: { type: Number, default: 1 },
       },
-  ],
-  
- 
+    ],    
+    purchasedProducts: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        quantity: { type: Number, default: 1 },
+        status: { type: String, enum: ["Upcoming", "Shipped", "Delivered"], default: "Upcoming" },
+        shippingDate: { type: Date, required: false }, // Date when the product is shipped
+        deliveredDate: { type: Date, required: false }, // Date when the product is delivered
+      },
+    ],
+    
+    
   deliveryAddresses: [
     {
       address: { type: String, required: true },
