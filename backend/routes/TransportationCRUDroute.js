@@ -8,6 +8,7 @@ const {
   deleteAllTransportations,
   readAdvertiserTransportations,
   getUpcomingTransportations,
+  getTransportationsByCriteria, // Import the new function
 } = require("../controllers/TransportationCRUDcontroller");
 
 // Define routes
@@ -18,5 +19,6 @@ router.delete("/delete/:id", deleteTransportation);
 router.delete("/deleteAll", deleteAllTransportations);
 router.get("/getAdverTrans", readAdvertiserTransportations);
 router.get("/upcoming", getUpcomingTransportations);
+router.get("/search", getTransportationsByCriteria); // Add the new route
 
 module.exports = router;

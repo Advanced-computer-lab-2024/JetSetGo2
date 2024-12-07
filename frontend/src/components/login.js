@@ -78,7 +78,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const tourismGovernorEmail = "tourism@gmail.com";
+    const tourismGovernorEmail = "marwanallam8@gmail.com";
     const tourismGovernorPassword = localStorage.getItem("tourismGovernorPassword") || "tourism123";
     //const tourismGovernorPassword = "tourism123";
 

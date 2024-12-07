@@ -13,7 +13,6 @@ const TransportationPage = () => {
     vehicleType: "",
     seatsAvailable: "",
     driverName: "",
-    isBookingOpen: true,
   });
   const [transportations, setTransportations] = useState([]);
   const [error, setError] = useState(null);
@@ -69,7 +68,7 @@ const TransportationPage = () => {
         vehicleType: "",
         seatsAvailable: "",
         driverName: "",
-        isBookingOpen: true,
+
       });
       setSuccessMessage("Transportation created successfully!");
 
@@ -161,20 +160,7 @@ const TransportationPage = () => {
           required
           style={styles.input}
         />
-        <label style={styles.bookingLabel}>
-          Booking Open:
-          <input
-            type="checkbox"
-            name="isBookingOpen"
-            checked={formData.isBookingOpen}
-            onChange={(e) =>
-              setFormData((prevData) => ({
-                ...prevData,
-                isBookingOpen: e.target.checked,
-              }))
-            }
-          />
-        </label>
+        
         <button type="submit" style={styles.submitButton}>
           Create Transportation
         </button>
