@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -154,6 +155,11 @@ app.get("/home/tourist/bookedFlights/:touristId", async (req, res) => {
 });
 
 // Define your routes here
+
+
+// Register the payment routes AFTER the raw body middleware
+
+// Use raw body parsing specifically for Stripe webhook
 app.use("/activity", activityRoutes);
 app.use("/historicalPlace", historicalPlaceRoutes);
 app.use("/museum", museumRoutes);

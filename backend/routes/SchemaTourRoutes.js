@@ -1,5 +1,5 @@
     const express = require('express');
-    const { createGuide, readGuide, readGuideID,getBookedItineraries,submitReview,cancelBooking, updateGuide, deleteGuide,bookTour, flagItinerary,toggleActivation,getIteneraries,getItineraryById} = require('../controllers/schematourController');
+    const { createGuide, readGuide,finalizeBooking, readGuideID,getBookedItineraries,submitReview,cancelBooking, updateGuide, deleteGuide,bookTour, flagItinerary,toggleActivation,getIteneraries,getItineraryById} = require('../controllers/schematourController');
 
 const router = express.Router();
     router.post('/submitReview/:itineraryId',submitReview);
@@ -15,6 +15,7 @@ const router = express.Router();
     router.get("/getIteneraries", getIteneraries);
     router.post("/cancelBooking/:id", cancelBooking);
     router.get('/getBookedItineraries', getBookedItineraries);
+    router.post('/finalizeBooking/:id', finalizeBooking);
 
 
     router.patch("/flag/:id", flagItinerary);

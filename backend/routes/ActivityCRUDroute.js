@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createActivity,getBookedactivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity} = require('../controllers/ActivityCRUDcontroller');
+const {createActivity,finalizeActivityBooking,getBookedactivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity} = require('../controllers/ActivityCRUDcontroller');
 
 // Define routes
 router.post("/add", createActivity);
@@ -15,6 +15,7 @@ router.patch("/flag/:id", flagActivity);
 router.post("/cancelBooking/:id", cancelactivity);
 router.get('/getBookedactivities', getBookedactivities);
 router.post('/submitReview/:activityId',submitReview);
+router.post("/finalizeBooking/:id", finalizeActivityBooking); // Finalize booking after payment
 
 
 module.exports = router;
