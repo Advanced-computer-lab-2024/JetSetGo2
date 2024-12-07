@@ -10,7 +10,7 @@ const getNewUsersByMonth = async (req, res) => {
   try {
     const { year } = req.query;
     const targetYear = year ? parseInt(year) : new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;  // Get the current month (1-based index)
+    const currentMonth = new Date().getMonth() + 1; // Get the current month (1-based index)
 
     // Helper function to get the number of users for a specific month
     const getMonthlyCounts = async (model) => {
@@ -19,14 +19,16 @@ const getNewUsersByMonth = async (req, res) => {
           $match: {
             createdAt: {
               $gte: new Date(`${targetYear}-${currentMonth}-01T00:00:00.000Z`),
-              $lt: new Date(`${targetYear}-${currentMonth + 1}-01T00:00:00.000Z`),
+              $lt: new Date(
+                `${targetYear}-${currentMonth + 1}-01T00:00:00.000Z`
+              ),
             },
             Admin_Acceptance: true, // Add the condition for admin acceptance
           },
         },
         {
           $group: {
-            _id: null,  // No need to group by month anymore, just get total count
+            _id: null, // No need to group by month anymore, just get total count
             count: { $sum: 1 },
           },
         },
@@ -48,8 +50,8 @@ const getNewUsersByMonth = async (req, res) => {
 
     res.status(200).json({
       year: targetYear,
-      currentMonth,  // Return the current month number
-      totalAcceptedUsersThisMonth,  // Return the total count of accepted users for the current month
+      currentMonth, // Return the current month number
+      totalAcceptedUsersThisMonth, // Return the total count of accepted users for the current month
     });
   } catch (error) {
     console.error("Error fetching new users by month:", error);
@@ -60,19 +62,25 @@ const getNewUsersByMonth = async (req, res) => {
   }
 };
 
-
-
-
 const getTotalUsers = async (req, res) => {
   try {
     // Count the number of users with admin acceptance set to true in each model
-    const advertiserCount = await adverModel.countDocuments({ Admin_Acceptance: true });
-    const touristCount = await touristModel.countDocuments({ Admin_Acceptance: true });
-    const tourGuideCount = await tourGuideModel.countDocuments({ Admin_Acceptance: true });
-    const sellerCount = await sellerModel.countDocuments({ Admin_Acceptance: true });
+    const advertiserCount = await adverModel.countDocuments({
+      Admin_Acceptance: true,
+    });
+    const touristCount = await touristModel.countDocuments({
+      Admin_Acceptance: true,
+    });
+    const tourGuideCount = await tourGuideModel.countDocuments({
+      Admin_Acceptance: true,
+    });
+    const sellerCount = await sellerModel.countDocuments({
+      Admin_Acceptance: true,
+    });
 
     // Calculate the total number of users
-    const totalUsers = advertiserCount + touristCount + tourGuideCount + sellerCount;
+    const totalUsers =
+      advertiserCount + touristCount + tourGuideCount + sellerCount;
 
     // Send the response with the total user count
     res.status(200).json({ totalUsers });
@@ -84,8 +92,6 @@ const getTotalUsers = async (req, res) => {
     });
   }
 };
-
-
 
 // Create Admin
 const createAdmin = async (req, res) => {
@@ -122,6 +128,7 @@ const createAdmin = async (req, res) => {
       .json({ message: "Error creating user", error: error.message });
   }
 };
+
 // Get all Admins
 const getAdmins = async (req, res) => {
   try {
