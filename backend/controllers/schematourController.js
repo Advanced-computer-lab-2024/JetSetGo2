@@ -1,6 +1,7 @@
 const Schema = require("../models/schematour.js");
 const User = require("../models/Tourist.js");
 const { default: mongoose } = require("mongoose");
+const sendNotificationEmails = require("../utils/tabbakh");
 
 const createGuide = async (req, res) => {
   const {
@@ -18,6 +19,8 @@ const createGuide = async (req, res) => {
     tourGuide,
     Tags,
     rating,
+    isActive, // Include isActive
+    isActive1
   } = req.body;
 
   const newSchema = new Schema({
@@ -35,6 +38,8 @@ const createGuide = async (req, res) => {
     tourGuide,
     Tags,
     rating,
+    isActive, // Add isActive field
+    isActive1
   });
 
   try {
@@ -65,40 +70,31 @@ const getItineraryById = async (req, res) => {
 
 const readGuide = async (req, res) => {
   try {
-    // Log the entire request query to check its contents
     console.log("Request Query Params:", req.query);
 
-    let userId = req.query.userId;
+    const userId = req.query.userId;
 
-    // Log the received User ID
-    console.log("Received User ID:", userId);
-
-    // Validate userId
-    if (!userId || !mongoose.isValidObjectId(userId.trim())) {
-      return res.status(400).json({ message: "Invalid or missing User ID." });
+    // Validate the User ID if provided
+    if (userId && !mongoose.isValidObjectId(userId.trim())) {
+      return res.status(400).json({ message: "Invalid User ID." });
     }
 
-    // Trim any whitespace or newline characters from the user ID
-    userId = userId.trim();
-
-    // Find active tours or tours booked by the user
-    const schemas = await Schema.find({
-      $or: [
-        { isActive: true }, // Active tours
-        { bookedUsers: userId }, // Tours booked by the user
-      ],
-    })
+    // Fetch all itineraries without restrictions
+    const schemas = await Schema.find()
       .populate("activities")
       .populate("Tags", "name");
 
-    // Add booking status for each tour
-    const toursWithBookingStatus = schemas.map((tour) => ({
-      ...tour.toObject(),
-      isBooked: tour.bookedUsers.includes(userId), // Check if the user has booked this tour
-    }));
+    // If a user ID is provided, add booking status for each itinerary
+    const toursWithBookingStatus = userId
+      ? schemas.map((tour) => ({
+          ...tour.toObject(),
+          isBooked: tour.bookedUsers.includes(userId.trim()), // Check if the user has booked this tour
+        }))
+      : schemas.map((tour) => tour.toObject()); // If no user ID, return itineraries as is
 
     res.status(200).json(toursWithBookingStatus);
   } catch (err) {
+    console.error("Error in readGuide:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
@@ -199,7 +195,6 @@ const getIteneraries = async (req, res) => {
   }
 };
 
-// Update Guide
 const updateGuide = async (req, res) => {
   const { id } = req.params;
   const updateData = {};
@@ -218,6 +213,7 @@ const updateGuide = async (req, res) => {
   if (req.body.pickUpLoc) updateData.pickUpLoc = req.body.pickUpLoc;
   if (req.body.DropOffLoc) updateData.DropOffLoc = req.body.DropOffLoc;
   if (req.body.Tags) updateData.Tags = req.body.Tags;
+  if (req.body.isActive !== undefined) updateData.isActive = req.body.isActive; // Allow toggling isActive
 
   try {
     const updatedGuide = await Schema.findByIdAndUpdate(id, updateData, {
@@ -231,6 +227,7 @@ const updateGuide = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const deleteGuide = async (req, res) => {
   const { id } = req.params;
@@ -270,42 +267,62 @@ const flagItinerary = async (req, res) => {
   }
 };
 
-// Toggle Activation
-const toggleActivation = async (req, res) => {
+const toggleActivation1 = async (req, res) => {
   try {
     const { id } = req.params;
     const cleanId = id.trim(); // Clean the ID
 
-    const itinerary = await Schema.findById(cleanId);
-    if (!itinerary) {
-      return res.status(404).json({ message: "Itinerary not found" });
-    }
+    console.log("Toggling activation for activity ID:", cleanId);
 
-    // Prevent deactivation if it is active and has no bookings
-    if (itinerary.isActive && itinerary.bookings === 0) {
-      return res.status(400).json({
-        message: "Itinerary cannot be deactivated because it has no bookings.",
-      });
+    // Fetch the activity and populate notificationRequests with email and UserName
+    const activity = await Schema.findById(cleanId).populate(
+      'notificationRequests',
+      'Email UserName'
+    );
+
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found." });
     }
 
     // Toggle the activation status
-    itinerary.isActive = !itinerary.isActive;
-    await itinerary.save();
+    activity.isActive1 = !activity.isActive1;
+    await activity.save();
 
-    if (itinerary.isActive) {
-      return res
-        .status(200)
-        .json({ message: "Itinerary activated", itinerary });
-    } else {
-      return res
-        .status(200)
-        .json({ message: "Itinerary deactivated", itinerary });
+    // Send emails only if the status changes to active
+    if (activity.isActive1) {
+      console.log("Activity activated.");
+
+      if (!activity.notificationRequests.length) {
+        return res.status(200).json({
+          message: "Activity activated, but no users to notify.",
+          activity,
+        });
+      }
+
+      const emailPromises = activity.notificationRequests.map((user) => {
+        console.log(`Sending email to: ${user.UserName} (${user.Email})`); // Debugging log
+        return sendNotificationEmails(
+          user.Email,
+          user.UserName,
+          activity.name
+        );
+      });
+
+      await Promise.all(emailPromises);
     }
+
+    res.status(200).json({
+      message: activity.isActive
+        ? "Activity activated"
+        : "Activity deactivated",
+      activity,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error in toggleActivation:", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-// Add to the Controller
+
 
 const cancelBooking = async (req, res) => {
   let { id } = req.params;
@@ -410,6 +427,104 @@ const getBookedItineraries = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const requestNotification = async (req, res) => {
+  const { id } = req.params; // Itinerary ID
+  const { userId } = req.body; // Tourist ID
+
+  // Validate Itinerary ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid Itinerary ID." });
+  }
+
+  // Validate User ID
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid User ID." });
+  }
+
+  try {
+    // Fetch the itinerary
+    const itinerary = await Schema.findById(id);
+
+    // If itinerary does not exist
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found." });
+    }
+
+    // Initialize notificationRequests array if it doesn't exist
+    if (!Array.isArray(itinerary.notificationRequests)) {
+      itinerary.notificationRequests = [];
+    }
+
+    // Check if the user has already requested notification
+    if (itinerary.notificationRequests.includes(userId)) {
+      return res.status(400).json({
+        message: "You have already requested a notification for this itinerary.",
+      });
+    }
+
+    // Add userId to notificationRequests array
+    itinerary.notificationRequests.push(userId);
+    await itinerary.save();
+
+    res.status(200).json({ message: "Notification request added successfully." });
+  } catch (error) {
+    console.error(
+      "Error adding notification request for itinerary:",
+      id,
+      "and user:",
+      userId,
+      error
+    );
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+const getNotificationRequests = async (req, res) => {
+  const { id } = req.params;
+
+  // Log the received ID
+  console.log("Fetching notification requests for Itinerary ID:", id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    console.error("Invalid Itinerary ID:", id);
+    return res.status(400).json({ message: "Invalid Itinerary ID." });
+  }
+
+  try {
+    // Attempt to find the itinerary
+    const itinerary = await Schema.findById(id).populate(
+      "notificationRequests", // Ensure this field exists in your schema
+      "Email" // Populate user fields
+    );
+
+    // Log what we fetched from the database
+    console.log("Fetched itinerary:", itinerary);
+
+    if (!itinerary) {
+      console.error("Itinerary not found for ID:", id);
+      return res.status(404).json({ message: "Itinerary not found." });
+    }
+
+    // Check if `notificationRequests` is populated correctly
+    if (!itinerary.notificationRequests) {
+      console.warn("No notification requests found.");
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(itinerary.notificationRequests);
+  } catch (error) {
+    console.error("Error fetching notification requests:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
+
+
+
+
+
+
 
 module.exports = {
   createGuide,
@@ -420,9 +535,11 @@ module.exports = {
   bookTour,
   getItineraryById,
   flagItinerary,
-  toggleActivation,
+  toggleActivation1,
   cancelBooking,
   submitReview,
   getBookedItineraries,
   getIteneraries,
+  getNotificationRequests,
+  requestNotification
 };

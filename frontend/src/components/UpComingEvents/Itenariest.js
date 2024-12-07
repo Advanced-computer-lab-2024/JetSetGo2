@@ -32,6 +32,7 @@ const Itinerariest = () => {
   const fetchItineraries = async () => {
     try {
       if (!touristId) {
+        console.log(touristId);
         console.error("Tourist ID is missing");
         return;
       }
@@ -160,16 +161,23 @@ const handleBookmark = async (itineraryId) => {
     );
 
     if (response.status === 200) {
-      setBookmarkedItineraries(response.data.bookmarkedItineraries); // Update local state
-      alert(
-        response.data.message || "Itinerary bookmark toggled successfully!"
-      );
+      setBookmarkedItineraries((prev) => {
+        if (prev.includes(itineraryId)) {
+          // Remove from bookmarks if it was already bookmarked
+          return prev.filter((id) => id !== itineraryId);
+        } else {
+          // Add to bookmarks if not already bookmarked
+          return [...prev, itineraryId];
+        }
+      });
+      alert(response.data.message || "Bookmark updated successfully!");
     }
   } catch (error) {
-    console.error("Error toggling itinerary bookmark:", error);
+    console.error("Error toggling bookmark:", error);
     alert("Failed to toggle bookmark. Please try again.");
   }
 };
+
 useEffect(() => {
   const fetchBookmarkedItineraries = async () => {
     try {
@@ -338,6 +346,30 @@ const viewBookmarkedItineraries = async () => {
     // Open the email client
     window.location.href = mailtoLink;
   };
+  const handleRequestNotification = async (itineraryId) => {
+    try {
+      console.log("Tourist ID:", touristId); // Add this before the request
+      console.log("itineraryId ID:", itineraryId);
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      const response = await axios.post(
+        `http://localhost:8000/itinerary/requestNotification/${itineraryId}`,
+        { userId: touristId }
+      );
+      
+  
+      if (response.status === 200) {
+        alert(response.data.message || "Notification request submitted successfully!");
+      }
+    } catch (error) {
+      console.error("Error requesting notification:", error);
+      alert("Failed to request notification. Please try again.");
+    }
+  };
+  
 
   return (
     <div id="itineraries">
@@ -470,13 +502,34 @@ const viewBookmarkedItineraries = async () => {
               <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
               <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
               
-              {itinerary.isBooked ? (
-                <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
-                  Cancel Booking
-                </button>
-              ) : (
-                <button onClick={() => handleBookTour(itinerary._id)}>Book Tour</button>
-              )}
+              {
+  itinerary.isActive ? (
+    itinerary.isBooked ? (
+      <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
+        Cancel Booking
+      </button>
+    ) : (
+      <button onClick={() => handleBookTour(itinerary._id)}>Book Tour</button>
+    )
+  ) : bookmarkedItineraries.includes(itinerary._id) ? ( // Check if itinerary is bookmarked
+    <button onClick={() => handleRequestNotification(itinerary._id)}>
+      Request Notification
+    </button>
+  ) : (
+    <button
+      onClick={() => handleBookmark(itinerary._id)}
+      style={{
+        backgroundColor: "white",
+        color: "gray",
+        cursor: "pointer",
+      }}
+    >
+      Bookmark to Request Notification
+    </button>
+  )
+}
+
+
             </li>
           ))}
         </ul>

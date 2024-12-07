@@ -61,6 +61,12 @@ const activitySchema = new Schema(
       type: Boolean,
       default: false,
     }, // Add flagged attribute with default value
+
+    notificationRequests: {
+      type: [mongoose.Schema.Types.ObjectId], // Stores tourist IDs
+      ref: "Tourist"
+    },
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

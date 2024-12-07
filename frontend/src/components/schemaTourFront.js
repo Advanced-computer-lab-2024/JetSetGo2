@@ -46,6 +46,7 @@ const SchemaTourFront = () => {
     tourGuide: '',
     Tags: '',
     rating: 0,
+    isActive: false, // Add isActive
   });
   const [editId, setEditId] = useState(null);
   const navigate = useNavigate();
@@ -153,6 +154,7 @@ const SchemaTourFront = () => {
         tourGuide: userId,
         Tags: '',
         rating: 0,
+        isActive: false, // Add isActive
       });
       setEditId(null);
     } catch (error) {
@@ -223,6 +225,15 @@ const SchemaTourFront = () => {
           <label>Rating:</label>
           <input type="range" min="0" max="5" step="0.1" value={formData.rating} onChange={handleRatingChange} style={{ marginBottom: '10px' }} />
           <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span>
+          <label>
+    <input
+      type="checkbox"
+      name="isActive"
+      checked={formData.isActive}
+      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+    />
+    Is Active
+  </label>
 
           <textarea name="locations" value={formData.locations} onChange={handleChange} placeholder="Locations" required style={{ width: '100%', padding: '10px', marginBottom: '10px' }} />
           <input name="timeline" value={formData.timeline} onChange={handleChange} placeholder="Timeline" required style={{ width: '100%', padding: '10px', marginBottom: '10px' }} />
@@ -276,6 +287,8 @@ const SchemaTourFront = () => {
                 <p>Accessibility: {itinerary.accessibility}</p>
                 <p>Pick Up Location: {itinerary.pickUpLoc}</p>
                 <p>Drop Off Location: {itinerary.DropOffLoc}</p>
+                <p>Active: {itinerary.isActive ? "Yes" : "No"}</p>
+
               </div>
               <div>
                 <button onClick={() => handleEdit(itinerary)} style={{

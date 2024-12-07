@@ -53,6 +53,7 @@ const historicalPlaceSchema = new Schema(
       type: Number,
     },
     flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

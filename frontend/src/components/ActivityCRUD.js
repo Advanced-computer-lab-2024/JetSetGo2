@@ -43,6 +43,7 @@ const ActivityCRUD = () => {
     specialDiscount: "",
     isBookingOpen: true,
     rating: 0,
+    isActive : false ,
   });
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [searchLocation, setSearchLocation] = useState("");
@@ -165,6 +166,7 @@ const ActivityCRUD = () => {
       specialDiscount: "",
       isBookingOpen: true,
       rating: 0,
+      isActive : false ,
     });
     setPinPosition([30.0444, 31.2357]); // Reset map pin to default location (Cairo)
   };
@@ -320,6 +322,15 @@ const ActivityCRUD = () => {
               onChange={handleRatingChange}
             />
           </label>
+          <label>
+    <input
+      type="checkbox"
+      name="isActive"
+      checked={formData.isActive}
+      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+    />
+    Is Active
+  </label>
           <button type="submit">Create Activity</button>
         </form>
       </section>
@@ -438,6 +449,19 @@ const ActivityCRUD = () => {
                 onChange={handleRatingChange}
               />
             </label>
+            <label>
+  <input
+    type="checkbox"
+    name="isActive"
+    checked={formData.isActive}
+    onChange={(e) =>
+      setFormData((prev) => ({ ...prev, isActive: e.target.checked }))
+    }
+    
+  />
+  Is Active
+</label>
+
             <button type="submit">Update Activity</button>
           </form>
           <button onClick={resetEditForm}>Cancel Edit</button>
@@ -487,6 +511,7 @@ const ActivityCRUD = () => {
                     <p>Booking Open: {activity.isBookingOpen ? 'Yes' : 'No'}</p>
                     <p>Rating: {activity.rating}</p>
                     <p>Price: {activity.price} EGP</p>
+                    <p>Active: {activity.isActive ? "Yes" : "No"}</p>
                   </div>
                   {/* Edit and Delete buttons */}
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
