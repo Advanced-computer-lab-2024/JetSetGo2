@@ -673,6 +673,25 @@ const addPereferenceTags = async (req, res) => {
   }
 };
 
+const getTouristPreferences = async (req, res) => {
+  const { id } = req.params; // Tourist ID
+
+  try {
+    // Find the tourist and populate the preferenceTags field
+    const tourist = await touristModel.findById(id).populate("preferenceTags");
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+
+    // Return the preference tags
+    res.status(200).json(tourist.preferenceTags);
+  } catch (error) {
+    console.error("Error fetching preference tags:", error);
+    res.status(500).json({ error: "Failed to retrieve preference tags." });
+  }
+};
+
 module.exports = {
   createTourist,
   updateTourist,
@@ -693,4 +712,5 @@ module.exports = {
   getCart,
   removeFromCart,
   addPereferenceTags,
+  getTouristPreferences
 };

@@ -40,6 +40,7 @@ const Itinerariest = () => {
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
 
   const [Tags, setTags] = useState([]);
+  const [userPreferences, setUserPreferences] = useState([]); 
   const [activities, setActivities] = useState([]);
 
   const navigate = useNavigate();
@@ -82,17 +83,39 @@ const Itinerariest = () => {
       console.error("Error fetching Tags:", error);
     }
   };
+  const fetchUserPreferences = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/home/tourist/preferences/${touristId}`
+      );
+      setUserPreferences(response.data); // Store the full tag objects
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+    }
+  };
 
   useEffect(() => {
     fetchItineraries();
     fetchTags();
     fetchActivities();
+    fetchUserPreferences();
   }, []);
 
   // Filter itineraries based on selected filters
   useEffect(() => {
     let filtered = itineraries;
 
+    if (userPreferences.length > 0) {
+      const preferenceIds = userPreferences.map((tag) => tag._id);
+
+      filtered = filtered.filter((itinerary) =>
+        Array.isArray(itinerary.Tags)
+          ? itinerary.Tags.some((tag) =>
+              preferenceIds.includes(tag._id || tag)
+            )
+          : preferenceIds.includes(itinerary.Tags._id || itinerary.Tags)
+      );
+    }
     // Filter by tag
     if (selectedTag) {
       filtered = filtered.filter((itinerary) =>
@@ -130,7 +153,7 @@ const Itinerariest = () => {
 
     setFilteredItineraries(filtered);
     console.log("Filtered Itineraries:", filtered); // Log filtered itineraries
-  }, [itineraries, selectedTag, selectedPrice, selectedDate, selectedLanguage]);
+  }, [itineraries,userPreferences, selectedTag, selectedPrice, selectedDate, selectedLanguage]);
 
   const handleSortChange = (e) => {
     const value = e.target.value;

@@ -19,7 +19,8 @@ const {
   addToCart,
   getCart,
   removeFromCart,
-  addPereferenceTags
+  addPereferenceTags,
+  getTouristPreferences
 } = require("../controllers/touristController");
 router.post("/cart/add/:touristId/:productId", addToCart);
 router.get("/cart/:touristId", getCart);
@@ -51,5 +52,7 @@ router.delete("/deleteAllTourist", deleteAllTourist);
 router.put("/redeempoints/:id", redeemPointsToCash);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
 router.post("/addPreferenceTags/:id", addPereferenceTags);
+router.get("/preferences/:id", getTouristPreferences);
+
 
 module.exports = router;
