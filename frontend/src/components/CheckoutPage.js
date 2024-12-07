@@ -32,6 +32,7 @@ const CheckoutPage = () => {
         setMessage("Failed to load addresses.");
       }
     };
+    
 
     fetchAddresses();
   }, []);

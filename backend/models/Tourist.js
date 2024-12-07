@@ -68,6 +68,12 @@ const TouristSchema = new Schema(
       default: 1,
     },
     bookedHotels: [Object],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ], // Array of product IDs
     cart: [
       {
           type: mongoose.Schema.Types.ObjectId,

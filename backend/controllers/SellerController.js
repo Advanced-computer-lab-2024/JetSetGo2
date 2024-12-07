@@ -119,6 +119,7 @@ const deleteSeller = async (req, res) => {
 };
 
 const acceptSeller = async (req, res) => {
+ 
   try {
     const { id } = req.params;
 

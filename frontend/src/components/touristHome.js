@@ -300,6 +300,21 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
             My Museums
           </button>
           <button
+  onClick={() => navigate("/my-orders")}
+  style={{
+    padding: "10px 20px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    marginTop: "10px",
+  }}
+>
+  My Orders
+</button>
+
+          <button
             onClick={handleDeleteAccount}
             style={{
               color: "red",
