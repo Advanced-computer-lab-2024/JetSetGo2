@@ -319,6 +319,16 @@ const deleteAllHistoricalPlaces = async (req, res) => {
   }
 };
 
+const getHistoricalPlaceNotifications = async (req, res) => {
+  try {
+    const historicalPlaces = await HistoricalPlace.find({ Notifications: { $exists: true, $not: { $size: 0 } } }, 'Notifications');
+    const notifications = historicalPlaces.flatMap(place => place.Notifications);
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 const flagHistoricalPlace = async (req, res) => {
@@ -366,4 +376,5 @@ module.exports = {
   getBookedHP,
   cancelHP,
   submitReview,
+  getHistoricalPlaceNotifications,
 };

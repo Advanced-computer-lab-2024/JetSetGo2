@@ -77,6 +77,16 @@ const getMuseumById = async (req, res) => {
   }
 };
 
+const getMuseumNotifications = async (req, res) => {
+  try {
+    const museums = await Museum.find({ Notifications: { $exists: true, $not: { $size: 0 } } }, 'Notifications');
+    const notifications = museums.flatMap(museum => museum.Notifications);
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Update a Museum (including tourismGovernerTags if provided)
 const updateMuseum = async (req, res) => {
   const { id } = req.params; // Extract id from the request parameters
@@ -359,4 +369,5 @@ module.exports = {
   getBookedHP,
   cancelHP,
   submitReview,
+  getMuseumNotifications
 };

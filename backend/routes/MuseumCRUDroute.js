@@ -3,7 +3,7 @@ const router = express.Router();
 const {createMuseum,getMuseum , bookm,
     getBookedHP,
     cancelHP,
-    submitReview,updateMuseum,deleteMuseum,deleteAllMuseums, flagMuseum,getMuseumById} = require('../controllers/MuseumCRUDcontroller');
+    submitReview,updateMuseum,deleteMuseum,deleteAllMuseums, flagMuseum,getMuseumById,getMuseumNotifications} = require('../controllers/MuseumCRUDcontroller');
 
 
 
@@ -19,5 +19,6 @@ router.patch("/book/:id", bookm);
 router.post("/cancelHP/:id", cancelHP);
 router.post("/submitReview/:HPId", submitReview);
 router.get("/getbookedHP", getBookedHP);
+router.get("/getNotifications", getMuseumNotifications);
 
 module.exports = router;
