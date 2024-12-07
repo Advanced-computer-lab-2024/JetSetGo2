@@ -84,12 +84,8 @@ const TouristSchema = new Schema(
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, default: 1 },
-        status: { type: String, enum: ["Upcoming", "Shipped", "Delivered"], default: "Upcoming" },
-        shippingDate: { type: Date, required: false }, // Date when the product is shipped
-        deliveredDate: { type: Date, required: false }, // Date when the product is delivered
       },
     ],
-    
     
   deliveryAddresses: [
     {

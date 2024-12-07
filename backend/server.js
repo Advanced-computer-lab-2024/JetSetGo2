@@ -75,7 +75,7 @@ const updateOrderStatuses = async () => {
 };
 
 // Schedule the job to run daily at midnight
-cron.schedule("0 0 * * *", updateOrderStatuses);
+cron.schedule("*/5 * * * *", updateOrderStatuses);
 
 // Connect to MongoDB
 mongoose

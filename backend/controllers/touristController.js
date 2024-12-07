@@ -224,7 +224,7 @@ const buyProduct = async (req, res) => {
       const product = await productModel.findById(productId);
 
       if (!product) {
-        return res.status(404).json({ error: `Product not found: ${productId}` });
+        return res.status(404).json(`{ error: Product not found: ${productId} }`);
       }
 
       // Update product stock, add purchase record, etc.
@@ -253,44 +253,43 @@ const buyProducts = async (req, res) => {
   }
 
   try {
-    const tourist = await Tourist.findById(touristId).populate("cart.product");
+    const tourist = await touristModel.findById(touristId).populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found." });
     }
 
-    const cartItems = tourist.cart;
+    const cartItems = tourist.cart; // Get the items in the cart
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ error: "Cart is empty." });
     }
 
     const processedProducts = [];
-    const currentDate = new Date();
 
     for (const cartItem of cartItems) {
       const product = cartItem.product;
       const quantity = cartItem.quantity;
 
+      // Check stock availability
       if (product.availableQuantity < quantity) {
         return res.status(400).json({
           error: `Product '${product.description}' has insufficient stock. Available: ${product.availableQuantity}, Requested: ${quantity}`,
         });
       }
 
+      // Deduct stock and save product
       product.availableQuantity -= quantity;
       await product.save();
 
-      // Add product with shipping and delivery dates
+      // Add product and quantity to the purchase history
       tourist.purchasedProducts.push({
         product: product._id,
         quantity,
-        status: "Upcoming",
-        shippingDate: new Date(currentDate.getTime() + 2 * 24 * 60 * 60 * 1000), // Ships in 2 days
-        deliveredDate: new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000), // Delivered in 7 days
       });
 
       processedProducts.push({ product, quantity });
     }
 
+    // Clear the cart after successful purchase
     tourist.cart = [];
     await tourist.save();
 
@@ -360,41 +359,59 @@ const getPurchasedProducts = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    const tourist = await Tourist.findById(touristId).populate("purchasedProducts.product");
+    // Find the tourist
+    const tourist = await touristModel.findById(touristId);
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    const currentDate = new Date();
+    // Fetch and populate purchased products
+    const populatedProducts = await Promise.all(
+      tourist.purchasedProducts.map(async (purchasedItem) => {
+        const product = await productModel.findById(purchasedItem.product);
 
-    const products = tourist.purchasedProducts.map((item) => {
-      let status = item.status;
+        if (!product) {
+          return null; // Skip if product not found
+        }
 
-      if (status === "Upcoming" && item.shippingDate && new Date(item.shippingDate) <= currentDate) {
-        status = "Shipped";
-      }
-      if (status === "Shipped" && item.deliveredDate && new Date(item.deliveredDate) <= currentDate) {
-        status = "Delivered";
-      }
+        // Check if seller exists in Seller or Admin collection
+        const seller = await SellerModel.findById(product.sellerId);
+        const admin = await AdminModel.findById(product.sellerId);
 
-      return {
-        product: item.product,
-        quantity: item.quantity,
-        status,
-        shippingDate: item.shippingDate,
-        deliveredDate: item.deliveredDate,
-      };
-    });
+        // Attach seller name and role to the product
+        return {
+          product: {
+            ...product.toObject(), // Convert Mongoose document to plain object
+            sellerDetails: seller
+              ? { name: seller.Name, role: "Seller" }
+              : admin
+              ? { name: admin.Username, role: "Admin" }
+              : null, // If no match found
+          },
+          quantity: purchasedItem.quantity, // Include the quantity from purchasedProducts
+        };
+      })
+    );
 
-    res.status(200).json(products);
+    // Filter out null values (e.g., products not found)
+    const validProducts = populatedProducts.filter(
+      (purchasedProduct) => purchasedProduct !== null
+    );
+
+    if (validProducts.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No purchased products found for this tourist." });
+    }
+
+    // Send the populated products
+    res.status(200).json(validProducts);
   } catch (error) {
     console.error("Error fetching purchased products:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 
 const getTouristNationality = async (req, res) => {
@@ -451,11 +468,11 @@ const redeemPointsToCash = async (req, res) => {
     // Save the updated tourist
     await tourist.save();
 
-    res.status(200).json({
-      message: `Successfully redeemed ${pointsToRedeem} points for ${cashEquivalent} EGP`,
+    res.status(200).json(`{
+      message: Successfully redeemed ${pointsToRedeem} points for ${cashEquivalent} EGP,
       wallet: tourist.Wallet,
       loyaltyPointsRemaining: tourist.Loyalty_Points,
-    });
+    }`);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -670,7 +687,7 @@ const addToCart = async (req, res) => {
 
     if (existingCartItem) {
       // If the product is already in the cart, increment the quantity
-      return res.status(400).json({ error: `Product '${product.description}' is already in cart.` });
+      existingCartItem.quantity += 1;
     } else {
       // Otherwise, add the product with a default quantity of 1
       tourist.cart.push({ product: product._id, quantity: 1 });
@@ -685,6 +702,7 @@ const addToCart = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const getCart = async (req, res) => {
   const { touristId } = req.params;
@@ -789,6 +807,7 @@ const updateCartQuantity = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 const addDeliveryAddress = async (req, res) => {
