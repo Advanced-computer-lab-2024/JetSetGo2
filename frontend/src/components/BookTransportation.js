@@ -11,6 +11,12 @@ const TransportationBooking = () => {
   const API_URL = "http://localhost:8000"; // Change to your backend URL
   const navigate = useNavigate();
 
+  const [date, setDate] = useState("");
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [searchPerformed, setSearchPerformed] = useState(false);
+
   // Fetch all transportations and booked transportations on component mount
   useEffect(() => {
     fetchTransportations();
@@ -61,6 +67,7 @@ const TransportationBooking = () => {
       setError("User ID not found in local storage. Please log in.");
       return;
     }
+    console.log(userId);
 
     try {
       // Make an API call to book the transportation and pass touristId and transportationId
@@ -95,6 +102,29 @@ const TransportationBooking = () => {
     navigate('/tourist-home'); // Adjust this path according to your routing setup
   };
 
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/transportation/search`, {
+        params: { date, startLocation, endLocation, vehicleType },
+      });
+      setTransportations(response.data);
+      setError("");
+      setSearchPerformed(true);
+    } catch (err) {
+      setError("Error fetching transportations. Please try again.");
+      setSearchPerformed(true);
+    }
+  };
+
+  const handleBook = async (transportationId) => {
+    try {
+      // Implement booking logic here
+      alert(`Booking transportation with ID: ${transportationId}`);
+    } catch (err) {
+      setError("Error booking transportation. Please try again.");
+    }
+  };
+
   return (
     <div style={styles.transportationPage}>
       {/* Home Button */}
@@ -107,8 +137,42 @@ const TransportationBooking = () => {
       {error && <p style={styles.errorMessage}>{error}</p>}
       {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
 
+      <div style={styles.form}>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          style={styles.input}
+          placeholder="Date"
+        />
+        <input
+          type="text"
+          value={startLocation}
+          onChange={(e) => setStartLocation(e.target.value)}
+          style={styles.input}
+          placeholder="Start Location"
+        />
+        <input
+          type="text"
+          value={endLocation}
+          onChange={(e) => setEndLocation(e.target.value)}
+          style={styles.input}
+          placeholder="End Location"
+        />
+        <input
+          type="text"
+          value={vehicleType}
+          onChange={(e) => setVehicleType(e.target.value)}
+          style={styles.input}
+          placeholder="Vehicle Type"
+        />
+        <button onClick={handleSearch} style={styles.button}>
+          Search
+        </button>
+      </div>
+
       <div style={styles.transportationCards}>
-        {transportations.length > 0 ? (
+        {searchPerformed && transportations.length > 0 ? (
           transportations.map((transport) => (
             <div key={transport._id} style={styles.transportationCard}>
               <h4 style={styles.cardTitle}>{transport.vehicleType}</h4>
@@ -134,7 +198,7 @@ const TransportationBooking = () => {
             </div>
           ))
         ) : (
-          <p style={styles.noTransportations}>No transportations available.</p>
+          searchPerformed && <p style={styles.noTransportations}>No transportations available.</p>
         )}
       </div>
 
@@ -228,6 +292,28 @@ const styles = {
     padding: "20px",
     backgroundColor: "#f9f9f9",
     borderRadius: "10px",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: "20px",
+  },
+  input: {
+    padding: "10px",
+    margin: "10px",
+    width: "80%",
+    maxWidth: "400px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+  },
+  button: {
+    padding: "10px 20px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
   },
 };
 

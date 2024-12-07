@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createHistoricalPlace,getHistoricalPlace,updateHistoricalPlace,deleteHistoricalPlace, deleteAllHistoricalPlaces, flagHistoricalPlace,getHistoricalPlaceById,bookHP,getBookedHP,cancelHP,submitReview} = require('../controllers/HistoricalPlaceCRUDcontroller');
+const {createHistoricalPlace,getHistoricalPlace,updateHistoricalPlace,deleteHistoricalPlace, deleteAllHistoricalPlaces, flagHistoricalPlace,getHistoricalPlaceById,bookHP,getBookedHP,cancelHP,submitReview,getHistoricalPlaceNotifications} = require('../controllers/HistoricalPlaceCRUDcontroller');
 const { get } = require('mongoose');
 
 
@@ -16,5 +16,6 @@ router.patch("/book/:id", bookHP);
 router.post("/cancelHP/:id", cancelHP);
 router.post("/submitReview/:HPId", submitReview);
 router.get("/getbookedHP", getBookedHP);router.patch("/flag/:id", flagHistoricalPlace);
+router.get("/getNotifications", getHistoricalPlaceNotifications);
 
 module.exports = router;

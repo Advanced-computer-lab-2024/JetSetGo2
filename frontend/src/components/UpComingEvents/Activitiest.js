@@ -4,10 +4,20 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import L from 'leaflet';                    
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
+const stripePromise = loadStripe(
+  "pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx"
+);
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -37,6 +47,76 @@ const currencyRates = {
   USD: 1,  // Example conversion rate
   EGP: 30,   // Example conversion rate
 };
+const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements || !clientSecret) {
+      alert("Stripe is not ready. Please try again.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const cardElement = elements.getElement(CardElement);
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: "Customer Name", // Replace with the actual user's name
+            },
+          },
+        }
+      );
+
+      if (error) {
+        console.error("Payment error:", error);
+        alert("Payment failed. Please try again.");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        alert("Payment successful!");
+        onPaymentSuccess(paymentIntent.id); // Pass PaymentIntent ID to finalize booking
+      }
+    } catch (err) {
+      console.error("Error during payment confirmation:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: "16px",
+              color: "#424770",
+              "::placeholder": {
+                color: "#aab7c4",
+              },
+            },
+            invalid: {
+              color: "#9e2146",
+            },
+          },
+          hidePostalCode: true,
+        }}
+      />
+      <button type="submit" disabled={!stripe || isProcessing}>
+        {isProcessing ? "Processing..." : "Pay"}
+      </button>
+    </form>
+  );
+};
+
 const Activitiest = () => {
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
@@ -57,6 +137,9 @@ const Activitiest = () => {
     rating: "",
   });
   const [bookedActivities, setBookedActivities] = useState([]); // Track booked activities
+  const [clientSecret, setClientSecret] = useState("");
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [currentActivityId, setCurrentActivityId] = useState(null);
 
   const navigate = useNavigate(); // Initialize useNavigate hook
   const location = useLocation(); // Use useLocation to access the state
@@ -69,27 +152,53 @@ const Activitiest = () => {
   }, []);
 
   const handleBookTour = async (id) => {
-    console.log("tourist ID:", touristId);
-    console.log("hp ID:", id);
+    const paymentMethod = prompt("Enter payment method (wallet/card):").toLowerCase();
+  
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+  
     try {
-      if (!touristId) {
-        alert("Tourist ID not found. Please log in.");
-        return;
-      }
-
       const response = await axios.patch(
         `http://localhost:8000/activity/book/${id}`,
-        { userId: touristId } // Send touristId in the request body
+        { userId: touristId, paymentMethod }
       );
-
-      if (response.status === 200) {
-        // Update the bookings count in the UI
-        setBookedActivities((prev) => [...prev, id]); // Mark activity as booked
-        alert("activity booked successfully!");
+  
+      const { clientSecret, message } = response.data;
+  
+      if (paymentMethod === "card" && clientSecret) {
+        setClientSecret(clientSecret);
+        setCurrentActivityId(id);
+        setIsPaymentModalOpen(true);
+      } else {
+        // Use the message from the backend
+        alert(message || "Activity booked successfully using wallet!");
+        fetchActivities(); // Refresh activities
       }
     } catch (error) {
       console.error("Error booking activity:", error);
-      alert("already booked");
+      // Check if the error has a response and message
+      const errorMessage = error.response?.data?.message || "Error booking activity. Please try again.";
+      alert(errorMessage);
+    }
+  };
+  
+
+  const handlePaymentSuccess = async (paymentIntentId) => {
+    try {
+      setIsPaymentModalOpen(false);
+
+      await axios.post(
+        `http://localhost:8000/activity/finalizeBooking/${currentActivityId}`,
+        { userId: touristId, paymentIntentId }
+      );
+
+      alert("Activity booked successfully!");
+      fetchActivities();
+    } catch (error) {
+      console.error("Error finalizing booking:", error);
+      alert("Booking was successful, but there was an error finalizing it.");
     }
   };
   const handleShare = (activity) => {
@@ -416,6 +525,16 @@ const handleCopy = (activity) => {
 
   return (
     <div id="activities">
+         {isPaymentModalOpen && (
+      <div className="payment-modal">
+        <Elements stripe={stripePromise}>
+          <PaymentForm
+            clientSecret={clientSecret}
+            onPaymentSuccess={handlePaymentSuccess}
+          />
+        </Elements>
+      </div>
+    )}
       <div className="back-button-container">
         <button
           className="back-button"

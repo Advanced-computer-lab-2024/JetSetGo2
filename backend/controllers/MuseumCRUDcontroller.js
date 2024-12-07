@@ -4,6 +4,7 @@ const router = express.Router();
 const Museum = require("../models/MuseumCRUD"); // Assuming you have Museum model like HistoricalPlaceCRUD
 const TourismGovernerTag = require("../models/tourismGovernerTags"); // Import the tourismGovernerTag model
 const User = require("../models/Tourist.js");
+const sendEmailFlag = require('../utils/sendEmailFlag');
 
 // CRUD operations
 
@@ -73,6 +74,17 @@ const getMuseumById = async (req, res) => {
     res.status(200).json(museum);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+
+const getMuseumNotifications = async (req, res) => {
+  try {
+    const museums = await Museum.find({ Notifications: { $exists: true, $not: { $size: 0 } } }, 'Notifications');
+    const notifications = museums.flatMap(museum => museum.Notifications);
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -309,6 +321,8 @@ const deleteAllMuseums = async (req, res) => {
   }
 };
 
+
+// Flag a Museum
 const flagMuseum = async (req, res) => {
   const { id } = req.params;
 
@@ -323,6 +337,17 @@ const flagMuseum = async (req, res) => {
     if (!updatedMuseum) {
       return res.status(404).json({ message: "Museum not found" });
     }
+
+    // Send email to the specified email address
+    const recipientEmail = "marwanallam8@gmail.com";
+    const subject = "A museum has been flagged";
+    const text = `Dear User, the museum with the following description has been flagged: ${updatedMuseum.description}`;
+
+    await sendEmailFlag(recipientEmail, subject, text);
+
+    const notificationMessage = `The Museum with Description ${updatedMuseum.description} has been flagged.`;
+    updatedMuseum.Notifications.push(notificationMessage);
+    await updatedMuseum.save();
 
     res.status(200).json(updatedMuseum);
   } catch (error) {
@@ -342,4 +367,5 @@ module.exports = {
   getBookedHP,
   cancelHP,
   submitReview,
+  getMuseumNotifications
 };

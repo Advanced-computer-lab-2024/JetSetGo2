@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 import { useNavigate } from "react-router-dom";
@@ -488,7 +489,7 @@ const MuseumCRUD = () => {
             {/* Museum details */}
             <div style={{ flex: 1, paddingRight: '20px' }}>
               <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
-                Name: {place.tourismGovernerTags.name}
+                Name: {place.tourismGovernerTags?.name}
               </h3>
               <img
                 src={place.pictures}

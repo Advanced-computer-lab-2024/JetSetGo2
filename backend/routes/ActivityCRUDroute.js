@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createActivity,getBookedactivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity, toggleActivation ,
+const {createActivity,finalizeActivityBooking,getBookedactivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity, toggleActivation ,
     getBookedactivity ,
     requestNotification, 
     getNotificationRequests} = require('../controllers/ActivityCRUDcontroller');
@@ -25,6 +25,7 @@ router.post('/requestNotification/:activityId', requestNotification);
 router.get("/notificationRequests/:id", getNotificationRequests);
 router.patch("/toggleActivation/:id", toggleActivation); 
 
+router.post("/finalizeBooking/:id", finalizeActivityBooking); // Finalize booking after payment
 
 
 module.exports = router;

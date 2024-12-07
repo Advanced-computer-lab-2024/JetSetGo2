@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -7,6 +8,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
+const scheduleBirthdayEmails = require("./birthdayScheduler");
+const cron = require("node-cron");
 
 const MongoURI = process.env.MONGO_URI;
 
@@ -40,6 +43,9 @@ const AdvertiserRoutes = require("./routes/AdverRoutes.js");
 const loginRoutes = require("./routes/authRoutes.js");
 const transportationRoutes = require("./routes/TransportationCRUDroute.js");
 const complaintRoutes = require("./routes/complaintRoutes.js");
+const otpRoutes = require("./routes/otpRoutes.js");
+const promoCodeRoutes = require("./routes/promoCodeRoutes");
+const notificationRoutes = require("./routes/notificationRoutes.js");
 
 const app = express();
 app.use(express.json());
@@ -47,11 +53,40 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || "8000";
 
+const updateOrderStatuses = async () => {
+  try {
+    const tourists = await Tourist.find({});
+    const currentDate = new Date();
+
+    for (const tourist of tourists) {
+      for (const order of tourist.purchasedProducts) {
+        if (order.status === "Upcoming" && order.shippingDate && new Date(order.shippingDate) <= currentDate) {
+          order.status = "Shipped"; // Update to shipped if the shipping date has passed
+        }
+        if (order.status === "Shipped" && order.deliveredDate && new Date(order.deliveredDate) <= currentDate) {
+          order.status = "Delivered"; // Update to delivered if the delivery date has passed
+        }
+      }
+      await tourist.save(); // Save the updated tourist document
+    }
+
+    console.log("Order statuses updated successfully.");
+  } catch (error) {
+    console.error("Error updating order statuses:", error);
+  }
+};
+
+// Schedule the job to run daily at midnight
+cron.schedule("*/5 * * * *", updateOrderStatuses);
+
 // Connect to MongoDB
 mongoose
   .connect(MongoURI)
   .then(() => {
     console.log("MongoDB is now connected!");
+    // Start the birthday scheduler
+    scheduleBirthdayEmails();
+
     // Start server
     app.listen(port, () => {
       console.log(`Listening to requests on http://localhost:${port}`);
@@ -159,6 +194,11 @@ app.get("/home/tourist/bookedFlights/:touristId", async (req, res) => {
 });
 
 // Define your routes here
+
+
+// Register the payment routes AFTER the raw body middleware
+
+// Use raw body parsing specifically for Stripe webhook
 app.use("/activity", activityRoutes);
 app.use("/historicalPlace", historicalPlaceRoutes);
 app.use("/museum", museumRoutes);
@@ -177,6 +217,9 @@ app.use("/admin", adminRoutes);
 app.use("/login", loginRoutes);
 app.use("/transportation", transportationRoutes);
 app.use("/complaint", complaintRoutes);
+app.use("/otp", otpRoutes);
+app.use("/promo", promoCodeRoutes);
+app.use("/notifications", notificationRoutes);
 
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -300,7 +343,7 @@ app.get("/search", async (req, res) => {
       });
       searchResults.itinaries = await Itinerary.find({
         Tags: { $in: prefIds },
-      });
+      }); 
     } else {
       return res.status(400).json({ message: "Invalid Search Type." });
     }

@@ -41,6 +41,10 @@ const TGuidechema = new Schema(
       type: Number,
       required: false,
     },
+    Notifications: {
+      type: [String],
+      required: false,
+    },
     YearsOfExperience: {
       type: Number,
       required: false,

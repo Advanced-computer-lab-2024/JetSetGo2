@@ -1,8 +1,12 @@
 const Schema = require("../models/schematour.js");
 const User = require("../models/Tourist.js");
+const TourGuide = require('../models/TGuide');
+const sendEmailFlag = require('../utils/sendEmailFlag');
 const { default: mongoose } = require("mongoose");
 const sendNotificationEmails = require("../utils/tabbakh");
-
+const Stripe = require("stripe");
+const nodemailer = require("nodemailer");
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const createGuide = async (req, res) => {
   const {
     name,
@@ -114,59 +118,110 @@ function calculateLoyaltyPoints(level, price) {
   return points;
 }
 
+
 const bookTour = async (req, res) => {
-  const { id } = req.params; // Extract the tour ID from the URL parameters
-  const userId = req.body.userId; // Get userId from the request body (can come from the frontend or authenticated session)
+  const { id } = req.params; // Tour ID
+  const { userId, paymentMethod } = req.body;
 
   try {
+    // Find the itinerary to be booked
     const schema = await Schema.findById(id);
     if (!schema) {
       return res.status(404).json({ message: "Tour not found" });
     }
 
-    // Increment the bookings count if the user has not booked this tour before
-    await schema.incrementBookings(userId);
+    // Check if the user has already booked this itinerary
+    if (schema.bookedUsers.includes(userId)) {
+      return res.status(400).json({ message: "You have already booked this tour." });
+    }
 
-    // Retrieve the user from the database using the userId
-    const user = await User.findById(userId); // Assuming you have a User model
-
+    // Find the user attempting to book the tour
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Use the existing calculateLoyaltyPoints function
-    const loyaltyPoints = calculateLoyaltyPoints(
-      user.Loyalty_Level,
-      schema.TourPrice
-    );
+    if (paymentMethod === "card") {
+      // Create a PaymentIntent for the card payment
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: schema.TourPrice*100, // Convert price to cents
+        currency: "usd", // Currency code
+        metadata: {
+          tourId: id, // Pass the itinerary ID
+          userId: userId, // Pass the user ID
+          type: "itinerary", // Optional type field
+        },
+      });
 
-    // Add loyalty points to the user's account
-    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
-    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
+      console.log("Generated PaymentIntent client_secret:", paymentIntent.client_secret);
 
-    if (user.Total_Loyalty_Points >= 500000) {
-      user.Loyalty_Level = 3;
-    } else if (user.Total_Loyalty_Points >= 100000) {
-      user.Loyalty_Level = 2;
+      // Send the `client_secret` to the frontend
+      return res.status(200).json({
+        clientSecret: paymentIntent.client_secret,
+        message: "Payment initiated. Confirm payment on the frontend.",
+      });
+    } else if (paymentMethod === "wallet") {
+    
+      if (user.Wallet < schema.TourPrice) {
+        return res.status(400).json({
+          message: "Insufficient wallet balance. Please top up your wallet.",
+        });
+      }
+
+      // Deduct the activity price from the user's wallet
+      user.Wallet -= schema.TourPrice;
+      await user.save(); // Save the updated user balance
+
+      schema.bookedUsers.push(userId);
+      schema.bookings += 1;
+      await schema.save();
+
+    
+
+      return res.status(200).json({ message: "Tour booked successfully using wallet." });
     } else {
-      user.Loyalty_Level = 1;
+      return res.status(400).json({ message: "Invalid payment method" });
     }
-    // Save the updated user record
-    await user.save();
-
-    res.status(200).json({
-      message: "Booking successful",
-      bookings: schema.bookings,
-      earnedPoints: loyaltyPoints, // Include the points earned in the response
-      totalLoyaltyPoints: user.Loyalty_Points, // Include total points in the response
-    });
   } catch (error) {
-    if (error.message === "User has already booked this tour.") {
-      return res.status(409).json({ message: error.message }); // Handle duplicate booking
-    }
-    res.status(500).json({ message: error.message });
+    console.error("Error in bookTour:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+const finalizeBooking = async (req, res) => {
+  const { id } = req.params;
+  const { userId} = req.body;
+
+  try {
+    const schema = await Schema.findById(id);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!schema) {
+      return res.status(404).json({ message: "Itinerary not found." });
+    }
+    if (schema.bookedUsers.includes(userId)) {
+      return res.status(400).json({ message: "You have already booked this tour." });
+    }
+    schema.bookedUsers.push(userId);
+
+    // Update booking status
+    schema.isBooked = true;
+    schema.bookings += 1; // Increment bookings count
+    await schema.save();
+    user.Loyalty_Points += calculateLoyaltyPoints(user.Loyalty_Level, schema.TourPrice);
+      await user.save();
+    res.status(200).json({ message: "Booking finalized successfully." });
+  } catch (error) {
+    console.error("Error finalizing booking:", error.message);
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+
+
+
 
 // Read Guide by ID
 const readGuideID = async (req, res) => {
@@ -260,6 +315,27 @@ const flagItinerary = async (req, res) => {
     if (!updatedSchema) {
       return res.status(404).json({ message: "Itinerary not found" });
     }
+
+    // Fetch the tour guide's ID from the itinerary
+    const tourGuideId = updatedSchema.tourGuide;
+
+    // Use the TourGuide model to get the tour guide's email
+    const tourGuide = await TourGuide.findById(tourGuideId);
+
+    if (!tourGuide) {
+      return res.status(404).json({ message: "Tour guide not found" });
+    }
+
+    const tourGuideEmail = tourGuide.Email; // Assuming the tour guide has an email field
+    const subject = "Your itinerary has been flagged";
+    const text = `Dear Tour Guide, your itinerary with name ${updatedSchema.name} has been flagged.`;
+
+    await sendEmailFlag(tourGuideEmail, subject, text);
+    const notificationMessage = `Your itinerary with name ${updatedSchema.name} has been flagged.`;
+
+    // Push the notification to the tour guide's Notifications array
+    tourGuide.Notifications.push(notificationMessage);
+    await tourGuide.save();
 
     res.status(200).json(updatedSchema);
   } catch (error) {
@@ -527,6 +603,7 @@ const getNotificationRequests = async (req, res) => {
 
 
 module.exports = {
+  
   createGuide,
   readGuide,
   readGuideID,
@@ -542,4 +619,5 @@ module.exports = {
   getIteneraries,
   getNotificationRequests,
   requestNotification
+  finalizeBooking
 };

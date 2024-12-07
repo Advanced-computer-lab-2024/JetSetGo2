@@ -109,6 +109,7 @@ const deleteTGuide = async (req, res) => {
     });
   }
 };
+
 const createUser = async (req, res) => {
   //add a new user to the database with
   //Name, Email and Age
@@ -136,6 +137,7 @@ const createUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 const submitReview = async (req, res) => {
   const { userId, rating, comment } = req.body;
   const { tourGuideId } = req.params;
@@ -169,6 +171,7 @@ const submitReview = async (req, res) => {
 };
 
 const acceptTourguide = async (req, res) => {
+ 
   try {
     const { id } = req.params;
 

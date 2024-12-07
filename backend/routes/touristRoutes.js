@@ -24,7 +24,27 @@ const {
   toggleBookmarkItinerary,
   toggleBookmarkHistoricalPlace,
   toggleBookmarkMuseum
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
+  addToCart,
+  getCart,
+  removeFromCart,
+  updateCartQuantity,
+  addDeliveryAddress,
+  getTouristAddresses,
+  buyProducts,
 } = require("../controllers/touristController");
+router.post("/add/:touristId/:productId", addToCart);
+router.get("/cart/:touristId", getCart);
+router.delete("/remove/:touristId/:productId", removeFromCart);
+router.put("/updateq", updateCartQuantity);
+router.post("/address/:touristId", addDeliveryAddress);
+router.get("/geta/:userId", getTouristAddresses);
+
+
+
+
 
 router.get("/", (req, res) => {
   res.status(200).send("You have everything installed!");
@@ -48,11 +68,13 @@ router.get("/getBookedTransportations/:touristId", getBookedTransportations);
 // Products-related routes
 router.post("/buyProduct/:touristId/:productId", buyProduct);
 router.get("/getPurchasedProducts/:touristId", getPurchasedProducts);
+router.post("/buyProducts", buyProducts);
+
 router.post("/rateProduct/:productId", addRating);
 router.post("/reviewProduct/:productId", addReview);
 
 // Tourist features routes
-router.get("/getNat/:touristId", getTouristNationality);
+router.get("/getNat/:touristId",  getTouristNationality);
 router.put("/redeempoints/:id", redeemPointsToCash);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
 
@@ -69,5 +91,9 @@ router.post("/bookmarkMuseum/:touristId/:museumId", toggleBookmarkMuseum);
 
 
 
+// Wishlist routes
+router.post("/:userId/wishlist/add", addToWishlist);
+router.get("/:userId/wishlist", getWishlist);
+router.post("/:userId/wishlist/remove", removeFromWishlist);
 
 module.exports = router;

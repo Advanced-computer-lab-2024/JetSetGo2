@@ -1,6 +1,88 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+// Initialize Stripe
+const stripePromise = loadStripe("pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx"); // Replace with your Stripe publishable key
+
+
+
+const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements || !clientSecret) {
+      alert("Stripe or client secret is not ready. Please try again.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const cardElement = elements.getElement(CardElement);
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: "Customer Name", // Replace with actual user name if available
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Payment error:", error);
+        alert("Payment failed. Please try again.");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        alert("Payment successful!");
+        onPaymentSuccess(paymentIntent.id); // Pass PaymentIntent ID to finalize booking
+      }
+    } catch (err) {
+      console.error("Error during payment confirmation:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+   <CardElement
+  options={{
+    style: {
+      base: {
+        fontSize: "16px",
+        color: "#424770",
+        "::placeholder": {
+          color: "#aab7c4",
+        },
+      },
+      invalid: {
+        color: "#9e2146",
+      },
+    },
+    hidePostalCode: true, // This disables the ZIP/postal code field
+  }}
+
+      />
+      <button type="submit" disabled={!stripe || isProcessing}>
+        {isProcessing ? "Processing..." : "Pay"}
+      </button>
+    </form>
+  );
+};
+
+
+
+
+
+// Service method to fetch itineraries
+
 
 const currencyRates = {
   EUR: 1, // Base currency (assumed for conversion)
@@ -12,6 +94,8 @@ const Itinerariest = () => {
   const [itineraries, setItineraries] = useState([]);
   const [filteredItineraries, setFilteredItineraries] = useState([]);
   const [error, setError] = useState(null);
+  const [currentItineraryId, setCurrentItineraryId] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [bookmarkedItineraries, setBookmarkedItineraries] = useState([]);
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
@@ -24,6 +108,7 @@ const Itinerariest = () => {
 
   const [Tags, setTags] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [clientSecret, setClientSecret] = useState("");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +117,6 @@ const Itinerariest = () => {
   const fetchItineraries = async () => {
     try {
       if (!touristId) {
-        console.log(touristId);
         console.error("Tourist ID is missing");
         return;
       }
@@ -56,6 +140,7 @@ const Itinerariest = () => {
       setError("Failed to load itineraries.");
     }
   };
+  
 
   const fetchActivities = async () => {
     try {
@@ -260,33 +345,65 @@ const viewBookmarkedItineraries = async () => {
 
   // Function to handle booking the tour
   const handleBookTour = async (id) => {
+    const paymentMethod = prompt("Enter payment method (wallet/card):").toLowerCase();
+  
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+  
     try {
-      if (!touristId) {
-        alert("Tourist ID not found. Please log in.");
-        return;
-      }
-
       const response = await axios.patch(
         `http://localhost:8000/itinerary/book/${id}`,
-        { userId: touristId } // Send touristId in the request body
+        { userId: touristId, paymentMethod }
       );
-
+  
       if (response.status === 200) {
-        // Update the bookings count in the UI
-        setFilteredItineraries((prevItineraries) =>
-          prevItineraries.map((itinerary) =>
-            itinerary._id === id
-              ? { ...itinerary, isBooked: true, bookings: itinerary.bookings + 1 }
-              : itinerary
-          )
-        );
-        alert("Tour booked successfully!");
+        const { clientSecret } = response.data;
+        if (paymentMethod === "card" && clientSecret) {
+          setCurrentItineraryId(id);
+          setClientSecret(clientSecret);
+          setIsPaymentModalOpen(true); // Open payment modal
+        } else {
+          alert(response.data.message || "Tour booked successfully using wallet!");
+          fetchItineraries(); // Refresh itineraries
+        }
       }
     } catch (error) {
-      console.error("Error booking tour:", error);
-      alert("Error booking tour. Please try again.");
+      if (error.response?.status === 400) {
+        alert(error.response.data.message); // Display message from backend
+      } else {
+        console.error("Error initiating booking:", error);
+        alert("Error initiating booking. Please try again.");
+      }
     }
   };
+  
+  
+
+  const handlePaymentSuccess = async (paymentIntentId) => {
+    try {
+      setIsPaymentModalOpen(false);
+
+      // Call backend to finalize booking
+      await axios.post( `http://localhost:8000/itinerary/finalizeBooking/${currentItineraryId}`,
+        {
+          userId: touristId, // Send userId to backend
+        }
+      );
+
+      alert("Tour booked successfully!");
+      fetchItineraries(); // Refresh the itineraries to reflect the new booking status
+    } catch (error) {
+      console.error("Error finalizing booking:", error);
+      alert("Booking was successful, but there was an error finalizing it. Please contact support.");
+    }
+  };
+  
+  
+  
+  
+
 
   const handleCancelBooking = async (itineraryId, availableDate) => {
     try {
@@ -499,6 +616,14 @@ const viewBookmarkedItineraries = async () => {
             >
               {bookmarkedItineraries.includes(itinerary._id) ? "Unbookmark" : "Bookmark"}
             </button>
+    {isPaymentModalOpen && (
+        <div className="payment-modal">
+          <Elements stripe={stripePromise}>
+            <PaymentForm clientSecret={clientSecret} onPaymentSuccess={handlePaymentSuccess} />
+          </Elements>
+        </div>
+      )}
+
               <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
               <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
               
