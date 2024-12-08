@@ -34,11 +34,11 @@ const schema = new mongoose.Schema(
     rating: { type: Number, required: true },
     flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
     reviews: [
-      { 
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         rating: { type: Number, min: 1, max: 5 },
-        comment: { type: String }
-      }
+        comment: { type: String },
+      },
     ],
     isActive: { type: Boolean, default: true },
   },
@@ -57,10 +57,16 @@ schema.methods.toggleActive = async function () {
 };
 
 // Method to submit a review for the itinerary
-schema.methods.submitItineraryReview = async function (userId, rating, comment) {
+schema.methods.submitItineraryReview = async function (
+  userId,
+  rating,
+  comment
+) {
   this.itineraryReviews.push({ userId, rating, comment });
   // Recalculate the average rating based on all reviews
-  this.rating = this.itineraryReviews.reduce((acc, review) => acc + review.rating, 0) / this.itineraryReviews.length;
+  this.rating =
+    this.itineraryReviews.reduce((acc, review) => acc + review.rating, 0) /
+    this.itineraryReviews.length;
   await this.save();
 };
 
@@ -80,17 +86,24 @@ schema.methods.cancelBooking = async function (userId) {
     throw new Error("User has not booked this tour.");
   }
 
-  const nearestAvailableDate = this.availableDates.find(date => date > new Date());
+  const nearestAvailableDate = this.availableDates.find(
+    (date) => date > new Date()
+  );
   if (!nearestAvailableDate) {
     throw new Error("No future dates available for this tour.");
   }
 
-  const hoursDifference = (nearestAvailableDate - Date.now()) / (1000 * 60 * 60);
+  const hoursDifference =
+    (nearestAvailableDate - Date.now()) / (1000 * 60 * 60);
   if (hoursDifference < 48) {
-    throw new Error("Cancellations are allowed only 48 hours before the tour date.");
+    throw new Error(
+      "Cancellations are allowed only 48 hours before the tour date."
+    );
   }
 
-  this.bookedUsers = this.bookedUsers.filter(user => user.toString() !== userId.toString());
+  this.bookedUsers = this.bookedUsers.filter(
+    (user) => user.toString() !== userId.toString()
+  );
   this.bookings -= 1;
 
   await this.save();

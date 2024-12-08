@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const scheduleBirthdayEmails = require("./birthdayScheduler");
+const itenarynotification = require("./notificationScheduler.js");
 
 const MongoURI = process.env.MONGO_URI;
 
@@ -55,6 +56,7 @@ mongoose
     console.log("MongoDB is now connected!");
     // Start the birthday scheduler
     scheduleBirthdayEmails();
+    itenarynotification();
 
     // Start server
     app.listen(port, () => {
