@@ -1,10 +1,37 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
 
 const TourismGovernorPage = () => {
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const [notifications, setNotifications] = useState([]);
+
+  const fetchNotifications = async () => {
+    try {
+      const [historicalPlaceResponse, museumResponse] = await Promise.all([
+        axios.get('http://localhost:8000/historicalPlace/getNotifications'),
+        axios.get('http://localhost:8000/museum/getNotifications')
+      ]);
+
+      const historicalPlaceNotifications = historicalPlaceResponse.data.map(notification => ({
+        type: 'Historical Place',
+        message: notification
+      }));
+
+      const museumNotifications = museumResponse.data.map(notification => ({
+        type: 'Museum',
+        message: notification
+      }));
+
+      setNotifications([...historicalPlaceNotifications, ...museumNotifications]);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
 
   const buttonStyle = {
     margin: '10px',
@@ -96,22 +123,45 @@ const TourismGovernorPage = () => {
       <div style={styles.mainContent}>
         <h1 style={styles.header}>Hello Tourism Governor</h1>
 
+        
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {[
-            { label: 'Historical Places', path: '/historicalplaces' },
-            { label: 'Museum', path: '/museums' },
-          ].map((button) => (
-            <button
-              key={button.path}
-              style={buttonStyle}
-              onClick={() => navigate(button.path)}
-              onMouseEnter={handleHover}
-              onMouseLeave={handleLeave}
-            >
-              {button.label}
-            </button>
-          ))}
-        </div>
+        {[
+          { label: 'Historical Places', path: '/historicalplaces' },
+          { label: 'Museum', path: '/museums' },
+        ].map((button) => (
+          <button
+            key={button.path}
+            style={buttonStyle}
+            onClick={() => navigate(button.path)}
+            onMouseEnter={handleHover}
+            onMouseLeave={handleLeave}
+          >
+            {button.label}
+          </button>
+        ))}
+        <button
+          style={buttonStyle}
+          onClick={fetchNotifications}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+        >
+          Show Notifications
+        </button>
+      </div>
+      <div style={{ marginTop: '20px', width: '100%' }}>
+        <h2>Notifications</h2>
+        {notifications.length > 0 ? (
+          <ul>
+            {notifications.map((notification, index) => (
+              <li key={index}>
+                <strong>{notification.type}:</strong> {notification.message}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>click to see notifications</p>
+        )}
+      </div>
       </div>
     </div>
   );

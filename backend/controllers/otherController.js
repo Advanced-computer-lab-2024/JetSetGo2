@@ -8,19 +8,19 @@ const createOther = async (req, res) => {
   const { UserName, Email, Password, AccountType } = req.body;
 
   // Ensure files are uploaded and present in req.files
-const IDDocument = req.files.IDDocument
-? req.files.IDDocument[0].path.split(/[/\\]/).pop()
-: null; // Extract only the last part of the path for the ID document
-const Certificates = req.files.Certificates
-? req.files.Certificates[0].path.split(/[/\\]/).pop()
-: null; // Extract only the last part of the path for the certificate (if applicable)
-const TaxationRegistryCard = req.files.TaxationRegistryCard
-? req.files.TaxationRegistryCard[0].path.split(/[/\\]/).pop()
-: null; // Extract only the last part of the path for the taxation registry card (if applicable)
+  const IDDocument = req.files.IDDocument
+    ? req.files.IDDocument[0].path.split(/[/\\]/).pop()
+    : null; // Extract only the last part of the path for the ID document
+  const Certificates = req.files.Certificates
+    ? req.files.Certificates[0].path.split(/[/\\]/).pop()
+    : null; // Extract only the last part of the path for the certificate (if applicable)
+  const TaxationRegistryCard = req.files.TaxationRegistryCard
+    ? req.files.TaxationRegistryCard[0].path.split(/[/\\]/).pop()
+    : null; // Extract only the last part of the path for the taxation registry card (if applicable)
 
-    console.log("IDDocument:", IDDocument);
-    console.log("Certificates:", Certificates);
-    console.log("TaxationRegistryCard:", TaxationRegistryCard);
+  console.log("IDDocument:", IDDocument);
+  console.log("Certificates:", Certificates);
+  console.log("TaxationRegistryCard:", TaxationRegistryCard);
 
   try {
     if (AccountType == "Seller") {
@@ -31,8 +31,6 @@ const TaxationRegistryCard = req.files.TaxationRegistryCard
         IDDocument,
         TaxationRegistryCard,
         Profile_Completed: false,
-        
-        
       });
     }
 
@@ -44,19 +42,17 @@ const TaxationRegistryCard = req.files.TaxationRegistryCard
         IDDocument,
         Certificates,
         Profile_Completed: false,
-        
       });
     }
 
     if (AccountType == "Advertiser") {
       const seller = await AdverModel.create({
         UserName,
-        Email,
+        email: Email,
         Password,
         IDDocument,
         TaxationRegistryCard,
         Profile_Completed: false,
-        
       });
     }
 
@@ -67,5 +63,4 @@ const TaxationRegistryCard = req.files.TaxationRegistryCard
   }
 };
 
-
-module.exports = { createOther};
+module.exports = { createOther };

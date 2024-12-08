@@ -4,6 +4,8 @@ const Category = require("../models/CategoryCRUD");
 const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
 const PrefTag = require("../models/preferanceTagsCRUD");
 const User = require("../models/Tourist.js");
+const adverModel = require('../models/AdverMODEL');
+const sendEmailFlag = require('../utils/sendEmailFlag');
 
 // Create Activity
 const createActivity = async (req, res) => {
@@ -44,7 +46,7 @@ const getActivity = async (req, res) => {
   try {
     const activities = await Activity.find()
       .populate("category", "name") // Populate the 'category' field with the 'name'
-      .populate("advertiser", "UserName")
+      .populate("advertiser", "UserName Email")
       .populate("tags"); // Populate the 'advertiser' field with the 'name'
 
     res.status(200).json(activities);
@@ -367,9 +369,31 @@ const flagActivity = async (req, res) => {
       return res.status(404).json({ message: "Activity not found" });
     }
 
+    // Fetch the advertiser's ID from the activity
+    const advertiserId = updatedActivity.advertiser;
+
+    // Use the getAdverById method to get the advertiser's email
+    const advertiser = await adverModel.findById(advertiserId);
+
+    if (!advertiser) {
+      return res.status(404).json({ message: "Advertiser not found" });
+    }
+
+    const advertiserEmail = advertiser.Email; // Assuming the advertiser has an Email field
+    const subject = "Your activity has been flagged";
+    const text = `Dear Advertiser, your activity with ID ${id} has been flagged.`;
+
+    await sendEmailFlag(advertiserEmail, subject, text);
+
+    const notificationMessage = `Your activity with name ${updatedActivity.name} has been flagged.`;
+
+    // Push the notification to the tour guide's Notifications array
+    advertiser.Notifications.push(notificationMessage);
+    await advertiser.save();
+
     res.status(200).json(updatedActivity);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -242,6 +242,7 @@ const getLoyaltyImage = () => {
 return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/sites/default/files/badges/champ_level01.png";
 };
 
+
   return (
     <div style={styles.container}>
       {/* Tourist Profile Section */}
@@ -299,6 +300,21 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
             My Museums
           </button>
           <button
+  onClick={() => navigate("/my-orders")}
+  style={{
+    padding: "10px 20px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    marginTop: "10px",
+  }}
+>
+  My Orders
+</button>
+
+          <button
             onClick={handleDeleteAccount}
             style={{
               color: "red",
@@ -309,6 +325,21 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           >
             Delete Account
           </button>
+<button
+  onClick={() => navigate("/cart")}
+  style={{
+    backgroundColor: "#007bff",
+    color: "#fff",
+    padding: "10px 15px",
+    borderRadius: "5px",
+    border: "none",
+    cursor: "pointer",
+    marginTop: "10px",
+  }}
+>
+  View My Cart
+</button>
+
           <button style={styles.button} onClick={handleLogout}>
             Logout
           </button>{" "}

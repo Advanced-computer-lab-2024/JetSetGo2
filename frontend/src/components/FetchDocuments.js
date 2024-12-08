@@ -118,6 +118,7 @@ const OthersListPage = () => {
   };
   
   const handleAcceptAdver = async (adverId) => {
+    
     try {
       const response = await fetch(
         `http://localhost:8000/home/adver/acceptAdver/${adverId}`,

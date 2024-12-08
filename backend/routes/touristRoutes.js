@@ -16,15 +16,28 @@ const {
   addReview,
   redeemPointsToCash,
   reqAccountToBeDeleted,
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
   addToCart,
   getCart,
   removeFromCart,
+  updateCartQuantity,
+  addDeliveryAddress,
+  getTouristAddresses,
+  buyProducts,
   addPereferenceTags,
   getTouristPreferences
 } = require("../controllers/touristController");
-router.post("/cart/add/:touristId/:productId", addToCart);
+router.post("/add/:touristId/:productId", addToCart);
 router.get("/cart/:touristId", getCart);
-router.delete("/cart/remove/:touristId/:productId", removeFromCart);
+router.delete("/remove/:touristId/:productId", removeFromCart);
+router.put("/updateq", updateCartQuantity);
+router.post("/address/:touristId", addDeliveryAddress);
+router.get("/geta/:userId", getTouristAddresses);
+
+
+
 
 
 router.get("/", (req, res) => {
@@ -37,6 +50,8 @@ router.post(
   bookTransportation
 );
 router.post("/buyProduct/:touristId/:productId", buyProduct);
+router.post("/buyProducts", buyProducts);
+
 router.post("/rateProduct/:productId", addRating);
 router.post("/reviewProduct/:productId", addReview);
 router.put("/updateTourist/:id", updateTourist);
@@ -46,11 +61,15 @@ router.get("/get", getTourist);
 router.get("/getTourist/:id", getTouristById);
 router.get("/getBookedTransportations/:touristId", getBookedTransportations);
 router.get("/getPurchasedProducts/:touristId", getPurchasedProducts);
-router.get("/getNat/:touristId",getTouristNationality);
+router.get("/getNat/:touristId", getTouristNationality);
 router.delete("/delete/:id", deleteTourist);
 router.delete("/deleteAllTourist", deleteAllTourist);
 router.put("/redeempoints/:id", redeemPointsToCash);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
+// Wishlist routes
+router.post("/:userId/wishlist/add", addToWishlist);
+router.get("/:userId/wishlist", getWishlist);
+router.post("/:userId/wishlist/remove", removeFromWishlist);
 router.post("/addPreferenceTags/:id", addPereferenceTags);
 router.get("/preferences/:id", getTouristPreferences);
 

@@ -68,11 +68,17 @@ const TouristSchema = new Schema(
       default: 1,
     },
     bookedHotels: [Object],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ], // Array of product IDs
     
     cart: [
       {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          ref: "Product", quantity: { type: Number, default: 1 },
       },
   ],
   preferenceTags: [
@@ -81,6 +87,16 @@ const TouristSchema = new Schema(
       ref: "PreferenceTag",
       default: [],
     },
+  ],
+  deliveryAddresses: [
+    {
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
+    
   ],
   },
   { timestamps: true }

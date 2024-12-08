@@ -1,5 +1,7 @@
 const Schema = require("../models/schematour.js");
 const User = require("../models/Tourist.js");
+const TourGuide = require('../models/TGuide');
+const sendEmailFlag = require('../utils/sendEmailFlag');
 const { default: mongoose } = require("mongoose");
 
 const createGuide = async (req, res) => {
@@ -263,6 +265,27 @@ const flagItinerary = async (req, res) => {
     if (!updatedSchema) {
       return res.status(404).json({ message: "Itinerary not found" });
     }
+
+    // Fetch the tour guide's ID from the itinerary
+    const tourGuideId = updatedSchema.tourGuide;
+
+    // Use the TourGuide model to get the tour guide's email
+    const tourGuide = await TourGuide.findById(tourGuideId);
+
+    if (!tourGuide) {
+      return res.status(404).json({ message: "Tour guide not found" });
+    }
+
+    const tourGuideEmail = tourGuide.Email; // Assuming the tour guide has an email field
+    const subject = "Your itinerary has been flagged";
+    const text = `Dear Tour Guide, your itinerary with name ${updatedSchema.name} has been flagged.`;
+
+    await sendEmailFlag(tourGuideEmail, subject, text);
+    const notificationMessage = `Your itinerary with name ${updatedSchema.name} has been flagged.`;
+
+    // Push the notification to the tour guide's Notifications array
+    tourGuide.Notifications.push(notificationMessage);
+    await tourGuide.save();
 
     res.status(200).json(updatedSchema);
   } catch (error) {
