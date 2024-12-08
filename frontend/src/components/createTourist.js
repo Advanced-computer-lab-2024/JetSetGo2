@@ -59,7 +59,7 @@ const TouristSignup = () => {
           Back to website →
         </button>
         <div className="caption">
-          <p>Capturing Moments, Creating Memories</p>
+          
           <div className="pagination-dots">
             <span></span>
             <span></span>
