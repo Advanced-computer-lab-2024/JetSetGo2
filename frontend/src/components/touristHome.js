@@ -300,6 +300,20 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
             My Museums
           </button>
           <button
+            onClick={() =>
+              navigate("/MyUpcomingAct", { state: { touristId: touristId } })
+            }
+          >
+            My Booked Upcoming activities
+          </button>
+          <button
+            onClick={() =>
+              navigate("/MyUpcomingIten", { state: { touristId: touristId } })
+            }
+          >
+            My Booked Upcoming Itenaries
+          </button>
+          <button
   onClick={() => navigate("/my-orders")}
   style={{
     padding: "10px 20px",

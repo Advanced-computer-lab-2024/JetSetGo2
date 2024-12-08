@@ -8,7 +8,6 @@ const sendEmailFlag = require('../utils/sendEmailFlag');
 
 // CRUD operations
 
-// Create a Museum with tourismGovernerTags reference
 const createMuseum = async (req, res) => {
   try {
     const {
@@ -20,15 +19,14 @@ const createMuseum = async (req, res) => {
       nativeTicketPrice,
       studentTicketPrice,
       tourismGovernerTags,
+      isActive, // Optional field
     } = req.body;
 
-    // Find the tourismGovernerTags (this ensures you're referencing valid tags)
     const tag = await TourismGovernerTag.findById(tourismGovernerTags);
     if (!tag) {
       return res.status(400).json({ error: "Invalid tourism governer tag" });
     }
 
-    // Create the museum
     const museum = await Museum.create({
       description,
       pictures,
@@ -37,7 +35,8 @@ const createMuseum = async (req, res) => {
       foreignerTicketPrice,
       nativeTicketPrice,
       studentTicketPrice,
-      tourismGovernerTags: tag._id, // Reference the tourismGovernerTags by _id
+      tourismGovernerTags: tag._id,
+      isActive: isActive || false, // Default to false if not provided
     });
 
     res.status(201).json(museum);
@@ -45,6 +44,7 @@ const createMuseum = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Fetch all Museums with populated tourismGovernerTags
 const getMuseum = async (req, res) => {
@@ -77,6 +77,7 @@ const getMuseumById = async (req, res) => {
   }
 };
 
+
 const getMuseumNotifications = async (req, res) => {
   try {
     const museums = await Museum.find({ Notifications: { $exists: true, $not: { $size: 0 } } }, 'Notifications');
@@ -87,12 +88,10 @@ const getMuseumNotifications = async (req, res) => {
   }
 };
 
-// Update a Museum (including tourismGovernerTags if provided)
 const updateMuseum = async (req, res) => {
-  const { id } = req.params; // Extract id from the request parameters
-  const updateData = {}; // Initialize an empty object for updates
+  const { id } = req.params;
+  const updateData = {};
 
-  // Only add fields to updateData if they exist in the request body
   if (req.body.description) updateData.description = req.body.description;
   if (req.body.pictures) updateData.pictures = req.body.pictures;
   if (req.body.location) updateData.location = req.body.location;
@@ -103,8 +102,8 @@ const updateMuseum = async (req, res) => {
     updateData.nativeTicketPrice = req.body.nativeTicketPrice;
   if (req.body.studentTicketPrice)
     updateData.studentTicketPrice = req.body.studentTicketPrice;
+  if (req.body.isActive !== undefined) updateData.isActive = req.body.isActive;
 
-  // Handle updating the tourismGovernerTags field
   if (req.body.tourismGovernerTags) {
     const tag = await TourismGovernerTag.findById(req.body.tourismGovernerTags);
     if (!tag) {
@@ -114,17 +113,16 @@ const updateMuseum = async (req, res) => {
   }
 
   try {
-    const updatedMuseum = await Museum.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true } // Ensure validators run on updates
-    );
+    const updatedMuseum = await Museum.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedMuseum) {
       return res.status(404).json({ error: "Museum not found" });
     }
 
-    res.status(200).json(updatedMuseum); // Send updated museum as response
+    res.status(200).json(updatedMuseum);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

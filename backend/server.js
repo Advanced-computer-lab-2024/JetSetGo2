@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
 require("dotenv").config();
 const scheduleBirthdayEmails = require("./birthdayScheduler");
 const itenarynotification = require("./notificationScheduler.js");
@@ -23,6 +24,7 @@ const Activity = require("./models/ActivityCRUD.js");
 const Category = require("./models/CategoryCRUD.js");
 const Itinerary = require("./models/schematour.js");
 const PreferenceTagSearch = require("./models/preferanceTagsCRUD.js");
+
 
 // Import routes
 const activityRoutes = require("./routes/ActivityCRUDroute");
@@ -63,7 +65,7 @@ mongoose
     // Start the birthday scheduler
     scheduleBirthdayEmails();
     itenarynotification();
-    changeorderstatus();
+    changeorderstatus();    
     // Start server
     app.listen(port, () => {
       console.log(`Listening to requests on http://localhost:${port}`);
@@ -92,7 +94,10 @@ const authMiddleware = (req, res, next) => {
 app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({ message: "Welcome to the protected route!", userId: req.userId });
 });
+app.use("/itinerary", itineraryRoutes);
+app.use("/", touristRoutes);
 
+app.use('/activity', activityRoutes); 
 function calculateLoyaltyPoints(level, price) {
   let points = 0;
 

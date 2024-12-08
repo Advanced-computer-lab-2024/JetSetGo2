@@ -49,8 +49,11 @@ const HPT = () => {
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
   const [bookedHP, setBookedHP] = useState([]); // Track booked activities
+  const [filteredBookmarkedHP, setFilteredBookmarkedHP] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate hook
   const location = useLocation(); // Use useLocation to access the state
+  const [bookmarkedHP, setBookmarkedHP] = useState([]); // Track bookmarked places
+
 
   //const touristId = location.state?.touristId || ""; // Extract touristId from the location state
   const touristId = localStorage.getItem("userId");
@@ -75,10 +78,75 @@ const HPT = () => {
       setFilteredPlaces(historicalPlaces);
     }
   }, [selectedTag, historicalPlaces]);
-
-
-
-
+  useEffect(() => {
+    fetchBookmarkedHistoricalPlaces(); // Fetch bookmarks on mount
+  }, []);
+  const viewBookmarkedHistoricalPlaces = async () => {
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+  
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/bookmarkedHistoricalPlaces/${touristId}`
+      );
+  
+      if (response.status === 200) {
+        const bookmarked = response.data;
+        if (bookmarked.length > 0) {
+          setFilteredPlaces(bookmarked); // Set the filtered places to the bookmarked historical places
+        } else {
+          alert("No bookmarked historical places to display.");
+          setFilteredPlaces([]); // Clear the filtered places
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching bookmarked historical places:", error);
+      alert("Failed to fetch bookmarked historical places. Please try again.");
+    }
+  };
+  const viewAllHistoricalPlaces = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/historicalPlace/get");
+      if (response.status === 200) {
+        const allPlaces = response.data;
+        setFilteredPlaces(allPlaces); // Reset the filtered places to all historical places
+      } else {
+        alert("Failed to fetch historical places.");
+      }
+    } catch (error) {
+      console.error("Error fetching all historical places:", error);
+      alert("Failed to fetch all historical places. Please try again.");
+    }
+  };
+  
+  const fetchBookmarkedHistoricalPlaces = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/bookmarkedHistoricalPlaces/${touristId}`
+      );
+      const bookmarkedIds = response.data.map((place) => place._id);
+      setBookmarkedHP(bookmarkedIds); // Store only IDs
+    } catch (error) {
+      console.error("Error fetching bookmarked places:", error);
+    }
+  };
+  const toggleBookmarkHistoricalPlace = async (id) => {
+    try {
+      console.log("Tourist ID:", touristId);
+      console.log("Itinerary ID:", id);
+      const response = await axios.post(
+        `http://localhost:8000/bookmarkHistoricalPlace/${touristId}/${id}`
+      );
+  
+      const updatedBookmarks = response.data.bookmarkedHistoricalPlaces;
+      setBookmarkedHP(updatedBookmarks); // Update bookmarked IDs
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      alert("Failed to toggle bookmark. Please try again.");
+    }
+  };
   const handleBookTour = async (id) => {
     try {
       console.log("tourist ID:", touristId);
@@ -208,6 +276,9 @@ const HPT = () => {
       <h2 style={styles.heading}>Historical Places</h2>
       {error && <p className="error">{error}</p>}
       <div className="back-button-container">
+      <button onClick={viewBookmarkedHistoricalPlaces}> Show Bookmarked Historical Places</button>
+<button onClick={viewAllHistoricalPlaces}>View All Historical Places</button>
+
         <button
           className="back-button"
           onClick={() => navigate(-1)}
@@ -232,6 +303,8 @@ const HPT = () => {
         <label htmlFor="tagFilter" style={styles.filterLabel}>
           Filter by Tourism Governor Tag:
         </label>
+        
+
         <select
           id="tagFilter"
           value={selectedTag}
@@ -264,7 +337,7 @@ const HPT = () => {
             return (
               <div key={place._id} style={styles.card}>
                 <h3 style={styles.cardTitle}>
-                  {place.tourismGovernerTags?.name || "Unnamed"}
+                  {place.tourismGovernerTags?.name }
                 </h3>
                 <p style={styles.cardText}>Description: {place.description}</p>
                 <p style={styles.cardText}>Location: {place.location}</p>
@@ -315,6 +388,15 @@ const HPT = () => {
                 )}
                 <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
                 <button onClick={() => handleShare(place)}>Share via mail </button>
+                <button
+  onClick={() => toggleBookmarkHistoricalPlace(place._id)}
+  style={{
+    backgroundColor: bookmarkedHP.includes(place._id) ? "gold" : "gray",
+    color: bookmarkedHP.includes(place._id) ? "black" : "white",
+  }}
+>
+  {bookmarkedHP.includes(place._id) ? "Unbookmark" : "Bookmark"}
+</button>
               </div>
 
             );

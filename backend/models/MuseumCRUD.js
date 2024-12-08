@@ -56,6 +56,7 @@ const museumSchema = new Schema(
       required: true,
     },
     flagged: { type: Boolean, default: false }, // Add flagged attribute with default value
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

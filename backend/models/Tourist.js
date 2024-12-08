@@ -68,6 +68,32 @@ const TouristSchema = new Schema(
       default: 1,
     },
     bookedHotels: [Object],
+
+    // New attributes for bookmarking
+    bookmarkedActivities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Activity",
+      },
+    ],
+    bookmarkedItineraries: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SchemaT",
+      },
+    ],
+    bookmarkedHistoricalPlaces: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "HistoricalPlace",
+      },
+    ],
+    bookmarkedMuseums: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Museum",
+      },
+    ],
     wishlist: [
       {
         type:  mongoose.Schema.Types.ObjectId,

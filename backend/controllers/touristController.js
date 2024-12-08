@@ -759,6 +759,212 @@ const addReview = async (req, res) => {
     return res.status(500).json({ error: error.message }); // Return error response
   }
 };
+// Method to get bookmarked historical places
+
+
+// Method to get bookmarked museums
+
+const getBookmarkedActivities = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId).populate("bookmarkedActivities");
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    res.status(200).json({ bookmarkedActivities: tourist.bookmarkedActivities });
+  } catch (error) {
+    console.error("Error fetching bookmarked activities:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const toggleBookmarkActivity = async (req, res) => {
+  const { touristId, activityId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    const isBookmarked = tourist.bookmarkedActivities.includes(activityId);
+    if (isBookmarked) {
+      tourist.bookmarkedActivities = tourist.bookmarkedActivities.filter(
+        (id) => id.toString() !== activityId
+      );
+    } else {
+      tourist.bookmarkedActivities.push(activityId);
+    }
+
+    await tourist.save();
+
+    res.status(200).json({
+      message: isBookmarked
+        ? "Activity removed from bookmarks."
+        : "Activity added to bookmarks.",
+      bookmarkedActivities: tourist.bookmarkedActivities,
+    });
+  } catch (error) {
+    console.error("Error handling bookmark:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const getBookmarkedItineraries = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId).populate("bookmarkedItineraries");
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    res.status(200).json({ bookmarkedItineraries: tourist.bookmarkedItineraries });
+  } catch (error) {
+    console.error("Error fetching bookmarked itineraries:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+const toggleBookmarkItinerary = async (req, res) => {
+  const { touristId, itineraryId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    const isBookmarked = tourist.bookmarkedItineraries.includes(itineraryId);
+    if (isBookmarked) {
+      // Remove itinerary from bookmarks
+      tourist.bookmarkedItineraries = tourist.bookmarkedItineraries.filter(
+        (id) => id.toString() !== itineraryId
+      );
+    } else {
+      // Add itinerary to bookmarks
+      tourist.bookmarkedItineraries.push(itineraryId);
+    }
+
+    await tourist.save();
+
+    res.status(200).json({
+      message: isBookmarked
+        ? "Itinerary removed from bookmarks."
+        : "Itinerary added to bookmarks.",
+      bookmarkedItineraries: tourist.bookmarkedItineraries,
+    });
+  } catch (error) {
+    console.error("Error handling bookmark itinerary:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const getBookmarkedHistoricalPlaces = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId).populate("bookmarkedHistoricalPlaces");
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    res.status(200).json(tourist.bookmarkedHistoricalPlaces);
+  } catch (error) {
+    console.error("Error fetching bookmarked historical places:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+const toggleBookmarkHistoricalPlace = async (req, res) => {
+  const { touristId, historicalPlaceId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    const isBookmarked = tourist.bookmarkedHistoricalPlaces.includes(historicalPlaceId);
+    if (isBookmarked) {
+      // Remove historical place from bookmarks
+      tourist.bookmarkedHistoricalPlaces = tourist.bookmarkedHistoricalPlaces.filter(
+        (id) => id.toString() !== historicalPlaceId
+      );
+    } else {
+      // Add historical place to bookmarks
+      tourist.bookmarkedHistoricalPlaces.push(historicalPlaceId);
+    }
+
+    await tourist.save();
+
+    res.status(200).json({
+      message: isBookmarked
+        ? "Historical Place removed from bookmarks."
+        : "Historical Place added to bookmarks.",
+      bookmarkedHistoricalPlaces: tourist.bookmarkedHistoricalPlaces,
+    });
+  } catch (error) {
+    console.error("Error handling bookmark historical place:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const getBookmarkedMuseums = async (req, res) => {
+  const { touristId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId).populate("bookmarkedMuseums");
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    res.status(200).json({ bookmarkedMuseums: tourist.bookmarkedMuseums });
+  } catch (error) {
+    console.error("Error fetching bookmarked museums:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const toggleBookmarkMuseum = async (req, res) => {
+  const { touristId, museumId } = req.params;
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    const isBookmarked = tourist.bookmarkedMuseums.includes(museumId);
+    if (isBookmarked) {
+      // Remove from bookmarks
+      tourist.bookmarkedMuseums = tourist.bookmarkedMuseums.filter(
+        (id) => id.toString() !== museumId
+      );
+    } else {
+      // Add to bookmarks
+      tourist.bookmarkedMuseums.push(museumId);
+    }
+
+    await tourist.save();
+
+    res.status(200).json({
+      message: isBookmarked
+        ? "Museum removed from bookmarks."
+        : "Museum added to bookmarks.",
+      bookmarkedMuseums: tourist.bookmarkedMuseums,
+    });
+  } catch (error) {
+    console.error("Error toggling bookmark:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+
+
 
 const addToCart = async (req, res) => {
   const { touristId, productId } = req.params;
@@ -1043,8 +1249,17 @@ module.exports = {
   getPurchasedProducts,
   addRating,
   addReview,
+  addToWishlist,
   redeemPointsToCash,
   reqAccountToBeDeleted,
+  getBookmarkedActivities,
+  getBookmarkedItineraries,
+  getBookmarkedHistoricalPlaces,
+  getBookmarkedMuseums,
+  toggleBookmarkActivity,
+  toggleBookmarkItinerary,
+  toggleBookmarkHistoricalPlace,
+  toggleBookmarkMuseum,
   addToCart,
   getCart,
   removeFromCart,

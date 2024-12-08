@@ -126,6 +126,8 @@ const Activitiest = () => {
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [searchLocation, setSearchLocation] = useState("");
   const [error, setError] = useState(null);
+  const [bookmarkedActivities, setBookmarkedActivities] = useState([]);
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
   const [filters, setFilters] = useState({
     date: "",
@@ -272,6 +274,141 @@ const Activitiest = () => {
       setError("Failed to load Activities.");
     }
   };*/
+ 
+  
+  const handleBookmark = async (activityId) => {
+    console.log("Tourist ID:", touristId);
+    console.log("Activity ID:", activityId);
+  
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      const response = await axios.post(
+        `http://localhost:8000/bookmarkActivity/${touristId}/${activityId}`,
+        { userId: touristId } // Send touristId in the request body
+      );
+  
+      if (response.status === 200) {
+        // Update the bookmarked activities based on the response
+        setBookmarkedActivities(response.data.bookmarkedActivities);
+        alert(
+          response.data.message || 
+          "Bookmark toggled successfully!"
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      alert("Failed to toggle bookmark. Please try again.");
+    }
+  };
+  
+  useEffect(() => {
+    localStorage.setItem(
+      "bookmarkedActivities",
+      JSON.stringify(bookmarkedActivities)
+    );
+  }, [bookmarkedActivities]);
+  useEffect(() => {
+    const savedBookmarks = JSON.parse(localStorage.getItem("bookmarkedActivities")) || [];
+    console.log("Loaded bookmarks from localStorage:", savedBookmarks);
+    setBookmarkedActivities(savedBookmarks);
+  }, []);
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/tourists/${touristId}/bookmarks`);
+        setBookmarkedActivities(response.data.bookmarkedActivities);
+  
+        const activitiesResponse = await getActivity();
+        setActivities(activitiesResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    if (touristId) {
+      fetchInitialData();
+    }
+  }, [touristId]);
+    
+ 
+  // View all activities
+  const viewAllActivities = () => {
+    setFilteredActivities(activities); // Reset to show all activities
+    setShowOnlyBookmarked(false);
+  };
+
+  const viewBookmarkedActivities = async () => {
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+  
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/bookmarkActivity/${touristId}`
+      );
+  
+      if (response.status === 200) {
+        const bookmarked = response.data.bookmarkedActivities;
+        if (bookmarked.length > 0) {
+          setFilteredActivities(bookmarked); // Set filtered activities to the bookmarked ones
+          setShowOnlyBookmarked(true);
+        } else {
+          alert("No bookmarked activities to display.");
+          setFilteredActivities([]); // Clear filtered activities if no bookmarks exist
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching bookmarked activities:", error);
+      alert("Failed to fetch bookmarked activities. Please try again.");
+    }
+  };
+  
+ // Frontend Code
+const handleRequestNotification = async (activityId) => {
+  try {
+    console.log("Tourist ID:", touristId); // Log touristId
+    console.log("Activity ID:", activityId); // Log activityId
+
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+
+    const response = await axios.post(
+      `http://localhost:8000/activity/requestNotification/${activityId}`, // Ensure activityId is included in the URL
+      { userId: touristId } // Pass touristId in the body
+    );
+
+    if (response.status === 200) {
+      alert(response.data.message || "Notification request submitted successfully!");
+    }
+  } catch (error) {
+    console.error("Error requesting notification:", error);
+    alert("Failed to request notification. Please try again.");
+  }
+};
+
+  
+  
+  
+  
+  useEffect(() => {
+    const savedBookmarks = JSON.parse(localStorage.getItem('bookmarkedActivities')) || [];
+    setBookmarkedActivities(savedBookmarks);
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem('bookmarkedActivities', JSON.stringify(bookmarkedActivities));
+  }, [bookmarkedActivities]);
+     // Initialize filteredActivities with all activities
+  useEffect(() => {
+    setFilteredActivities(activities);
+  }, [activities]);
 
   const fetchCategories = async () => {
     try {
@@ -294,27 +431,7 @@ const Activitiest = () => {
       );
     }
 
-    // Apply category filter
-    if (filters.category) {
-      filtered = filtered.filter(
-        (activity) => activity.category.name === filters.category
-      );
-    }
-
-    // Apply price range filter
-    if (filters.minPrice || filters.maxPrice) {
-      const minPrice = parseFloat(filters.minPrice) || 0;
-      const maxPrice = parseFloat(filters.maxPrice) || Infinity;
-      filtered = filtered.filter(
-        (activity) => activity.price >= minPrice && activity.price <= maxPrice
-      );
-    }
-
-    // Apply rating filter
-    if (filters.rating) {
-      const ratingLimit = parseFloat(filters.rating);
-      filtered = filtered.filter((activity) => activity.rating >= ratingLimit);
-    }
+ 
 
     // Sort activities based on selected criteria (price or rating) and order
     filtered.sort((a, b) => {
@@ -506,6 +623,8 @@ const handleCopy = (activity) => {
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
             </select>
+            <button onClick={viewBookmarkedActivities}>View Bookmarked Activities</button>
+            <button onClick={viewAllActivities}>View All Activities</button>
           </div>
         </div>
       </section>
@@ -550,7 +669,8 @@ const handleCopy = (activity) => {
                 <strong>Location:</strong> {activity.location}
               </p>
               <p>
-              <strong>Price:</strong> ${convertPrice(activity.price)} {selectedCurrency}              </p>
+                <strong>Price:</strong> ${convertPrice(activity.price)} {selectedCurrency}
+              </p>
               <p>
                 <strong>Tags:</strong> {activity.tags ? activity.tags.name : "No Tags"}
               </p>
@@ -566,17 +686,50 @@ const handleCopy = (activity) => {
               <p>
                 <strong>Rating:</strong> {activity.rating}
               </p>
-              
-              {/* Add a "Book Now" button */}
-              {bookedActivities.includes(activity._id) ? (
-                    <button onClick={() => handleCancelBooking(activity._id)}>Cancel Booking</button>
-                  ) : (
-                    <button onClick={() => handleBookTour(activity._id)}>Book Now</button>
-                  )}
+        
+              {/* Separate Bookmark Button */}
+              <button
+                onClick={() => handleBookmark(activity._id)}
+                style={{
+                  backgroundColor: bookmarkedActivities.includes(activity._id)
+                    ? "gold"
+                    : "white",
+                  color: bookmarkedActivities.includes(activity._id) ? "black" : "gray",
+                }}
+              >
+                {bookmarkedActivities.includes(activity._id) ? "Unbookmark" : "Bookmark"}
+              </button>
+        
+              {/* Button for Request Notification or Book Now */}
+              {activity.isActive ? (
+                bookedActivities.includes(activity._id) ? (
+                  <button onClick={() => handleCancelBooking(activity._id)}>
+                    Cancel Booking
+                  </button>
+                ) : (
+                  <button onClick={() => handleBookTour(activity._id)}>Book Now</button>
+                )
+              ) : bookmarkedActivities.includes(activity._id) ? (
+                <button onClick={() => handleRequestNotification(activity._id)}>
+                  Request Notification
+                </button>
+              ) : (
+                <button
+                  onClick={() => alert("Bookmark the activity to request notifications.")}
+                  style={{
+                    backgroundColor: "white",
+                    color: "gray",
+                    cursor: "pointer",
+                  }}
+                >
+                  Request Notification
+                </button>
+              )}
+        
               <button onClick={() => handleCopy(activity)}>Share via copy Link</button>
-                  <button onClick={() => handleShare(activity)}>Share via mail </button>
+              <button onClick={() => handleShare(activity)}>Share via mail</button>
             </div>
-
+        
             {/* Map iframe */}
             <iframe
               src={mapSrc}
@@ -585,13 +738,9 @@ const handleCopy = (activity) => {
               style={{ border: 'none' }}
               title={`Map of ${activity.location}`}
             ></iframe>
-            {/* {bookedActivities.includes(activity._id) ? (
-                    <button onClick={() => handleCancelBooking(activity._id)}>Cancel Booking</button>
-                  ) : (
-                    <button onClick={() => handleBookTour(activity._id)}>Book Now</button>
-                  )} */}
           </li>
         );
+        
       })}
     </ul>
   ) : (

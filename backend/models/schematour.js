@@ -21,6 +21,11 @@ const schema = new mongoose.Schema(
       ref: "User",
       default: [],
     },
+    notificationRequests: {
+      type: [mongoose.Schema.Types.ObjectId], // Stores tourist IDs
+      ref: "Tourist",
+      default: [],
+    },
     tourGuide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tour",
@@ -41,6 +46,8 @@ const schema = new mongoose.Schema(
       },
     ],
     isActive: { type: Boolean, default: true },
+
+    isActive1: { type: Boolean, default: false },
   },
   {
     timestamps: true,

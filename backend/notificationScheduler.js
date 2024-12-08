@@ -3,6 +3,7 @@ const moment = require("moment-timezone");
 const SchemaT = require("./models/schematour"); // Itinerary model
 const Notification = require("./models/Notification"); // Notification model
 const User = require("./models/Tourist"); // User model
+const itenaryMail = require("./utils/tabbakh3.js")
 
 const scheduleItineraryNotifications = async () => {
   try {
@@ -10,6 +11,7 @@ const scheduleItineraryNotifications = async () => {
 
     itineraries.forEach((itinerary) => {
       const cairoTimezone = "Africa/Cairo";
+
       // Iterate over all available dates for the itinerary
       itinerary.availableDates.forEach((date) => {
         const itineraryDate = moment(date);
@@ -17,8 +19,8 @@ const scheduleItineraryNotifications = async () => {
           .tz(itineraryDate, cairoTimezone)
           .subtract(1, "days")
           .set({
-            hour: 13,
-            minute: 34,
+            hour: 15,
+            minute: 4,
             second: 0,
           });
 
@@ -39,6 +41,8 @@ const scheduleItineraryNotifications = async () => {
                     message: notificationMessage,
                   });
 
+                  await itenaryMail(user.Email, user.UserName  ,itinerary.name , itineraryDate);
+
                   console.log(
                     `Notification sent to user ${user.Email} for itinerary "${itinerary.name}".`
                   );
@@ -52,6 +56,9 @@ const scheduleItineraryNotifications = async () => {
             }
           });
         }
+         else {
+            console.log("zby mnga ");
+         }
       });
     });
   } catch (err) {

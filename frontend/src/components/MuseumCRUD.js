@@ -33,6 +33,7 @@ const MuseumCRUD = () => {
       foreignerTicketPrice: '',
       nativeTicketPrice: '',
       studentTicketPrice: '',
+      isActive: false, // Add isActive field
   });
   const [pinPosition, setPinPosition] = useState([30.0444, 31.2357]); // Default to Cairo, Egypt
   const [searchLocation, setSearchLocation] = useState("");
@@ -172,6 +173,7 @@ const MuseumCRUD = () => {
       foreignerTicketPrice: museum.foreignerTicketPrice,
       nativeTicketPrice: museum.nativeTicketPrice,
       studentTicketPrice: museum.studentTicketPrice,
+      isActive: museum.isActive, // Load isActive state for editing
       
     });
     // Logic to set the pin position on the map based on the location
@@ -188,6 +190,7 @@ const MuseumCRUD = () => {
       foreignerTicketPrice: '',
       nativeTicketPrice: '',
       studentTicketPrice: '',
+      isActive: false, // Reset isActive
     });
     setCreatedTagId(null); // Reset created tag ID
     setPinPosition([30.0444, 31.2357]);
@@ -365,6 +368,15 @@ const MuseumCRUD = () => {
               required
             />
           </label>
+          <label>
+            Is Active:
+            <input
+              type="checkbox"
+              name="isActive"
+              checked={formData.isActive}
+              onChange={(e) => handleChange(e, setFormData)}
+            />
+          </label>
           <button type="submit">Create new museum</button>
         </form>
       </section>
@@ -433,6 +445,16 @@ const MuseumCRUD = () => {
               required
             />
           </label>
+          <label>
+            Is Active:
+            <input
+              type="checkbox"
+              name="isActive"
+              checked={formData.isActive}
+              onChange={(e) => handleChange(e, setFormData)}
+            />
+          </label>
+          
           
             <button type="submit">Update Museum</button>
           </form>
@@ -481,6 +503,7 @@ const MuseumCRUD = () => {
               <p>Native Ticket Price: {place.nativeTicketPrice}</p>
               <p>Student Ticket Price: {place.studentTicketPrice}</p>
               <p>Tags: {place.tourismGovernerTags?.type}</p>
+              <p>Active: {place.isActive ? 'Yes' : 'No'}</p>
             </div>
             {/* Edit and Delete buttons */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>

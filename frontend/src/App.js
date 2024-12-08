@@ -30,6 +30,8 @@ import MYHPT from "./components/myhp";
 import HPT from "./components/UpComingEvents/historicalplacest";
 import ItinerariesPage from "./components/myitenaries";
 import MyActivities from "./components/myactivities";
+import MyActivitiess from "./components/MyUpcomingAct";
+import ItinerariesPagee from "./components/MyUpcomingIten";
 import TouristHome from "./components/touristHome";
 import Museums from "./components/UpComingEvents/Museums";
 import HistoricalPlaces from "./components/UpComingEvents/HistoricalPlaces";
@@ -161,6 +163,8 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />;
           <Route path="/payment-options" element={<PaymentOptionsPage />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/MyUpcomingAct" element={< MyActivitiess />} />
+          <Route path="/MyUpcomingIten" element={< ItinerariesPagee />} />
 
           <Route path="/notifications" element={<Notifications />} />
         </Routes>

@@ -96,7 +96,8 @@ const Itinerariest = () => {
   const [error, setError] = useState(null);
   const [currentItineraryId, setCurrentItineraryId] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-
+  const [bookmarkedItineraries, setBookmarkedItineraries] = useState([]);
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
   const [sortRating, setSortRating] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
@@ -209,7 +210,109 @@ const Itinerariest = () => {
     setFilteredItineraries(filtered);
     console.log("Filtered Itineraries:", filtered); // Log filtered itineraries
   }, [itineraries, selectedTag, selectedPrice, selectedDate, selectedLanguage]);
+  // Fetch all itineraries initially
+useEffect(() => {
+  const fetchItineraries = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/allItineraries"); // Replace with your endpoint
+      setItineraries(response.data);
+      setFilteredItineraries(response.data);
+    } catch (error) {
+      console.error("Error fetching itineraries:", error);
+    }
+  };
 
+  fetchItineraries();
+}, []);
+
+// View all itineraries
+const viewAllItineraries = () => {
+  setFilteredItineraries(itineraries);
+  setShowOnlyBookmarked(false);
+};
+// Handle bookmarking an itinerary
+const handleBookmark = async (itineraryId) => {
+  console.log("Tourist ID:", touristId);
+  console.log("Itinerary ID:", itineraryId);
+
+  try {
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+
+    const response = await axios.post(
+      `http://localhost:8000/bookmarkItinerary/${touristId}/${itineraryId}`
+    );
+
+    if (response.status === 200) {
+      setBookmarkedItineraries((prev) => {
+        if (prev.includes(itineraryId)) {
+          // Remove from bookmarks if it was already bookmarked
+          return prev.filter((id) => id !== itineraryId);
+        } else {
+          // Add to bookmarks if not already bookmarked
+          return [...prev, itineraryId];
+        }
+      });
+      alert(response.data.message || "Bookmark updated successfully!");
+    }
+  } catch (error) {
+    console.error("Error toggling bookmark:", error);
+    alert("Failed to toggle bookmark. Please try again.");
+  }
+};
+
+useEffect(() => {
+  const fetchBookmarkedItineraries = async () => {
+    try {
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+
+      const response = await axios.get(
+        `http://localhost:8000/bookmarkItinerary/${touristId}`
+      );
+
+      if (response.status === 200) {
+        setBookmarkedItineraries(response.data.bookmarkedItineraries);
+      }
+    } catch (error) {
+      console.error("Error fetching bookmarked itineraries:", error);
+      alert("Failed to load bookmarked itineraries.");
+    }
+  };
+
+  fetchBookmarkedItineraries();
+}, [touristId]);
+
+const viewBookmarkedItineraries = async () => {
+  if (!touristId) {
+    alert("Tourist ID not found. Please log in.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/bookmarkItinerary/${touristId}`
+    );
+
+    if (response.status === 200) {
+      const bookmarked = response.data.bookmarkedItineraries;
+      if (bookmarked.length > 0) {
+        setFilteredItineraries(bookmarked); // Set the filtered activities to the bookmarked itineraries
+        setShowOnlyBookmarked(true);
+      } else {
+        alert("No bookmarked itineraries to display.");
+        setFilteredItineraries([]); // Clear the filtered activities
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching bookmarked itineraries:", error);
+    alert("Failed to fetch bookmarked itineraries. Please try again.");
+  }
+};
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortOrder(value);
@@ -360,6 +463,30 @@ const Itinerariest = () => {
     // Open the email client
     window.location.href = mailtoLink;
   };
+  const handleRequestNotification = async (itineraryId) => {
+    try {
+      console.log("Tourist ID:", touristId); // Add this before the request
+      console.log("itineraryId ID:", itineraryId);
+      if (!touristId) {
+        alert("Tourist ID not found. Please log in.");
+        return;
+      }
+  
+      const response = await axios.post(
+        `http://localhost:8000/itinerary/requestNotification/${itineraryId}`,
+        { userId: touristId }
+      );
+      
+  
+      if (response.status === 200) {
+        alert(response.data.message || "Notification request submitted successfully!");
+      }
+    } catch (error) {
+      console.error("Error requesting notification:", error);
+      alert("Failed to request notification. Please try again.");
+    }
+  };
+  
 
   return (
     <div id="itineraries">
@@ -421,6 +548,10 @@ const Itinerariest = () => {
           <option value="asc">Lowest to Highest</option>
           <option value="desc">Highest to Lowest</option>
         </select>
+        <div>
+        <button onClick={viewAllItineraries}>View All Itineraries</button>
+        <button onClick={viewBookmarkedItineraries}>View Bookmarked Itineraries</button>
+      </div>
 
         {/* Sort by Rating */}
         <label htmlFor="sortRating">Sort by Rating:</label>
@@ -474,6 +605,17 @@ const Itinerariest = () => {
               <p>
                 <strong>Bookings:</strong> {itinerary.bookings}
               </p>
+              <button
+              onClick={() => handleBookmark(itinerary._id)}
+              style={{
+                backgroundColor: bookmarkedItineraries.includes(itinerary._id)
+                  ? "gold"
+                  : "white",
+                color: bookmarkedItineraries.includes(itinerary._id) ? "black" : "gray",
+              }}
+            >
+              {bookmarkedItineraries.includes(itinerary._id) ? "Unbookmark" : "Bookmark"}
+            </button>
     {isPaymentModalOpen && (
         <div className="payment-modal">
           <Elements stripe={stripePromise}>
@@ -484,13 +626,35 @@ const Itinerariest = () => {
 
               <button onClick={() => handleCopyLink(itinerary._id)}>Share via copy Link</button>
               <button onClick={() => handleShareByEmail(itinerary)}>Share via mail</button>
-              {itinerary.isBooked ? (
-                <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
-                  Cancel Booking
-                </button>
-              ) : (
-                <button onClick={() => handleBookTour(itinerary._id)}>Book Tour</button>
-              )}
+              
+              {
+  itinerary.isActive ? (
+    itinerary.isBooked ? (
+      <button onClick={() => handleCancelBooking(itinerary._id, itinerary.availableDates[0])}>
+        Cancel Booking
+      </button>
+    ) : (
+      <button onClick={() => handleBookTour(itinerary._id)}>Book Tour</button>
+    )
+  ) : bookmarkedItineraries.includes(itinerary._id) ? ( // Check if itinerary is bookmarked
+    <button onClick={() => handleRequestNotification(itinerary._id)}>
+      Request Notification
+    </button>
+  ) : (
+    <button
+      onClick={() => handleBookmark(itinerary._id)}
+      style={{
+        backgroundColor: "white",
+        color: "gray",
+        cursor: "pointer",
+      }}
+    >
+      Bookmark to Request Notification
+    </button>
+  )
+}
+
+
             </li>
           ))}
         </ul>

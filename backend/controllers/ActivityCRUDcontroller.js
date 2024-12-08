@@ -4,6 +4,7 @@ const Category = require("../models/CategoryCRUD");
 const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
 const PrefTag = require("../models/preferanceTagsCRUD");
 const User = require("../models/Tourist.js");
+const  sendNotificationEmails  = require("../utils/tabbakh2");
 const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY); // Initialize Stripe with your secret key
 
@@ -230,6 +231,7 @@ const updateActivity = async (req, res) => {
     updateData.specialDiscount = req.body.specialDiscount;
   if (req.body.isBookingOpen !== undefined)
     updateData.isBookingOpen = req.body.isBookingOpen;
+  if (req.body.isActive !== undefined) updateData.isActive = req.body.isActive; // Allow toggling isActive
 
   try {
     const updatedActivity = await Activity.findByIdAndUpdate(
@@ -422,9 +424,144 @@ const flagActivity = async (req, res) => {
 
     res.status(200).json(updatedActivity);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
+
+const toggleActivation = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log("Toggling activation for activity ID:", id);
+
+    const activity = await Activity.findById(id).populate(
+      "notificationRequests",
+      "Email UserName" // Only fetch the email field
+    );
+
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found." });
+    }
+
+    activity.isActive = !activity.isActive; // Toggle activation
+    await activity.save();
+
+    if (activity.isActive) {
+      console.log("Activity activated, sending emails to:", activity.notificationRequests);
+
+      // Call the email sending function
+      await sendNotificationEmails(activity.notificationRequests, activity.name);
+    }
+    
+
+    res.status(200).json({ message: `Activity ${activity.isActive ? "activated" : "deactivated"}.` });
+  } catch (error) {
+    console.error("Error in toggleActivation:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+const getBookedactivity = async (req, res) => {
+  try {
+    const { touristId } = req.query;
+    // Validate touristId
+    if (!touristId || !mongoose.isValidObjectId(touristId.trim())) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing Tourist ID." });
+    }
+    // Find all itineraries that the tourist has booked
+    const bookedactivity = await Schema.find({
+      bookedUsers: touristId.trim(),
+    })
+      .populate("Tags", "name");
+    // Respond with the list of booked itineraries
+    res.status(200).json(bookedactivity);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const requestNotification = async (req, res) => {
+  const { activityId } = req.params;
+  const { userId } = req.body;
+
+  console.log("Request received for activityId:", activityId, "userId:", userId);
+
+  if (!mongoose.Types.ObjectId.isValid(activityId)) {
+    return res.status(400).json({ message: "Invalid Activity ID." });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid User ID." });
+  }
+
+  try {
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found." });
+    }
+
+    // Prevent duplicates
+    if (activity.notificationRequests.includes(userId)) {
+      return res.status(400).json({
+        message: "You have already requested a notification for this activity.",
+      });
+    }
+
+    // Add user ID to the array
+    activity.notificationRequests = [...activity.notificationRequests, userId];
+    await activity.save();
+
+    res.status(200).json({ message: "Notification request submitted successfully!" });
+  } catch (error) {
+    console.error("Error adding notification request:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
+
+const getNotificationRequests = async (req, res) => {
+  const { id } = req.params;
+
+  // Log the received ID
+  console.log("Fetching notification requests for activity ID:", id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    console.error("Invalid activity ID:", id);
+    return res.status(400).json({ message: "Invalid Itinerary ID." });
+  }
+
+  try {
+    // Attempt to find the itinerary
+    const activity = await Activity.findById(id).populate(
+      "notificationRequests", // Ensure this field exists in your schema
+      "Email" // Populate user fields
+    );
+
+    // Log what we fetched from the database
+    console.log("Fetched activity:", activity);
+
+    if (!activity) {
+      console.error("activity not found for ID:", id);
+      return res.status(404).json({ message: "activity not found." });
+    }
+
+    // Check if `notificationRequests` is populated correctly
+    if (!activity.notificationRequests) {
+      console.warn("No notification requests found.");
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(activity.notificationRequests);
+  } catch (error) {
+    console.error("Error fetching notification requests:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 
 module.exports = {
   createActivity,
@@ -440,5 +577,10 @@ module.exports = {
   cancelactivity,
   getBookedactivities,
   submitReview,
+  toggleActivation ,
+  getBookedactivity ,
+  requestNotification, 
+  getNotificationRequests,
+
   finalizeActivityBooking
 };

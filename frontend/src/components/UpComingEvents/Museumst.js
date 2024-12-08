@@ -41,14 +41,11 @@ const predefinedLocations = [
   // Add more locations as needed
 ];
 
-const currencyRates = {
-  EUR: 1,    // Base currency (assumed for conversion)
-  USD: 1,  // Example conversion rate
-  EGP: 30,   // Example conversion rate
-};
-
 const Museums = () => {
   const [museums, setMuseums] = useState([]);
+  const [bookmarkedMuseums, setBookmarkedMuseums] = useState([]); 
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+
   const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
@@ -102,12 +99,67 @@ const Museums = () => {
       setError("Failed to load Museums.");
     }
   };
+// Fetch bookmarked museums
+const fetchBookmarkedMuseums = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/bookmarkMuseum/${touristId}`
+    );
+    setBookmarkedMuseums(response.data.map((museum) => museum._id));
+  } catch (error) {
+    console.error("Error fetching bookmarked museums:", error);
+  }
+};
 
-  const generateMapSrc = (coordinates) => {
-    const [long1, lat1, long2, lat2] = coordinates.split(",");
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates}&layer=mapnik&marker=${lat1},${long1}`;
-  };
+const handleBookmarkToggle = async (museumId) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:8000/bookmarkMuseum/${touristId}/${museumId}`
+    );
 
+    if (response.status === 200) {
+      console.log("Bookmark toggled:", response.data);
+      fetchMuseums(); // Refresh museums to reflect bookmark status
+    }
+  } catch (error) {
+    console.error("Error toggling bookmark:", error);
+    alert("Failed to toggle bookmark. Please try again.");
+  }
+};
+
+const viewBookmarkedMuseums = async () => {
+  if (!touristId) {
+    alert("Tourist ID not found. Please log in.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/bookmarkMuseum/${touristId}`
+    );
+
+    if (response.status === 200) {
+      const bookmarked = response.data.bookmarkedMuseums;
+      if (bookmarked.length > 0) {
+        setFilteredMuseums(bookmarked); // Set the filtered museums to the bookmarked ones
+        setShowOnlyBookmarked(true);
+      } else {
+        alert("No bookmarked museums to display.");
+        setFilteredMuseums([]); // Clear filtered museums if no bookmarks exist
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching bookmarked museums:", error);
+    alert("Failed to fetch bookmarked museums. Please try again.");
+  }
+};
+
+
+const viewAllMuseums = () => {
+  setFilteredMuseums(museums);
+};
+
+  // Share by copying the link
   const handleCopybylink = (place) => {
     const link = `http://localhost:3000/M/${place._id}`;
     navigator.clipboard.writeText(link)
@@ -137,7 +189,7 @@ const Museums = () => {
         return;
       }
       const response = await axios.patch(
-        `http://localhost:8000/museum/book/${id}`,
+       ` http://localhost:8000/museum/book/${id}`,
         { userId: touristId } // Send touristId in the request body
       );
 
@@ -199,10 +251,16 @@ const Museums = () => {
   return (
     <div id="museums" style={styles.museumsContainer}>
       <div className="back-button-container">
-        <button className="back-button" onClick={() => navigate(-1)}>
+        <button
+          className="back-button"
+          onClick={() => navigate(-1)}
+        >
           Back
         </button>
-
+        <button onClick={viewAllMuseums}>View All Museums</button>
+        <button onClick={viewBookmarkedMuseums}>View Bookmarked Museums</button>
+        
+        
       </div>
       
       <style>{`
@@ -267,20 +325,6 @@ const Museums = () => {
       </div>
       {error && <p className="error">{error}</p>}
 
-      {/* Currency Selection */}
-      <div className="filter-container">
-        <label htmlFor="currencySelect">Choose Currency:</label>
-        <select
-          id="currencySelect"
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="EGP">EGP</option>
-        </select>
-      </div>
-
       {/* Filter by Tag */}
       <div className="filter-container">
         <label htmlFor="tagFilter">Filter by Tourism Governor Tag:</label>
@@ -306,8 +350,8 @@ const Museums = () => {
       </div>
 
       {filteredMuseums.length > 0 ? (
-        <div className="museum-cards">
-         {filteredMuseums.map((place) => {
+  <div className="museum-cards">
+    {filteredMuseums.map((place) => {
       // Extract latitude and longitude from the location string
       const locationCoords = place.location.split(",");
       const latitude = locationCoords[0];
@@ -365,29 +409,38 @@ const Museums = () => {
                   ) : (
                     <button onClick={() => handleBookTour(place._id)}>Book Now</button>
                   )}
+                  
           <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
           <button onClick={() => handleShare(place)}>Share via mail </button>
-              </div>
-            );
-          })}
+          <button
+              onClick={() => handleBookmarkToggle(place._id)}
+              style={{
+                Color: bookmarkedMuseums.includes(place._id)
+                  ? "gold"
+                  : "white",
+              }}
+            >
+              {bookmarkedMuseums.includes(place._id)
+                ? "Unbookmark"
+                : "Bookmark"}
+            </button>
+            
         </div>
-      ) : (
-        <p>No Museums available.</p>
-      )}
+      );
+    })}
+  </div>
+) : (
+  <p>No Museums available.</p>
+)}
+
     </div>
   );
 };
 
 const styles = {
-  museumsContainer: {
+  container: {
     padding: "20px",
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    color: "#FF4500",
-    fontSize: "24px",
-    textAlign: "center",
-    marginBottom: "20px",
+    backgroundColor: "#f7f8f9",
   },
 };
 
