@@ -57,7 +57,7 @@ const scheduleItineraryNotifications = async () => {
           });
         }
          else {
-            console.log("zby mnga ");
+            console.log("keda helw ya hoda  ");
          }
       });
     });
