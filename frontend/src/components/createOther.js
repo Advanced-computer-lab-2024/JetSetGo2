@@ -103,9 +103,6 @@ const OtherSignup = () => {
         <button className="back-to-website-btn" onClick={() => navigate("/")}>
           Back to website →
         </button>
-        <div className="caption">
-          <p>Sign up as Advertiser, Tour Guide, or Seller</p>
-        </div>
       </div>
 
       {/* Right Section */}

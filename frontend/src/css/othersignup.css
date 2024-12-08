@@ -28,7 +28,7 @@
 /* Left Section (Image Section) */
 .other-signup-left {
   flex: 1;
-  background-image: url('https://img.freepik.com/free-vector/flat-join-us-promo-illustrated_23-2148957743.jpg'); /* Replace with your actual image URL */
+  background-image: url('https://i.pinimg.com/736x/ba/e0/df/bae0df5d52b103513ad61dc9a7c945fd.jpg'); /* Replace with your actual image URL */
   background-size: cover;
   background-position: center;
   color: #FFFFFF; /* Text over image */
@@ -59,9 +59,6 @@
 
 .other-signup-left .back-to-website-btn:hover {
   background-color: rgba(255, 255, 255, 0.3); /* Slightly brighter on hover */
-}
-.back-to-website-btn:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.5); /* Accessible focus outline */
 }
 
 .other-signup-left .caption {
@@ -139,19 +136,20 @@
 }
 
 /* Checkbox Group */
-/* Checkbox Group */
 .checkbox-group {
   display: flex;
   align-items: center; /* Align items vertically */
   font-size: 1rem; /* Ensure consistent text size */
   color: #ffffff; /* Text color */
-  margin: 50px;
+  gap: 8px; /* Space between checkbox and text */
 }
 
 .checkbox-group input[type="checkbox"] {
-  margin: 0px; /* Remove default margin */
-  transform: scale(0.9); /* Slightly larger checkbox */
-  
+  width: 16px;
+  height: 16px;
+  margin: 0; /* Remove default margin */
+  cursor: pointer; /* Change cursor on hover */
+  accent-color: #8B5CF6; /* Custom color for checkbox */
 }
 
 .checkbox-group .terms-link {
@@ -160,7 +158,6 @@
   cursor: pointer;
   font-weight: bold; /* Make it distinct */
   transition: color 0.3s ease; /* Smooth hover transition */
-  margin: -400px
 }
 
 .checkbox-group .terms-link:hover {
