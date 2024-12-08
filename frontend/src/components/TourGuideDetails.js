@@ -1,82 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-
-const styles = {
-  container: {
-    display: "flex",
-    minHeight: "100vh",
-    backgroundColor: "#f7f8fa",
-    padding: "20px",
-  },
-  sidebar: {
-    width: "250px",
-    //backgroundColor: "#2d3e50",
-    padding: "20px",
-    borderRadius: "10px",
-    color: "#fff",
-  },
-  profileContainer: {
-    textAlign: "center",
-  },
-  profileImage: {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    marginBottom: "15px",
-    border: "3px solid #fff",
-    objectFit: "cover",
-  },
-  profileName: {
-    fontSize: "22px",
-    fontWeight: "bold",
-  },
-  button: {
-    margin: "10px",
-    padding: "10px 20px",
-    fontSize: "16px",
-    backgroundColor: "#ff6348",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-    transition: "background-color 0.3s, transform 0.3s",
-    width: "180px",
-    textAlign: "center",
-  },
-  mainContent: {
-    flex: 1,
-    marginLeft: "30px",
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-  },
-  header: {
-    fontSize: "28px",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-around",
-    //backgroundColor: "#2d3e50",
-    padding: "10px",
-    borderRadius: "5px",
-    marginBottom: "20px",
-  },
-  navLink: {
-    color: "#fff",
-    textDecoration: "none",
-  },
-};
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from './logoo444.JPG';
+import "../css/TourGuidePage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from './logoo4.JPG';
 
 const TourGuidePage = () => {
   const navigate = useNavigate();
   const [tourGuide, setTourGuide] = useState(null);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState("Details");
   const [formData, setFormData] = useState({
     UserName: "",
     Password: "",
@@ -161,7 +97,6 @@ const TourGuidePage = () => {
       setError("Error updating tour guide.");
     }
   };
-
   const handleImageUpload = (event, setData) => {
     const file = event.target.files[0];
     if (file) {
@@ -181,8 +116,6 @@ const TourGuidePage = () => {
     }
   };
 
-
-  // Function to handle account deletion
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete your account? This action cannot be undone."
@@ -199,7 +132,6 @@ const TourGuidePage = () => {
           navigate("/login"); // Redirect to homepage or login after deletion
         }
       } catch (error) {
-        // Handle errors, such as when there are upcoming booked itineraries
         if (error.response && error.response.data.message) {
           alert(error.response.data.message); // Display error message from backend
         } else {
@@ -208,225 +140,234 @@ const TourGuidePage = () => {
       }
     }
   };
+
   const handleLogout = () => {
-    // Clear user session or token if needed
-    localStorage.removeItem('userToken'); // Example: remove token from localStorage
-    navigate('/login'); // Redirect to the login page
+    localStorage.removeItem("userToken"); // Example: remove token from localStorage
+    navigate("/login"); // Redirect to the login page
   };
 
   const handleCancel = () => {
     setIsEditing(false); // Exit edit mode without saving changes
   };
 
-  if (error) return <div style={styles.error}>{error}</div>;
-  if (!tourGuide) return <div style={styles.loading}>Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!tourGuide) return <div className="loading">Loading...</div>;
 
   return (
-    <div style={styles.container}>
+    <div className="tour-guide-page">
+      <Navbar className="navbar">
+      <Container>
+        <Navbar.Brand href="#" className="navbar-brand">
+          {/* Replace with your logo */}
+          <img src={img1} alt="Logo" className="navbar-logo" />
+        </Navbar.Brand>
+        <Nav className="ml-auto">
+          <Link to="/Upcoming-activities" className="nav-link">
+            Activities
+          </Link>
+          <Link to="/Upcoming-itinerariestg" className="nav-link">
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" className="nav-link">
+            Historical Places
+          </Link>
+          <Link to="/all-museums" className="nav-link">
+            Museums
+          </Link>
+        </Nav>
+      </Container>
+    </Navbar>
+    <div className="admin-container">
       {/* Sidebar */}
-      <div style={styles.sidebar}>
-        <div style={styles.profileContainer}>
+      <div className="sidebar">
+        <div className="profile-container">
           <img
             src={`data:image/png;base64,${tourGuide.Photo}`}
             alt="Product"
-            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+            className="profile-image"
           />
-          <p style={styles.profileName}>{tourGuide.UserName}</p>
-          <button onClick={() => setIsEditing(true)} style={styles.button}>
+          <p className="profile-name">{tourGuide.UserName}</p>
+          <button onClick={() => setIsEditing(true)} className="sidebar-button">
             Edit
           </button>
-          <button onClick={handleSchemaTourFrontPage} style={styles.button}>
+          <button onClick={handleSchemaTourFrontPage} className="sidebar-button">
             Create/View Itinerary
           </button>
-          <button style={styles.button} onClick={handleLogout}>
+          <button className="sidebar-button" onClick={handleLogout}>
             Logout
-          </button> {/* Logout Button */}
+          </button>
           <button
             onClick={handleDeleteAccount}
-            style={{
-              color: "red",
-              background: "lightgrey",
-              padding: "10px",
-              marginTop: "20px",
-            }}
+            className="sidebar-button"
           >
             Delete Account
           </button>
         </div>
+        <div className="sidebar-image-container">
+          <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+        </div>
       </div>
 
-      {/* Main Content */}
-      <div style={styles.mainContent}>
-        <h1 style={styles.header}>Tour Guide Details</h1>
+      <div className="main-content">
+  <h1 className="header">Tour Guide Details</h1>
 
-        {notification && (
-          <div
-            style={{
-              padding: "10px",
-              backgroundColor: "#28a745",
-              color: "#fff",
-              borderRadius: "5px",
-              marginBottom: "20px",
-              textAlign: "center",
-            }}
-          >
-            {notification}
-          </div>
-        )}
-
-        {isEditing ? (
-          <form onSubmit={handleSubmit}>
-            <div style={styles.formGroup}>
-              <label>UserName:</label>
-              <input
-                name="UserName"
-                value={formData.UserName}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Password:</label>
-              <input
-                name="Password"
-                value={formData.Password}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Email:</label>
-              <input
-                name="Email"
-                value={formData.Email}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Age:</label>
-              <input
-                name="Age"
-                value={formData.Age}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Languages Spoken:</label>
-              <input
-                name="LanguagesSpoken"
-                value={formData.LanguagesSpoken}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Mobile Number:</label>
-              <input
-                name="MobileNumber"
-                value={formData.MobileNumber}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Years of Experience:</label>
-              <input
-                name="YearsOfExperience"
-                value={formData.YearsOfExperience}
-                onChange={handleChange}
-                style={styles.inputStyle}
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Previous Work:</label>
-              <input
-                name="PreviousWork"
-                value={formData.PreviousWork}
-                onChange={handleChange}
-                style={styles.inputStyle}
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label>Upload Photo:</label>
-              <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setFormData)}
-  required
-/>
-            </div>
-
-            <button type="submit" style={styles.button}>
-              Update
-            </button>
-            <button type="button" onClick={handleCancel} style={styles.button}>
-              Cancel
-            </button>
-          </form>
-        ) : (
-          <ul>
-            <li>
-              <strong>UserName:</strong> {tourGuide.UserName}
-            </li>
-
-            <li>
-              <strong>Email:</strong> {tourGuide.Email}
-            </li>
-            <li>
-              <strong>Age:</strong> {tourGuide.Age}
-            </li>
-            <li>
-              <strong>Languages Spoken:</strong> {tourGuide.LanguagesSpoken}
-            </li>
-            <li>
-              <strong>Mobile Number:</strong> {tourGuide.MobileNumber}
-            </li>
-            <li>
-              <strong>Years of Experience:</strong>{" "}
-              {tourGuide.YearsOfExperience}
-            </li>
-            <li>
-              <strong>Previous Work:</strong> {tourGuide.PreviousWork}
-            </li>
-            <li>
-  <strong>Notifications:</strong>
-  {tourGuide.Notifications && tourGuide.Notifications.length > 0 ? (
-    <ul>
-      {tourGuide.Notifications.map((notification, index) => (
-        <li key={index}>{notification}</li>
-      ))}
-    </ul>
-  ) : (
-    <p>No notifications</p>
+  {notification && (
+    <div className="notification">{notification}</div>
   )}
-</li>
-          </ul>
-        )}
 
-        {/* Navigation Links */}
-        <nav style={styles.navbar}>
-          <Link to="/Upcoming-activities" style={styles.navLink}>
-            Activities
-          </Link>
-          <Link to="/Upcoming-itinerariestg" style={styles.navLink}>
-            Itineraries
-          </Link>
-          <Link to="/all-historicalplaces" style={styles.navLink}>
-            Historical Places
-          </Link>
-          <Link to="/all-museums" style={styles.navLink}>
-            Museums
-          </Link>
-        </nav>
+  <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="tg">
+    <Tab eventKey="details" title="Details">
+    <div className="complaints-container">
+      {isEditing ? (
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>UserName:</label>
+            <input
+              name="UserName"
+              value={formData.UserName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password:</label>
+            <input
+              name="Password"
+              value={formData.Password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Email:</label>
+            <input
+              name="Email"
+              value={formData.Email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Age:</label>
+            <input
+              name="Age"
+              value={formData.Age}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Languages Spoken:</label>
+            <input
+              name="LanguagesSpoken"
+              value={formData.LanguagesSpoken}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mobile Number:</label>
+            <input
+              name="MobileNumber"
+              value={formData.MobileNumber}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Years of Experience:</label>
+            <input
+              name="YearsOfExperience"
+              value={formData.YearsOfExperience}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Previous Work:</label>
+            <input
+              name="PreviousWork"
+              value={formData.PreviousWork}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Upload Photo:</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, setFormData)}
+              required
+            />
+          </div>
+          <button type="submit" className="button">Update</button>
+          <button type="button" onClick={handleCancel} className="button">Cancel</button>
+        </form>
+      ) : (
+        <ul>
+          <li><strong>UserName:</strong> {tourGuide.UserName}</li>
+          <li><strong>Email:</strong> {tourGuide.Email}</li>
+          <li><strong>Age:</strong> {tourGuide.Age}</li>
+          <li><strong>Languages Spoken:</strong> {tourGuide.LanguagesSpoken}</li>
+          <li><strong>Mobile Number:</strong> {tourGuide.MobileNumber}</li>
+          <li><strong>Years of Experience:</strong> {tourGuide.YearsOfExperience}</li>
+          <li><strong>Previous Work:</strong> {tourGuide.PreviousWork}</li>
+          <li>
+            <strong>Notifications:</strong>
+            {tourGuide.Notifications && tourGuide.Notifications.length > 0 ? (
+              <ul>
+                {tourGuide.Notifications.map((notification, index) => (
+                  <li key={index}>{notification}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No notifications</p>
+            )}
+          </li>
+        </ul>
+      )}
+            </div>
+
+    </Tab>
+
+    
+  </Tabs>
+</div>
+{/* Right Sidebar */}
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    <button className="box" onClick={() => navigate("/category")}>Categories</button>
+    <button className="box" onClick={() => navigate("/TagsManagement")}>Tags</button>
+    <button className="box" onClick={() => navigate("/product")}>Products</button>
+    <button className="box" onClick={() => navigate("/activitiesAdmin")}>Activities</button>
+    <button className="box" onClick={() => navigate("/ItinerariesAdmin")}>Itineraries</button>
+    <button className="box" onClick={() => navigate("/MuseumsAdmin")}>Museums</button>
+    <button className="box" onClick={() => navigate("/HistoricalPlacesAdmin")}>Historical Places</button>
+  </div>
+</div>
+      
+</div>
+
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );
