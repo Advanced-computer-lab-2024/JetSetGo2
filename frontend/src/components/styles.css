@@ -1,0 +1,286 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: white; /* Set the primary background color to white */
+}
+
+.page-background {
+  background-color: white; /* Set the background color for the whole page */
+  min-height: 200vh; /* Ensure it covers the full viewport height */
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+    margin-bottom: 15px;
+    background-color: #2a2737;
+    border-radius: 20px; /* Adjust the radius as needed */
+  }
+
+.navbar .navbar-nav {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-left: -100px; /* Adjust this value to shift the tabs to the left */
+
+  }
+
+.navbar-nav .nav-link {
+  color: #fefefe !important;
+  font-weight: bold; /* Make the font thicker */
+  font-family: 'Roboto', sans-serif; /* Change the font family */
+  text-transform: uppercase;
+  font-weight: 400;
+  padding: 0 10px;
+  line-height: 60px;
+  letter-spacing: .5px;
+  display: block;
+  transition: color .25s ease, background-color .25s ease;
+  font-size: 20px; /* Adjust the font size as needed */
+
+}
+
+.navbar-nav .nav-link.selected {
+    color: white !important;
+  }
+
+.navbar-nav .nav-link.home-link {
+  color: white !important;
+  font-weight: bold; /* Make the font thicker */
+}
+.navbar-brand img {
+    height: 70px; /* Adjust the height as needed */
+    width: 180px
+}
+
+.navbar-nav .nav-link:hover {
+  color: #94a8bc !important;
+}
+
+.header {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.section {
+  padding: 100px 20px;
+  text-align: center;
+  border-radius: 15px; /* Adjust the radius as needed */
+margin-bottom: 15px;
+}
+
+.section h2 {
+  margin-bottom: 20px;
+}
+
+.section p {
+  margin-bottom: 20px;
+}
+
+.section.discover-section {
+    background-color: #d6d3d3;
+    border-radius: 20px; /* Adjust the radius as needed */
+    color: #fefefe;
+  }
+.section.welcome-section {
+    background-color: #666278;
+    border-radius: 20px; /* Adjust the radius as needed */
+    margin-bottom: 20px;
+
+}
+.welcome-image {
+    width: 20%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 10px; /* Optional: Add rounded corners */
+    
+  }
+
+.section.welcome-section h2 {
+    font-size: 50px;
+    color: #fefefe;
+    font-family: 'Roboto', sans-serif; /* Ensure you have imported this font in your HTML or CSS */
+    font-weight: bold; /* Make the font thicker */
+    font-size: 24px;
+
+}
+  
+  .section.welcome-section p {
+    font-size: 25px;
+    color: #fefefb;
+    font-family: 'Roboto', sans-serif; /* Ensure you have imported this font in your HTML or CSS */
+
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 20px; /* Adjust the radius as needed */
+  margin-bottom: 15px;
+
+
+}
+
+.card {
+    position: relative;
+    text-align: center;
+    padding: 0; /* Remove padding to allow the image to fill the card */
+    border: 0px solid #fefefe;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Ensure the image does not overflow the card */
+    height: 300px; /* Set a fixed height for all cards */
+
+  }
+  
+  .card-title {
+    color: #fefefe !important;
+  font-weight: bold; /* Make the font thicker */
+  font-family: 'Roboto', sans-serif; /* Change the font family */
+  text-transform: uppercase;
+  font-weight: 400;
+  padding: 0 10px;
+  line-height: 60px;
+  letter-spacing: .5px;
+  display: block;
+  transition: color .25s ease, background-color .25s ease;
+  font-size: 24px; /* Adjust the font size as needed */
+  }
+
+  .card-hover {
+    transition: transform 0.3s ease;
+  }
+  
+  .card-hover:hover {
+    transform: scale(1.05);
+  }
+  
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Ensure the image is behind the card content */
+  }
+
+  .card-body {
+    position: relative;
+    z-index: 2; /* Ensure the card content is above the image */
+    color: #fff; /* Optional: Change the text color to white */
+    padding: 20px; /* Add padding to the card content */
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .timeline-img {
+    flex: 0 0 500px; /* Increase the size */
+    margin-right: 20px;
+  }
+  
+  .timeline-img img {
+    width: 100%;
+    height: 500px; /* Increase the height */
+    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    border-radius: 20px;
+  }
+  
+  .timeline-content {
+    background: #666278;
+    padding: 137.5px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    color: #fefefe;
+    font-size: 20px;
+  }
+  
+  .timeline-content h3 {
+    margin-top: 0;
+  }
+  
+  .timeline-content p {
+    margin-bottom: 0;
+  }
+
+  .signup-section {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #d6d3d3; /* Adjust the background color as needed */
+    border-radius: 10px;
+    margin: 40px 0;
+  }
+  
+  .signup-section h2 {
+    font-size: 36px;
+    color: #2a2737; /* Dark purple color */
+    margin-bottom: 20px;
+  }
+  
+  .signup-section p {
+    font-size: 20px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .signup-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .signup-btn {
+    background-color: #666278; /* Dark purple color */
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .signup-btn:hover {
+    background-color: #3a0066; /* Darker shade of purple */
+  }
+
+
+  .footer {
+    background-color: #2a2737;
+    color: #94a8bc;
+    padding: 20px 0;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    border-radius: 20px; /* Adjust the radius as needed */
+    margin-bottom: 30px;
+
+  }
+  
+  .footer h5 {
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .footer p {
+    margin: 0;
+    color: #94a8bc;
+  }
+  
+  .footer a {
+    color: #94a8bc;
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }

@@ -597,7 +597,7 @@ const styles = {
   },
   sidebar: {
     width: "250px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "20px",
     borderRadius: "10px",
     color: "#fff",
@@ -661,7 +661,7 @@ const styles = {
   },
   searchButton: {
     padding: "10px 20px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -670,7 +670,7 @@ const styles = {
   navbar: {
     display: "flex",
     justifyContent: "space-around",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "10px",
     borderRadius: "5px",
     marginBottom: "20px",
@@ -680,7 +680,7 @@ const styles = {
     textDecoration: "none",
     padding: "10px 15px",
     borderRadius: "4px",
-    backgroundColor: "#2d3e50",
+   // backgroundColor: "#2d3e50",
     fontWeight: "bold",
     transition: "background-color 0.3s",
   },

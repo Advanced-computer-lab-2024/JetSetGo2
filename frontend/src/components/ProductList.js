@@ -72,7 +72,7 @@ const ProductList = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f7f8fa', padding: '20px' }}>
-      <div style={{ width: '250px', padding: '20px', backgroundColor: '#2d3e50', borderRadius: '10px', color: '#fff' }}>
+      <div style={{ width: '250px', padding: '20px', backgroundColor: '#ffffff', borderRadius: '10px', color: '#fff' }}>
         <h3>Welcome</h3>
         <div style={{ textAlign: 'center', marginBottom: '10px' }}>
           <button onClick={() => navigate(-1)} style={{

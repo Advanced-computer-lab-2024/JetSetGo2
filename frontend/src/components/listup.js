@@ -314,7 +314,7 @@ const AdvertiserDetails = () => {
   const sidebarStyle = {
     width: "250px",
     padding: "20px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     borderRadius: "10px",
     color: "#fff",
   };
