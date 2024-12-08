@@ -56,6 +56,9 @@ const scheduleItineraryNotifications = async () => {
             }
           });
         }
+         else {
+            console.log("keda helw ya hoda  ");
+         }
       });
     });
   } catch (err) {
