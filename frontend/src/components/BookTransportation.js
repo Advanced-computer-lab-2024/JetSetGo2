@@ -2,6 +2,87 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../App.css";
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+// Initialize Stripe
+const stripePromise = loadStripe("pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx"); // Replace with your Stripe publishable key
+
+const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+  
+    if (!stripe || !elements || !clientSecret) {
+      alert("Stripe or client secret is not ready. Please try again.");
+      return;
+    }
+  
+    setIsProcessing(true);
+  
+    const cardElement = elements.getElement(CardElement);
+  
+    try {
+      // Confirm the card payment
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: "Customer Name", // Replace with the actual user's name
+          },
+        },
+      });
+  
+      // Log the payment intent after confirmation
+      console.log("Payment Intent after confirmation:", paymentIntent);
+  
+      // Handle payment errors or success
+      if (error) {
+        console.error("Payment error:", error);
+        alert(`Payment failed: ${error.message}`);
+      } else if (paymentIntent.status === "succeeded") {
+        alert("Payment successful!");
+  
+        // Call the backend to finalize the booking
+        onPaymentSuccess(paymentIntent.id); // Pass the paymentIntent ID to finalize booking
+      } else {
+        console.error("Unexpected PaymentIntent status:", paymentIntent.status);
+        alert("Payment was not successful. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error during payment confirmation:", err.message);
+      alert(`An error occurred: ${err.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: "16px",
+              color: "#424770",
+              "::placeholder": { color: "#aab7c4" },
+            },
+            invalid: { color: "#9e2146" },
+          },
+          hidePostalCode: true, // This disables the ZIP/postal code field
+        }}
+      />
+      <button type="submit" disabled={!stripe || isProcessing}>
+        {isProcessing ? "Processing..." : "Pay"}
+      </button>
+    </form>
+  );
+};
+
 
 const TransportationBooking = () => {
   const [transportations, setTransportations] = useState([]);
@@ -10,12 +91,17 @@ const TransportationBooking = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const API_URL = "http://localhost:8000"; // Change to your backend URL
   const navigate = useNavigate();
-
+  const [clientSecret, setClientSecret] = useState("");
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [currentTransportationId, setCurrentTransportationId] = useState(null);
   const [date, setDate] = useState("");
   const [startLocation, setStartLocation] = useState("");
   const [endLocation, setEndLocation] = useState("");
   const [vehicleType, setVehicleType] = useState("");
   const [searchPerformed, setSearchPerformed] = useState(false);
+  
+  const userId = localStorage.getItem("userId"); // Fetch tourist ID from localStorage
+  const touristId = localStorage.getItem("userId"); // Fetch tourist ID from localStorage
 
   // Fetch all transportations and booked transportations on component mount
   useEffect(() => {
@@ -34,7 +120,6 @@ const TransportationBooking = () => {
   };
 
   const fetchBookedTransportations = async () => {
-    const userId = localStorage.getItem("userId"); // Fetch tourist ID from localStorage
     if (!userId) {
       setError("User ID not found in local storage. Please log in.");
       return;
@@ -60,43 +145,60 @@ const TransportationBooking = () => {
       setError("Failed to fetch booked transportations. Please try again later.");
     }
   };
+  const handleBooking = async (id) => {
+    const paymentMethod = prompt("Enter payment method (wallet/card):").toLowerCase();
 
-  const handleBooking = async (transportationId) => {
-    const userId = localStorage.getItem("userId"); // Fetch tourist ID from localStorage
-    if (!userId) {
-      setError("User ID not found in local storage. Please log in.");
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
       return;
     }
-    console.log(userId);
 
     try {
-      // Make an API call to book the transportation and pass touristId and transportationId
       const response = await axios.post(
-        `${API_URL}/home/tourist/bookTransportation/${userId}/${transportationId}`
+        `http://localhost:8000/home/tourist/bookTransportation/${touristId}/${id}`,
+        { paymentMethod }
       );
 
-      setSuccessMessage("Transportation booked successfully!");
-
-      // Update the transportation list to reflect the seat decrement and booking closure
-      const updatedTransportations = transportations.map((transport) =>
-        transport._id === transportationId
-          ? { ...transport, seatsAvailable: transport.seatsAvailable - 1, isBookingOpen: transport.seatsAvailable > 1 }
-          : transport
-      );
-
-      setTransportations(updatedTransportations);
-
-      // Optionally, you can show the booked transportations separately below the available ones
-      fetchBookedTransportations();
-
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
+      if (response.status === 200) {
+        const { clientSecret } = response.data;
+        if (paymentMethod === "card" && clientSecret) {
+          setCurrentTransportationId(id);
+          setClientSecret(clientSecret);
+          setIsPaymentModalOpen(true); // Open payment modal
+        } else {
+          alert(response.data.message || "Transportation booked successfully using wallet!");
+          fetchTransportations(); // Refresh transportations
+        }
+      }
     } catch (error) {
-      console.error("Error booking transportation:", error);
-      setError("Failed to book transportation. Please try again.");
+      if (error.response?.status === 400) {
+        alert(error.response.data.message); // Display message from backend
+      } else {
+        console.error("Error initiating booking:", error);
+        alert("Error initiating booking. Please try again.");
+      }
     }
   };
+
+  const handlePaymentSuccess = async (paymentIntentId) => {
+    try {
+      setIsPaymentModalOpen(false);
+
+      // Call backend to finalize booking
+      await axios.post(
+        `http://localhost:8000/home/tourist/transportation/finalizeBooking/${currentTransportationId}`,
+        { userId: touristId, paymentIntentId }
+      );
+
+      alert("Transportation booked successfully!");
+      fetchTransportations(); // Refresh transportations
+    } catch (error) {
+      console.error("Error finalizing booking:", error);
+      alert("Booking was successful, but there was an error finalizing it. Please contact support.");
+    }
+  };
+
+
 
   const handleHomeNavigation = () => {
     navigate('/tourist-home'); // Adjust this path according to your routing setup
@@ -116,18 +218,18 @@ const TransportationBooking = () => {
     }
   };
 
-  const handleBook = async (transportationId) => {
-    try {
-      // Implement booking logic here
-      alert(`Booking transportation with ID: ${transportationId}`);
-    } catch (err) {
-      setError("Error booking transportation. Please try again.");
-    }
-  };
+
 
   return (
     <div style={styles.transportationPage}>
       {/* Home Button */}
+      {isPaymentModalOpen && (
+        <div className="payment-modal">
+          <Elements stripe={stripePromise}>
+            <PaymentForm clientSecret={clientSecret} onPaymentSuccess={handlePaymentSuccess} />
+          </Elements>
+        </div>
+      )}
       <button onClick={handleHomeNavigation} className="home-button">
         Home
       </button>
