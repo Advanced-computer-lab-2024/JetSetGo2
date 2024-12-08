@@ -11,6 +11,162 @@ const historicalModel = require("../models/HistoricalPlaceCRUD.js");
 const Notification = require("../models/Notification.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Ensure Stripe is initialized
+
+const bookTransportation = async (req, res) => {
+  const { touristId, transportationId } = req.params;
+  const { paymentMethod } = req.body;
+
+  try {
+    console.log("Booking Transportation:", { touristId, transportationId, paymentMethod });
+
+    // Check if touristId and transportationId are valid ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(touristId) || !mongoose.Types.ObjectId.isValid(transportationId)) {
+      console.error("Error: Invalid touristId or transportationId.");
+      return res.status(400).json({ error: "Invalid tourist or transportation ID." });
+    }
+
+    // Find the transportation
+    const transportation = await transportationModel.findById(transportationId);
+    if (!transportation) {
+      console.error("Error: Transportation not found.");
+      return res.status(404).json({ error: "Transportation not found." });
+    }
+    console.log("Transportation found:", transportation);
+
+    if (!transportation.isBookingOpen) {
+      console.error("Error: Booking is closed for this transportation.");
+      return res.status(400).json({ error: "Booking is closed for this transportation." });
+    }
+
+    if (transportation.seatsAvailable <= 0) {
+      console.error("Error: No available seats.");
+      return res.status(400).json({ error: "No available seats." });
+    }
+
+    // Find the tourist
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      console.error("Error: Tourist not found.");
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+    console.log("Tourist found:", tourist);
+
+    // Handle card payment
+    if (paymentMethod === "card") {
+      console.log("Initiating Stripe Payment...");
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: transportation.price * 100, // Convert price to cents
+        currency: "usd",
+        metadata: {
+          transportationId,
+          touristId,
+        },
+      });
+      console.log("Stripe Payment Initiated:", paymentIntent);
+
+      return res.status(200).json({
+        clientSecret: paymentIntent.client_secret,
+        message: "Payment initiated. Confirm payment on the frontend.",
+      });
+    } 
+    // Handle wallet payment
+    else if (paymentMethod === "wallet") {
+      if (tourist.Wallet < transportation.price) {
+        console.error("Error: Insufficient wallet balance.");
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+
+      console.log("Processing wallet payment...");
+      tourist.Wallet -= transportation.price;
+      transportation.seatsAvailable -= 1;
+
+      if (transportation.seatsAvailable === 0) {
+        transportation.isBookingOpen = false;
+      }
+
+      await transportation.save();
+      await tourist.save();
+
+      console.log("Wallet payment successful.");
+      return res.status(200).json({
+        message: "Transportation booked successfully using wallet.",
+        tourist,
+        transportation,
+      });
+    } 
+    // Handle invalid payment method
+    else {
+      console.error("Error: Invalid payment method.");
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+  } catch (error) {
+    console.error("Error during transportation booking:", error);
+    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+  }
+};
+const finalizeTransportationBooking = async (req, res) => {
+  const { transportationId } = req.params;
+  const { userId, paymentIntentId } = req.body;
+
+  try {
+    console.log("Finalizing booking for Transportation:", { transportationId, userId, paymentIntentId });
+
+    // Validate transportationId and userId
+    if (!mongoose.Types.ObjectId.isValid(transportationId) || !mongoose.Types.ObjectId.isValid(userId)) {
+      console.error("Error: Invalid transportationId or userId.");
+      return res.status(400).json({ error: "Invalid transportation or user ID." });
+    }
+
+    // Validate transportation existence
+    const transportation = await transportationModel.findById(transportationId);
+    if (!transportation) {
+      console.error("Error: Transportation not found.");
+      return res.status(404).json({ error: "Transportation not found." });
+    }
+    console.log("Transportation found:", transportation);
+
+    // Validate tourist existence
+    const tourist = await touristModel.findById(userId);
+    if (!tourist) {
+      console.error("Error: Tourist not found.");
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+    console.log("Tourist found:", tourist);
+
+    // Verify PaymentIntent status
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (!paymentIntent) {
+      console.error("Error: PaymentIntent not found.");
+      return res.status(400).json({ error: "PaymentIntent not found." });
+    }
+    console.log("Retrieved PaymentIntent:", paymentIntent);
+
+    if (paymentIntent.status !== "succeeded") {
+      console.error("Error: Payment not confirmed. Status:", paymentIntent.status);
+      return res.status(400).json({ error: `Payment not confirmed. Status: ${paymentIntent.status}` });
+    }
+
+    // Prevent duplicate finalization
+
+    // Finalize the booking
+    transportation.seatsAvailable -= 1;
+    if (transportation.seatsAvailable === 0) {
+      transportation.isBookingOpen = false;
+    }
+    await transportation.save();
+
+    tourist.bookedTransportations.push(transportationId);
+    await tourist.save();
+
+    console.log("Transportation booking finalized successfully.");
+    res.status(200).json({ message: "Transportation booking finalized successfully." });
+  } catch (error) {
+    console.error("Error finalizing transportation booking:", error);
+    res.status(500).json({ error: "Internal Server Error.", details: error.message });
+  }
+};
+
 
 const createTourist = async (req, res) => {
   // create a tourist after sign up
@@ -158,52 +314,7 @@ function calculateLoyaltyPoints(level, price) {
   return points;
 }
 
-const bookTransportation = async (req, res) => {
-  const { touristId, transportationId } = req.params;
 
-  try {
-    const transportation = await transportationModel.findById(transportationId);
-
-    if (!transportation) {
-      return res.status(404).json({ error: "Transportation not found" });
-    }
-
-    if (!transportation.isBookingOpen) {
-      return res
-        .status(400)
-        .json({ error: "Booking is closed for this transportation." });
-    }
-
-    if (transportation.seatsAvailable <= 0) {
-      return res.status(400).json({ error: "No available seats." });
-    }
-
-    const tourist = await touristModel.findById(touristId);
-
-    if (!tourist) {
-      return res.status(404).json({ error: "Tourist not found" });
-    }
-
-    // Decrement seat and close booking if seats reach 0
-    transportation.seatsAvailable -= 1;
-    if (transportation.seatsAvailable === 0) {
-      transportation.isBookingOpen = false; // Close booking when no seats are left
-    }
-    await transportation.save();
-
-    // Add the booked transportation to the tourist's bookings
-    tourist.bookedTransportations.push(transportation._id);
-    await tourist.save();
-
-    res.status(200).json({
-      message: "Transportation booked successfully",
-      transportation,
-      tourist,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 const buyProduct = async (req, res) => {
   const { touristId, productIds, addressId } = req.body;
@@ -944,4 +1055,5 @@ module.exports = {
   getWishlist,
   removeFromWishlist,
   buyProducts,
+  finalizeTransportationBooking
 };
