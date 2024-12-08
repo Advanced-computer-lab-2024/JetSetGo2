@@ -1,0 +1,147 @@
+/* General Styles */
+.LoginContainer {
+  
+  font-family: "Arial", sans-serif;
+  background: #2a2737;
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 360px;
+  text-align: center;
+  margin: 100px;
+  margin-top: 100px;
+}
+
+.LoginTitle {
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+  color: #fefefe;
+  font-weight: bold;
+}
+
+.LoginSubtitle {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #fefefe;
+  margin-bottom: 2rem;
+}
+
+.LoginForm {
+  
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-icon-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  border: 1px solid #ebd5d52e;
+  border-radius: 8px;
+  background-color: #4A4A5E;;
+  padding: 0.5rem;
+}
+
+.input-icon-container i {
+  color: #696975;
+  margin-right: 0.5rem; /* Space between icon and input field */
+  font-size: 1.2rem;
+}
+
+.LoginInput {
+  flex: 1; /* Allows input to take the remaining space */
+  background-color:#4A4A5E;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.LoginInput::placeholder {
+  font-weight: bold;
+  color: #696975;
+}
+
+.LoginInput:focus {
+  
+  
+  box-shadow: none;
+   /* Avoid shadow inside the container */
+}
+
+.input-icon-container:focus-within {
+  border-color: #6D4ECF;
+ 
+}
+.input-icon-container:hover {
+  border-color: #6D4ECF;
+ 
+}
+
+
+.LoginButton {
+  font-weight: bold;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: #8b5cf6;
+  color: #fefefe;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.LoginButton:hover {
+  background:#6241cb;
+  color: #fefefe;
+  transform: translateY(-2px);
+}
+
+.ForgotPassword {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color:  #6D4ECF;
+  text-decoration: none;
+  margin-top: 0.5rem;
+  display: block;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.ForgotPassword:hover {
+  color: #ffffff;
+ 
+}
+.password-toggle {
+  
+  position: absolute;
+  right: 100000px; /* Align with the right side of the input */
+  bottom: 50%;
+  transform: translateY(50%);
+  cursor: pointer;
+  color: #888888;
+}
+
+.password-toggle:hover {
+  color: #6d4ecf;
+}
+
+.Background {
+  background:  #666278;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ErrorMessage {
+  color: red;
+  margin-top: 1rem;
+}
+
+.SuccessMessage {
+  color: green;
+  margin-top: 1rem;
+}
