@@ -1,23 +1,62 @@
-
-import React, { useState,useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './admin.css';
+import img1 from './logoo4.JPG';
+import sidebarImage from './logoo444.JPG';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
 
 const AdminCapabilities = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [newPassword, setNewPassword] = useState("");
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [passwordChanged, setPasswordChanged] = useState(false);
   const [complaints, setComplaints] = useState([]);
   const [replyText, setReplyText] = useState({});
   const [totalUsers, setTotalUsers] = useState(0);  // State to hold total users count
   const [currentMonth, setCurrentMonth] = useState(null);
   const [newUsersThisMonth, setNewUsersThisMonth] = useState(0); // State for new users this month
   const [statusFilter, setStatusFilter] = useState("all");
-const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [activeTab, setActiveTab] = useState("complaints");
 
-useEffect(() => {
-  fetchComplaints();
-  fetchUserStatistics();
-}, []);
+  useEffect(() => {
+    fetchComplaints();
+    fetchUserStatistics();
+  }, []);
+
+  const userData = {
+    labels: ['Total Users', `Users in Month ${currentMonth}`],
+    datasets: [
+      {
+        label: 'Number of Users',
+        data: [totalUsers, newUsersThisMonth],
+        backgroundColor: ['#4B0082', '#007BFF'],
+        borderColor: ['#4B0082', '#007BFF'],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'User Statistics',
+      },
+    },
+  };
 
   const fetchComplaints = async () => {
     try {
@@ -27,6 +66,7 @@ useEffect(() => {
       console.error("Error fetching complaints:", error);
     }
   };
+
   const fetchUserStatistics = async () => {
     try {
       // Fetch total users (existing request)
@@ -48,7 +88,6 @@ useEffect(() => {
     }
   };
 
-  
   const handleResolveComplaint = async (complaintId) => {
     try {
       await axios.put(`http://localhost:8000/complaint/resolve/${complaintId}`);
@@ -83,6 +122,7 @@ useEffect(() => {
     localStorage.removeItem('userToken'); // Example: remove token from localStorage
     navigate('/login'); // Redirect to the login page
   };
+
   const handleReplyChange = (id, value) => {
     setReplyText({ ...replyText, [id]: value });
   };
@@ -98,21 +138,19 @@ useEffect(() => {
       console.error("Error replying to complaint:", error);
     }
   };
+
   const filteredAndSortedComplaints = complaints
-  .filter((complaint) => statusFilter === "all" || complaint.status === statusFilter)
-  .sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-  });
-
-
+    .filter((complaint) => statusFilter === "all" || complaint.status === statusFilter)
+    .sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
 
   const buttonStyle = {
     margin: '10px',
     padding: '10px 20px', // Reduced padding for smaller buttons
     fontSize: '16px', // Adjusted font size for smaller buttons
-    //backgroundColor: '#2d3e50',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
@@ -139,158 +177,180 @@ useEffect(() => {
 
   const adminData = {
     UserName: 'Admin',
-    
   };
 
   return (
-    <div style={styles.container}>
+    <div className="admin-page">
+      {/* Navbar */}
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand href="#">
+            <img src={img1} alt="Logo" />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            {/*<Nav className="me-auto">
+              <Nav.Link href="#" className={`home-link ${location.pathname === '/' ? 'selected' : ''}`} onClick={() => navigate("/")}>Home</Nav.Link>
+            </Nav>*/}
+            <Nav className="ml-auto">
+            <Dropdown >
+                <Dropdown.Toggle className="drop" id="dropdown-basic">
+                  <img src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg" alt="Profile" className="navbar-profile-image" />
+                  Admin
+                </Dropdown.Toggle>
 
-      {/* Sidebar with Profile */}
-      <div style={styles.sidebar}>
-        <div style={styles.profileContainer}>
-          <img
-            src="https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-            alt="Profile"
-            style={styles.profileImage}
-          />
-          <h2 style={styles.profileName}>{adminData.UserName}</h2>
-          <p>Admin</p>
-          <button style={styles.button} onClick={handleLogout}>
-            Logout
-          </button> {/* Logout Button */}
-          
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => setShowPasswordChange(true)}>Change Password</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      <div className="admin-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+    <button className="sidebar-button" onClick={() => navigate("/adminCapabilities")}>
+      <i className="fas fa-tachometer-alt"></i> Dashboard
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/fetchdocuments")}>
+      <i className="fas fa-users"></i> View Users
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/AddAdmin")}>
+      <i className="fas fa-user-plus"></i> Add An Admin
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
+      <i className="fas fa-user-cog"></i> Manage Users
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/AddTourismGoverner")}>
+      <i className="fas fa-user-tie"></i> Tourism Governer
+    </button>
+    <button className="sidebar-button" onClick={handleLogout}>
+      <i className="fas fa-sign-out-alt"></i> Logout
+    </button>
+    <div className="sidebar-image-container">
+      <img src={sidebarImage} alt="Sidebar Image" className="sidebar-image" />
+    </div>
+  </div>
+
+       {/* Main Content */}
+<div className="main-content">
+{showPasswordChange && (
+            <div className="password-change-container">
+              <h2>Change Password</h2>
+              <Form onSubmit={handlePasswordChange}>
+                <Form.Group controlId="formNewPassword">
+                  <Form.Label>New Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Submit
+                </Button>
+              </Form>
+              {passwordChanged && <p>Password changed successfully!</p>}
+            </div>
+          )}
+  <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="admin-tabs">
+    <Tab eventKey="complaints" title="Complaints">
+      <div className="filter-sort-container">
+        <label>Filter by Status: </label>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="resolved">Resolved</option>
+        </select>
+
+        <label>Sort by Date: </label>
+        <button className='sort-button' onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+          {sortOrder === "asc" ? "Oldest First" : "Newest First"}
+        </button>
+      </div>
+      <div className="complaints-container">
+        {filteredAndSortedComplaints.map((complaint) => (
+          <div key={complaint._id} className="complaint-card">
+            <div className="complaint-header">
+              <img src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png" alt="User" className="complaint-profile-image" />
+              <div>
+                <h3>{complaint.title}</h3>
+                <p>{new Date(complaint.date).toLocaleDateString()}</p>
+              </div>
+            </div>
+            <p>{complaint.body}</p>
+            <div className="action-buttons">
+              {complaint.status === "pending" && (
+                <button className="resolve-button" onClick={() => handleResolveComplaint(complaint._id)}>Resolve</button>
+              )}
+              <div className="reply-section">
+                <input
+                  type="text"
+                  placeholder="Reply here..."
+                  value={replyText[complaint._id] || ""}
+                  onChange={(e) => handleReplyChange(complaint._id, e.target.value)}
+                  className="reply-input"
+                />
+                <button className="reply-button" onClick={() => handleReplySubmit(complaint._id)}>Send Reply</button>
+                {complaint.reply && <p className="reply-text">Admin Reply: {complaint.reply}</p>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Tab>
+    <Tab eventKey="manage-users" title="User Statistics">
+      <div>
+        <div>
+          <Bar data={userData} options={options} />
         </div>
       </div>
-
-      {/* Main Content */}
-      <div style={styles.mainContent}>
-        <h1 style={styles.header}>Admin Capabilities</h1>
-        <div>
-  <label>Filter by Status: </label>
-  <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-    <option value="all">All</option>
-    <option value="pending">Pending</option>
-    <option value="resolved">Resolved</option>
-  </select>
-
-  <label>Sort by Date: </label>
-  <button onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
-    {sortOrder === "asc" ? "Oldest First" : "Newest First"}
-  </button>
+    </Tab>
+  </Tabs>
 </div>
-<div>
-            <h1>Admin Dashboard</h1>
-            {/* Display total users count above complaints section */}
-            <div>
-                <h2>Total Users: {totalUsers}</h2>
-                
-      <h3>Total Users for Month {currentMonth} : {newUsersThisMonth}</h3>
-            </div>
-            {/* You can place your complaints section here */}
-        </div>
-<h2>Complaints</h2>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAndSortedComplaints.map((complaint) => (
-              <tr key={complaint._id}>
-                <td>{complaint.title}</td>
-                <td>{complaint.body}</td>
-                <td>{complaint.status}</td>
-                <td>{new Date(complaint.date).toLocaleDateString()}</td>
-                <td style={styles.actionButtons}>
-                  {complaint.status === "pending" && (
-                    <button style={styles.resolveButton} onClick={() => handleResolveComplaint(complaint._id)}>Resolve</button>
-                  )}
-                  <div style={styles.replySection}>
-                    <input
-                      type="text"
-                      placeholder="Reply here..."
-                      value={replyText[complaint._id] || ""}
-                      onChange={(e) => handleReplyChange(complaint._id, e.target.value)}
-                      style={styles.replyInput}
-                    />
-                    <button style={styles.replyButton} onClick={() => handleReplySubmit(complaint._id)}>Send Reply</button>
-                    {complaint.reply && <p style={styles.replyText}>Reply: {complaint.reply}</p>}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      
 
-        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {[
-            { label: 'Manage Categories', path: '/category' },
-            { label: 'Manage Tags', path: '/TagsManagement' },
-            { label: 'Manage Products', path: '/product' },
-            { label: 'View Product List', path: '/productList' },
-            { label: 'Delete Users', path: '/DeleteUsers' },
-            { label: 'Add a Tourism Governor', path: '/AddTourismGovernor' },
-            { label: 'Add an Admin', path: '/AddAdmin' },
-            { label: 'Manage Itineraries', path: '/ItinerariesAdmin' },
-            { label: 'Manage Activities', path: '/ActivitiesAdmin' },
-            { label: 'Manage Historical Places', path: '/HistoricalPlacesAdmin' },
-            { label: 'Manage Museums', path: '/MuseumsAdmin' },
-            { label: 'Fetch Documents', path: '/fetchdocuments' },
-            
-          ].map((button) => (
-            <button
-              key={button.path}
-              style={buttonStyle}
-              onClick={() => navigate(button.path)}
-              onMouseEnter={handleHover}
-              onMouseLeave={handleLeave}
-            >
-              {button.label}
-            </button>
-          ))}
-          <h3>Change Password</h3>
-      <input
-        type="password"
-        placeholder="New Password"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
-      <button onClick={handlePasswordChange}>Change Password</button>
-        </div>
+        {/* Right Sidebar */}
+        {/* Right Sidebar */}
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    <button className="box" onClick={() => navigate("/category")}>Categories</button>
+    <button className="box" onClick={() => navigate("/TagsManagement")}>Tags</button>
+    <button className="box" onClick={() => navigate("/product")}>Products</button>
+    <button className="box" onClick={() => navigate("/activitiesAdmin")}>Activities</button>
+    <button className="box" onClick={() => navigate("/ItinerariesAdmin")}>Itineraries</button>
+    <button className="box" onClick={() => navigate("/MuseumsAdmin")}>Museums</button>
+    <button className="box" onClick={() => navigate("/HistoricalPlacesAdmin")}>Historical Places</button>
+  </div>
+</div>
+      </div>
+
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
-    
   );
-};
-
-// Styles
-const styles = {
-  container: { display: 'flex', minHeight: '100vh', backgroundColor: '#f7f8fa', padding: '20px' },
-  sidebar: { width: '250px', padding: '20px', borderRadius: '10px', color: '#fff' },
-  profileContainer: { textAlign: 'center' },
-  profileImage: { width: '80px', height: '80px', borderRadius: '50%', marginBottom: '15px', border: '3px solid #fff' },
-  profileName: { fontSize: '22px', fontWeight: 'bold' },
-  button: { backgroundColor: '#ff6348', color: '#fff', padding: '10px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer', marginTop: '10px' },
-  mainContent: { flex: 1, marginLeft: '30px', backgroundColor: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' },
-  header: { fontSize: '28px', marginBottom: '20px', color: '#333' },
-  filterSortContainer: { marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' },
-  select: { padding: '5px', borderRadius: '5px', border: '1px solid #ccc' },
-  table: { width: '100%', borderCollapse: 'collapse', marginBottom: '20px' },
-  actionButtons: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start' },
-  resolveButton: { backgroundColor: '#4CAF50', color: '#fff', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', marginBottom: '10px' },
-  replySection: { display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px' },
-  replyInput: { width: '60%', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' },
-  replyButton: { backgroundColor: '#007BFF', color: '#fff', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' },
-  replyText: { fontSize: '14px', marginTop: '5px' },
-  buttonsContainer: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' },
-  passwordInput: { width: '200px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' },
-  changePasswordButton: { backgroundColor: '#ff6348', color: '#fff', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer' }
 };
 
 export default AdminCapabilities;
