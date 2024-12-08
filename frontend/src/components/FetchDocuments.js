@@ -240,7 +240,7 @@ const OthersListPage = () => {
     <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
       <i className="fas fa-user-cog"></i> Manage Users
     </button>
-    <button className="sidebar-button" onClick={() => navigate("/AddTourismGoverner")}>
+    <button className="sidebar-button" onClick={() => navigate("/AddTourismGovernor")}>
       <i className="fas fa-user-tie"></i> Tourism Governer
     </button>
     <button className="sidebar-button" onClick={() => navigate("/login")}>
