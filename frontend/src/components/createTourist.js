@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons
-import "../css/signup.css"; // Assuming the CSS file you provided is named signup.css
+import "../css/signup.css"; // Assuming the CSS file is named signup.css
 
 const TouristSignup = () => {
   const [formData, setFormData] = useState({
@@ -19,11 +19,21 @@ const TouristSignup = () => {
   const [error, setError] = useState(""); // State to hold error messages
   const navigate = useNavigate();
 
+  // Add a class to the body for this page
+  useEffect(() => {
+    document.body.classList.add("signup-body");
+    return () => {
+      document.body.classList.remove("signup-body");
+    };
+  }, []);
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -165,77 +175,5 @@ const TouristSignup = () => {
     </div>
   );
 };
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    //backgroundColor: "#2d3e50", // Dark background color
-    fontFamily: "'Poppins', sans-serif",
-    margin: 0, // Remove any margin
-    padding: 0, // Remove any padding
-  },
-  header: {
-    color: "#ffffff", // Change header color to white for better visibility
-    fontSize: "36px",
-    marginBottom: "20px",
-    textAlign: "center",
-  },
-  form: {
-    background: "#fff",
-    padding: "40px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-    width: "350px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
-  },
-  inputGroup: {
-    width: "100%",
-    marginBottom: "20px",
-  },
-  label: {
-    display: "block",
-    marginBottom: "5px",
-    fontSize: "16px",
-    fontWeight: "500",
-    color: "#333",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    fontSize: "16px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    outline: "none",
-    transition: "border-color 0.3s ease",
-  },
-  button: {
-    backgroundColor: "#ff6348", // Match with tourist home page button color
-    color: "#fff",
-    padding: "12px 25px",
-    borderRadius: "5px",
-    border: "none",
-    fontSize: "16px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    marginTop: "10px",
-    transition: "background-color 0.3s ease",
-    width: "100%", // Ensure button takes full width
-  },
-  error: {
-    color: "red",
-    marginBottom: "15px",
-    textAlign: "center",
-  },
-};
-
-// Set global styles in the body
-document.body.style.margin = "0"; // Remove any margin from body
-document.body.style.backgroundColor = "#ffffff"; // Set dark background color for the entire page
 
 export default TouristSignup;
