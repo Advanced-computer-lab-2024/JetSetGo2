@@ -2,7 +2,7 @@ const express = require("express");
 const {
   createPromoCode,
   getAllPromoCodes,
-  redeemPromoCode,
+  validatePromoCode,
 } = require("../controllers/promoCodeController");
 
 const router = express.Router();
@@ -14,6 +14,6 @@ router.post("/create", createPromoCode);
 router.get("/get", getAllPromoCodes);
 
 // Redeem a promo code
-router.post("/redeem", redeemPromoCode);
+router.post("/redeem", validatePromoCode);
 
 module.exports = router;

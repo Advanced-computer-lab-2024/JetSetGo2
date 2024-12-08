@@ -7,6 +7,9 @@ const sendNotificationEmails = require("../utils/tabbakh");
 const Stripe = require("stripe");
 const nodemailer = require("nodemailer");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const validatePromoCode = require("./promoCodeController.js").validatePromoCode; // Ensure you import the validation function
+
+
 const createGuide = async (req, res) => {
   const {
     name,
@@ -118,10 +121,9 @@ function calculateLoyaltyPoints(level, price) {
   return points;
 }
 
-
 const bookTour = async (req, res) => {
   const { id } = req.params; // Tour ID
-  const { userId, paymentMethod } = req.body;
+  const { userId, paymentMethod, promoCode } = req.body;
 
   try {
     // Find the itinerary to be booked
@@ -141,14 +143,41 @@ const bookTour = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Calculate the price
+    let discountedPrice = schema.TourPrice;
+
+    // Validate and apply promo code (if provided)
+    if (promoCode) {
+      const validation = await validatePromoCode(promoCode);
+
+      if (!validation.valid) {
+        return res.status(400).json({ message: validation.message });
+      }
+
+      const { discountType, discountValue } = validation;
+
+      // Apply the discount
+      if (discountType === "percentage") {
+        discountedPrice = schema.TourPrice - (schema.TourPrice * discountValue) / 100;
+      } else if (discountType === "fixed") {
+        discountedPrice = schema.TourPrice - discountValue;
+      }
+
+      // Ensure discounted price is not less than zero
+      if (discountedPrice < 0) discountedPrice = 0;
+
+      console.log(`Promo code applied. Discounted price: ${discountedPrice}`);
+    }
+
     if (paymentMethod === "card") {
       // Create a PaymentIntent for the card payment
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: schema.TourPrice*100, // Convert price to cents
+        amount: Math.round(discountedPrice * 100), // Convert price to cents
         currency: "usd", // Currency code
         metadata: {
           tourId: id, // Pass the itinerary ID
           userId: userId, // Pass the user ID
+          promoCode: promoCode || "N/A", // Include promo code in metadata
           type: "itinerary", // Optional type field
         },
       });
@@ -161,24 +190,26 @@ const bookTour = async (req, res) => {
         message: "Payment initiated. Confirm payment on the frontend.",
       });
     } else if (paymentMethod === "wallet") {
-    
-      if (user.Wallet < schema.TourPrice) {
+      // Check if the user has sufficient wallet balance
+      if (user.Wallet < discountedPrice) {
         return res.status(400).json({
           message: "Insufficient wallet balance. Please top up your wallet.",
         });
       }
 
       // Deduct the activity price from the user's wallet
-      user.Wallet -= schema.TourPrice;
+      user.Wallet -= discountedPrice;
       await user.save(); // Save the updated user balance
 
+      // Update the itinerary with the booking details
       schema.bookedUsers.push(userId);
       schema.bookings += 1;
       await schema.save();
 
-    
-
-      return res.status(200).json({ message: "Tour booked successfully using wallet." });
+      return res.status(200).json({
+        message: "Tour booked successfully using wallet.",
+        discountedPrice,
+      });
     } else {
       return res.status(400).json({ message: "Invalid payment method" });
     }
@@ -219,7 +250,6 @@ const finalizeBooking = async (req, res) => {
   }
 };
 
-
 // Toggle Activation
 const toggleActivation = async (req, res) => {
   try {
@@ -255,7 +285,6 @@ const toggleActivation = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // Read Guide by ID
 const readGuideID = async (req, res) => {
@@ -433,7 +462,6 @@ const toggleActivation1 = async (req, res) => {
   }
 };
 
-
 const cancelBooking = async (req, res) => {
   let { id } = req.params;
   const userId = req.body.userId;
@@ -537,6 +565,7 @@ const getBookedItineraries = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 const requestNotification = async (req, res) => {
   const { id } = req.params; // Itinerary ID
   const { userId } = req.body; // Tourist ID

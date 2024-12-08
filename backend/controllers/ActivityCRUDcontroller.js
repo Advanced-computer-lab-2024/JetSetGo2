@@ -7,6 +7,10 @@ const User = require("../models/Tourist.js");
 const  sendNotificationEmails  = require("../utils/tabbakh2");
 const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY); // Initialize Stripe with your secret key
+const adverModel = require('../models/AdverMODEL');
+const sendEmailFlag = require('../utils/sendEmailFlag');
+const validatePromoCode = require("./promoCodeController.js").validatePromoCode; // Ensure you import the validation function
+
 
 const bookactivity = async (req, res) => {
   const { id } = req.params; // Extract the activity ID from the URL parameters
@@ -74,6 +78,7 @@ const bookactivity = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error." });
   }
 };
+
 const finalizeActivityBooking = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.body;
@@ -101,8 +106,6 @@ const finalizeActivityBooking = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error." });
   }
 };
-const adverModel = require('../models/AdverMODEL');
-const sendEmailFlag = require('../utils/sendEmailFlag');
 
 // Create Activity
 const createActivity = async (req, res) => {
@@ -151,6 +154,7 @@ const getActivity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 // Get a specific Activity by ID with populated category, advertiser, and tags
 const getActivityById = async (req, res) => {
   const { id } = req.params; // Extract the activity ID from the URL parameters
@@ -314,8 +318,6 @@ function calculateLoyaltyPoints(level, price) {
   console.log(`Points calculated for level ${level}: ${points}`); // Log calculated points
   return points;
 }
-
-
 
 const deleteAllActivities = async (req, res) => {
   try {
@@ -520,8 +522,6 @@ const requestNotification = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-
-
 
 const getNotificationRequests = async (req, res) => {
   const { id } = req.params;

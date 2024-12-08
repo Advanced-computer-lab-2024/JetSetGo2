@@ -355,7 +355,10 @@ const viewBookmarkedItineraries = async () => {
     try {
       const response = await axios.patch(
         `http://localhost:8000/itinerary/book/${id}`,
-        { userId: touristId, paymentMethod }
+        { userId: touristId, 
+          paymentMethod, 
+          promoCode: "SAVE20"
+        }
       );
   
       if (response.status === 200) {

@@ -42,41 +42,37 @@ const getAllPromoCodes = async (req, res) => {
 };
 
 // Redeem a promo code
-const redeemPromoCode = async (req, res) => {
-  const { code } = req.body;
+const validatePromoCode = async (promoCode) => {
+  const currentDate = new Date();
 
   try {
-    const promoCode = await PromoCode.findOne({ code });
+    // Check if the promo code exists
+    const code = await PromoCode.findOne({ code: promoCode });
 
-    if (!promoCode) {
-      return res.status(404).json({ message: "Promo code not found" });
+    if (!code) {
+      return { valid: false, message: "Promo code not found." };
     }
 
-    const now = new Date();
-    if (now < promoCode.startDate || now > promoCode.expiryDate) {
-      return res
-        .status(400)
-        .json({ message: "Promo code is not active or expired" });
+    // Check if the promo code is active and within the valid date range
+    if (!code.isActive || code.expiryDate < currentDate || code.startDate > currentDate) {
+      return { valid: false, message: "Promo code is expired or inactive." };
     }
 
-    if (!promoCode.isActive) {
-      return res.status(400).json({ message: "Promo code is inactive" });
-    }
-
-    res.json({
-      message: "Promo code redeemed successfully",
-      discount: promoCode.discountValue,
-    });
+    // Return valid response with promo code details
+    return {
+      valid: true,
+      discountType: code.discountType,
+      discountValue: code.discountValue,
+    };
   } catch (error) {
-    console.error("Error redeeming promo code:", error.message);
-    res
-      .status(500)
-      .json({ message: "Failed to redeem promo code", error: error.message });
+    console.error("Error validating promo code:", error.message);
+    return { valid: false, message: "An error occurred during validation." };
   }
 };
+
 
 module.exports = {
   createPromoCode,
   getAllPromoCodes,
-  redeemPromoCode,
+  validatePromoCode,
 };
