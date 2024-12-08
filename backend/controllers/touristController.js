@@ -1138,6 +1138,7 @@ module.exports = {
   getPurchasedProducts,
   addRating,
   addReview,
+  addToWishlist,
   redeemPointsToCash,
   reqAccountToBeDeleted,
   getBookmarkedActivities,

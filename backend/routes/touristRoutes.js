@@ -23,7 +23,7 @@ const {
   toggleBookmarkActivity,
   toggleBookmarkItinerary,
   toggleBookmarkHistoricalPlace,
-  toggleBookmarkMuseum
+  toggleBookmarkMuseum,
   addToWishlist,
   getWishlist,
   removeFromWishlist,

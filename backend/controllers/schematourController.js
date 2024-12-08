@@ -220,7 +220,41 @@ const finalizeBooking = async (req, res) => {
 };
 
 
+// Toggle Activation
+const toggleActivation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const cleanId = id.trim(); // Clean the ID
 
+    const itinerary = await Schema.findById(cleanId);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    // Prevent deactivation if it is active and has no bookings
+    if (itinerary.isActive && itinerary.bookings === 0) {
+      return res.status(400).json({
+        message: "Itinerary cannot be deactivated because it has no bookings.",
+      });
+    }
+
+    // Toggle the activation status
+    itinerary.isActive = !itinerary.isActive;
+    await itinerary.save();
+
+    if (itinerary.isActive) {
+      return res
+        .status(200)
+        .json({ message: "Itinerary activated", itinerary });
+    } else {
+      return res
+        .status(200)
+        .json({ message: "Itinerary deactivated", itinerary });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 // Read Guide by ID
@@ -613,11 +647,12 @@ module.exports = {
   getItineraryById,
   flagItinerary,
   toggleActivation1,
+  toggleActivation,
   cancelBooking,
   submitReview,
   getBookedItineraries,
   getIteneraries,
   getNotificationRequests,
-  requestNotification
+  requestNotification,
   finalizeBooking
 };
