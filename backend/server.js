@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const scheduleBirthdayEmails = require("./birthdayScheduler");
+const itenarynotification = require("./notificationScheduler.js");
 const changeorderstatus = require("./changeorderstatus.js");
 const cron = require("node-cron");
 
@@ -61,6 +62,7 @@ mongoose
     console.log("MongoDB is now connected!");
     // Start the birthday scheduler
     scheduleBirthdayEmails();
+    itenarynotification();
     changeorderstatus();
     // Start server
     app.listen(port, () => {

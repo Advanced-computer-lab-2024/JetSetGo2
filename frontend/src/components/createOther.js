@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../css/othersignup.css"; // Reuse the existing CSS for consistency
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB file size limit
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 2 MB file size limit
 
 const OtherSignup = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,13 @@ const OtherSignup = () => {
   const [termsError, setTermsError] = useState(""); // State for Terms and Conditions error
   const [termsVisible, setTermsVisible] = useState(false); // State for dialog visibility
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.classList.add("other-signup-body");
+    return () => {
+      document.body.classList.remove("other-signup-body");
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -89,53 +97,54 @@ const OtherSignup = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.header}>Sign Up for Other Users</h2>
-      <button className="back-button" onClick={() => navigate('/')}>
-          Home
+    <div className="other-signup-container">
+      {/* Left Section */}
+      <div className="other-signup-left">
+        <button className="back-to-website-btn" onClick={() => navigate("/")}>
+          Back to website →
         </button>
-      {error && <p style={styles.error}>{error}</p>} {/* Show error message */}
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Email:</label>
+        <div className="caption">
+          <p>Sign up as Advertiser, Tour Guide, or Seller</p>
+        </div>
+      </div>
+
+      {/* Right Section */}
+      <div className="other-signup-right">
+        <h2>Create account</h2>
+        {error && <p className="other-signup-error-message">{error}</p>}
+        <form onSubmit={handleSubmit} className="other-signup-form">
+          {/* Email */}
           <input
             type="email"
             name="Email"
             value={formData.Email}
             onChange={handleChange}
-            style={styles.input}
+            placeholder="Email"
             required
           />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>UserName:</label>
+          {/* Username */}
           <input
             type="text"
             name="UserName"
             value={formData.UserName}
             onChange={handleChange}
-            style={styles.input}
+            placeholder="Username"
             required
           />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Password:</label>
+          {/* Password */}
           <input
             type="password"
             name="Password"
             value={formData.Password}
             onChange={handleChange}
-            style={styles.input}
+            placeholder="Password"
             required
           />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Account Type:</label>
+          {/* Account Type */}
           <select
             name="AccountType"
             value={formData.AccountType}
             onChange={handleChange}
-            style={styles.input}
             required
           >
             <option value="">Select Account Type</option>
@@ -143,60 +152,55 @@ const OtherSignup = () => {
             <option value="TourGuide">Tour Guide</option>
             <option value="Seller">Seller</option>
           </select>
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>ID Document:</label>
+          {/* ID Document */}
           <input
             type="file"
             name="IDDocument"
             onChange={handleChange}
-            style={styles.input}
             accept=".jpg, .jpeg, .png, .pdf"
             required
           />
           {fileErrors.IDDocument && (
-            <p style={styles.error}>{fileErrors.IDDocument}</p>
+            <p className="other-signup-error-message">
+              {fileErrors.IDDocument}
+            </p>
           )}
-        </div>
-
-        {/* Conditional rendering for Certificates and TaxationRegistryCard */}
-        {formData.AccountType === "TourGuide" && (
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Certificates:</label>
-            <input
-              type="file"
-              name="Certificates"
-              onChange={handleChange}
-              style={styles.input}
-              accept=".jpg, .jpeg, .png, .pdf"
-              required
-            />
-            {fileErrors.Certificates && (
-              <p style={styles.error}>{fileErrors.Certificates}</p>
-            )}
-          </div>
-        )}
-
-        {(formData.AccountType === "Advertiser" ||
-          formData.AccountType === "Seller") && (
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Taxation Registry Card:</label>
-            <input
-              type="file"
-              name="TaxationRegistryCard"
-              onChange={handleChange}
-              style={styles.input}
-              accept=".jpg, .jpeg, .png, .pdf"
-              required
-            />
-            {fileErrors.TaxationRegistryCard && (
-              <p style={styles.error}>{fileErrors.TaxationRegistryCard}</p>
-            )}
-          </div>
-        )}
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>
+          {/* Conditional Fields */}
+          {formData.AccountType === "TourGuide" && (
+            <>
+              <input
+                type="file"
+                name="Certificates"
+                onChange={handleChange}
+                accept=".jpg, .jpeg, .png, .pdf"
+                required
+              />
+              {fileErrors.Certificates && (
+                <p className="other-signup-error-message">
+                  {fileErrors.Certificates}
+                </p>
+              )}
+            </>
+          )}
+          {(formData.AccountType === "Advertiser" ||
+            formData.AccountType === "Seller") && (
+            <>
+              <input
+                type="file"
+                name="TaxationRegistryCard"
+                onChange={handleChange}
+                accept=".jpg, .jpeg, .png, .pdf"
+                required
+              />
+              {fileErrors.TaxationRegistryCard && (
+                <p className="other-signup-error-message">
+                  {fileErrors.TaxationRegistryCard}
+                </p>
+              )}
+            </>
+          )}
+          {/* Accept Terms */}
+          <div className="checkbox-group">
             <input
               type="checkbox"
               name="acceptTerms"
@@ -204,122 +208,50 @@ const OtherSignup = () => {
               onChange={handleChange}
               required
             />
-            &nbsp; I accept the{" "}
-            <span
-              style={{ color: "blue", cursor: "pointer" }}
-              onClick={() => setTermsVisible(true)} // Open the dialog on click
-            >
-              Terms and Conditions
-            </span>
-          </label>
-          {termsError && <p style={styles.error}>{termsError}</p>}
-        </div>
-
-        <button type="submit" style={styles.button}>
-          Sign Up
-        </button>
-      </form>
-      {/* Terms and Conditions Dialog */}
-      {termsVisible && (
-        <dialog open style={styles.dialog}>
-          <h3>Terms and Conditions</h3>
-          <p>
-            By signing up and using our platform, you agree to the following
-            terms and conditions. Your personal information, including but not
-            limited to your name, email address, and any uploaded documents,
-            will be stored and processed securely in accordance with our privacy
-            policy. You are responsible for maintaining the accuracy and
-            confidentiality of your account details. Any content you upload,
-            including documents and images, must comply with legal and ethical
-            standards, and you agree not to misuse our platform for any
-            unauthorized or harmful activities. We reserve the right to update
-            or modify these terms at any time, and it is your responsibility to
-            review them periodically. Continued use of the platform following
-            any changes signifies your acceptance of the updated terms. If you
-            do not agree to these terms, please refrain from using our services.
-          </p>
-          <button
-            style={styles.closeButton}
-            onClick={() => setTermsVisible(false)}
-          >
-            Close
+            <label>
+              I accept the{" "}
+              <span
+                className="terms-link"
+                onClick={() => setTermsVisible(true)}
+              >
+                Terms and Conditions
+              </span>
+            </label>
+          </div>
+          {termsError && (
+            <p className="other-signup-error-message">{termsError}</p>
+          )}
+          {/* Submit */}
+          <button type="submit" className="btn">
+            Sign Up
           </button>
-        </dialog>
-      )}
+        </form>
+        {/* Terms Dialog */}
+        {termsVisible && (
+          <div className="modal-overlay">
+            <div className="terms-modal">
+              <h3>Terms and Conditions</h3>
+              <p>
+                By signing up, you agree to comply with all rules and
+                regulations for using our platform. Ensure the uploaded
+                documents are accurate and follow the legal standards.
+              </p>
+              <p>
+                You also agree to the processing of your data according to our
+                privacy policy.
+              </p>
+              <button
+                className="close-modal-btn"
+                onClick={() => setTermsVisible(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    fontFamily: "'Roboto', sans-serif",
-  },
-  header: {
-    color: "#fff",
-    fontSize: "30px",
-    marginBottom: "20px",
-    textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
-  },
-  error: {
-    color: "red",
-    marginBottom: "10px",
-  },
-  form: {
-    background: "#fff",
-    padding: "40px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    width: "400px",
-  },
-  inputGroup: {
-    marginBottom: "20px",
-  },
-  label: {
-    fontSize: "14px",
-    marginBottom: "5px",
-    display: "block",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    fontSize: "14px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#667eea",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "16px",
-  },
-  dialog: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    width: "500px",
-    textAlign: "center",
-  },
-  closeButton: {
-    padding: "10px 20px",
-    backgroundColor: "#667eea",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "16px",
-    marginTop: "10px",
-  },
 };
 
 export default OtherSignup;
