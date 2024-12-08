@@ -11,11 +11,11 @@
   }
 
   .navbar-profile-image {
-    width: 40px; /* Adjust the size as needed */
-    height: 40px; /* Adjust the size as needed */
+    width: 30px; /* Adjust the size as needed */
+    height: 30px; /* Adjust the size as needed */
     border-radius: 50%; /* Make the image circular */
-    margin-right: 10px; /* Add some space between the image and the text */
-    margin-left: 950px;
+    margin-right: 5px; /* Add some space between the image and the text */
+    margin-left: 500px;
   }
   
   .main-content-nav {
@@ -589,15 +589,32 @@
     background-color: #2a2737;
     border: none; /* Remove border */
     color: #fff; /* Ensure text color is white */
-    margin-left: 10px;
+    padding: 5px 10px; /* Adjust padding to make it smaller */
+    display: flex;
+    align-items: center;
+    margin-left: 500px;
+    outline: none; /* Remove default focus outline */
   }
-
+  
   .drop:hover {
-    background-color: #3a364a;
+    background-color: #443f57;
     border: none; /* Remove border */
     color: #fff; /* Ensure text color is white */
-    margin-left: -10px;
+    padding: 5px 10px; /* Adjust padding to make it smaller */
+    display: flex;
+    align-items: center;
+    margin-left: 500px;
   }
+  
+  
+.drop:focus,
+.drop:active,
+.drop.show,
+.drop.show:focus {
+  background-color: #2a2737; /* Maintain the same background color */
+  outline: none; /* Remove default focus outline */
+  box-shadow: none; /* Remove default box shadow */
+}
   
   .drop::after {
     display: none; /* Remove the default caret */
@@ -606,8 +623,9 @@
   .dropdown-menu {
     background-color: #2a2737; /* Same background color */
     border: none; /* Remove border */
-    margin-left: -10px; /* Adjust margin to decrease width from the left */
-    max-width: 20px; /* Set a maximum width for the dropdown menu */
+    right: 0; /* Align to the right */
+    left: auto; /* Override default left alignment */
+    margin-left: 500px;
   }
   
   .dropdown-item {
@@ -617,3 +635,51 @@
   .dropdown-item:hover {
     background-color: #666278; /* Change background color on hover */
   }
+
+  
+  .back-button {
+    background-color: #2a2737;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .back-button:hover {
+    background-color: #443f57;
+  }
+  
+  .section-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #2a2737;
+    font-family: 'roboto', sans-serif;
+  }
+  
+  .styled-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border-radius: 30px; font-family: 'roboto', sans-serif; font-weight: bold;font-size: 14px;   overflow: hidden; /* Ensure rounded corners */
+  }
+
+.styled-table th, .styled-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+
+.styled-table th { background-color: #2a2737; color: #fff; }
+
+.styled-table tr:nth-child(even) { background-color: #f6f5f7; }
+.styled-table tr:nth-child(odd) { background-color: #fefefe; }
+
+
+.styled-table tr:hover { background-color: #cfc8ef; }
+
+.user-info { display: flex; align-items: center; }
+
+.profile-image { width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; }
+
+.accept-button { background-color: #666278; color: #fff; padding: 5px 8px; border: none; border-radius: 5px; cursor: pointer;font-size: 10px; margin-bottom: 3px; }
+
+.accept-button:hover { background-color: #c0b9e1; }
+
+.reject-button { background-color: #2a2737; color: #fff; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;font-size: 10px; }
+
+.reject-button:hover { background-color: #655f81; }
+
