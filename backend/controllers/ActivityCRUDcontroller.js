@@ -14,7 +14,7 @@ const validatePromoCode = require("./promoCodeController.js").validatePromoCode;
 
 const bookactivity = async (req, res) => {
   const { id } = req.params; // Extract the activity ID from the URL parameters
-  const { userId, paymentMethod } = req.body; // Extract the user ID and payment method
+  const { userId, paymentMethod, promoCode } = req.body; // Include promoCode in request body
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid Activity ID." });
@@ -23,29 +23,53 @@ const bookactivity = async (req, res) => {
   if (!userId) {
     return res.status(400).json({ message: "User ID is required." });
   }
+
   const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({ message: "User not found." });
   }
+
   const activity = await Activity.findById(id);
+  if (!activity) {
+    return res.status(404).json({ message: "Activity not found." });
+  }
+
   if (activity.bookedUsers.includes(userId)) {
-    return res.status(400).json({ message: "You have already booked this tour." });
+    return res.status(400).json({ message: "You have already booked this activity." });
   }
 
   try {
-    
-    if (!activity) {
-      return res.status(404).json({ message: "Activity not found." });
+    let finalPrice = activity.price;
+
+    // Validate the promo code, if provided
+    if (promoCode) {
+      const validationResult = await validatePromoCode(promoCode);
+      if (!validationResult.valid) {
+        return res.status(400).json({ message: validationResult.message });
+      }
+
+      // Apply discount
+      const { discountType, discountValue } = validationResult.code;
+      if (discountType === "percentage") {
+        console.log("promo code save20");
+        finalPrice -= (finalPrice * discountValue) / 100; // Apply percentage discount
+      } else if (discountType === "fixed") {
+        finalPrice -= discountValue; // Apply fixed discount
+      }
+
+      // Ensure price is not less than zero
+      finalPrice = Math.max(finalPrice, 0);
     }
 
     if (paymentMethod === "card") {
       // Create a PaymentIntent for the card payment
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: activity.price * 100, // Convert price to cents
+        amount: Math.round(finalPrice * 100), // Convert price to cents
         currency: "usd", // Set currency
         metadata: {
           activityId: id, // Add activity ID to metadata
           userId: userId, // Add user ID to metadata
+          promoCode: promoCode || null, // Include promo code if provided
         },
       });
 
@@ -54,16 +78,15 @@ const bookactivity = async (req, res) => {
         message: "Payment initiated. Confirm payment on the frontend.",
       });
     } else if (paymentMethod === "wallet") {
-   
       // Check if the user has sufficient wallet balance
-      if (user.Wallet < activity.price) {
+      if (user.Wallet < finalPrice) {
         return res.status(400).json({
           message: "Insufficient wallet balance. Please top up your wallet.",
         });
       }
 
       // Deduct the activity price from the user's wallet
-      user.Wallet -= activity.price;
+      user.Wallet -= finalPrice;
       await user.save(); // Save the updated user balance
 
       // Finalize the booking
@@ -73,11 +96,12 @@ const bookactivity = async (req, res) => {
     } else {
       res.status(400).json({ message: "Invalid payment method." });
     }
-   } catch (error) {
+  } catch (error) {
     console.error("Error during booking:", error);
     res.status(500).json({ message: "Internal Server Error." });
   }
 };
+
 
 const finalizeActivityBooking = async (req, res) => {
   const { id } = req.params;

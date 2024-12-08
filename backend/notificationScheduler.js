@@ -56,9 +56,6 @@ const scheduleItineraryNotifications = async () => {
             }
           });
         }
-         else {
-            console.log("zby mnga ");
-         }
       });
     });
   } catch (err) {

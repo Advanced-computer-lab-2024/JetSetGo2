@@ -162,7 +162,10 @@ const Activitiest = () => {
     try {
       const response = await axios.patch(
         `http://localhost:8000/activity/book/${id}`,
-        { userId: touristId, paymentMethod }
+        { userId: touristId, 
+          paymentMethod ,
+          PromoCode : "SAVE20"
+        }
       );
   
       const { clientSecret, message } = response.data;
