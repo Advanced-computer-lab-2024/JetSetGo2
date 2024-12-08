@@ -84,8 +84,11 @@ const TouristSchema = new Schema(
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, default: 1 },
+        status: { type: String, enum: ["Pending", "Shipped"], default: "Pending" }, // Add status
       },
     ],
+    
+    
     
   deliveryAddresses: [
     {

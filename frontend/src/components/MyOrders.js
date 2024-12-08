@@ -4,26 +4,34 @@ import axios from "axios";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
 
+  // Function to fetch orders
+  const fetchOrders = async () => {
+    const touristId = localStorage.getItem("userId");
+
+    if (!touristId) {
+      console.error("User ID not found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/home/tourist/getPurchasedProducts/${touristId}`
+      );
+      setOrders(response.data); // Assuming purchasedProducts is populated with product details, quantity, and status
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      const touristId = localStorage.getItem("userId");
-
-      if (!touristId) {
-        console.error("User ID not found. Please log in.");
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-         ` http://localhost:8000/home/tourist/getPurchasedProducts/${touristId}`
-        );
-        setOrders(response.data); // Assuming purchasedProducts is populated with product details and quantity
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
-
+    // Initial fetch
     fetchOrders();
+
+    // Poll every 10 seconds for status updates
+    const intervalId = setInterval(fetchOrders, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -53,6 +61,17 @@ const MyOrders = () => {
               </p>
               <p>
                 <strong>Total:</strong> ${(order.product.price * order.quantity).toFixed(2)}
+              </p>
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  style={{
+                    color: order.status === "Shipped" ? "green" : "orange",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {order.status || "Pending"}
+                </span>
               </p>
               <p>
                 <strong>Seller:</strong> {order.product.sellerDetails?.name || "Unknown"} (

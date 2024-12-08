@@ -1,0 +1,256 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Apply styles only for pages with the 'signup-body' class */
+.signup-body {
+font-family: 'Arial', sans-serif;
+background-color: #666278; /* Primary Background */
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+}
+
+.back-to-website-btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+color: #ffffff; /* Text color */
+font-size: 1rem; /* Adjust font size */
+font-weight: bold;
+border: none; /* Remove default button border */
+border-radius: 25px; /* Rounded corners */
+padding: 10px 20px; /* Padding inside the button */
+cursor: pointer;
+transition: all 0.3s ease; /* Smooth hover animation */
+outline: none; /* Remove focus outline */
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Optional shadow */
+}
+
+.back-to-website-btn:hover {
+background-color: rgba(255, 255, 255, 0.3); /* Slightly brighter on hover */
+}
+
+.back-to-website-btn:focus {
+outline: 2px solid rgba(255, 255, 255, 0.5); /* Accessible focus outline */
+}
+
+/* Main Container */
+.signup-container {
+  display: flex;
+  width: 1000px;
+  max-width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Left Section (Image Section) */
+.signup-left {
+  flex: 1;
+  background-image: url('https://www.nps.gov/deva/planyourvisit/images/Death-Valley-Sunset.png'); /* Replace with your actual image URL */
+  background-size: cover;
+  background-position: center;
+  color: #FFFFFF; /* Text over image */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+}
+
+.signup-left h1 {
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.signup-left .caption {
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.signup-left .pagination-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.signup-left .pagination-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  margin: 0 5px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.signup-left .pagination-dots span.active {
+  opacity: 1;
+}
+
+/* Right Section (Form Section) */
+.signup-right {
+  flex: 1.5;
+  background-color: #2a2737; /* Secondary Background */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #FFFFFF; /* Text color */
+}
+
+.signup-right h2 {
+  font-size: 2rem;
+  color: #FFFFFF; /* White text for title */
+  margin-bottom: 20px;
+}
+
+/* Form Styles */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Consistent spacing between form elements */
+  width: 100%; /* Ensure form takes full width */
+}
+
+.signup-form .form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.signup-form input {
+  width: 100%; /* Ensure inputs take full width of parent */
+  height: 50px; /* Uniform height for all input fields */
+  padding: 0 15px; /* Consistent padding */
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #4A4A5E; /* Input background */
+  color: #FFFFFF; /* Input text color */
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.signup-form input::placeholder {
+  color: #696975; /* Placeholder text */
+}
+
+.signup-form input:focus {
+  border: 1px solid #8B5CF6; /* Accent color for focus state */
+  background-color: #3B3B4F; /* Slightly darker background on focus */
+}
+
+.signup-form .form-row input {
+  flex: 1; /* Make inputs in the same row consistent in size */
+}
+
+.signup-form .form-row input:first-child {
+  margin-right: 10px; /* Add spacing between first and second input in a row */
+}
+
+/* Password Input Field Styling */
+/* Password Input Field Styling */
+.password-input {
+  position: relative;
+  margin: 10px 0; /* Add spacing above and below the password input field */
+}
+
+.password-input input {
+  width: 100%; /* Ensure the password field matches other inputs */
+  height: 50px; /* Same height as other inputs */
+  padding: 0 15px 0 15px; /* Add space for the icon */
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #4A4A5E; /* Input background */
+  color: #FFFFFF; /* Input text color */
+  outline: none;
+}
+
+.password-input .toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 15px; /* Place the icon to the right */
+  transform: translateY(-50%);
+  font-size: 1.2rem; /* Icon size */
+  color: #8B5CF6; /* Icon color */
+  cursor: pointer;
+}
+
+.password-input .toggle-password:hover {
+  color: #6D4ECF; /* Icon hover color */
+}
+
+/* Adjust spacing for form-group if necessary */
+.signup-form .form-group {
+  margin-bottom: 20px; /* Add spacing below each form-group */
+}
+
+/* Buttons */
+.signup-form button {
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #FFFFFF;
+  background-color: #8B5CF6; /* Accent Color */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-form button:hover {
+  background-color: #6D4ECF; /* Button Hover */
+}
+
+/* Login Redirect */
+.login-redirect {
+text-align: center;
+margin-top: 15px; /* Spacing above the login text */
+}
+
+.login-redirect p {
+font-size: 0.9rem;
+color: #A3A3B3; /* Secondary Text Color */
+}
+
+.login-redirect .login-link {
+color: #8B5CF6; /* Link Color */
+text-decoration: none;
+font-weight: bold;
+}
+
+.login-redirect .login-link:hover {
+text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .signup-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .signup-left {
+    height: 300px;
+    background-size: cover;
+    padding: 10px;
+  }
+
+  .signup-right {
+    padding: 20px;
+  }
+
+  .signup-form button {
+    font-size: 0.9rem;
+  }
+}

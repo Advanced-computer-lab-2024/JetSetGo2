@@ -178,7 +178,6 @@ const createTourist = async (req, res) => {
     Nationality,
     DateOfBirth,
     Job,
-    cart: [],
   } = req.body;
 
   // Validation checks
@@ -501,6 +500,7 @@ const getPurchasedProducts = async (req, res) => {
               : null, // If no match found
           },
           quantity: purchasedItem.quantity, // Include the quantity from purchasedProducts
+          status: purchasedItem.status || "Pending", // Include the status
         };
       })
     );
