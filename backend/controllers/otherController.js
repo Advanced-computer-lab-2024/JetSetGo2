@@ -48,7 +48,7 @@ const createOther = async (req, res) => {
     if (AccountType == "Advertiser") {
       const seller = await AdverModel.create({
         UserName,
-        email: Email,
+        Email,
         Password,
         IDDocument,
         TaxationRegistryCard,

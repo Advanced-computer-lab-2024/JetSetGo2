@@ -22,6 +22,25 @@ const MyOrders = () => {
       console.error("Error fetching orders:", error);
     }
   };
+  const cancelOrder = async (orderId) => {
+    const touristId = localStorage.getItem("userId");
+
+    if (!touristId) {
+      console.error("User ID not found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:8000/home/tourist/${touristId}/cancelOrder/${orderId}` // Include touristId in the API URL
+      );
+      alert(response.data.message);
+      fetchOrders(); // Refresh the orders after cancellation
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      alert(error.response?.data?.error || "Failed to cancel order.");
+    }
+  };
 
   useEffect(() => {
     // Initial fetch
@@ -35,7 +54,13 @@ const MyOrders = () => {
   }, []);
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "#f7f8fa", minHeight: "100vh" }}>
+    <div
+      style={{
+        padding: "20px",
+        backgroundColor: "#f7f8fa",
+        minHeight: "100vh",
+      }}
+    >
       <h2>My Orders</h2>
       {orders.length > 0 ? (
         <ul style={{ listStyleType: "none", padding: 0 }}>
@@ -60,7 +85,8 @@ const MyOrders = () => {
                 <strong>Quantity:</strong> {order.quantity}
               </p>
               <p>
-                <strong>Total:</strong> ${(order.product.price * order.quantity).toFixed(2)}
+                <strong>Total:</strong> $
+                {(order.product.price * order.quantity).toFixed(2)}
               </p>
               <p>
                 <strong>Status:</strong>{" "}
@@ -74,9 +100,26 @@ const MyOrders = () => {
                 </span>
               </p>
               <p>
-                <strong>Seller:</strong> {order.product.sellerDetails?.name || "Unknown"} (
+                <strong>Seller:</strong>{" "}
+                {order.product.sellerDetails?.name || "Unknown"} (
                 {order.product.sellerDetails?.role || "Unknown Role"})
               </p>
+              <button
+                disabled={order.status === "Shipped"} // Disable the button if shipped
+                onClick={() => cancelOrder(order._id)}
+                style={{
+                  padding: "5px 10px",
+                  backgroundColor:
+                    order.status === "Shipped" ? "#ccc" : "#ff4d4f",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor:
+                    order.status === "Shipped" ? "not-allowed" : "pointer",
+                }}
+              >
+                Cancel Order
+              </button>
             </li>
           ))}
         </ul>

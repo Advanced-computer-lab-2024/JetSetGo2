@@ -48,12 +48,6 @@ const TouristSchema = new Schema(
         ref: "Transportation",
       },
     ],
-    purchasedProducts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-      },
-    ],
     bookedFlights: [Object],
     Total_Loyalty_Points: {
       type: Number,
@@ -96,7 +90,7 @@ const TouristSchema = new Schema(
     ],
     wishlist: [
       {
-        type:  mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ], // Array of product IDs
@@ -105,26 +99,32 @@ const TouristSchema = new Schema(
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, default: 1 },
       },
-    ],    
+    ],
     purchasedProducts: [
       {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          default: () => new mongoose.Types.ObjectId(),
+        }, // Unique ID
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, default: 1 },
-        status: { type: String, enum: ["Pending", "Shipped"], default: "Pending" }, // Add status
+        status: {
+          type: String,
+          enum: ["Pending", "Shipped"],
+          default: "Pending",
+        }, // Order status
       },
     ],
-    
-    
-    
-  deliveryAddresses: [
-    {
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
-    },
-  ],
+
+    deliveryAddresses: [
+      {
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String },
+        postalCode: { type: String, required: true },
+        country: { type: String, required: true },
+      },
+    ],
   },
   { timestamps: true }
 );

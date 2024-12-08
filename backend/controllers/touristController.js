@@ -18,12 +18,21 @@ const bookTransportation = async (req, res) => {
   const { paymentMethod } = req.body;
 
   try {
-    console.log("Booking Transportation:", { touristId, transportationId, paymentMethod });
+    console.log("Booking Transportation:", {
+      touristId,
+      transportationId,
+      paymentMethod,
+    });
 
     // Check if touristId and transportationId are valid ObjectIds
-    if (!mongoose.Types.ObjectId.isValid(touristId) || !mongoose.Types.ObjectId.isValid(transportationId)) {
+    if (
+      !mongoose.Types.ObjectId.isValid(touristId) ||
+      !mongoose.Types.ObjectId.isValid(transportationId)
+    ) {
       console.error("Error: Invalid touristId or transportationId.");
-      return res.status(400).json({ error: "Invalid tourist or transportation ID." });
+      return res
+        .status(400)
+        .json({ error: "Invalid tourist or transportation ID." });
     }
 
     // Find the transportation
@@ -36,7 +45,9 @@ const bookTransportation = async (req, res) => {
 
     if (!transportation.isBookingOpen) {
       console.error("Error: Booking is closed for this transportation.");
-      return res.status(400).json({ error: "Booking is closed for this transportation." });
+      return res
+        .status(400)
+        .json({ error: "Booking is closed for this transportation." });
     }
 
     if (transportation.seatsAvailable <= 0) {
@@ -69,7 +80,7 @@ const bookTransportation = async (req, res) => {
         clientSecret: paymentIntent.client_secret,
         message: "Payment initiated. Confirm payment on the frontend.",
       });
-    } 
+    }
     // Handle wallet payment
     else if (paymentMethod === "wallet") {
       if (tourist.Wallet < transportation.price) {
@@ -94,7 +105,7 @@ const bookTransportation = async (req, res) => {
         tourist,
         transportation,
       });
-    } 
+    }
     // Handle invalid payment method
     else {
       console.error("Error: Invalid payment method.");
@@ -102,7 +113,9 @@ const bookTransportation = async (req, res) => {
     }
   } catch (error) {
     console.error("Error during transportation booking:", error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 };
 const finalizeTransportationBooking = async (req, res) => {
@@ -110,12 +123,21 @@ const finalizeTransportationBooking = async (req, res) => {
   const { userId, paymentIntentId } = req.body;
 
   try {
-    console.log("Finalizing booking for Transportation:", { transportationId, userId, paymentIntentId });
+    console.log("Finalizing booking for Transportation:", {
+      transportationId,
+      userId,
+      paymentIntentId,
+    });
 
     // Validate transportationId and userId
-    if (!mongoose.Types.ObjectId.isValid(transportationId) || !mongoose.Types.ObjectId.isValid(userId)) {
+    if (
+      !mongoose.Types.ObjectId.isValid(transportationId) ||
+      !mongoose.Types.ObjectId.isValid(userId)
+    ) {
       console.error("Error: Invalid transportationId or userId.");
-      return res.status(400).json({ error: "Invalid transportation or user ID." });
+      return res
+        .status(400)
+        .json({ error: "Invalid transportation or user ID." });
     }
 
     // Validate transportation existence
@@ -143,8 +165,13 @@ const finalizeTransportationBooking = async (req, res) => {
     console.log("Retrieved PaymentIntent:", paymentIntent);
 
     if (paymentIntent.status !== "succeeded") {
-      console.error("Error: Payment not confirmed. Status:", paymentIntent.status);
-      return res.status(400).json({ error: `Payment not confirmed. Status: ${paymentIntent.status}` });
+      console.error(
+        "Error: Payment not confirmed. Status:",
+        paymentIntent.status
+      );
+      return res.status(400).json({
+        error: `Payment not confirmed. Status: ${paymentIntent.status}`,
+      });
     }
 
     // Prevent duplicate finalization
@@ -160,13 +187,16 @@ const finalizeTransportationBooking = async (req, res) => {
     await tourist.save();
 
     console.log("Transportation booking finalized successfully.");
-    res.status(200).json({ message: "Transportation booking finalized successfully." });
+    res
+      .status(200)
+      .json({ message: "Transportation booking finalized successfully." });
   } catch (error) {
     console.error("Error finalizing transportation booking:", error);
-    res.status(500).json({ error: "Internal Server Error.", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal Server Error.", details: error.message });
   }
 };
-
 
 const createTourist = async (req, res) => {
   // create a tourist after sign up
@@ -313,8 +343,6 @@ function calculateLoyaltyPoints(level, price) {
   return points;
 }
 
-
-
 const buyProduct = async (req, res) => {
   const { touristId, productIds, addressId } = req.body;
 
@@ -334,7 +362,9 @@ const buyProduct = async (req, res) => {
       const product = await productModel.findById(productId);
 
       if (!product) {
-        return res.status(404).json(`{ error: Product not found: ${productId} }`);
+        return res
+          .status(404)
+          .json(`{ error: Product not found: ${productId} }`);
       }
 
       // Update product stock, add purchase record, etc.
@@ -363,7 +393,9 @@ const buyProducts = async (req, res) => {
   }
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("cart.product");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found." });
     }
@@ -412,7 +444,6 @@ const buyProducts = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
-
 
 const getBookedTransportations = async (req, res) => {
   const { touristId } = req.params;
@@ -469,61 +500,47 @@ const getPurchasedProducts = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    // Find the tourist
     const tourist = await touristModel.findById(touristId);
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    // Fetch and populate purchased products
     const populatedProducts = await Promise.all(
       tourist.purchasedProducts.map(async (purchasedItem) => {
         const product = await productModel.findById(purchasedItem.product);
 
         if (!product) {
-          return null; // Skip if product not found
+          return null;
         }
 
-        // Check if seller exists in Seller or Admin collection
         const seller = await SellerModel.findById(product.sellerId);
         const admin = await AdminModel.findById(product.sellerId);
 
-        // Attach seller name and role to the product
         return {
+          _id: purchasedItem._id, // Include the unique order ID
           product: {
-            ...product.toObject(), // Convert Mongoose document to plain object
+            ...product.toObject(),
             sellerDetails: seller
               ? { name: seller.Name, role: "Seller" }
               : admin
               ? { name: admin.Username, role: "Admin" }
-              : null, // If no match found
+              : null,
           },
-          quantity: purchasedItem.quantity, // Include the quantity from purchasedProducts
-          status: purchasedItem.status || "Pending", // Include the status
+          quantity: purchasedItem.quantity,
+          status: purchasedItem.status || "Pending",
         };
       })
     );
 
-    // Filter out null values (e.g., products not found)
-    const validProducts = populatedProducts.filter(
-      (purchasedProduct) => purchasedProduct !== null
-    );
+    const validProducts = populatedProducts.filter((item) => item !== null);
 
-    if (validProducts.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "No purchased products found for this tourist." });
-    }
-
-    // Send the populated products
     res.status(200).json(validProducts);
   } catch (error) {
     console.error("Error fetching purchased products:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const getTouristNationality = async (req, res) => {
   const { touristId } = req.params;
@@ -761,20 +778,23 @@ const addReview = async (req, res) => {
 };
 // Method to get bookmarked historical places
 
-
 // Method to get bookmarked museums
 
 const getBookmarkedActivities = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("bookmarkedActivities");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("bookmarkedActivities");
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    res.status(200).json({ bookmarkedActivities: tourist.bookmarkedActivities });
+    res
+      .status(200)
+      .json({ bookmarkedActivities: tourist.bookmarkedActivities });
   } catch (error) {
     console.error("Error fetching bookmarked activities:", error);
     res.status(500).json({ error: error.message });
@@ -815,13 +835,17 @@ const getBookmarkedItineraries = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("bookmarkedItineraries");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("bookmarkedItineraries");
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    res.status(200).json({ bookmarkedItineraries: tourist.bookmarkedItineraries });
+    res
+      .status(200)
+      .json({ bookmarkedItineraries: tourist.bookmarkedItineraries });
   } catch (error) {
     console.error("Error fetching bookmarked itineraries:", error.message);
     res.status(500).json({ error: error.message });
@@ -864,7 +888,9 @@ const getBookmarkedHistoricalPlaces = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("bookmarkedHistoricalPlaces");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("bookmarkedHistoricalPlaces");
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
@@ -872,7 +898,10 @@ const getBookmarkedHistoricalPlaces = async (req, res) => {
 
     res.status(200).json(tourist.bookmarkedHistoricalPlaces);
   } catch (error) {
-    console.error("Error fetching bookmarked historical places:", error.message);
+    console.error(
+      "Error fetching bookmarked historical places:",
+      error.message
+    );
     res.status(500).json({ error: error.message });
   }
 };
@@ -885,12 +914,14 @@ const toggleBookmarkHistoricalPlace = async (req, res) => {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
-    const isBookmarked = tourist.bookmarkedHistoricalPlaces.includes(historicalPlaceId);
+    const isBookmarked =
+      tourist.bookmarkedHistoricalPlaces.includes(historicalPlaceId);
     if (isBookmarked) {
       // Remove historical place from bookmarks
-      tourist.bookmarkedHistoricalPlaces = tourist.bookmarkedHistoricalPlaces.filter(
-        (id) => id.toString() !== historicalPlaceId
-      );
+      tourist.bookmarkedHistoricalPlaces =
+        tourist.bookmarkedHistoricalPlaces.filter(
+          (id) => id.toString() !== historicalPlaceId
+        );
     } else {
       // Add historical place to bookmarks
       tourist.bookmarkedHistoricalPlaces.push(historicalPlaceId);
@@ -913,7 +944,9 @@ const getBookmarkedMuseums = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("bookmarkedMuseums");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("bookmarkedMuseums");
 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
@@ -960,19 +993,18 @@ const toggleBookmarkMuseum = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 const addToCart = async (req, res) => {
   const { touristId, productId } = req.params;
 
   try {
     // Validate ObjectIds
-    if (!mongoose.Types.ObjectId.isValid(touristId) || !mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ error: "Invalid tourist ID or product ID" });
+    if (
+      !mongoose.Types.ObjectId.isValid(touristId) ||
+      !mongoose.Types.ObjectId.isValid(productId)
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Invalid tourist ID or product ID" });
     }
 
     // Find the tourist
@@ -994,12 +1026,15 @@ const addToCart = async (req, res) => {
 
     // Check if the product is out of stock
     if (product.availableQuantity <= 0) {
-      return res.status(400).json({ error: `Product '${product.description}' is out of stock.` });
+      return res
+        .status(400)
+        .json({ error: `Product '${product.description}' is out of stock.` });
     }
 
     // Check if the product already exists in the cart
     const existingCartItem = tourist.cart.find(
-      (cartItem) => cartItem.product && cartItem.product.toString() === productId
+      (cartItem) =>
+        cartItem.product && cartItem.product.toString() === productId
     );
 
     if (existingCartItem) {
@@ -1013,20 +1048,23 @@ const addToCart = async (req, res) => {
     // Save the updated tourist document
     await tourist.save();
 
-    return res.status(200).json({ message: "Product added to cart", cart: tourist.cart });
+    return res
+      .status(200)
+      .json({ message: "Product added to cart", cart: tourist.cart });
   } catch (error) {
     console.error("Error adding to cart:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-
 const getCart = async (req, res) => {
   const { touristId } = req.params;
 
   try {
     // Find the tourist and populate the cart
-    const tourist = await touristModel.findById(touristId).populate("cart.product");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
@@ -1062,7 +1100,9 @@ const removeFromCart = async (req, res) => {
     // Save the updated tourist document
     await tourist.save();
 
-    res.status(200).json({ message: "Product removed from cart", cart: tourist.cart });
+    res
+      .status(200)
+      .json({ message: "Product removed from cart", cart: tourist.cart });
   } catch (error) {
     console.error("Error removing from cart:", error);
     res.status(500).json({ error: error.message });
@@ -1100,7 +1140,9 @@ const updateCartQuantity = async (req, res) => {
 
     // Ensure tourist.cart exists and is an array
     if (!Array.isArray(tourist.cart)) {
-      return res.status(400).json({ error: "Cart is not initialized or invalid." });
+      return res
+        .status(400)
+        .json({ error: "Cart is not initialized or invalid." });
     }
 
     // Find the cart item
@@ -1118,14 +1160,15 @@ const updateCartQuantity = async (req, res) => {
     // Save the updated tourist document
     await tourist.save();
 
-    res.status(200).json({ message: "Cart quantity updated successfully", cart: tourist.cart });
+    res.status(200).json({
+      message: "Cart quantity updated successfully",
+      cart: tourist.cart,
+    });
   } catch (error) {
     console.error("Error updating cart quantity:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const addDeliveryAddress = async (req, res) => {
   const { touristId } = req.params;
@@ -1142,7 +1185,10 @@ const addDeliveryAddress = async (req, res) => {
 
     await tourist.save();
 
-    res.status(200).json({ message: "Address added successfully", addresses: tourist.deliveryAddresses });
+    res.status(200).json({
+      message: "Address added successfully",
+      addresses: tourist.deliveryAddresses,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1234,6 +1280,52 @@ const removeFromWishlist = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const cancelOrder = async (req, res) => {
+  const { touristId, orderId } = req.params;
+
+  console.log("Received touristId:", touristId);
+  console.log("Received orderId:", orderId);
+
+  // Validate both IDs
+  const isTouristIdValid = mongoose.Types.ObjectId.isValid(touristId);
+  const isOrderIdValid = mongoose.Types.ObjectId.isValid(orderId);
+
+  console.log("Is touristId valid?", isTouristIdValid);
+  console.log("Is orderId valid?", isOrderIdValid);
+
+  if (!isTouristIdValid || !isOrderIdValid) {
+    return res
+      .status(400)
+      .json({ error: "Invalid tourist or order ID format." });
+  }
+
+  try {
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      console.log("Tourist not found.");
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+
+    console.log("Tourist found:", tourist);
+
+    const order = tourist.purchasedProducts.id(orderId);
+    if (!order) {
+      console.log("Order not found.");
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    console.log("Order found:", order);
+
+    // Remove order and save
+    tourist.purchasedProducts.remove(order);
+    await tourist.save();
+
+    res.status(200).json({ message: "Order cancelled successfully." });
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
 
 module.exports = {
   createTourist,
@@ -1270,5 +1362,6 @@ module.exports = {
   getWishlist,
   removeFromWishlist,
   buyProducts,
-  finalizeTransportationBooking
+  finalizeTransportationBooking,
+  cancelOrder,
 };
