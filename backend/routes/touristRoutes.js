@@ -34,19 +34,21 @@ const {
   addDeliveryAddress,
   getTouristAddresses,
   buyProducts,
-  finalizeTransportationBooking
+  finalizeTransportationBooking,
+  cancelOrder,
 } = require("../controllers/touristController");
+// routes/touristRoutes.js
+router.delete("/:touristId/cancelOrder/:orderId", cancelOrder);
 router.post("/add/:touristId/:productId", addToCart);
 router.get("/cart/:touristId", getCart);
 router.delete("/remove/:touristId/:productId", removeFromCart);
 router.put("/updateq", updateCartQuantity);
 router.post("/address/:touristId", addDeliveryAddress);
 router.get("/geta/:userId", getTouristAddresses);
-router.post("/transportation/finalizeBooking/:transportationId", finalizeTransportationBooking);
-
-
-
-
+router.post(
+  "/transportation/finalizeBooking/:transportationId",
+  finalizeTransportationBooking
+);
 
 router.get("/", (req, res) => {
   res.status(200).send("You have everything installed!");
@@ -76,22 +78,27 @@ router.post("/rateProduct/:productId", addRating);
 router.post("/reviewProduct/:productId", addReview);
 
 // Tourist features routes
-router.get("/getNat/:touristId",  getTouristNationality);
+router.get("/getNat/:touristId", getTouristNationality);
 router.put("/redeempoints/:id", redeemPointsToCash);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);
 
 router.get("/bookmarkActivity/:touristId", getBookmarkedActivities);
 router.post("/bookmarkActivity/:touristId/:activityId", toggleBookmarkActivity);
 router.get("/bookmarkItinerary/:touristId", getBookmarkedItineraries);
-router.post("/bookmarkItinerary/:touristId/:itineraryId", toggleBookmarkItinerary);
-router.post("/bookmarkHistoricalPlace/:touristId/:historicalPlaceId",toggleBookmarkHistoricalPlace);
-router.get( "/bookmarkedHistoricalPlaces/:touristId",getBookmarkedHistoricalPlaces);
+router.post(
+  "/bookmarkItinerary/:touristId/:itineraryId",
+  toggleBookmarkItinerary
+);
+router.post(
+  "/bookmarkHistoricalPlace/:touristId/:historicalPlaceId",
+  toggleBookmarkHistoricalPlace
+);
+router.get(
+  "/bookmarkedHistoricalPlaces/:touristId",
+  getBookmarkedHistoricalPlaces
+);
 router.get("/bookmarkMuseum/:touristId", getBookmarkedMuseums); // Get all bookmarked museums
 router.post("/bookmarkMuseum/:touristId/:museumId", toggleBookmarkMuseum);
-
-
-
-
 
 // Wishlist routes
 router.post("/:userId/wishlist/add", addToWishlist);
