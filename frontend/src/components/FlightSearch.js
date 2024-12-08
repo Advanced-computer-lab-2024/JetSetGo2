@@ -178,42 +178,49 @@ const [currentFlight, setCurrentFlight] = useState(null);
 
     const handleBooking = async (flight) => {
         const paymentMethod = prompt("Enter payment method (wallet/card):").toLowerCase();
-
+      
         const touristId = localStorage.getItem("userId");
         if (!touristId) {
-            alert("Tourist ID not found. Please log in.");
-            return;
+          alert("Tourist ID not found. Please log in.");
+          return;
         }
-
+      
+        if (!flight || !flight.price || !flight.price.total) {
+          alert("Invalid flight or price data.");
+          return;
+        }
+      
         try {
-            const response = await axios.post(`http://localhost:8000/home/tourist/bookFlight`, {
-                touristId,
-                flight: {
-                    flightNumber: flight.id,
-                    airline: flight.validatingAirlineCodes?.[0],
-                    departure: flight.itineraries?.[0].segments?.[0].departure.iataCode,
-                    arrival: flight.itineraries?.[0].segments?.[0].arrival.iataCode,
-                    date: flight.itineraries?.[0].segments?.[0].departure.at,
-                    price: flight.price?.total,
-                    currency: flight.price?.currency,
-                },
-                paymentMethod,
-            });
-
+          const response = await axios.post(`http://localhost:8000/home/tourist/bookFlight`, {
+            touristId,
+            flight: {
+              flightNumber: flight.id,
+              airline: flight.validatingAirlineCodes?.[0],
+              departure: flight.itineraries?.[0].segments?.[0].departure.iataCode,
+              arrival: flight.itineraries?.[0].segments?.[0].arrival.iataCode,
+              date: flight.itineraries?.[0].segments?.[0].departure.at,
+              price: flight.price?.total,
+              currency: flight.price?.currency,
+            },
+            paymentMethod,
+          });
+      
+          if (paymentMethod === "wallet") {
+            alert(response.data.message || "Flight booked successfully using wallet!");
+          } else if (paymentMethod === "card") {
             const { clientSecret } = response.data;
-
-            if (paymentMethod === "card" && clientSecret) {
-                setClientSecret(clientSecret);
-                setCurrentFlight(flight);
-                setIsPaymentModalOpen(true);
-            } else {
-                alert(response.data.message || "Flight booked successfully using wallet!");
+            if (clientSecret) {
+              setClientSecret(clientSecret);
+              setCurrentFlight(flight);
+              setIsPaymentModalOpen(true);
             }
+          }
         } catch (error) {
-            console.error("Error booking flight:", error);
-            alert("Error booking flight. Please try again.");
+          console.error("Error booking flight:", error);
+          alert(error.response?.data?.message || "Error booking flight. Please try again.");
         }
-    };
+      };
+      
 
     const handlePaymentSuccess = async (paymentIntentId) => {
         try {

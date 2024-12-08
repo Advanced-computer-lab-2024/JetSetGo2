@@ -133,15 +133,25 @@ function calculateLoyaltyPoints(level, price) {
 // In your backend (e.g., Node.js/Express)
 app.post("/home/tourist/bookFlight", async (req, res) => {
   try {
-    const { touristId, flight, paymentMethod, paymentIntentId } = req.body;
 
+    const { touristId, flight, paymentMethod, paymentIntentId } = req.body;
+    let flightPrice = parseFloat(flight?.price?.total);
+
+    if (isNaN(flightPrice)) {
+      flightPrice = parseFloat(flight?.price);
+    }
+    
+    if (isNaN(flightPrice)) {
+      throw new Error("Invalid flight price provided.");
+    }
     // Step 1: Validate tourist existence
     const tourist = await Tourist.findById(touristId);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found." });
     }
 
-    console.log("Tourist found:", tourist);
+
+    // console.log("Tourist found:", tourist);
 
     // Step 2: Handle payment logic
     if (paymentMethod === "card") {
@@ -153,30 +163,47 @@ app.post("/home/tourist/bookFlight", async (req, res) => {
           metadata: { touristId, ...flight },
         });
 
-        console.log("Payment Intent Created:", paymentIntent);
+        // console.log("Payment Intent Created:", paymentIntent);
 
         return res.status(200).json({
           clientSecret: paymentIntent.client_secret,
           message: "Payment initiated. Confirm payment on the frontend.",
         });
       }
-
-      console.log("Verifying payment...");
+      console.log("Flight price =", flight.price.total);
+      // console.log("Verifying payment...");
       const verifiedPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
       if (verifiedPaymentIntent.status !== "succeeded") {
         return res.status(400).json({ message: `Payment not confirmed. Status: ${verifiedPaymentIntent.status}` });
       }
+      const loyaltyPoints = calculateLoyaltyPoints(tourist.Loyalty_Level, flightPrice);
 
-      console.log("Payment confirmed:", verifiedPaymentIntent);
+      // if (isNaN(flight.price) || loyaltyPoints < 0) {
+      //   throw new Error("Invalid loyalty points calculated.");
+      // }
+  
+      tourist.Loyalty_Points += loyaltyPoints;
+      tourist.Total_Loyalty_Points += loyaltyPoints;
+      // Update loyalty level
+      if (tourist.Total_Loyalty_Points >= 500000) {
+        tourist.Loyalty_Level = 3;
+      } else if (tourist.Total_Loyalty_Points >= 100000) {
+        tourist.Loyalty_Level = 2;
+      } else {
+        tourist.Loyalty_Level = 1;
+      }
+      // console.log("Payment confirmed:", verifiedPaymentIntent);
     } else if (paymentMethod === "wallet") {
-      const flightPrice = parseFloat(flight.price); // Ensure price is converted here
-      if (tourist.Wallet < flightPrice) {
+      if (tourist.Wallet==0){
+        return res.status(400).json({ message: "Insufficient wallet balance." });
+      }
+      else if (tourist.Wallet < flightPrice) {
         return res.status(400).json({ message: "Insufficient wallet balance." });
       }
 
       tourist.Wallet -= flightPrice;
-      console.log("Wallet payment processed.");
+      // console.log("Wallet payment processed.");
     } else {
       return res.status(400).json({ message: "Invalid payment method." });
     }
@@ -185,24 +212,8 @@ app.post("/home/tourist/bookFlight", async (req, res) => {
     console.log("Finalizing flight booking...");
     tourist.bookedFlights.push(flight);
 
-    const flightPrice = parseFloat(flight.price); // Ensure price is converted here
-    const loyaltyPoints = calculateLoyaltyPoints(tourist.Loyalty_Level, flightPrice);
+    
 
-    if (isNaN(loyaltyPoints) || loyaltyPoints < 0) {
-      throw new Error("Invalid loyalty points calculated.");
-    }
-
-    tourist.Loyalty_Points += loyaltyPoints;
-    tourist.Total_Loyalty_Points += loyaltyPoints;
-
-    // Update loyalty level
-    if (tourist.Total_Loyalty_Points >= 500000) {
-      tourist.Loyalty_Level = 3;
-    } else if (tourist.Total_Loyalty_Points >= 100000) {
-      tourist.Loyalty_Level = 2;
-    } else {
-      tourist.Loyalty_Level = 1;
-    }
 
     await tourist.save();
 
@@ -267,42 +278,109 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.post("/home/tourist/:touristId/bookHotel", async (req, res) => {
   const { touristId } = req.params;
-  const { offer, hotelName } = req.body; // Destructure hotelName from the request body
+  const { offer, hotelName, paymentMethod, paymentIntentId } = req.body;
+  const hotelPrice = offer?.price?.total;
 
   try {
+    if (!offer || !hotelName || !paymentMethod) {
+      throw new Error("Missing required fields: offer, hotelName, or paymentMethod");
+    }
+
+    // Step 1: Validate tourist existence
     const tourist = await Tourist.findById(touristId);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    const bookedData = { hotelName, offer }; // Combine hotelName with the offer
-    tourist.bookedHotels.push(bookedData); // Add the combined data to bookedHotels
+    // Step 2: Handle payment logic
+    if (paymentMethod === "card") {
+      if (!paymentIntentId) {
+        console.log("Initiating Stripe payment...");
 
-    // Use the existing calculateLoyaltyPoints function
-    const loyaltyPoints = calculateLoyaltyPoints(
-      tourist.Loyalty_Level,
-      bookedData.offer.price.total
-    );
+        // Stringify object-like metadata values
+        const metadata = {
+          touristId: String(touristId),
+          hotelName: String(hotelName),
+          checkInDate: offer.checkInDate,
+          checkOutDate: offer.checkOutDate,
+          roomType: offer.room?.typeEstimated?.category || "N/A",
+          guests: String(offer.guests?.adults || "1"),
+          rateFamilyEstimated: JSON.stringify(offer.rateFamilyEstimated || {}),
+          priceTotal: String(hotelPrice),
+        };
 
-    // Add loyalty points to the user's account
-    tourist.Loyalty_Points = tourist.Loyalty_Points + loyaltyPoints;
-    tourist.Total_Loyalty_Points = tourist.Total_Loyalty_Points + loyaltyPoints;
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(parseFloat(hotelPrice) * 100), // Convert price to cents
+          currency: "usd",
+          metadata, // Ensure metadata values are strings
+        });
 
-    if (tourist.Total_Loyalty_Points >= 500000) {
-      tourist.Loyalty_Level = 3;
-    } else if (tourist.Total_Loyalty_Points >= 100000) {
-      tourist.Loyalty_Level = 2;
+        console.log("Payment Intent Created:", paymentIntent);
+
+        return res.status(200).json({
+          clientSecret: paymentIntent.client_secret,
+          message: "Payment initiated. Confirm payment on the frontend.",
+        });
+      }
+
+      console.log("Verifying payment...");
+      const verifiedPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      if (verifiedPaymentIntent.status !== "succeeded") {
+        return res
+          .status(400)
+          .json({ message: `Payment not confirmed. Status: ${verifiedPaymentIntent.status}` });
+      }
+
+      console.log("Payment confirmed:", verifiedPaymentIntent);
+      const loyaltyPoints = calculateLoyaltyPoints(tourist.Loyalty_Level, hotelPrice);
+
+      if (isNaN(loyaltyPoints) || loyaltyPoints < 0) {
+        throw new Error("Invalid loyalty points calculated.");
+      }
+  
+      tourist.Loyalty_Points += loyaltyPoints;
+      tourist.Total_Loyalty_Points += loyaltyPoints;
+  
+      // Update loyalty level
+      if (tourist.Total_Loyalty_Points >= 500000) {
+        tourist.Loyalty_Level = 3;
+      } else if (tourist.Total_Loyalty_Points >= 100000) {
+        tourist.Loyalty_Level = 2;
+      } else {
+        tourist.Loyalty_Level = 1;
+      }
+  
+    } else if (paymentMethod === "wallet") {
+      if (tourist.Wallet==0){
+        return res.status(400).json({ message: "Insufficient wallet balance." });
+      }
+      else if (tourist.Wallet < hotelPrice) {
+        return res.status(400).json({ message: "Insufficient wallet balance." });
+      }
+
+      tourist.Wallet -= hotelPrice;
+      console.log("Wallet payment processed.");
     } else {
-      tourist.Loyalty_Level = 1;
+      return res.status(400).json({ message: "Invalid payment method." });
     }
 
+    // Step 3: Finalize hotel booking
+    console.log("Finalizing hotel booking...");
+    const bookedData = { hotelName, offer };
+    tourist.bookedHotels.push(bookedData);
+
+   
     await tourist.save();
 
-    res.status(200).json({ message: "Booking successful!" });
+    console.log("Hotel booking finalized successfully.");
+    res.status(200).json({ message: "Hotel booked successfully." });
   } catch (error) {
-    res.status(500).json({ message: "Error saving booking", error });
+    console.error("Error booking hotel:", error.message, error.stack);
+    res.status(500).json({ message: "Error booking hotel.", details: error.message });
   }
 });
+
 
 app.get("/home/tourist/bookedHotels/:touristId", async (req, res) => {
   try {

@@ -178,7 +178,6 @@ const createTourist = async (req, res) => {
     Nationality,
     DateOfBirth,
     Job,
-    cart: [],
   } = req.body;
 
   // Validation checks
