@@ -237,11 +237,13 @@ const TouristHome = () => {
     3: "https://readingbydesign.org/sites/default/files/badges/champ_level03.png",
     // Add more levels as needed
   };
-const getLoyaltyImage = () => {
-// Fallback image if level is undefined or no matching level found
-return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/sites/default/files/badges/champ_level01.png";
-};
-
+  const getLoyaltyImage = () => {
+    // Fallback image if level is undefined or no matching level found
+    return (
+      loyaltyImages[touristData.Loyalty_Level] ||
+      "https://readingbydesign.org/sites/default/files/badges/champ_level01.png"
+    );
+  };
 
   return (
     <div style={styles.container}>
@@ -260,7 +262,6 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           <p style={styles.walletText}>Loyalty Points: {points}</p>
           <p style={styles.walletText}>Wallet: $ {Wallet}</p>{" "}
           {/* Display updated wallet */}
-          
           <img
             src={getLoyaltyImage()}
             alt="Loyalty Level"
@@ -314,20 +315,19 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
             My Booked Upcoming Itenaries
           </button>
           <button
-  onClick={() => navigate("/my-orders")}
-  style={{
-    padding: "10px 20px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginTop: "10px",
-  }}
->
-  My Orders
-</button>
-
+            onClick={() => navigate("/my-orders")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            My Orders
+          </button>
           <button
             onClick={handleDeleteAccount}
             style={{
@@ -339,21 +339,20 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           >
             Delete Account
           </button>
-<button
-  onClick={() => navigate("/cart")}
-  style={{
-    backgroundColor: "#007bff",
-    color: "#fff",
-    padding: "10px 15px",
-    borderRadius: "5px",
-    border: "none",
-    cursor: "pointer",
-    marginTop: "10px",
-  }}
->
-  View My Cart
-</button>
-
+          <button
+            onClick={() => navigate("/cart")}
+            style={{
+              backgroundColor: "#007bff",
+              color: "#fff",
+              padding: "10px 15px",
+              borderRadius: "5px",
+              border: "none",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            View My Cart
+          </button>
           <button style={styles.button} onClick={handleLogout}>
             Logout
           </button>{" "}
@@ -422,9 +421,9 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
                     <strong>Date:</strong> {flight.date}
                   </p>
                   <p>
-  <strong>Price:</strong> {flight.price.currency} {flight.price.total}
-</p>
-
+                    <strong>Price:</strong> {flight.price.currency}{" "}
+                    {flight.price.total}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -695,7 +694,7 @@ const styles = {
     textDecoration: "none",
     padding: "10px 15px",
     borderRadius: "4px",
-   // backgroundColor: "#2d3e50",
+    // backgroundColor: "#2d3e50",
     fontWeight: "bold",
     transition: "background-color 0.3s",
   },

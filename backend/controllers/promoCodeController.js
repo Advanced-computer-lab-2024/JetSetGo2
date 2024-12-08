@@ -51,10 +51,16 @@ const validatePromoCode = async (promoCode) => {
 
     if (!code) {
       return { valid: false, message: "Promo code not found." };
+    } else {
+      console.log("promocode SAVE20");
     }
 
     // Check if the promo code is active and within the valid date range
-    if (!code.isActive || code.expiryDate < currentDate || code.startDate > currentDate) {
+    if (
+      !code.isActive ||
+      code.expiryDate < currentDate ||
+      code.startDate > currentDate
+    ) {
       return { valid: false, message: "Promo code is expired or inactive." };
     }
 
@@ -69,7 +75,6 @@ const validatePromoCode = async (promoCode) => {
     return { valid: false, message: "An error occurred during validation." };
   }
 };
-
 
 module.exports = {
   createPromoCode,
