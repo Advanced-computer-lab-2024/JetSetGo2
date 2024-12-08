@@ -2,6 +2,78 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import axios from 'axios';
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+// Initialize Stripe
+const stripePromise = loadStripe("pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx");
+
+const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (!stripe || !elements || !clientSecret) {
+            alert("Stripe is not ready. Please try again.");
+            return;
+        }
+
+        setIsProcessing(true);
+
+        const cardElement = elements.getElement(CardElement);
+
+        try {
+            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: "Customer Name", // Replace with actual user name if available
+                    },
+                },
+            });
+
+            if (error) {
+                console.error("Payment error:", error);
+                alert("Payment failed. Please try again.");
+            } else if (paymentIntent && paymentIntent.status === "succeeded") {
+                alert("Payment successful!");
+                onPaymentSuccess(paymentIntent.id);
+            }
+        } catch (err) {
+            console.error("Error during payment confirmation:", err);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+           <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: "16px",
+              color: "#424770",
+              "::placeholder": {
+                color: "#aab7c4",
+              },
+            },
+            invalid: {
+              color: "#9e2146",
+            },
+          },
+          hidePostalCode: true,
+        }}
+      />
+            <button type="submit" disabled={!stripe || isProcessing}>
+                {isProcessing ? "Processing..." : "Pay"}
+            </button>
+        </form>
+    );
+};
 
 const FlightSearch = () => {
     const [origin, setOrigin] = useState('');
@@ -14,6 +86,9 @@ const FlightSearch = () => {
 const [departureTime, setDepartureTime] = useState('');
 const navigate = useNavigate();
 
+const [clientSecret, setClientSecret] = useState("");
+const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+const [currentFlight, setCurrentFlight] = useState(null);
 
 
     const getBearerToken = async () => {
@@ -102,10 +177,16 @@ const navigate = useNavigate();
     
 
     const handleBooking = async (flight) => {
+        const paymentMethod = prompt("Enter payment method (wallet/card):").toLowerCase();
+
+        const touristId = localStorage.getItem("userId");
+        if (!touristId) {
+            alert("Tourist ID not found. Please log in.");
+            return;
+        }
+
         try {
-            const touristId = localStorage.getItem("userId");
             const response = await axios.post(`http://localhost:8000/home/tourist/bookFlight`, {
-                
                 touristId,
                 flight: {
                     flightNumber: flight.id,
@@ -116,18 +197,44 @@ const navigate = useNavigate();
                     price: flight.price?.total,
                     currency: flight.price?.currency,
                 },
+                paymentMethod,
             });
 
-            if (response.status === 200) {
-                alert('Flight booked successfully!');
+            const { clientSecret } = response.data;
+
+            if (paymentMethod === "card" && clientSecret) {
+                setClientSecret(clientSecret);
+                setCurrentFlight(flight);
+                setIsPaymentModalOpen(true);
             } else {
-                alert('Failed to book the flight. Please try again.');
+                alert(response.data.message || "Flight booked successfully using wallet!");
             }
         } catch (error) {
             console.error("Error booking flight:", error);
-            alert("Error booking flight. Please try again later.");
+            alert("Error booking flight. Please try again.");
         }
     };
+
+    const handlePaymentSuccess = async (paymentIntentId) => {
+        try {
+            setIsPaymentModalOpen(false);
+
+            const touristId = localStorage.getItem("userId");
+
+            await axios.post(`http://localhost:8000/home/tourist/bookFlight`, {
+                touristId,
+                flight: currentFlight,
+                paymentMethod: "card",
+                paymentIntentId,
+            });
+
+            alert("Flight booked successfully!");
+        } catch (error) {
+            console.error("Error finalizing booking:", error);
+            alert("Booking was successful, but there was an error finalizing it.");
+        }
+    };
+
 
     return (
         <div >
@@ -208,7 +315,16 @@ const navigate = useNavigate();
                     ))}
                 </div>
             )}
+             {isPaymentModalOpen && (
+                <Elements stripe={stripePromise}>
+                    <PaymentForm
+                        clientSecret={clientSecret}
+                        onPaymentSuccess={handlePaymentSuccess}
+                    />
+                </Elements>
+            )}
         </div>
+        
     );
 };
 

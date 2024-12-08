@@ -44,6 +44,7 @@ const complaintRoutes = require("./routes/complaintRoutes.js");
 const otpRoutes = require("./routes/otpRoutes.js");
 const promoCodeRoutes = require("./routes/promoCodeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes.js");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 app.use(express.json());
@@ -132,28 +133,69 @@ function calculateLoyaltyPoints(level, price) {
 // In your backend (e.g., Node.js/Express)
 app.post("/home/tourist/bookFlight", async (req, res) => {
   try {
-    const { touristId, flight } = req.body;
+    const { touristId, flight, paymentMethod, paymentIntentId } = req.body;
 
-    // Assuming you have a Tourist model/schema in your database
+    // Step 1: Validate tourist existence
     const tourist = await Tourist.findById(touristId);
-
     if (!tourist) {
-      return res.status(404).json({ message: "Tourist not found" });
+      return res.status(404).json({ message: "Tourist not found." });
     }
 
-    // Add the flight to the tourist's booked flights
+    console.log("Tourist found:", tourist);
+
+    // Step 2: Handle payment logic
+    if (paymentMethod === "card") {
+      if (!paymentIntentId) {
+        console.log("Initiating Stripe payment...");
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(parseFloat(flight.price) * 100), // Convert price to cents
+          currency: "usd",
+          metadata: { touristId, ...flight },
+        });
+
+        console.log("Payment Intent Created:", paymentIntent);
+
+        return res.status(200).json({
+          clientSecret: paymentIntent.client_secret,
+          message: "Payment initiated. Confirm payment on the frontend.",
+        });
+      }
+
+      console.log("Verifying payment...");
+      const verifiedPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      if (verifiedPaymentIntent.status !== "succeeded") {
+        return res.status(400).json({ message: `Payment not confirmed. Status: ${verifiedPaymentIntent.status}` });
+      }
+
+      console.log("Payment confirmed:", verifiedPaymentIntent);
+    } else if (paymentMethod === "wallet") {
+      const flightPrice = parseFloat(flight.price); // Ensure price is converted here
+      if (tourist.Wallet < flightPrice) {
+        return res.status(400).json({ message: "Insufficient wallet balance." });
+      }
+
+      tourist.Wallet -= flightPrice;
+      console.log("Wallet payment processed.");
+    } else {
+      return res.status(400).json({ message: "Invalid payment method." });
+    }
+
+    // Step 3: Finalize flight booking
+    console.log("Finalizing flight booking...");
     tourist.bookedFlights.push(flight);
 
-    // Use the existing calculateLoyaltyPoints function
-    const loyaltyPoints = calculateLoyaltyPoints(
-      tourist.Loyalty_Level,
-      flight.price
-    );
+    const flightPrice = parseFloat(flight.price); // Ensure price is converted here
+    const loyaltyPoints = calculateLoyaltyPoints(tourist.Loyalty_Level, flightPrice);
 
-    // Add loyalty points to the user's account
-    tourist.Loyalty_Points = tourist.Loyalty_Points + loyaltyPoints;
-    tourist.Total_Loyalty_Points = tourist.Total_Loyalty_Points + loyaltyPoints;
+    if (isNaN(loyaltyPoints) || loyaltyPoints < 0) {
+      throw new Error("Invalid loyalty points calculated.");
+    }
 
+    tourist.Loyalty_Points += loyaltyPoints;
+    tourist.Total_Loyalty_Points += loyaltyPoints;
+
+    // Update loyalty level
     if (tourist.Total_Loyalty_Points >= 500000) {
       tourist.Loyalty_Level = 3;
     } else if (tourist.Total_Loyalty_Points >= 100000) {
@@ -164,12 +206,14 @@ app.post("/home/tourist/bookFlight", async (req, res) => {
 
     await tourist.save();
 
-    res.status(200).json({ message: "Flight booked successfully" });
+    console.log("Flight booking finalized successfully.");
+    res.status(200).json({ message: "Flight booked successfully." });
   } catch (error) {
     console.error("Error booking flight:", error);
-    res.status(500).json({ message: "Error booking flight" });
+    res.status(500).json({ message: "Error booking flight.", details: error.message });
   }
 });
+
 
 app.get("/home/tourist/bookedFlights/:touristId", async (req, res) => {
   try {

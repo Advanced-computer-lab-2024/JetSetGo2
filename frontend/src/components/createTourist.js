@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons
-import "../css/signup.css"; // Assuming the CSS file you provided is named signup.css
 
 const TouristSignup = () => {
   const [formData, setFormData] = useState({
