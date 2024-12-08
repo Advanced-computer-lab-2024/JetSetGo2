@@ -1,7 +1,78 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import axios from 'axios';
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
+// Initialize Stripe
+const stripePromise = loadStripe("pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx");
+
+const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements || !clientSecret) {
+      alert("Stripe is not ready. Please try again.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const cardElement = elements.getElement(CardElement);
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: "Customer Name", // Replace with actual user name if available
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Payment error:", error);
+        alert("Payment failed. Please try again.");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        alert("Payment successful!");
+        onPaymentSuccess(paymentIntent.id);
+      }
+    } catch (err) {
+      console.error("Error during payment confirmation:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: "16px",
+              color: "#424770",
+              "::placeholder": {
+                color: "#aab7c4",
+              },
+            },
+            invalid: {
+              color: "#9e2146",
+            },
+          },
+          hidePostalCode: true,
+        }}
+      />
+      <button type="submit" disabled={!stripe || isProcessing}>
+        {isProcessing ? "Processing..." : "Pay"}
+      </button>
+    </form>
+  );
+};
 const HotelSearch = () => {
   const [cityCode, setCityCode] = useState('');
   const [checkInDate, setCheckInDate] = useState('');
@@ -12,6 +83,9 @@ const HotelSearch = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedHotelId, setSelectedHotelId] = useState(null);
+  const [clientSecret, setClientSecret] = useState("");
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [currentOffer, setCurrentOffer] = useState(null);
   const navigate = useNavigate();
 
   // Get Bearer Token from Amadeus API
@@ -36,22 +110,66 @@ const HotelSearch = () => {
     }
   };
 
+
   const handleBookOffer = async (offer, hotelName) => {
-    setSuccessMessage(''); // Clear previous success message
-    const touristId = localStorage.getItem("userId"); // Retrieve tourist ID from local storage
-
+    const paymentMethod = prompt("Enter payment method (wallet/card):").toLowerCase();
+  
+    const touristId = localStorage.getItem("userId");
+    if (!touristId) {
+      alert("Tourist ID not found. Please log in.");
+      return;
+    }
+  
+    if (!offer || !offer.price || !offer.price.total) {
+      alert("Invalid offer or price data.");
+      return;
+    }
+  
     try {
-      const response = await axios.post(`http://localhost:8000/home/tourist/${touristId}/bookHotel`, { offer, hotelName });
-      console.log("offer ", offer, "hotelName", hotelName);
-
-      if (response.status === 200) {
-        setSuccessMessage('Booked successfully!');
+      const response = await axios.post(
+        `http://localhost:8000/home/tourist/${touristId}/bookHotel`,
+        {
+          offer,
+          hotelName,
+          paymentMethod,
+        }
+      );
+  
+      if (paymentMethod === "wallet") {
+        alert(response.data.message || "Hotel booked successfully using wallet!");
+      } else if (paymentMethod === "card") {
+        const { clientSecret } = response.data;
+        if (clientSecret) {
+          setClientSecret(clientSecret);
+          setCurrentOffer({ offer, hotelName });
+          setIsPaymentModalOpen(true);
+        }
       }
     } catch (error) {
-      console.error('Error booking offer:', error);
-      setError('Booking failed. Please try again.');
+      console.error("Error booking hotel:", error);
+      alert(error.response?.data?.message || "Error booking hotel. Please try again.");
     }
-};
+  };
+  
+
+  const handlePaymentSuccess = async (paymentIntentId) => {
+    try {
+      setIsPaymentModalOpen(false);
+
+      const touristId = localStorage.getItem("userId");
+
+      await axios.post(`http://localhost:8000/home/tourist/${touristId}/bookHotel`, {
+        ...currentOffer,
+        paymentMethod: "card",
+        paymentIntentId,
+      });
+
+      alert("Hotel booked successfully!");
+    } catch (error) {
+      console.error("Error finalizing booking:", error);
+      alert("Booking was successful, but there was an error finalizing it.");
+    }
+  };
 
 
   // Search Hotels by City Code
@@ -246,7 +364,7 @@ const HotelSearch = () => {
           onChange={(e) => setCityCode(e.target.value.toUpperCase())}
           style={styles.input}
         />
-
+  
         <label htmlFor="checkInDate">Check-In Date</label>
         <input
           id="checkInDate"
@@ -255,7 +373,7 @@ const HotelSearch = () => {
           onChange={(e) => setCheckInDate(e.target.value)}
           style={styles.input}
         />
-
+  
         <label htmlFor="checkOutDate">Check-Out Date</label>
         <input
           id="checkOutDate"
@@ -268,11 +386,10 @@ const HotelSearch = () => {
       <button onClick={searchHotels} disabled={loading} style={styles.button}>
         {loading ? 'Searching...' : 'Search Hotels'}
       </button>
-
+  
       {error && <p style={styles.error}>{error}</p>}
-
       {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
-
+  
       {hotels.length > 0 && !selectedHotelId && (
         <div>
           <h2>Hotel Results</h2>
@@ -292,12 +409,10 @@ const HotelSearch = () => {
           ))}
         </div>
       )}
-
+  
       {selectedHotelId && (
         <>
-          <button onClick={handleBackToHotels}>
-            Back to Hotels
-          </button>
+          <button onClick={handleBackToHotels}>Back to Hotels</button>
           {offers.length === 0 ? (
             <div style={styles.loading}>
               <h2>Fetching Offers for Hotel...</h2>
@@ -309,7 +424,7 @@ const HotelSearch = () => {
                 <div key={index} style={styles.hotelCard}>
                   <h3 style={styles.hotelName}>Hotel: {offer.hotel.name}</h3>
                   <p style={styles.hotelLocation}>Location: {offer.hotel.cityCode}</p>
-
+  
                   {offer.offers.map((individualOffer, offerIndex) => (
                     <div key={offerIndex} style={styles.offerCard}>
                       <h4 style={styles.offerTitle}>Offer {offerIndex + 1}</h4>
@@ -331,10 +446,12 @@ const HotelSearch = () => {
                           ? `Free cancellation before ${individualOffer.policies.cancellations[0].deadline}`
                           : "No free cancellation"}
                       </p>
-                      <button onClick={() => handleBookOffer(individualOffer, offer.hotel.name)} style={styles.button}>
-  Book Now
-</button>
-
+                      <button
+                        onClick={() => handleBookOffer(individualOffer, offer.hotel.name)}
+                        style={styles.button}
+                      >
+                        Book Now
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -343,8 +460,21 @@ const HotelSearch = () => {
           )}
         </>
       )}
+  
+      {isPaymentModalOpen && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>Complete Your Payment</h3>
+          <Elements stripe={stripePromise}>
+            <PaymentForm
+              clientSecret={clientSecret}
+              onPaymentSuccess={handlePaymentSuccess}
+            />
+          </Elements>
+        </div>
+      )}
     </div>
   );
+  
 };
 
 export default HotelSearch;
