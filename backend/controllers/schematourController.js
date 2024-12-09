@@ -1,14 +1,15 @@
+require("dotenv").config();
 const Schema = require("../models/schematour.js");
 const User = require("../models/Tourist.js");
-const TourGuide = require('../models/TGuide');
-const sendEmailFlag = require('../utils/sendEmailFlag');
+const TourGuide = require("../models/TGuide");
+const sendEmailFlag = require("../utils/sendEmailFlag");
 const { default: mongoose } = require("mongoose");
 const sendNotificationEmails = require("../utils/tabbakh");
 const Stripe = require("stripe");
-const nodemailer = require("nodemailer");
+const senditenaryreciept =
+  require("../utils/itenaryReceiptEmail.js").senditenaryreciept;
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const validatePromoCode = require("./promoCodeController.js").validatePromoCode; // Ensure you import the validation function
-
 
 const createGuide = async (req, res) => {
   const {
@@ -27,7 +28,7 @@ const createGuide = async (req, res) => {
     Tags,
     rating,
     isActive, // Include isActive
-    isActive1
+    isActive1,
   } = req.body;
 
   const newSchema = new Schema({
@@ -46,7 +47,7 @@ const createGuide = async (req, res) => {
     Tags,
     rating,
     isActive, // Add isActive field
-    isActive1
+    isActive1,
   });
 
   try {
@@ -134,7 +135,9 @@ const bookTour = async (req, res) => {
 
     // Check if the user has already booked this itinerary
     if (schema.bookedUsers.includes(userId)) {
-      return res.status(400).json({ message: "You have already booked this tour." });
+      return res
+        .status(400)
+        .json({ message: "You have already booked this tour." });
     }
 
     // Find the user attempting to book the tour
@@ -158,7 +161,8 @@ const bookTour = async (req, res) => {
 
       // Apply the discount
       if (discountType === "percentage") {
-        discountedPrice = schema.TourPrice - (schema.TourPrice * discountValue) / 100;
+        discountedPrice =
+          schema.TourPrice - (schema.TourPrice * discountValue) / 100;
       } else if (discountType === "fixed") {
         discountedPrice = schema.TourPrice - discountValue;
       }
@@ -181,9 +185,7 @@ const bookTour = async (req, res) => {
           type: "itinerary", // Optional type field
         },
       });
-
-      console.log("Generated PaymentIntent client_secret:", paymentIntent.client_secret);
-
+      await senditenaryreciept(user.Email, user.UserName, discountedPrice);
       // Send the `client_secret` to the frontend
       return res.status(200).json({
         clientSecret: paymentIntent.client_secret,
@@ -204,6 +206,12 @@ const bookTour = async (req, res) => {
       // Update the itinerary with the booking details
       schema.bookedUsers.push(userId);
       schema.bookings += 1;
+      console.log("Preparing to send email with details:", {
+        email: user.Email,
+        name: user.UserName,
+        price: discountedPrice,
+      });
+      await senditenaryreciept(user.Email, user.UserName, discountedPrice);
       await schema.save();
 
       return res.status(200).json({
@@ -221,7 +229,7 @@ const bookTour = async (req, res) => {
 
 const finalizeBooking = async (req, res) => {
   const { id } = req.params;
-  const { userId} = req.body;
+  const { userId } = req.body;
 
   try {
     const schema = await Schema.findById(id);
@@ -233,7 +241,9 @@ const finalizeBooking = async (req, res) => {
       return res.status(404).json({ message: "Itinerary not found." });
     }
     if (schema.bookedUsers.includes(userId)) {
-      return res.status(400).json({ message: "You have already booked this tour." });
+      return res
+        .status(400)
+        .json({ message: "You have already booked this tour." });
     }
     schema.bookedUsers.push(userId);
 
@@ -241,8 +251,11 @@ const finalizeBooking = async (req, res) => {
     schema.isBooked = true;
     schema.bookings += 1; // Increment bookings count
     await schema.save();
-    user.Loyalty_Points += calculateLoyaltyPoints(user.Loyalty_Level, schema.TourPrice);
-      await user.save();
+    user.Loyalty_Points += calculateLoyaltyPoints(
+      user.Loyalty_Level,
+      schema.TourPrice
+    );
+    await user.save();
     res.status(200).json({ message: "Booking finalized successfully." });
   } catch (error) {
     console.error("Error finalizing booking:", error.message);
@@ -346,7 +359,6 @@ const updateGuide = async (req, res) => {
   }
 };
 
-
 const deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {
@@ -415,8 +427,8 @@ const toggleActivation1 = async (req, res) => {
 
     // Fetch the activity and populate notificationRequests with email and UserName
     const activity = await Schema.findById(cleanId).populate(
-      'notificationRequests',
-      'Email UserName'
+      "notificationRequests",
+      "Email UserName"
     );
 
     if (!activity) {
@@ -440,11 +452,7 @@ const toggleActivation1 = async (req, res) => {
 
       const emailPromises = activity.notificationRequests.map((user) => {
         console.log(`Sending email to: ${user.UserName} (${user.Email})`); // Debugging log
-        return sendNotificationEmails(
-          user.Email,
-          user.UserName,
-          activity.name
-        );
+        return sendNotificationEmails(user.Email, user.UserName, activity.name);
       });
 
       await Promise.all(emailPromises);
@@ -611,7 +619,8 @@ const requestNotification = async (req, res) => {
     // Check if the user has already requested notification
     if (itinerary.notificationRequests.includes(userId)) {
       return res.status(400).json({
-        message: "You have already requested a notification for this itinerary.",
+        message:
+          "You have already requested a notification for this itinerary.",
       });
     }
 
@@ -619,7 +628,9 @@ const requestNotification = async (req, res) => {
     itinerary.notificationRequests.push(userId);
     await itinerary.save();
 
-    res.status(200).json({ message: "Notification request added successfully." });
+    res
+      .status(200)
+      .json({ message: "Notification request added successfully." });
   } catch (error) {
     console.error(
       "Error adding notification request for itinerary:",
@@ -761,7 +772,6 @@ const getItineraryTouristReport = async (req, res) => {
   }
 };
 module.exports = {
-  
   createGuide,
   readGuide,
   readGuideID,

@@ -192,6 +192,9 @@ const SchemaTourFront = () => {
       console.error('Error deleting itinerary:', error);
     }
   };
+  const handleRevenuePage = () => {
+    navigate("/revenue");
+  };
 
   return (
     
@@ -203,6 +206,20 @@ const SchemaTourFront = () => {
           {/* Replace with your logo */}
           <img src={img1} alt="Logo" className="navbar-logo" />
         </Navbar.Brand>
+        <Nav className="ml-auto">
+          <Link to="/Upcoming-activities" className="nav-link">
+            Activities
+          </Link>
+          <Link to="/Upcoming-itinerariestg" className="nav-link">
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" className="nav-link">
+            Historical Places
+          </Link>
+          <Link to="/all-museums" className="nav-link">
+            Museums
+          </Link>
+        </Nav>
       </Container>
     </Navbar>
     <div className="admin-container">
@@ -212,6 +229,9 @@ const SchemaTourFront = () => {
     <button className="sidebar-button" onClick={handleLogout}>
       Logout
     </button>
+    <button className="sidebar-button" onClick={handleRevenuePage} >
+            Revenue Rep
+          </button>
     <button onClick={handleDeleteAccount} className="sidebar-button">
       Delete Account
     </button>
@@ -237,211 +257,221 @@ const SchemaTourFront = () => {
 >
   {/* Create Itinerary Tab */}
   <Tab eventKey="createItinerary" title="Create Itinerary">
-    <div className="form-container">
-      <h2>Create Itinerary</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Tour Name</Form.Label>
+  <div className="form-container-modern">
+    <h2 className="form-title">Create Itinerary</h2>
+    <Form onSubmit={handleSubmit} className="modern-form">
+      <Form.Group className="form-group-modern">
+        <Form.Label>Tour Name</Form.Label>
+        <Form.Control
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter tour name"
+          required
+          className="form-input-modern"
+        />
+      </Form.Group>
+
+      <Form.Group className="form-group-modern">
+        <Form.Label>Select Activity</Form.Label>
+        <Form.Select
+          value={formData.selectedActivity}
+          onChange={(e) => handleChange(e)}
+          required
+          className="form-select-modern"
+        >
+          <option value="">Select an activity</option>
+          {activities.map((activity) => (
+            <option key={activity._id} value={activity._id}>
+              {activity.date} - {activity.location}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="form-group-modern">
+        <Form.Label>Tags</Form.Label>
+        <Form.Select
+          value={formData.Tags}
+          onChange={(e) => handleTagsChange(e)}
+          required
+          className="form-select-modern"
+        >
+          <option value="">Select Tag</option>
+          {Tags.map((tag) => (
+            <option key={tag._id} value={tag._id}>
+              {tag.name}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="form-group-modern">
+        <Form.Label>Rating</Form.Label>
+        <Form.Range
+          min="0"
+          max="5"
+          step="0.1"
+          value={formData.rating}
+          onChange={handleRatingChange}
+          className="form-range-modern"
+        />
+        <span className="rating-value">{formData.rating?.toFixed(1) || "0.0"}</span>
+      </Form.Group>
+
+      <Form.Group className="form-group-modern checkbox-modern">
+        <Form.Check
+          type="checkbox"
+          label="Is Active"
+          name="isActive"
+          checked={formData.isActive}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, isActive: e.target.checked }))
+          }
+        />
+      </Form.Group>
+
+      {[
+        { label: "Locations", name: "locations", type: "textarea", rows: 3 },
+        { label: "Timeline", name: "timeline", type: "text" },
+        { label: "Duration (hours)", name: "durationActivity", type: "number" },
+        { label: "Language", name: "tourLanguage", type: "text" },
+        { label: "Price", name: "TourPrice", type: "number" },
+        { label: "Available Dates", name: "availableDates", type: "date" },
+        { label: "Accessibility", name: "accessibility", type: "text" },
+        { label: "Pick Up Location", name: "pickUpLoc", type: "text" },
+        { label: "Drop Off Location", name: "DropOffLoc", type: "text" },
+      ].map((field) => (
+        <Form.Group className="form-group-modern" key={field.name}>
+          <Form.Label>{field.label}</Form.Label>
           <Form.Control
-            name="name"
-            value={formData.name}
+            as={field.type === "textarea" ? "textarea" : "input"}
+            type={field.type}
+            name={field.name}
+            value={formData[field.name]}
             onChange={handleChange}
-            placeholder="Enter tour name"
+            placeholder={`Enter ${field.label.toLowerCase()}`}
             required
+            rows={field.rows || undefined}
+            className="form-input-modern"
           />
         </Form.Group>
+      ))}
 
-        <Form.Group className="mb-3">
-          <Form.Label>Select Activity</Form.Label>
-          <Form.Select
-            value={formData.selectedActivity}
-            onChange={(e) => handleChange(e)}
-            required
-          >
-            <option value="">Select an activity</option>
-            {activities.map((activity) => (
-              <option key={activity._id} value={activity._id}>
-                {activity.date} - {activity.location}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
+      <Button className="reply-button" type="submit">
+        {editId ? "Update Itinerary" : "Create Itinerary"}
+      </Button>
+    </Form>
+  </div>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Tags</Form.Label>
-          <Form.Select
-            value={formData.Tags}
-            onChange={(e) => handleTagsChange(e)}
-            required
-          >
-            <option value="">Select Tag</option>
-            {Tags.map((tag) => (
-              <option key={tag._id} value={tag._id}>
-                {tag.name}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Rating</Form.Label>
-          <Form.Range
-            min="0"
-            max="5"
-            step="0.1"
-            value={formData.rating}
-            onChange={handleRatingChange}
-          />
-          <span>{(formData.rating !== undefined ? formData.rating : 0).toFixed(1)}</span>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Check
-            type="checkbox"
-            label="Is Active"
-            name="isActive"
-            checked={formData.isActive}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, isActive: e.target.checked }))
-            }
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Locations</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            name="locations"
-            value={formData.locations}
-            onChange={handleChange}
-            placeholder="Enter locations"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Timeline</Form.Label>
-          <Form.Control
-            name="timeline"
-            value={formData.timeline}
-            onChange={handleChange}
-            placeholder="Enter timeline"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Duration (hours)</Form.Label>
-          <Form.Control
-            type="number"
-            name="durationActivity"
-            value={formData.durationActivity}
-            onChange={handleChange}
-            placeholder="Enter duration in hours"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Language</Form.Label>
-          <Form.Control
-            name="tourLanguage"
-            value={formData.tourLanguage}
-            onChange={handleChange}
-            placeholder="Enter language"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Price</Form.Label>
-          <Form.Control
-            type="number"
-            name="TourPrice"
-            value={formData.TourPrice}
-            onChange={handleChange}
-            placeholder="Enter price"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Available Dates</Form.Label>
-          <Form.Control
-            type="date"
-            name="availableDates"
-            value={formData.availableDates}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Accessibility</Form.Label>
-          <Form.Control
-            name="accessibility"
-            value={formData.accessibility}
-            onChange={handleChange}
-            placeholder="Enter accessibility details"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Pick Up Location</Form.Label>
-          <Form.Control
-            name="pickUpLoc"
-            value={formData.pickUpLoc}
-            onChange={handleChange}
-            placeholder="Enter pick-up location"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Drop Off Location</Form.Label>
-          <Form.Control
-            name="DropOffLoc"
-            value={formData.DropOffLoc}
-            onChange={handleChange}
-            placeholder="Enter drop-off location"
-            required
-          />
-        </Form.Group>
-
-        <Button className="reply-button" type="submit">
-          {editId ? 'Update Itinerary' : 'Create Itinerary'}
-        </Button>
-      </Form>
-    </div>
-  </Tab>
+  {/* Modern CSS styles */}
+  <style>{`
+    .form-container-modern {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .form-title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #333;
+    }
+    .form-group-modern {
+      margin-bottom: 15px;
+    }
+    .form-input-modern, .form-select-modern, .form-range-modern {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .rating-value {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .modern-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .modern-button:hover {
+      background-color: #0056b3;
+    }
+  `}</style>
+</Tab>
 
 
-  <Tab eventKey="viewItineraries" title="View Itineraries">
-  <div className="itineraries-container">
-    <ul className="itineraries-list">
+
+<Tab eventKey="viewItineraries" title="View Itineraries">
+  <div className="itineraries-container-modern">
+    <ul className="itineraries-list-modern">
       {itineraries.map((itinerary) => (
-        <li key={itinerary._id} className="itinerary-card">
-          <div className="itinerary-details">
-            <h3 className="itinerary-title">{itinerary.name}</h3>
-            <p><strong>Activities:</strong> {itinerary.activities.map((activity) =>
-              `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category.name} - ${activity.specialDiscount}`
-            ).join(', ')}</p>
-            <p><strong>Tags:</strong> {itinerary.Tags.name}</p>
-            <p><strong>Locations:</strong> {itinerary.locations.join(', ')}</p>
-            <p><strong>Timeline:</strong> {itinerary.timeline}</p>
-            <p><strong>Duration:</strong> {itinerary.durationActivity} hours</p>
-            <p><strong>Language:</strong> {itinerary.tourLanguage}</p>
-            <p><strong>Price:</strong> ${itinerary.TourPrice}</p>
-            <p><strong>Rating:</strong> {itinerary.rating}</p>
-            <p><strong>Date:</strong> {itinerary.availableDates}</p>
-            <p><strong>Accessibility:</strong> {itinerary.accessibility}</p>
-            <p><strong>Pick Up Location:</strong> {itinerary.pickUpLoc}</p>
-            <p><strong>Drop Off Location:</strong> {itinerary.DropOffLoc}</p>
-            <p><strong>Active:</strong> {itinerary.isActive ? "Yes" : "No"}</p>
+        <li key={itinerary._id} className="itinerary-card-modern">
+          <div className="itinerary-details-modern">
+            <h3 className="itinerary-title-modern">{itinerary.name}</h3>
+            <p>
+              <strong>Activities:</strong>{" "}
+              {itinerary.activities
+                .map(
+                  (activity) =>
+                    `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price} - ${activity.category.name} - ${activity.specialDiscount}`
+                )
+                .join(", ")}
+            </p>
+            <p>
+              <strong>Tags:</strong> {itinerary.Tags.name}
+            </p>
+            <p>
+              <strong>Locations:</strong> {itinerary.locations.join(", ")}
+            </p>
+            <p>
+              <strong>Timeline:</strong> {itinerary.timeline}
+            </p>
+            <p>
+              <strong>Duration:</strong> {itinerary.durationActivity} hours
+            </p>
+            <p>
+              <strong>Language:</strong> {itinerary.tourLanguage}
+            </p>
+            <p>
+              <strong>Price:</strong> ${itinerary.TourPrice}
+            </p>
+            <p>
+              <strong>Rating:</strong> {itinerary.rating}
+            </p>
+            <p>
+              <strong>Date:</strong> {itinerary.availableDates}
+            </p>
+            <p>
+              <strong>Accessibility:</strong> {itinerary.accessibility}
+            </p>
+            <p>
+              <strong>Pick Up Location:</strong> {itinerary.pickUpLoc}
+            </p>
+            <p>
+              <strong>Drop Off Location:</strong> {itinerary.DropOffLoc}
+            </p>
+            <p>
+              <strong>Active:</strong> {itinerary.isActive ? "Yes" : "No"}
+            </p>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <div className="itinerary-actions-modern">
             <button
               onClick={() => handleEdit(itinerary)}
               className="reply-button"
@@ -455,12 +485,13 @@ const SchemaTourFront = () => {
               Delete
             </button>
           </div>
+
           {/* If editing this itinerary, show edit fields */}
           {editId === itinerary._id && (
-            <div >
+            <div className="edit-itinerary-form-modern">
               <h4>Edit Itinerary</h4>
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
+              <Form onSubmit={handleSubmit} className="modern-form">
+                <Form.Group className="form-group-modern">
                   <Form.Label>Tour Name</Form.Label>
                   <Form.Control
                     name="name"
@@ -468,18 +499,19 @@ const SchemaTourFront = () => {
                     onChange={handleChange}
                     placeholder="Enter tour name"
                     required
+                    className="form-input-modern"
                   />
                 </Form.Group>
-                <Form.Group className="mb-3">
+
+                <Form.Group className="form-group-modern">
                   <Form.Label>Select Activity</Form.Label>
                   <Form.Select
                     name="selectedActivity"
                     value={formData.selectedActivity}
                     onChange={handleChange}
                     required
+                    className="form-select-modern"
                   >
-
-
                     <option value="">Select an activity</option>
                     {activities.map((activity) => (
                       <option key={activity._id} value={activity._id}>
@@ -488,13 +520,15 @@ const SchemaTourFront = () => {
                     ))}
                   </Form.Select>
                 </Form.Group>
-                <Form.Group className="mb-3">
+
+                <Form.Group className="form-group-modern">
                   <Form.Label>Tags</Form.Label>
                   <Form.Select
                     name="Tags"
                     value={formData.Tags}
                     onChange={handleTagsChange}
                     required
+                    className="form-select-modern"
                   >
                     <option value="">Select Tag</option>
                     {Tags.map((tag) => (
@@ -504,7 +538,8 @@ const SchemaTourFront = () => {
                     ))}
                   </Form.Select>
                 </Form.Group>
-                <Form.Group className="mb-3">
+
+                <Form.Group className="form-group-modern">
                   <Form.Label>Timeline</Form.Label>
                   <Form.Control
                     name="timeline"
@@ -512,9 +547,11 @@ const SchemaTourFront = () => {
                     onChange={handleChange}
                     placeholder="Enter timeline"
                     required
+                    className="form-input-modern"
                   />
                 </Form.Group>
-                <Form.Group className="mb-3">
+
+                <Form.Group className="form-group-modern">
                   <Form.Label>Duration (hours)</Form.Label>
                   <Form.Control
                     name="durationActivity"
@@ -523,9 +560,11 @@ const SchemaTourFront = () => {
                     onChange={handleChange}
                     placeholder="Enter duration"
                     required
+                    className="form-input-modern"
                   />
                 </Form.Group>
-                <Form.Group className="mb-3">
+
+                <Form.Group className="form-group-modern">
                   <Form.Label>Price</Form.Label>
                   <Form.Control
                     name="TourPrice"
@@ -534,13 +573,16 @@ const SchemaTourFront = () => {
                     onChange={handleChange}
                     placeholder="Enter price"
                     required
+                    className="form-input-modern"
                   />
                 </Form.Group>
-                <Button type="submit" style={{ marginRight: '10px' }}>
+
+                <Button className="reply-button" type="submit">
                   Save
                 </Button>
                 <Button
                   variant="secondary"
+                  className="reply-button"
                   onClick={() => setEditId(null)}
                 >
                   Cancel

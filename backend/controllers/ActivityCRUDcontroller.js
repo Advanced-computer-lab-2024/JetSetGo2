@@ -4,13 +4,14 @@ const Category = require("../models/CategoryCRUD");
 const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
 const PrefTag = require("../models/preferanceTagsCRUD");
 const User = require("../models/Tourist.js");
-const  sendNotificationEmails  = require("../utils/tabbakh2");
+const sendNotificationEmails = require("../utils/tabbakh2");
 const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY); // Initialize Stripe with your secret key
-const adverModel = require('../models/AdverMODEL');
-const sendEmailFlag = require('../utils/sendEmailFlag');
+const adverModel = require("../models/AdverMODEL");
+const sendEmailFlag = require("../utils/sendEmailFlag");
+const sendactivityreciept =
+  require("../utils/activityrecieptEmail.js").sendactivityreciept;
 const validatePromoCode = require("./promoCodeController.js").validatePromoCode; // Ensure you import the validation function
-
 
 const bookactivity = async (req, res) => {
   const { id } = req.params; // Extract the activity ID from the URL parameters
@@ -35,7 +36,9 @@ const bookactivity = async (req, res) => {
   }
 
   if (activity.bookedUsers.includes(userId)) {
-    return res.status(400).json({ message: "You have already booked this activity." });
+    return res
+      .status(400)
+      .json({ message: "You have already booked this activity." });
   }
 
   try {
@@ -72,6 +75,7 @@ const bookactivity = async (req, res) => {
           promoCode: promoCode || null, // Include promo code if provided
         },
       });
+      await sendactivityreciept(user.Email, user.UserName, discountedPrice);
 
       return res.status(200).json({
         clientSecret: paymentIntent.client_secret,
@@ -92,6 +96,8 @@ const bookactivity = async (req, res) => {
       // Finalize the booking
       await activity.incrementBookings(userId);
 
+      await sendactivityreciept(user.Email, user.UserName, discountedPrice);
+
       res.status(200).json({ message: "Booking successful using wallet." });
     } else {
       res.status(400).json({ message: "Invalid payment method." });
@@ -101,7 +107,6 @@ const bookactivity = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error." });
   }
 };
-
 
 const finalizeActivityBooking = async (req, res) => {
   const { id } = req.params;
@@ -118,11 +123,16 @@ const finalizeActivityBooking = async (req, res) => {
     }
 
     if (activity.bookedUsers.includes(userId)) {
-      return res.status(400).json({ message: "You have already booked this activity." });
+      return res
+        .status(400)
+        .json({ message: "You have already booked this activity." });
     }
 
     await activity.incrementBookings(userId); // Add user to bookedUsers and increment bookings
-    user.Loyalty_Points += calculateLoyaltyPoints(user.Loyalty_Level, activity.price);
+    user.Loyalty_Points += calculateLoyaltyPoints(
+      user.Loyalty_Level,
+      activity.price
+    );
     await user.save();
     res.status(200).json({ message: "Booking finalized successfully." });
   } catch (error) {
@@ -495,20 +505,26 @@ const toggleActivation = async (req, res) => {
     await activity.save();
 
     if (activity.isActive) {
-      console.log("Activity activated, sending emails to:", activity.notificationRequests);
+      console.log(
+        "Activity activated, sending emails to:",
+        activity.notificationRequests
+      );
 
       // Call the email sending function
-      await sendNotificationEmails(activity.notificationRequests, activity.name);
+      await sendNotificationEmails(
+        activity.notificationRequests,
+        activity.name
+      );
     }
-    
 
-    res.status(200).json({ message: `Activity ${activity.isActive ? "activated" : "deactivated"}.` });
+    res.status(200).json({
+      message: `Activity ${activity.isActive ? "activated" : "deactivated"}.`,
+    });
   } catch (error) {
     console.error("Error in toggleActivation:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 const getBookedactivity = async (req, res) => {
   try {
@@ -522,8 +538,7 @@ const getBookedactivity = async (req, res) => {
     // Find all itineraries that the tourist has booked
     const bookedactivity = await Schema.find({
       bookedUsers: touristId.trim(),
-    })
-      .populate("Tags", "name");
+    }).populate("Tags", "name");
     // Respond with the list of booked itineraries
     res.status(200).json(bookedactivity);
   } catch (err) {
@@ -535,7 +550,12 @@ const requestNotification = async (req, res) => {
   const { activityId } = req.params;
   const { userId } = req.body;
 
-  console.log("Request received for activityId:", activityId, "userId:", userId);
+  console.log(
+    "Request received for activityId:",
+    activityId,
+    "userId:",
+    userId
+  );
 
   if (!mongoose.Types.ObjectId.isValid(activityId)) {
     return res.status(400).json({ message: "Invalid Activity ID." });
@@ -562,7 +582,9 @@ const requestNotification = async (req, res) => {
     activity.notificationRequests = [...activity.notificationRequests, userId];
     await activity.save();
 
-    res.status(200).json({ message: "Notification request submitted successfully!" });
+    res
+      .status(200)
+      .json({ message: "Notification request submitted successfully!" });
   } catch (error) {
     console.error("Error adding notification request:", error);
     res.status(500).json({ message: "Internal server error." });
@@ -701,11 +723,11 @@ module.exports = {
   getBookedActivities,
   getBookedactivities,
   submitReview,
-  toggleActivation ,
-  getBookedactivity ,
-  requestNotification, 
+  toggleActivation,
+  getBookedactivity,
+  requestNotification,
   getNotificationRequests,
 
   finalizeActivityBooking,
-  getTouristReport
+  getTouristReport,
 };
