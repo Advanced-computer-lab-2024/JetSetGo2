@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./CheckoutPage.css";
 import axios from "axios";
 
 const CheckoutPage = () => {
@@ -15,12 +14,7 @@ const CheckoutPage = () => {
 
   const API_URL = "http://localhost:8000";
   const navigate = useNavigate();
-  useEffect(() => {
-    document.body.classList.add("login-body");
-    return () => {
-      document.body.classList.remove("login-body");
-    };
-  }, []);
+
   // Fetch existing addresses
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -38,6 +32,7 @@ const CheckoutPage = () => {
         setMessage("Failed to load addresses.");
       }
     };
+    
 
     fetchAddresses();
   }, []);
@@ -81,21 +76,22 @@ const CheckoutPage = () => {
   };
 
   const handleContinueToPayment = () => {
-    navigate(`/payment-options, { state: { addressId: selectedAddress } }`);
+    // Navigate to the payment options page and pass the selected address
+    navigate(`/payment-options`, { state: { addressId: selectedAddress } });
   };
 
   return (
-    <div className="checkout-container">
-                <h3 className="total-revenue1">Checkout</h3>
-                {message && <p className="error-message">{message}</p>}
+    <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#f7f8fa" }}>
+      <h2>Checkout</h2>
+      {message && <p>{message}</p>}
 
       {/* Form to Add a New Address */}
       <form
-        className="checkout-form"
         onSubmit={(e) => {
           e.preventDefault();
           handleAddAddress();
         }}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
       >
         <input
           type="text"
@@ -103,7 +99,7 @@ const CheckoutPage = () => {
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           required
-          className="checkout-input"
+          style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
@@ -111,14 +107,14 @@ const CheckoutPage = () => {
           value={city}
           onChange={(e) => setCity(e.target.value)}
           required
-          className="checkout-input"
+          style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
           placeholder="State"
           value={state}
           onChange={(e) => setState(e.target.value)}
-          className="checkout-input"
+          style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
@@ -126,7 +122,7 @@ const CheckoutPage = () => {
           value={postalCode}
           onChange={(e) => setPostalCode(e.target.value)}
           required
-          className="checkout-input"
+          style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
@@ -134,42 +130,46 @@ const CheckoutPage = () => {
           value={country}
           onChange={(e) => setCountry(e.target.value)}
           required
-          className="checkout-input"
+          style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
-        <button type="submit" className="reply-button">
+        <button
+          type="submit"
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#28a745",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
           Add Address
         </button>
       </form>
 
       {/* Display Existing Addresses */}
-      <h3 className="total-revenue1">Your Addresses</h3>
+      <h3>Your Addresses</h3>
       {addresses.length === 0 ? (
         <p>No addresses added yet.</p>
       ) : (
-        <ul className="address-list">
+        <ul style={{ listStyleType: "none", padding: 0 }}>
           {addresses.map((addr) => (
             <li
               key={addr._id}
-              className={`address-item ${
-                selectedAddress === addr._id ? "selected" : ""
-              }`}
+              style={{
+                padding: "10px",
+                marginBottom: "10px",
+                border: "1px solid #ccc",
+                borderRadius: "5px",
+                backgroundColor: selectedAddress === addr._id ? "#d4edda" : "#fff",
+              }}
               onClick={() => handleSelectAddress(addr._id)}
             >
-              <p>
-                <strong>Address:</strong> {addr.address}
-              </p>
-              <p>
-                <strong>City:</strong> {addr.city}
-              </p>
-              <p>
-                <strong>State:</strong> {addr.state || "N/A"}
-              </p>
-              <p>
-                <strong>Postal Code:</strong> {addr.postalCode}
-              </p>
-              <p>
-                <strong>Country:</strong> {addr.country}
-              </p>
+              <p><strong>Address:</strong> {addr.address}</p>
+              <p><strong>City:</strong> {addr.city}</p>
+              <p><strong>State:</strong> {addr.state || "N/A"}</p>
+              <p><strong>Postal Code:</strong> {addr.postalCode}</p>
+              <p><strong>Country:</strong> {addr.country}</p>
             </li>
           ))}
         </ul>
@@ -177,7 +177,18 @@ const CheckoutPage = () => {
 
       {/* Continue to Payment */}
       {selectedAddress && (
-        <button onClick={handleContinueToPayment} className="payment-button">
+        <button
+          onClick={handleContinueToPayment}
+          style={{
+            padding: "10px 20px",
+            marginTop: "20px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
           Continue to Payment
         </button>
       )}
