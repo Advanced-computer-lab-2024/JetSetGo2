@@ -70,7 +70,7 @@ import MyOrders from "./components/MyOrders";
 import SalesReport from "./components/SalesReport";
 import TouristReport from "./components/TouristReport";
 import TourReport from "./components/TourReport";
-
+import VacationGuide from "./components/VacationGuide";
 
 
 import Notifications from "./components/Notifications";
@@ -173,7 +173,8 @@ function App() {
 
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/Select-Perefrence" element={<Perefrences />} />
-          
+          <Route path="/VacationGuide" element={<VacationGuide />} />
+
         </Routes>
       </div>
     </Router>

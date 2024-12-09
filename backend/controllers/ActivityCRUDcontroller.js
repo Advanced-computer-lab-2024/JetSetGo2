@@ -427,6 +427,7 @@ const flagActivity = async (req, res) => {
 };
 const getTouristReport = async (req, res) => {
   const { advertiserId } = req.params; // Advertiser ID from request parameters
+  const { month } = req.query; // Get the month from the query parameters
 
   try {
     console.log("Received Advertiser ID:", advertiserId); // Log the advertiserId for debugging
@@ -445,17 +446,25 @@ const getTouristReport = async (req, res) => {
     }
 
     // Fetch all activities for the advertiser
-    const activities = await Activity.find({ advertiser: advertiserId });
+    let activities = await Activity.find({ advertiser: advertiserId });
 
     if (activities.length === 0) {
       console.log("No activities found for this advertiser.");
       return res.status(404).json({ message: "No activities found for this advertiser." });
     }
 
-    // Calculate the total number of tourists
+    // If a month is provided, filter activities by that month
+    if (month) {
+      activities = activities.filter((activity) => {
+        const activityMonth = new Date(activity.date).getMonth() + 1; // Convert date to Month (1-12)
+        return activityMonth === parseInt(month); // Compare with selected month
+      });
+    }
+
+    // Calculate the total number of tourists (total bookings)
     const totalTourists = activities.reduce((total, activity) => total + (activity.bookings || 0), 0);
 
-    // Prepare response details
+    // Prepare activity details for the response
     const activityDetails = activities.map(({ _id, location, date, bookings }) => ({
       activityId: _id,
       location,
@@ -463,7 +472,7 @@ const getTouristReport = async (req, res) => {
       bookings,
     }));
 
-    // Send response
+    // Send response with the total number of tourists and activity details
     res.status(200).json({
       advertiserId,
       totalTourists,
@@ -474,6 +483,7 @@ const getTouristReport = async (req, res) => {
     res.status(500).json({ message: "Error fetching report", error: error.message });
   }
 };
+
 module.exports = {
   createActivity,
   getActivity,

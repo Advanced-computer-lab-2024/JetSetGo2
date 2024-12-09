@@ -489,6 +489,7 @@ const getBookedItineraries = async (req, res) => {
 
 const getItineraryTouristReport = async (req, res) => {
   const { tourGuideId } = req.params; // Get the Tour Guide ID from request parameters
+  const { month } = req.query; // Get the month from query parameters (1 for January, 12 for December)
 
   try {
     console.log("Received tour Guide ID:", tourGuideId); // Log the tourGuideId for debugging
@@ -507,11 +508,21 @@ const getItineraryTouristReport = async (req, res) => {
     }
 
     // Fetch all itineraries related to the specific tour guide
-    const itineraries = await Schema.find({ tourGuide: tourGuideId });
+    let itineraries = await Schema.find({ tourGuide: tourGuideId });
 
     if (itineraries.length === 0) {
       console.log("No itineraries found for this tour guide.");
       return res.status(404).json({ message: "No itineraries found for this tour guide." });
+    }
+
+    // If month is provided, filter itineraries by the month of availableDates
+    if (month) {
+      itineraries = itineraries.filter((itinerary) => {
+        return itinerary.availableDates.some((date) => {
+          const itineraryMonth = new Date(date).getMonth() + 1; // Get month (0-based, so +1)
+          return itineraryMonth === parseInt(month);
+        });
+      });
     }
 
     // Calculate the total number of tourists across all itineraries
@@ -536,8 +547,6 @@ const getItineraryTouristReport = async (req, res) => {
     res.status(500).json({ message: "Error fetching itinerary tourist report", error: error.message });
   }
 };
-
-
 module.exports = {
   
   createGuide,

@@ -8,6 +8,12 @@ const TouristReport = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState(""); // Track selected month
+
+  // Handle month selection
+  const handleMonthChange = async (e) => {
+    setSelectedMonth(e.target.value);
+  };
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -19,7 +25,11 @@ const TouristReport = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8000/itinerary/report/${userId}`);
+        const response = await axios.get(`http://localhost:8000/itinerary/report/${userId}`, {
+          params: {
+            month: selectedMonth, // Pass selected month as query param
+          },
+        });
         setReportData(response.data); // Set the data to state
       } catch (err) {
         setError(err.response?.data?.message || "Error fetching report");
@@ -29,7 +39,7 @@ const TouristReport = () => {
     };
 
     fetchReport();
-  }, [userId]); // Ensure effect runs when tourGuideId changes
+  }, [userId, selectedMonth]); // Fetch the report whenever userId or selectedMonth changes
 
   if (loading) {
     return <div>Loading...</div>;
@@ -42,6 +52,25 @@ const TouristReport = () => {
   return (
     <div>
       <h1>Tourist Report</h1>
+
+      <div>
+        <label htmlFor="month">Select Month:</label>
+        <select id="month" value={selectedMonth} onChange={handleMonthChange}>
+          <option value="">All Months</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
 
       <p>Total Tourists: {reportData.totalTourists}</p>
       <h2>Itinerary Details</h2>
