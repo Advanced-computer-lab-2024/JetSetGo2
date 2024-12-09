@@ -33,6 +33,9 @@ const Wishlist = () => {
         `http://localhost:8000/home/tourist/${userId}/wishlist/remove`,
         { productId }
       );
+
+
+      
       setMessage(response.data.message);
       fetchWishlist();
     } catch (error) {
