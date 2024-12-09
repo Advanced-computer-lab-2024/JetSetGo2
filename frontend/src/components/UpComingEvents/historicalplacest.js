@@ -8,7 +8,15 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import sidebarImage from '../logoo444.JPG';
+import "../TourGuidePage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from '../logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-control-geocoder';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -270,219 +278,212 @@ const HPT = () => {
 
     return pinPosition ? <Marker position={pinPosition}></Marker> : null;
   };
-
   return (
-    <div id="historical-places" style={styles.container}>
-      <h2 style={styles.heading}>Historical Places</h2>
-      {error && <p className="error">{error}</p>}
-      <div className="back-button-container">
-      <button onClick={viewBookmarkedHistoricalPlaces}> Show Bookmarked Historical Places</button>
-<button onClick={viewAllHistoricalPlaces}>View All Historical Places</button>
-
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-      </div>
-      <div className="filter-container">
-        <label htmlFor="currencySelect">Choose Currency:</label>
-        <select
-          id="currencySelect"
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="EGP">EGP</option>
-        </select>
-      </div>
-      {/* Filter by Tag */}
-      <div style={styles.filterContainer}>
-        <label htmlFor="tagFilter" style={styles.filterLabel}>
-          Filter by Tourism Governor Tag:
-        </label>
-        
-
-        <select
-          id="tagFilter"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-          style={styles.filterSelect}
-        >
-          <option value="">All Tags</option>
-          {historicalPlaces
-            .map((place) => place.tourismGovernerTags?.type)
-            .filter(
-              (value, index, self) => value && self.indexOf(value) === index
-            ) // Remove duplicates
-            .map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
-        </select>
-      </div>
-
-      {filteredPlaces.length > 0 ? (
-        <div style={styles.cardGrid}>
-          {filteredPlaces.map((place) => {
-            // Extract latitude and longitude from the location string
-            const locationCoords = place.location.split(",");
-            const latitude = locationCoords[0];
-            const longitude = locationCoords[1];
-            const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
-
-            return (
-              <div key={place._id} style={styles.card}>
-                <h3 style={styles.cardTitle}>
-                  {place.tourismGovernerTags?.name }
-                </h3>
-                <p style={styles.cardText}>Description: {place.description}</p>
-                <p style={styles.cardText}>Location: {place.location}</p>
-                <p style={styles.cardText}>
-                  Opening Hours: {place.openingHours}
-                </p>
-                <p>
-                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
-                </p>
-                <p style={styles.cardText}>
-                  {place.ticketPrice}
-                </p>
-                <div style={styles.cardImageContainer}>
-                  <img
-                    src={place.pictures}
-                    alt={`Picture of ${place.description}`}
-                    style={styles.cardImage}
-                  />
-                </div>
-                <p style={styles.cardText}>
-                  Tourism Governor Tags:{" "}
-                  {place.tourismGovernerTags?.type || "None"}
-                </p>
-                {/* Map iframe */}
-                {mapSrc && (
-                  <iframe
-                    title={`Map for ${place.location}`}
-                    src={mapSrc}
-                    width="100%"
-                    height="200"
-                    style={styles.map}
-                  ></iframe>
-                )}
-                {/* Add a "Book Now" button */}
-                {/* <button onClick={() => handleBookTour(place._id)}>
-                Book Now
-              </button> */}
-                {bookedHP.includes(place._id) ? (
-                  <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
-                ) : (
-                  <button onClick={() => handleBookTour(place._id)}>Book Now</button>
-                )}
-                <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
-                <button onClick={() => handleShare(place)}>Share via mail </button>
-                <button
-  onClick={() => toggleBookmarkHistoricalPlace(place._id)}
-  style={{
-    backgroundColor: bookmarkedHP.includes(place._id) ? "gold" : "gray",
-    color: bookmarkedHP.includes(place._id) ? "black" : "white",
-  }}
->
-  {bookmarkedHP.includes(place._id) ? "Unbookmark" : "Bookmark"}
-</button>
-              </div>
-
-            );
-
-          })}
+    <div id="historicalPlaces" className="tour-guide-page">
+      {/* Navbar */}
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand href="#" className="navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+          <Nav className="ml-auto"></Nav>
+        </Container>
+      </Navbar>
+  
+      <div className="admin-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <div className="profile-container">
+            <button className="sidebar-button" onClick={viewBookmarkedHistoricalPlaces}>
+             Bookmarked Historical Places
+            </button>
+            <button className="sidebar-button" onClick={viewAllHistoricalPlaces}>
+              View All Historical Places
+            </button>
+            <button className="sidebar-button" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          </div>
+          <div className="sidebar-image-container">
+            <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+          </div>
         </div>
-      ) : (
-        <p style={styles.noDataMessage}>No historical places available.</p>
-      )}
-
+  
+        {/* Main Content */}
+        <div className="main-content">
+          <Tabs defaultActiveKey="historicalPlaces" className="tg">
+            <Tab eventKey="historicalPlaces" title="Historical Places">
+              <div className="museums-container">
+                {error && <p className="error-message">{error}</p>}
+  
+                {/* Filters */}
+                <div className="filters-container">
+                  <div className="filter-group">
+                    <Form.Label className="filter-label">Choose Currency:</Form.Label>
+                    <Form.Select
+                      id="currencySelect"
+                      value={selectedCurrency}
+                      onChange={(e) => setSelectedCurrency(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="EUR">EUR</option>
+                      <option value="USD">USD</option>
+                      <option value="EGP">EGP</option>
+                    </Form.Select>
+                  </div>
+  
+                  <div className="filter-group">
+                    <Form.Label className="filter-label">Filter by Tourism Governor Tag:</Form.Label>
+                    <Form.Select
+                      id="tagFilter"
+                      value={selectedTag}
+                      onChange={(e) => setSelectedTag(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="">All Tags</option>
+                      {historicalPlaces
+                        .map((place) => place.tourismGovernerTags?.type)
+                        .filter((value, index, self) => value && self.indexOf(value) === index)
+                        .map((tag) => (
+                          <option key={tag} value={tag}>
+                            {tag}
+                          </option>
+                        ))}
+                    </Form.Select>
+                  </div>
+                </div>
+  
+                {/* Historical Place Cards */}
+                {filteredPlaces.length > 0 ? (
+                  <div className="museum-cards-grid">
+                    {filteredPlaces.map((place) => {
+                      const locationCoords = place.location.split(",");
+                      const latitude = locationCoords[0];
+                      const longitude = locationCoords[1];
+                      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  
+                      return (
+                        <div key={place._id} className="museum-card">
+                          <div className="museum-card-header">
+                            <h3 className="museum-title">
+                              {place.tourismGovernerTags?.name || "Unnamed"}
+                            </h3>
+                            <p className="museum-location">{place.location}</p>
+                          </div>
+  
+                          <div className="museum-card-body">
+                            <p className="museum-description">{place.description}</p>
+                            <div className="ticket-prices">
+                              <p>
+                                <strong>Foreigner:</strong>{" "}
+                                {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
+                              </p>
+                              <p>
+                                <strong>Student:</strong>{" "}
+                                {convertPrice(place.studentTicketPrice)} {selectedCurrency}
+                              </p>
+                              <p>
+                                <strong>Native:</strong>{" "}
+                                {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
+                              </p>
+                            </div>
+                          </div>
+  
+                          <div className="museum-card-image">
+                            <img
+                              src={place.pictures}
+                              alt={`Picture of ${place.description}`}
+                            />
+                          </div>
+  
+                          <div className="museum-card-buttons">
+                            {mapSrc && (
+                              <iframe
+                                title={`Map for ${place.location}`}
+                                src={mapSrc}
+                                className="museum-map"
+                              ></iframe>
+                            )}
+                            {bookedHP.includes(place._id) ? (
+                              <button
+                                className="card-button cancel-button"
+                                onClick={() => handleCancelBooking(place._id)}
+                              >
+                                Cancel Booking
+                              </button>
+                            ) : (
+                              <button
+                                className="card-button book-button"
+                                onClick={() => handleBookTour(place._id)}
+                              >
+                                Book Now
+                              </button>
+                            )}
+                            <button
+                              className="card-button share-button"
+                              onClick={() => handleCopybylink(place)}
+                            >
+                              Share via Copy Link
+                            </button>
+                            <button
+                              className="card-button share-button"
+                              onClick={() => handleShare(place)}
+                            >
+                              Share via Mail
+                            </button>
+                            <button
+                              className="card-button bookmark-button"
+                              onClick={() => toggleBookmarkHistoricalPlace(place._id)}
+                              style={{
+                                backgroundColor: bookmarkedHP.includes(place._id) ? "gold" : "gray",
+                                color: bookmarkedHP.includes(place._id) ? "black" : "white",
+                              }}
+                            >
+                              {bookmarkedHP.includes(place._id) ? "Unbookmark" : "Bookmark"}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="no-data-message">No Historical Places available.</p>
+                )}
+              </div>
+            </Tab>
+          </Tabs>
+        </div>
+  
+        {/* Right Sidebar */}
+        <div className="right-sidebar">
+          <div className="sidebar-buttons"></div>
+        </div>
+      </div>
+  
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    padding: "20px",
-    fontFamily: "'Arial', sans-serif",
-    backgroundColor: "#f9f9f9",
-  },
-  heading: {
-    textAlign: "center",
-    fontSize: "2.5rem",
-    color: "#333",
-    marginBottom: "20px",
-  },
-  filterContainer: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  filterLabel: {
-    marginRight: "10px",
-    fontSize: "1rem",
-    color: "#555",
-  },
-  filterSelect: {
-    padding: "10px",
-    fontSize: "1rem",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-  },
-  cardGrid: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "20px",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    padding: "20px",
-    maxWidth: "300px",
-    width: "100%",
-    transition: "transform 0.2s",
-    textAlign: "center",
-  },
-  cardTitle: {
-    fontSize: "1.5rem",
-    color: "#444",
-    marginBottom: "10px",
-  },
-  cardText: {
-    fontSize: "1rem",
-    color: "#666",
-    marginBottom: "10px",
-  },
-  cardImageContainer: {
-    height: "150px",
-    marginBottom: "10px",
-  },
-  cardImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    borderRadius: "10px",
-  },
-  map: {
-    marginTop: "15px",
-    borderRadius: "5px",
-  },
-  noDataMessage: {
-    textAlign: "center",
-    fontSize: "1.2rem",
-    color: "#888",
-  },
+  
 };
 
 export default HPT;
