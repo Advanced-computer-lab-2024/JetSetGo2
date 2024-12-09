@@ -218,6 +218,8 @@ const OthersListPage = () => {
   </Dropdown.Toggle>
 
   <Dropdown.Menu>
+  <Dropdown.Item onClick={() => navigate("/notifications")}>Notifications</Dropdown.Item>
+
     <Dropdown.Item onClick={() => navigate("/login")}>Logout</Dropdown.Item>
   </Dropdown.Menu>
 </Dropdown>

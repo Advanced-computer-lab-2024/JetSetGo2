@@ -735,6 +735,18 @@
   margin-bottom: 20px;
 }
 
+.addadmin-button:hover{
+  background-color: #a8a3bd;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
 
 .user-box {
   background-color: #fefefe;
@@ -792,4 +804,61 @@
   height: 50px;
   border-radius: 50%;
   margin-right: 10px;
+}
+
+.edit-button {
+  background-color: #a3a0b3;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-right: 5px;
+}
+
+.edit-button:hover {
+  background-color: #666278;
+}
+
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+  font-family: 'roboto', sans-serif;
+}
+
+.activity-item {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activity-details {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.activity-map {
+  flex-shrink: 0;
+}
+
+.flag-button {
+  background-color: #666278;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.flag-button:hover {
+  background-color: #393742;
 }

@@ -82,6 +82,8 @@ const TourismGovernorComponent = () => {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
+                <Dropdown.Item onClick={() => navigate("/notifications")}>Notifications</Dropdown.Item>
+
                   <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
