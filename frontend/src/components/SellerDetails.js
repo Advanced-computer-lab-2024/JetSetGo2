@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation,Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from './logoo444.JPG';
+import "./SellerPage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from './logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
 const SellerDetails = () => {
   const location = useLocation();
@@ -8,6 +14,7 @@ const SellerDetails = () => {
   const id = location.state?.id;
 
   const [Seller, setSeller] = useState(null);
+  const [activeTab, setActiveTab] = useState("Details");
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Fix the state definition
   const [formData, setFormData] = useState({
@@ -65,22 +72,44 @@ const SellerDetails = () => {
   };
 
   const buttonStyle = {
-    padding: "10px 20px",
-    backgroundColor: "#ff6348",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginBottom: "10px",
-    width: "100%",
-    fontSize: "16px",
+    background: '#2a2737', // Matches sidebar button background
+    color: '#fff', // Matches sidebar button text color
+    padding: '10px 400px', // Matches sidebar button padding
+    borderRadius: '10px', // Matches sidebar button border radius
+    border: 'none', // Matches sidebar button border
+    cursor: 'pointer',
+    fontSize: '16px', // Matches sidebar button font size
+    fontFamily: "'Roboto', sans-serif", // Matches sidebar button font family
+    transition: 'background-color 0.3s ease, transform 0.3s ease', // Matches sidebar button transitions
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    whiteSpace: 'nowrap', // Prevents wrapping of text
+    marginTop: '10px',
   };
-
+  const buttonStyle1 = {
+    background: '#2a2737', // Matches sidebar button background
+    color: '#fff', // Matches sidebar button text color
+    padding: '10px 427px', // Matches sidebar button padding
+    borderRadius: '10px', // Matches sidebar button border radius
+    border: 'none', // Matches sidebar button border
+    cursor: 'pointer',
+    fontSize: '16px', // Matches sidebar button font size
+    fontFamily: "'Roboto', sans-serif", // Matches sidebar button font family
+    transition: 'background-color 0.3s ease, transform 0.3s ease', // Matches sidebar button transitions
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    whiteSpace: 'nowrap', // Prevents wrapping of text
+    marginTop: '10px',
+  };
+  
   const cancelButtonStyle = {
-    ...buttonStyle,
-   // backgroundColor: "#2d3e50",
-    color: "#fff",
+    ...buttonStyle, // Inherit all styles from buttonStyle
+    background: '#666278', // Use a different color for cancel button
+    color: '#fff',
   };
+  
 
   const formGroupStyle = {
     marginBottom: "15px",
@@ -267,39 +296,39 @@ const SellerDetails = () => {
   const renderDetails = () => (
     <ul style={listStyle}>
       <li style={listItemStyle}>
-        <strong>UserName:</strong> {Seller.UserName}
+        <strong>UserName:</strong> {Seller?.UserName || "N/A"}
       </li>
       <li style={listItemStyle}>
-        <strong>Email:</strong> {Seller.Email}
+        <strong>Email:</strong> {Seller?.Email || "N/A"}
       </li>
       <li style={listItemStyle}>
-        <strong>Name:</strong> {Seller.Name}
+        <strong>Name:</strong> {Seller?.Name || "N/A"}
       </li>
       <li style={listItemStyle}>
-        <strong>Pick Up Location:</strong> {Seller.PickUp_Location}
+        <strong>Pick Up Location:</strong> {Seller?.PickUp_Location || "N/A"}
       </li>
       <li style={listItemStyle}>
-        <strong>Type of Products:</strong> {Seller.Type_Of_Products}
+        <strong>Type of Products:</strong> {Seller?.Type_Of_Products || "N/A"}
       </li>
       <li style={listItemStyle}>
-        <strong>Previous Work:</strong> {Seller.Previous_Work}
+        <strong>Previous Work:</strong> {Seller?.Previous_Work || "N/A"}
       </li>
       <li style={listItemStyle}>
-        <strong>Age:</strong> {Seller.Age}
+        <strong>Age:</strong> {Seller?.Age || "N/A"}
       </li>
-      {Seller.logo && (
+      {Seller?.logo && (
         <li style={listItemStyle}>
           <strong>Logo:</strong>{" "}
           <img
             src={`data:image/png;base64,${Seller.logo}`}
-            alt="Product"
+            alt="Logo"
             style={{ width: "50px", height: "50px", objectFit: "cover" }}
           />
         </li>
       )}
     </ul>
   );
-
+  
   const renderEditForm = () => (
     <form onSubmit={handleSubmit}>
       <div style={formGroupStyle}>
@@ -307,7 +336,7 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="UserName"
-          value={formData.UserName}
+          value={formData.UserName || ""}
           onChange={handleChange}
           type="text"
           required
@@ -318,7 +347,7 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Email"
-          value={formData.Email}
+          value={formData.Email || ""}
           onChange={handleChange}
           type="email"
           required
@@ -329,8 +358,9 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Name"
-          value={formData.Name}
+          value={formData.Name || ""}
           onChange={handleChange}
+          type="text"
           required
         />
       </div>
@@ -339,8 +369,9 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Password"
-          value={formData.Password}
+          value={formData.Password || ""}
           onChange={handleChange}
+          type="password"
           required
         />
       </div>
@@ -349,8 +380,9 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="PickUp_Location"
-          value={formData.PickUp_Location}
+          value={formData.PickUp_Location || ""}
           onChange={handleChange}
+          type="text"
           required
         />
       </div>
@@ -359,8 +391,9 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Type_Of_Products"
-          value={formData.Type_Of_Products}
+          value={formData.Type_Of_Products || ""}
           onChange={handleChange}
+          type="text"
           required
         />
       </div>
@@ -369,8 +402,9 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Previous_Work"
-          value={formData.Previous_Work}
+          value={formData.Previous_Work || ""}
           onChange={handleChange}
+          type="text"
           required
         />
       </div>
@@ -379,34 +413,35 @@ const SellerDetails = () => {
         <input
           style={inputStyle}
           name="Age"
-          value={formData.Age}
+          value={formData.Age || ""}
           onChange={handleChange}
           type="number"
           required
         />
       </div>
-
       <div style={formGroupStyle}>
         <label style={labelStyle}>Logo:</label>
         <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setFormData)}
-  required
-/>
+          style={inputStyle}
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleImageUpload(e, setFormData)}
+          required
+        />
       </div>
       <button style={buttonStyle} type="submit">
         Save Changes
       </button>
       <button
-        style={cancelButtonStyle}
+        style={buttonStyle1}
         type="button"
-        onClick={() => setIsEditing(false)} // Cancel button logic
+        onClick={() => setIsEditing(false)}
       >
         Cancel
       </button>
     </form>
   );
+  
 
   if (error) {
     return <div style={errorStyle}>{error}</div>; // Display error message
@@ -417,8 +452,34 @@ const SellerDetails = () => {
   }
 
   return (
-    <div style={containerStyle}>
-      <div style={sidebarStyle}>
+    <div className="seller-page">
+      <Navbar className="navbar1">
+      <Container>
+        
+        <Navbar.Brand href="#" className="navbar-brand">
+          {/* Replace with your logo */}
+          <img src={img1} alt="Logo" className="navbar-logo" />
+        </Navbar.Brand>
+        <Nav className="ml-auto">
+          <Link to="/Upcoming-activities" className="nav-link">
+            Activities
+          </Link>
+          <Link to="/Upcoming-itineraries" className="nav-link">
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" className="nav-link">
+            Historical Places
+          </Link>
+          <Link to="/all-museums" className="nav-link">
+            Museums
+          </Link>
+        </Nav>
+      </Container>
+    </Navbar>
+    <div className="seller-container">
+      {/* Sidebar */}
+      <div className="sidebar">
+      <div className="profile-container">
         <img
           src={`data:image/png;base64,${Seller.logo}`}
           alt="Product"
@@ -426,62 +487,87 @@ const SellerDetails = () => {
         />
         <h2>{Seller.UserName}</h2>
         <button
-          style={buttonStyle}
+          className="sidebar-button"
           onClick={() => handleSidebarClick("details")}
         >
           View Details
         </button>
-        <button style={buttonStyle} onClick={() => handleSidebarClick("edit")}>
+        <button className="sidebar-button" onClick={() => handleSidebarClick("edit")}>
           Edit Details
         </button>
-        <h3 style={{ color: "#ff6348" }}>Explore</h3>
-        <button style={buttonStyle} onClick={() => navigate("/productList")}>
-          View Products
-        </button>
-        <button style={buttonStyle} onClick={() => navigate("/product")}>
-          Add/Edit Product
-        </button>
-
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/Upcoming-activities")}
-        >
-          View Activities
-        </button>
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/Upcoming-itineraries")}
-        >
-          View Itineraries
-        </button>
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/all-historicalplaces")}
-        >
-          Historical Places
-        </button>
-        <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
-          Museums
-        </button>
-        <button onClick={() => navigate("/SellerRevenue")} style={buttonStyle}>
-  View Revenue
-</button>
-        <button onClick={handleLogout}>
+        <button className="sidebar-button" onClick={handleLogout}>
             Logout
           </button> {/* Logout Button */}
-        <button onClick={handleDeleteAccount} style={{ color: "red", background: "lightgrey", padding: "10px", marginTop: "20px" }}>
+        <button onClick={handleDeleteAccount} className="sidebar-button">
         Delete Account
       </button>
       </div>
+      <div className="sidebar-image-container">
+          <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+        </div>
+      </div>
       <div style={mainContentStyle}>
-        <h1 style={headerStyle}>
-          {isEditing ? "Edit Seller" : "Seller Details"}
-        </h1>
-        {notification && <div style={notificationStyle}>{notification}</div>}
+  <h1 style={headerStyle}>
+    {isEditing ? "Edit Seller" : "Seller Details"}
+  </h1>
+
+  {notification && (
+    <div style={notificationStyle}>{notification}</div>
+  )}
+
+  <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="seller">
+    <Tab eventKey="details" title="Details">
+      <div className="details-container">
         {isEditing ? renderEditForm() : renderDetails()}
+      </div>
+    </Tab>
+  </Tabs>
+</div>
+
+      {/* Right Sidebar */}
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+  <h3 style={{ color: "#ffffff", fontWeight: "bold", textAlign: "center" }}>Explore</h3>
+
+        <button className="box" onClick={() => navigate("/productList")}>
+          View Products
+        </button>
+        <button className="box" onClick={() => navigate("/product")}>
+          Add/Edit Product
+        </button>
+
+       
+        <button onClick={() => navigate("/SellerRevenue")} className="box">
+  View Revenue
+</button>
+  </div>
+</div>
+    </div>
+    
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );
 };
+
 
 export default SellerDetails;

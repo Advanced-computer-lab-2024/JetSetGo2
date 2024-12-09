@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link} from "react-router-dom";
 import {
   getProducts,
   createProduct,
@@ -10,6 +10,12 @@ import {
   getAdmins,
 } from "../services/ProductService";
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from './logoo444.JPG';
+import "./SellerPage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from './logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
 const ProductCRUD = () => {
   const [products, setProducts] = useState([]);
@@ -234,79 +240,35 @@ const ProductCRUD = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: "#f7f8fa",
-        padding: "20px",
-      }}
-    >
+    <div className="seller-page">
+    {/* Navbar */}
+    <Navbar className="navbar1">
+      <Container>
+        <Navbar.Brand href="#" className="navbar-brand">
+          <img src={img1} alt="Logo" className="navbar-logo" />
+        </Navbar.Brand>
+        <Nav className="ml-auto">
+          
+        </Nav>
+      </Container>
+    </Navbar>
+    <div className="seller-container">
       {/* Sidebar */}
-      <div style={{
-        width: '250px',
-        padding: '20px',
-        //backgroundColor: '#2d3e50',
-        borderRadius: '10px',
-        color: '#fff',
-      }}>
-        <h3>Welcome</h3>
+      <div className="sidebar">
+        
         <div style={{ textAlign: "center", marginBottom: "10px" }}>
           <button
             onClick={() => navigate(-1)}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#ff6348",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "16px",
-              width: "100%",
-            }}
+           className="sidebar-button"
           >
             Back
           </button>
         </div>
 
-        {/* View Product Button */}
-        <button
-          onClick={() => navigate("/productlist")}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#ff6348",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            marginTop: "10px",
-            width: "100%",
-            fontSize: "16px",
-          }}
-        >
-          View Products
-        </button>
       </div>
       {/* Main content */}
-      <div
-        style={{
-          flex: 1,
-          marginLeft: "30px",
-          padding: "20px",
-          backgroundColor: "#fff",
-          borderRadius: "10px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "28px",
-            marginBottom: "20px",
-            color: "#333",
-          }}
-        >
-          Product Management
-        </h2>
+      <div className="main-content">
+       <h2 class="center-heading">Product Management</h2>
 
         {/* Display success/error message */}
         {message && (
@@ -379,14 +341,7 @@ const ProductCRUD = () => {
               onChange={(e) => handleChange(e, setFormData)}
               required
             />
-            {/*<label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
-            <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-              name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
-              <option value="">Select a Seller</option>
-              {sellers.map(seller => (
-                <option key={seller._id} value={seller._id}>{seller.UserName}</option>
-              ))}
-            </select>*/}
+            
             <label style={{ display: "block", marginBottom: "10px" }}>
               Available Quantity:
             </label>
@@ -475,14 +430,7 @@ const ProductCRUD = () => {
                 onChange={(e) => handleChange(e, setEditData)}
                 required
               />
-              {/*<label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
-              <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
-                <option value="">Select a Seller</option>
-                {sellers.map(seller => (
-                  <option key={seller._id} value={seller._id}>{seller.UserName}</option>
-                ))}
-              </select>*/}
+              
               <label style={{ display: "block", marginBottom: "10px" }}>
                 Available Quantity:
               </label>
@@ -727,6 +675,28 @@ const ProductCRUD = () => {
           </div>
         </section>
       </div>
+    </div>
+        {/* Footer */}
+        <div className="footer">
+      <Container>
+        <Row>
+          <Col md={4}>
+            <h5>Contact Us</h5>
+            <p>Email: contact@jetsetgo.com</p>
+            <p>Phone: +123 456 7890</p>
+          </Col>
+          <Col md={4}>
+            <h5>Address</h5>
+            <p>123 Travel Road</p>
+            <p>Adventure City, World 45678</p>
+          </Col>
+          <Col md={4}>
+            <h5>Follow Us</h5>
+            <p>Facebook | Twitter | Instagram</p>
+          </Col>
+        </Row>
+      </Container>
+    </div>
     </div>
   );
 };
