@@ -14,7 +14,22 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-
+import "../../css/tourist.css";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Row,
+  Col,
+  Tab,
+  Tabs,
+  Dropdown,
+  Form,
+  Button,
+} from "react-bootstrap";
+import img1 from '../logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
+import sidebarImage from '../logoo444.JPG';
 const stripePromise = loadStripe(
   "pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx"
 );
@@ -569,7 +584,50 @@ const handleCopy = (activity) => {
   };
 
   return (
+    <div className="tourist-page">
+    {/* Navbar */}
+    <Navbar className="navbar">
+      <Container>
+      <Navbar.Brand href="#" className="advertiser-navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ml-auto">
+            {/* Cart Icon */}
+            <Nav.Link href="#" onClick={() => navigate("/cart")}>
+              <i
+                className="fas fa-shopping-cart"
+                style={{ fontSize: "20px" }}
+              ></i>
+            </Nav.Link>
+
+            {/* Wishlist Icon */}
+            <Nav.Link href="#" onClick={() => navigate("/wishlist")}>
+              <i className="fas fa-heart" style={{ fontSize: "20px" }}></i>
+            </Nav.Link>
+
+            {/* Notification Bell Icon */}
+            <Nav.Link href="#" onClick={() => navigate("/notifications")}>
+              <i className="fas fa-bell" style={{ fontSize: "20px" }}></i>
+            </Nav.Link>
+
+            {/* Tourist Dropdown */}
+            <Nav.Link className="profile-nav">
+              <img
+                src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg"
+                alt="Profile"
+                className="navbar-profile-image"
+              />
+            </Nav.Link>
+          
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+
     <div id="activities">
+      
          {isPaymentModalOpen && (
       <div className="payment-modal">
         <Elements stripe={stripePromise}>
@@ -846,6 +904,7 @@ const handleCopy = (activity) => {
           background-color: #2980b9;
         }
       `}</style>
+    </div>
     </div>
   );
 };

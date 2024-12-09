@@ -42,6 +42,7 @@ const bookactivity = async (req, res) => {
   }
 
   try {
+
     let finalPrice = activity.price;
 
     // Validate the promo code, if provided
@@ -52,7 +53,7 @@ const bookactivity = async (req, res) => {
       }
 
       // Apply discount
-      const { discountType, discountValue } = validationResult.code;
+      const { discountType, discountValue } = validationResult;
       if (discountType === "percentage") {
         console.log("promo code save20");
         finalPrice -= (finalPrice * discountValue) / 100; // Apply percentage discount
@@ -75,7 +76,7 @@ const bookactivity = async (req, res) => {
           promoCode: promoCode || null, // Include promo code if provided
         },
       });
-      await sendactivityreciept(user.Email, user.UserName, discountedPrice);
+      await sendactivityreciept(user.Email, user.UserName, finalPrice);
 
       return res.status(200).json({
         clientSecret: paymentIntent.client_secret,
@@ -96,7 +97,7 @@ const bookactivity = async (req, res) => {
       // Finalize the booking
       await activity.incrementBookings(userId);
 
-      await sendactivityreciept(user.Email, user.UserName, discountedPrice);
+      await sendactivityreciept(user.Email, user.UserName, finalPrice);
 
       res.status(200).json({ message: "Booking successful using wallet." });
     } else {
