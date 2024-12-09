@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Navbar, Nav, Container, Carousel, Card, Row, Col } from "react-bootstrap";
+import { Navbar, Nav, Container, Carousel, Card, Row, Col,NavDropdown } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
 import img1 from './logoo4.JPG';
@@ -24,7 +24,21 @@ const HomePage = () => {
             <Nav className="me-auto">
               <Nav.Link href="#" className={`home-link ${location.pathname === '/' ? 'selected' : ''}`}>Home</Nav.Link>
               <Nav.Link href="#" className={`nothome-link ${location.pathname === '/about' ? 'selected' : ''}`}>About Us</Nav.Link>
-              <Nav.Link className={`nothome-link ${location.pathname === '/tourist-signup' ? 'selected' : ''}`} onClick={() => navigate("/tourist-signup")}>Signup</Nav.Link>
+              <NavDropdown
+                title="Signup"
+                id="signup-dropdown"
+                className={`nothome-link ${
+                  location.pathname.includes("signup") ? "selected" : ""
+                }`}
+              >
+                <NavDropdown.Item onClick={() => navigate("/tourist-signup")}>
+                   Tourist
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate("/other-signup")}>
+                  Others
+                </NavDropdown.Item>
+                
+              </NavDropdown>
               <Nav.Link className={`nothome-link ${location.pathname === '/login' ? 'selected' : ''}`} onClick={() => navigate("/login")}>Login</Nav.Link>
             </Nav>
           </Navbar.Collapse>
@@ -155,17 +169,47 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Signup Section */}
-<div className="section signup-section">
-  <h2>Sign Up Now</h2>
-  <p>Join us today and explore the world in a whole new way!</p>
-  <div className="signup-options">
-    <button className="signup-btn" onClick={() => navigate("/tourist-signup")}>Sign Up as a Tourist</button>
-    <button className="signup-btn" onClick={() => navigate("/other-signup")}>Sign Up as a Tour Guide</button>
-    <button className="signup-btn" onClick={() => navigate("/other-signup")}>Sign Up as an Advertiser</button>
-    <button className="signup-btn" onClick={() => navigate("/other-signup")}>Sign Up as a Seller</button>
-  </div>
-</div>
+   {/* Feedback Slideshow Section */}
+   <div className="section signup-section">
+        <h2>What Our Travelers Are Saying</h2>
+        <Carousel>
+          {/* Feedback 1 */}
+          <Carousel.Item>
+            <div className="feedback-slide">
+              <h3>"Absolutely Wonderful Experience!"</h3>
+              <p>"JetSetGo made our trip to Paris an unforgettable experience. From seamless flight bookings to amazing city tours, everything was perfectly arranged!"</p>
+              <p><strong>- Emily T.</strong></p>
+            </div>
+          </Carousel.Item>
+          
+          {/* Feedback 2 */}
+          <Carousel.Item>
+            <div className="feedback-slide">
+              <h3>"A Dream Vacation to Madrid"</h3>
+              <p>"The team at JetSetGo took care of every little detail. Our Madrid getaway was full of exciting experiences, and we felt completely taken care of!"</p>
+              <p><strong>- John D.</strong></p>
+            </div>
+          </Carousel.Item>
+          
+          {/* Feedback 3 */}
+          <Carousel.Item>
+            <div className="feedback-slide">
+              <h3>"Amazing Service and Attention to Detail"</h3>
+              <p>"JetSetGo helped us plan the perfect trip to London. Their attention to detail made our travels smooth and memorable. Highly recommend their services!"</p>
+              <p><strong>- Sarah M.</strong></p>
+            </div>
+          </Carousel.Item>
+          
+          {/* Feedback 4 */}
+          <Carousel.Item>
+            <div className="feedback-slide">
+              <h3>"The Best Beach Vacation Ever!"</h3>
+              <p>"JetSetGo helped us plan our dream vacation to the Maldives. Everything from the resort to the activities was perfect. We'll definitely book again!"</p>
+              <p><strong>- Michael S.</strong></p>
+            </div>
+          </Carousel.Item>
+        </Carousel>
+      </div>
 
       {/* Footer */}
 <div className="footer">

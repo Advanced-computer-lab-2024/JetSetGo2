@@ -12,46 +12,54 @@
     border-radius: 20px; /* Adjust the radius as needed */
   }
 
-.navbar .navbar-nav {
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-left: -100px; /* Adjust this value to shift the tabs to the left */
+/* Dropdown Styling */
+/* Dropdown Styling */
+/* Dropdown Styling */
+.navbar-nav .nav-item.dropdown {
+  position: relative;
+}
 
-  }
-
-.navbar-nav .nav-link {
-  color: #fefefe !important;
-  font-weight: bold; /* Make the font thicker */
-  font-family: 'Roboto', sans-serif; /* Change the font family */
-  text-transform: uppercase;
-  font-weight: 400;
-  padding: 0 10px;
-  line-height: 60px;
-  letter-spacing: .5px;
+.navbar-nav .dropdown-menu {
+  background-color: #2a2737; /* Background color for the dropdown */
+  border-radius: 10px;
+  margin-top: 0.5rem;
   display: block;
-  transition: color .25s ease, background-color .25s ease;
-  font-size: 20px; /* Adjust the font size as needed */
-
+  width: 250px; /* Increase width to accommodate longer text */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px 0; /* Add padding for spacing */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  max-height: 300px; /* Max height for the dropdown to avoid overflowing */
+  overflow-y: auto; /* Enable scrolling if the content exceeds max-height */
+  z-index: 1000; /* Ensure the dropdown is above other content */
 }
 
-.navbar-nav .nav-link.selected {
-    color: white !important;
-  }
+.navbar-nav .dropdown-item {
+  color: #fefefe !important;
+  font-weight: 400;
+  font-size: 16px;
+  padding: 10px 20px;
+  display: block;
+  text-align: left;
+  transition: background-color 0.3s ease;
+  white-space: normal; /* Allow wrapping of long text */
+  word-wrap: break-word; /* Break words when necessary */
+}
 
-.navbar-nav .nav-link.home-link {
-  color: white !important;
-  font-weight: bold; /* Make the font thicker */
-}
-.navbar-brand img {
-    height: 70px; /* Adjust the height as needed */
-    width: 180px
+.navbar-nav .dropdown-item:hover {
+  background-color: #3a0066; /* Darker purple when hovering */
+  color: #fff;
 }
 
-.navbar-nav .nav-link:hover {
-  color: #94a8bc !important;
+.navbar-nav .dropdown-item:focus,
+.navbar-nav .dropdown-item.active {
+  background-color: #3a0066;
+  color: #fff;
 }
+
+
+
 
 .header {
   text-align: center;
@@ -207,74 +215,96 @@ margin-bottom: 15px;
 
   .signup-section {
     text-align: center;
-    padding: 40px 20px;
-    background-color: #d6d3d3; /* Adjust the background color as needed */
+    padding: 20px 0; /* Reduce padding to make the section smaller */
+    background-color: #d6d3d3; /* Retain the background color */
     border-radius: 10px;
-    margin: 40px 0;
-  }
-  
-  .signup-section h2 {
-    font-size: 36px;
-    color: #2a2737; /* Dark purple color */
-    margin-bottom: 20px;
-  }
-  
-  .signup-section p {
-    font-size: 20px;
-    color: #666;
-    margin-bottom: 30px;
-  }
-  
-  .signup-options {
+    margin: 20px 0 0; /* Remove bottom margin to stick the footer directly */
+}
+
+.signup-section h2 {
+    font-size: 28px; /* Slightly reduce the heading font size */
+    color: #2a2737; /* Retain the dark purple color */
+    margin-bottom: 15px; /* Reduce bottom margin */
+}
+
+.signup-section p {
+    font-size: 16px; /* Slightly reduce the font size for text */
+    color: #666; /* Retain the text color */
+    margin-bottom: 20px; /* Reduce spacing below the paragraph */
+}
+
+.signup-options {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .signup-btn {
-    background-color: #666278; /* Dark purple color */
+    gap: 15px; /* Reduce the gap between buttons */
+    flex-wrap: wrap; /* Ensure responsiveness */
+}
+
+.signup-btn {
+    background-color: #666278; /* Retain the dark purple color */
     color: #fff;
     border: none;
-    padding: 15px 30px;
-    font-size: 18px;
+    padding: 10px 20px; /* Reduce button padding */
+    font-size: 16px; /* Reduce button font size */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
-  
-  .signup-btn:hover {
-    background-color: #3a0066; /* Darker shade of purple */
-  }
+}
 
+.signup-btn:hover {
+    background-color: #3a0066; /* Retain the hover effect */
+}
 
-  .footer {
+.footer {
     background-color: #2a2737;
     color: #94a8bc;
-    padding: 20px 0;
+    padding: 10px 0;
     text-align: center;
     font-family: 'Roboto', sans-serif;
     border-radius: 20px; /* Adjust the radius as needed */
-    margin-bottom: 30px;
+    margin-top: 0; /* Remove top margin to stick the footer directly to the sign-up section */
+}
 
-  }
-  
-  .footer h5 {
+.footer h5 {
     color: #ffffff;
     font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .footer p {
-    margin: 0;
+    margin: 5px 0; /* Reduce top and bottom margins */
+}
+
+.footer p {
+    margin: 5px 0; /* Reduce spacing between paragraphs */
     color: #94a8bc;
-  }
-  
-  .footer a {
+    padding: 0; /* Ensure no padding around the paragraph */
+}
+
+.footer a {
     color: #94a8bc;
     text-decoration: none;
-  }
-  
-  .footer a:hover {
+    margin: 0; /* Remove margin around links */
+}
+
+.footer a:hover {
     text-decoration: underline;
-  }
+}
+
+
+.feedback-slide {
+  text-align: center;
+  padding: 20px;
+  height: 200px;
+}
+
+.feedback-slide h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.feedback-slide p {
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.feedback-slide strong {
+  font-weight: bold;
+}
+
