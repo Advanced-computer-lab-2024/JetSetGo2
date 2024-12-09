@@ -217,6 +217,8 @@ const handleToggleActivation = async (id) => {
   
 
   return (
+    <div className="tour-guide-page">
+
     <div id="itineraries">
       <div className="back-button-container">
         <button className="back-button" onClick={() => navigate(-1)}>
@@ -337,6 +339,7 @@ const handleToggleActivation = async (id) => {
       ) : (
         <p>No itineraries available.</p>
       )}
+    </div>
     </div>
   );
 };

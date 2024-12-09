@@ -209,10 +209,10 @@ const TourGuidePage = () => {
           <button className="sidebar-button" onClick={handleLogout}>
             Logout
           </button>
-          <button onClick={handleRevenuePage} style={styles.button}>
+          <button className="sidebar-button" onClick={handleRevenuePage} >
             Revenue Rep
           </button>
-          <button style={styles.button} onClick={handleLogout}>
+          <button className="sidebar-button" onClick={handleLogout}>
             Logout
           </button> {/* Logout Button */}
           <button
