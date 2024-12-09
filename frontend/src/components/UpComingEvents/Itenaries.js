@@ -216,6 +216,7 @@ const [activeTab, setActiveTab] = useState("Details");
     }
     setFilteredItineraries(sortedItineraries);
   };
+  
 
 
 // Toggle activation handler
@@ -261,6 +262,7 @@ const handleToggleActivation = async (id) => {
       setError("Failed to toggle activation.");
     }
   };
+  
   
 
   return (

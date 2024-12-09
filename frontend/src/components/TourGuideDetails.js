@@ -221,9 +221,7 @@ const TourGuidePage = () => {
         >
           View Tourist Report
         </button>
-          <button className="sidebar-button" onClick={handleLogout}>
-            Logout
-          </button> {/* Logout Button */}
+          {/* Logout Button */}
           <button
             onClick={handleDeleteAccount}
             className="sidebar-button"

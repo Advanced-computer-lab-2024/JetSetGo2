@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
+import { useNavigate, useLocation, Link} from "react-router-dom"; // Import useNavigate
 import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
 import 'bootstrap/dist/css/bootstrap.min.css';
 import sidebarImage from '../logoo444.JPG';
@@ -75,7 +75,7 @@ const HistoricalPlaces = () => {
   };
 
   const handleView = (place) => {
-    navigate(`/HP/${place.id}`, { state: { place } });
+    navigate(`/HP/${place.id}, { state: { place } }`);
   };
 
   const generateMapSrc = (coordinates) => {
@@ -85,7 +85,14 @@ const HistoricalPlaces = () => {
   const convertPrice = (price) => {
     return (price * currencyRates[selectedCurrency]).toFixed(2);
   };
- 
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
+  const handleBackClick = () => {
+    navigate(-1); // Navigate back
+  };
 
   const LocationMarker = () => {
     useMapEvents({
@@ -98,117 +105,172 @@ const HistoricalPlaces = () => {
   };
 
   return (
+    <div id="historicalPlaces" className="tour-guide-page">
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand href="#" className="navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+          <Nav className="ml-auto">
+           
+          </Nav>
+        </Container>
+      </Navbar>
+
+      <div className="admin-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <div className="profile-container">
+          
+          <button className="sidebar-button" onClick={handleLogout}>
+      Logout
+    </button>
     
-    <div id="historical-places" style={styles.container}>
-      <h2 style={styles.heading}>Historical Places</h2>
-      {error && <p className="error">{error}</p>}
-      <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-      </div>
-      <div className="filter-container">
-        <label htmlFor="currencySelect">Choose Currency:</label>
-        <select
-          id="currencySelect"
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="EGP">EGP</option>
-        </select>
-      </div>
-      {/* Filter by Tag */}
-      <div style={styles.filterContainer}>
-        <label htmlFor="tagFilter" style={styles.filterLabel}>
-          Filter by Tourism Governor Tag:
-        </label>
-        <select
-          id="tagFilter"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-          style={styles.filterSelect}
-        >
-          <option value="">All Tags</option>
-          {historicalPlaces
-            .map((place) => place.tourismGovernerTags?.type)
-            .filter(
-              (value, index, self) => value && self.indexOf(value) === index
-            ) // Remove duplicates
-            .map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
-        </select>
-      </div>
-
-      {filteredPlaces.length > 0 ? (
-  <div style={styles.cardGrid}>
-    {filteredPlaces.map((place) => {
-      // Extract latitude and longitude from the location string
-      const locationCoords = place.location.split(",");
-      const latitude = locationCoords[0];
-      const longitude = locationCoords[1];
-      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
-
-      return (
-        <div key={place._id} style={styles.card}>
-          <h3 style={styles.cardTitle}>
-            {place.tourismGovernerTags?.name || "Unnamed"}
-          </h3>
-          <p style={styles.cardText}>Description: {place.description}</p>
-          <p style={styles.cardText}>Location: {place.location}</p>
-          <p style={styles.cardText}>
-            Opening Hours: {place.openingHours}
-          </p>
-          <p>
-                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
-                  </p>
-          <p style={styles.cardText}>
-            Ticket Price: ${place.ticketPrice}
-          </p>
-          <div style={styles.cardImageContainer}>
-            <img
-              src={place.pictures}
-              alt={`Picture of ${place.description}`}
-              style={styles.cardImage}
-            />
+   
+    <button className="sidebar-button" onClick={handleBackClick}>
+      Back
+    </button>
           </div>
-          <p style={styles.cardText}>
-            Tourism Governor Tags:{" "}
-            {place.tourismGovernerTags?.type || "None"}
-          </p>
-          {/* Map iframe */}
-          {mapSrc && (
-            <iframe
-              title={`Map for ${place.location}`}
-              src={mapSrc}
-              width="100%"
-              height="200"
-              style={styles.map}
-            ></iframe>
-          )}
+          <div className="sidebar-image-container">
+            <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+          </div>
         </div>
-        
-      );
-      
-    })}
-  </div>
-) : (
-  <p style={styles.noDataMessage}>No historical places available.</p>
-)}
 
+        {/* Main Content */}
+        <div className="main-content">
+          <Tabs defaultActiveKey="historicalPlaces" className="tg">
+            <Tab eventKey="historicalPlaces" title="Historical Places">
+              <div className="museums-container">
+                {error && <p className="error-message">{error}</p>}
+
+                {/* Filters */}
+                <div className="filters-container">
+                  <div className="filter-group">
+                    <Form.Label className="filter-label">Choose Currency:</Form.Label>
+                    <Form.Select
+                      id="currencySelect"
+                      value={selectedCurrency}
+                      onChange={(e) => setSelectedCurrency(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="EUR">EUR</option>
+                      <option value="USD">USD</option>
+                      <option value="EGP">EGP</option>
+                    </Form.Select>
+                  </div>
+
+                  <div className="filter-group">
+                    <Form.Label className="filter-label">Filter by Tag:</Form.Label>
+                    <Form.Select
+                      id="tagFilter"
+                      value={selectedTag}
+                      onChange={(e) => setSelectedTag(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="">All Tags</option>
+                      {historicalPlaces
+                        .map((place) => place.tourismGovernerTags?.type)
+                        .filter((value, index, self) => value && self.indexOf(value) === index)
+                        .map((tag) => (
+                          <option key={tag} value={tag}>
+                            {tag}
+                          </option>
+                        ))}
+                    </Form.Select>
+                  </div>
+                </div>
+
+                {/* Historical Place Cards */}
+                {filteredPlaces.length > 0 ? (
+                  <div className="museum-cards-grid">
+                    {filteredPlaces.map((place) => {
+                      const locationCoords = place.location.split(",");
+                      const latitude = locationCoords[0];
+                      const longitude = locationCoords[1];
+                      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+
+                      return (
+                        <div key={place._id} className="museum-card">
+                          <div className="museum-card-header">
+                            <h3 className="museum-title">
+                              {place.tourismGovernerTags?.name || "Unnamed"}
+                            </h3>
+                            <p className="museum-location">{place.location}</p>
+                          </div>
+
+                          <div className="museum-card-body">
+                            <p className="museum-description">{place.description}</p>
+                            <div className="ticket-prices">
+                              <p>
+                                <strong>Foreigner:</strong>{" "}
+                                {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
+                              </p>
+                              <p>
+                                <strong>Student:</strong>{" "}
+                                {convertPrice(place.studentTicketPrice)} {selectedCurrency}
+                              </p>
+                              <p>
+                                <strong>Native:</strong>{" "}
+                                {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="museum-card-image">
+                            <img
+                              src={place.pictures}
+                              alt={`Picture of ${place.description}`}
+                            />
+                          </div>
+
+                          {mapSrc && (
+                            <iframe
+                              title={`Map for ${place.location}`}
+                              src={mapSrc}
+                              className="museum-map"
+                            ></iframe>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="no-data-message">No Historical Places available.</p>
+                )}
+              </div>
+            </Tab>
+          </Tabs>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="right-sidebar">
+          <div className="sidebar-buttons">
+            
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </div>
   );
 };
