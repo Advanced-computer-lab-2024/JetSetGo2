@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , Link} from 'react-router-dom';
 import "../App.css";
+import axios from "axios";
+
 import {
   getActivity,
   createActivity,
@@ -16,6 +18,12 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import "../AdvertiserDetails.css"; // Import the updated styles
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from './logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
+import sidebarImage from './logoo444.JPG';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -49,6 +57,7 @@ const ActivityCRUD = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [editData, setEditData] = useState(null);
   const navigate = useNavigate();
+  const adverId = localStorage.getItem("userId"); // Retrieve the Tour Guide ID from local storage
 
   useEffect(() => {
     fetchCategories();
@@ -153,7 +162,38 @@ const ActivityCRUD = () => {
     const [lat, lon] = activity.location.split(',').map(Number);
     setPinPosition([lat, lon]); // Set the map pin to the activity's location
   };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
 
+  // Function to handle account deletion
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/home/adver/deletMyAccount/${adverId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
   const resetCreateForm = () => {
     setFormData({
       date: "",
@@ -200,140 +240,226 @@ const ActivityCRUD = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', minHeight: '100vh', padding: '20px' }}>
-      <h1>Activity Management</h1>
+    <div className="advertiser-page">
+<Navbar className="advertiser-navbar">
+        <Container>
+          <Navbar.Brand href="#" className="advertiser-navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+          <Nav className="ml-auto">
+            <Link to="/Upcoming-activities" className="nav-link">
+              Activities
+            </Link>
+            <Link to="/Upcoming-itineraries" className="nav-link">
+              Itineraries
+            </Link>
+            <Link to="/all-historicalplaces" className="nav-link">
+              Historical Places
+            </Link>
+            <Link to="/all-museums" className="nav-link">
+              Museums
+            </Link>
+          </Nav>
+        </Container>
+      </Navbar>
+      <div className="advertiser-container">
+        {/* Left Sidebar */}
+        <div className="advertiser-sidebar">
+          <h3 className="sidebar-heading">Welcome</h3>
+          <button onClick={() => navigate("/list")} className="sidebar-button">
+            Home
+          </button>
+          <button onClick={handleLogout} className="sidebar-button">
+            Logout
+          </button>
+          <button onClick={handleDeleteAccount} className="sidebar-button">
+            Delete Account
+          </button>
+          <div className="advertiser-sidebar-image-container">
+          <img src={sidebarImage} alt="Advertiser Sidebar" className="advertiser-sidebar-image" />
+        </div>
+  </div>
+  <div className="advertiser-main-content">
+  <h1 className="header">Activity Management</h1>
+
       {message && <p className="message">{message}</p>}
   
       {/* Home Button */}
-      <button onClick={handleHomeNavigation} className="home-button">
-        Home
-      </button>
+   
   
       {/* Form for creating a new activity */}
       <section className="form-section">
-        <h2>Create New Activity</h2>
-        <form onSubmit={handleCreateSubmit}>
-          <label>
-            Date:
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={(e) => handleChange(e, setFormData)}
-              required
-            />
-          </label>
-          <label>
-            Time:
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={(e) => handleChange(e, setFormData)}
-              required
-            />
-          </label>
-  
-          {/* Map for selecting location */}
-          <label>Location: (Click on the map to place the pin)</label>
-          <input
-            type="text"
-            placeholder="Search location..."
-            value={searchLocation}
-            onChange={(e) => setSearchLocation(e.target.value)}
-          />
-          <button type="button" onClick={handleSearch}>Search</button>
-          <div style={{ height: "400px", width: "100%", marginBottom: "20px" }}>
-            <MapContainer center={pinPosition} zoom={13} style={{ height: "100%", width: "100%" }}>
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <LocationMarker />
-            </MapContainer>
-          </div>
-  
-          <label>
-            Price:
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={(e) => handleChange(e, setFormData)}
-              required
-            />
-          </label>
-          <label>
-            Category:
-            <select
-              name="category"
-              value={formData.category}
-              onChange={(e) => handleChange(e, setFormData)}
-              required
-            >
-              <option value="">Select Category</option>
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Tags:
-            <select
-              name="tags"
-              value={formData.tags}
-              onChange={(e) => handleChange(e, setFormData)}
-              required
-            >
-              <option value="">Select Tags</option>
-              {tags.map((tag) => (
-                <option key={tag._id} value={tag._id}>
-                  {tag.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Special Discount:
-            <input
-              type="number"
-              name="specialDiscount"
-              value={formData.specialDiscount}
-              onChange={(e) => handleChange(e, setFormData)}
-            />
-          </label>
-          <label>
-            Booking Open:
-            <input
-              type="checkbox"
-              name="isBookingOpen"
-              checked={formData.isBookingOpen}
-              onChange={(e) => handleChange(e, setFormData)}
-            />
-          </label>
-          <label>
-            Rating (0-5):
-            <input
-              type="number"
-              name="rating"
-              value={formData.rating}
-              onChange={handleRatingChange}
-            />
-          </label>
-          <label>
+  <h2 className="form-title">Create New Activity</h2>
+  <form onSubmit={handleCreateSubmit} className="modern-form">
+    <div className="form-row">
+      <div className="form-group">
+        <label>Date:</label>
+        <input
+          type="date"
+          name="date"
+          value={formData.date}
+          onChange={(e) => handleChange(e, setFormData)}
+          required
+          className="input-field"
+        />
+      </div>
+      <div className="form-group">
+        <label>Time:</label>
+        <input
+          type="time"
+          name="time"
+          value={formData.time}
+          onChange={(e) => handleChange(e, setFormData)}
+          required
+          className="input-field"
+        />
+      </div>
+    </div>
+
+    <div className="form-row">
+      <div className="form-group full-width">
+        <label>Location: (Click on the map to place the pin)</label>
+        <input
+          type="text"
+          placeholder="Search location..."
+          value={searchLocation}
+          onChange={(e) => setSearchLocation(e.target.value)}
+          className="input-field"
+        />
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="reply-button"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+    <div className="map-container">
+      <MapContainer
+        center={pinPosition}
+        zoom={13}
+        style={{ height: "400px", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <LocationMarker />
+      </MapContainer>
+    </div>
+
+    <div className="form-row">
+      <div className="form-group">
+        <label>Price:</label>
+        <input
+          type="number"
+          name="price"
+          value={formData.price}
+          onChange={(e) => handleChange(e, setFormData)}
+          required
+          className="input-field"
+        />
+      </div>
+      <div className="form-group">
+        <label>Category:</label>
+        <select
+          name="category"
+          value={formData.category}
+          onChange={(e) => handleChange(e, setFormData)}
+          required
+          className="input-field"
+        >
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category._id} value={category._id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <div className="form-row">
+      <div className="form-group">
+        <label>Tags:</label>
+        <select
+          name="tags"
+          value={formData.tags}
+          onChange={(e) => handleChange(e, setFormData)}
+          required
+          className="input-field"
+        >
+          <option value="">Select Tags</option>
+          {tags.map((tag) => (
+            <option key={tag._id} value={tag._id}>
+              {tag.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="form-group">
+        <label>Special Discount:</label>
+        <input
+          type="number"
+          name="specialDiscount"
+          value={formData.specialDiscount}
+          onChange={(e) => handleChange(e, setFormData)}
+          className="input-field"
+        />
+      </div>
+    </div>
+
+    <div className="form-row">
+  <div className="form-group custom-checkbox-group">
+    <input
+      type="checkbox"
+      name="isBookingOpen"
+      id="isBookingOpen"
+      checked={formData.isBookingOpen}
+      onChange={(e) => handleChange(e, setFormData)}
+      className="custom-checkbox"
+    />
+    <label htmlFor="isBookingOpen" className="custom-checkbox-label">
+      Booking Open
+    </label>
+  </div>
+  <div className="form-group custom-checkbox-group">
     <input
       type="checkbox"
       name="isActive"
+      id="isActive"
       checked={formData.isActive}
-      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+      onChange={(e) =>
+        setFormData((prev) => ({ ...prev, isActive: e.target.checked }))
+      }
+      className="custom-checkbox"
     />
-    Is Active
-  </label>
-          <button type="submit">Create Activity</button>
-        </form>
-      </section>
+    <label htmlFor="isActive" className="custom-checkbox-label">
+      Is Active
+    </label>
+</div>
+
+      <div className="form-group">
+        <label>Rating (0-5):</label>
+        <input
+          type="number"
+          name="rating"
+          value={formData.rating}
+          onChange={handleRatingChange}
+          className="input-field"
+        />
+      </div>
+    </div>
+
+  
+
+    <button type="submit" className="reply-button">
+      Create Activity
+    </button>
+  </form>
+</section>
+
   
       {/* Form for editing an activity */}
       {editData && (
@@ -512,22 +638,25 @@ const ActivityCRUD = () => {
                     <p>Rating: {activity.rating}</p>
                     <p>Price: {activity.price} EGP</p>
                     <p>Active: {activity.isActive ? "Yes" : "No"}</p>
-                  </div>
-                  {/* Edit and Delete buttons */}
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <button
                       onClick={() => handleEdit(activity._id)}
-                      style={{ marginBottom: '10px' }}
-                    >
+                      className="reply-button"
+                      >
+                    
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(activity._id)}
-                      style={{ backgroundColor: 'red', color: '#fff' }}
-                    >
+                      className="reply-button"
+                      >
+                    
                       Delete
                     </button>
                   </div>
+                  </div>
+                  {/* Edit and Delete buttons */}
+                
                   <iframe
                     src={mapSrc}
                     width="250"
@@ -536,6 +665,7 @@ const ActivityCRUD = () => {
                     title={`Map of ${activity.location}`}
                   ></iframe>
                 </div>
+                
               );
             })}
           </div>
@@ -543,6 +673,28 @@ const ActivityCRUD = () => {
           <p>No activities found.</p>
         )}
       </section>
+    </div>
+    </div>
+    <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </div>
   );
   

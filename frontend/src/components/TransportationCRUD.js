@@ -3,6 +3,13 @@ import axios from "axios";
 import "../App.css";
 import { useNavigate } from 'react-router-dom';
 
+import "../AdvertiserDetails.css"; // Import the updated styles
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from './logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
+import sidebarImage from './logoo444.JPG';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const TransportationPage = () => {
   const [formData, setFormData] = useState({
     date: "",
@@ -19,6 +26,7 @@ const TransportationPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const API_URL = "http://localhost:8000";
   const navigate = useNavigate();
+  const adverId = localStorage.getItem("userId"); // Retrieve the Tour Guide ID from local storage
 
   // Fetch all transportations on component mount
   useEffect(() => {
@@ -44,7 +52,38 @@ const TransportationPage = () => {
   const handleHomeNavigation = () => {
     navigate('/list'); // Adjust this path according to your routing setup
   };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
 
+  // Function to handle account deletion
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/home/adver/deletMyAccount/${adverId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userId = localStorage.getItem("userId"); // Fetch advertiser ID from localStorage
@@ -83,223 +122,217 @@ const TransportationPage = () => {
   };
 
   return (
-    <div style={styles.transportationPage}>
-      {/* Home Button */}
-      <button onClick={handleHomeNavigation} className="home-button">
-        Home
-      </button>
-      <h2 style={styles.pageTitle}>Create Transportation</h2>
-      <form style={styles.transportationForm} onSubmit={handleSubmit}>
-        <input
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="time"
-          name="time"
-          value={formData.time}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="text"
-          name="startLocation"
-          placeholder="Start Location"
-          value={formData.startLocation}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="text"
-          name="endLocation"
-          placeholder="End Location"
-          value={formData.endLocation}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Price ($)"
-          value={formData.price}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="text"
-          name="vehicleType"
-          placeholder="Vehicle Type"
-          value={formData.vehicleType}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="number"
-          name="seatsAvailable"
-          placeholder="Seats Available"
-          value={formData.seatsAvailable}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        <input
-          type="text"
-          name="driverName"
-          placeholder="Driver Name"
-          value={formData.driverName}
-          onChange={handleInputChange}
-          required
-          style={styles.input}
-        />
-        
-        <button type="submit" style={styles.submitButton}>
-          Create Transportation
-        </button>
-        {error && <p style={styles.errorMessage}>{error}</p>}
-        {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
-      </form>
+    <div className="advertiser-page">
+      {/* Navbar */}
+      <Navbar className="advertiser-navbar">
+        <Container>
+          <Navbar.Brand href="#" className="advertiser-navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+          <Nav className="ml-auto">
+            <Nav.Link href="/Upcoming-activities" className="nav-link">
+              Activities
+            </Nav.Link>
+            <Nav.Link href="/Upcoming-itineraries" className="nav-link">
+              Itineraries
+            </Nav.Link>
+            <Nav.Link href="/all-historicalplaces" className="nav-link">
+              Historical Places
+            </Nav.Link>
+            <Nav.Link href="/all-museums" className="nav-link">
+              Museums
+            </Nav.Link>
+          </Nav>
+        </Container>
+      </Navbar>
 
-      <h3 style={styles.sectionTitle}>Available Transportations</h3>
-      <div style={styles.transportationCards}>
-        {transportations.length > 0 ? (
-          transportations.map((transport) => (
-            <div key={transport._id} style={styles.transportationCard}>
-              <h4 style={styles.cardTitle}>{transport.vehicleType}</h4>
-              <p>
-                <strong>Date:</strong> {new Date(transport.date).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Time:</strong> {transport.time}
-              </p>
-              <p>
-                <strong>From:</strong> {transport.startLocation}
-              </p>
-              <p>
-                <strong>To:</strong> {transport.endLocation}
-              </p>
-              <p>
-                <strong>Price:</strong> ${transport.price}
-              </p>
-              <p>
-                <strong>Seats Available:</strong> {transport.seatsAvailable}
-              </p>
-              <p>
-                <strong>Driver:</strong> {transport.driverName}
-              </p>
-              <p
-                style={{
-                  ...styles.bookingStatus,
-                  color: transport.isBookingOpen ? "green" : "red",
-                }}
-              >
-                {transport.isBookingOpen ? "Booking Open" : "Booking Closed"}
-              </p>
-            </div>
-          ))
-        ) : (
-          <p style={styles.noTransportations}>No transportations available.</p>
-        )}
+      <div className="advertiser-container">
+        {/* Sidebar */}
+        <div className="advertiser-sidebar">
+          <h3 className="sidebar-heading">Welcome</h3>
+          <button onClick={() => navigate("/list")} className="sidebar-button">
+            Home
+          </button>
+          <button onClick={handleLogout} className="sidebar-button">
+            Logout
+          </button>
+          <button onClick={handleDeleteAccount} className="sidebar-button">
+            Delete Account
+          </button>
+          <div className="advertiser-sidebar-image-container">
+            <img src={sidebarImage} alt="Sidebar" className="advertiser-sidebar-image" />
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="advertiser-main-content">
+          <h1 className="header">Transportation Page</h1>
+
+          <h2 className="section-heading">Create Transportation</h2>
+          <Form className="modern-form" onSubmit={handleSubmit}>
+            <Row>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Time</Form.Label>
+                  <Form.Control
+                    type="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Start Location</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="startLocation"
+                    value={formData.startLocation}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>End Location</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="endLocation"
+                    value={formData.endLocation}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Price</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Vehicle Type</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="vehicleType"
+                    value={formData.vehicleType}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Seats Available</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="seatsAvailable"
+                    value={formData.seatsAvailable}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Driver Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="driverName"
+                    value={formData.driverName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Button type="submit" className="reply-button">
+              Create Transportation
+            </Button>
+          </Form>
+          {successMessage && <p className="success-message">{successMessage}</p>}
+          {error && <p className="error-message">{error}</p>}
+
+          <h2 className="section-heading">Available Transportations</h2>
+          <Row>
+  {transportations.map((transport) => (
+    <Col md={4} key={transport._id} className="transportation-card">
+      <div className="card">
+        <h4 className="card-header">{transport.vehicleType}</h4>
+        <div className="card-body">
+          <p>
+            <strong>Date:</strong> {new Date(transport.date).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Time:</strong> {transport.time}
+          </p>
+          <p>
+            <strong>From:</strong> {transport.startLocation}
+          </p>
+          <p>
+            <strong>To:</strong> {transport.endLocation}
+          </p>
+          <p>
+            <strong>Price:</strong> ${transport.price}
+          </p>
+          <p>
+            <strong>Seats Available:</strong> {transport.seatsAvailable}
+          </p>
+          <p>
+            <strong>Driver:</strong> {transport.driverName}
+          </p>
+        </div>
+      </div>
+    </Col>
+  ))}
+</Row>
+
+        </div>
+      </div>
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );
-};
-
-// Inline styles
-const styles = {
-  transportationPage: {
-    fontFamily: "Arial, sans-serif",
-    padding: "20px",
-    backgroundColor: "#f4f4f4",
-    maxWidth: "1200px",
-    margin: "auto",
-  },
-  pageTitle: {
-    textAlign: "center",
-    fontSize: "2.5rem",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  transportationForm: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "15px",
-    marginBottom: "30px",
-    justifyContent: "center",
-  },
-  input: {
-    padding: "10px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "1rem",
-    width: "calc(33.33% - 10px)",
-  },
-  submitButton: {
-    padding: "10px 20px",
-    borderRadius: "5px",
-    border: "none",
-    fontSize: "1rem",
-    backgroundColor: "#007bff",
-    color: "white",
-    cursor: "pointer",
-    transition: "background-color 0.3s",
-  },
-  bookingLabel: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  errorMessage: {
-    color: "red",
-    textAlign: "center",
-    marginTop: "10px",
-  },
-  successMessage: {
-    color: "green",
-    textAlign: "center",
-    marginTop: "10px",
-  },
-  sectionTitle: {
-    textAlign: "center",
-    fontSize: "2rem",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  transportationCards: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "20px",
-    justifyContent: "center",
-  },
-  transportationCard: {
-    backgroundColor: "white",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    padding: "20px",
-    width: "300px",
-    textAlign: "left",
-  },
-  cardTitle: {
-    marginBottom: "10px",
-    fontSize: "1.5rem",
-    color: "#007bff",
-  },
-  bookingStatus: {
-    fontWeight: "bold",
-  },
-  noTransportations: {
-    textAlign: "center",
-    fontSize: "1.2rem",
-    color: "#666",
-  },
 };
 
 export default TransportationPage;
