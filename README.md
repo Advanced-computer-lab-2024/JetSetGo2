@@ -11,7 +11,8 @@ We follow the StandardJS code style guidelines for JavaScript.
 ## Screenshots
 ![image](https://github.com/user-attachments/assets/7308cf9c-1722-4a75-a26f-fcbe2b1b039e)
 
-![image](https://github.com/user-attachments/assets/0490c236-9969-443a-8f6b-5d5d5bed4d6b)
+![image](https://github.com/user-attachments/assets/be5f7e07-52e8-445c-93fa-1539bc386b42)
+
 
 
 
