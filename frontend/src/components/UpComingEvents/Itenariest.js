@@ -8,6 +8,21 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import img1 from "../logoo4.JPG";
+
+import {
+  Navbar,
+  Nav,
+  Container,
+  Row,
+  Col,
+  Tab,
+  Tabs,
+  Dropdown,
+  Form,
+  Button,
+} from "react-bootstrap";
+import "../../css/itenarist.css";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -107,6 +122,12 @@ const Itinerariest = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
+  const [touristData, setTouristData] = useState({
+    UserName: "",
+    Loyalty_Level: 0,
+    Loyalty_Points: 0,
+    Wallet: 0,
+  });
 
   const [Tags, setTags] = useState([]);
   const [userPreferences, setUserPreferences] = useState([]); 
@@ -377,6 +398,8 @@ const Itinerariest = () => {
       "Enter payment method (wallet/card):"
     ).toLowerCase();
 
+    const promoCode = prompt("Enter Promo code:");
+
     if (!touristId) {
       alert("Tourist ID not found. Please log in.");
       return;
@@ -385,7 +408,7 @@ const Itinerariest = () => {
     try {
       const response = await axios.patch(
         `http://localhost:8000/itinerary/book/${id}`,
-        { userId: touristId, paymentMethod, promoCode: "SAVE20" }
+        { userId: touristId, paymentMethod, promoCode }
       );
 
       if (response.status === 200) {
@@ -530,13 +553,175 @@ const Itinerariest = () => {
     }
   };
 
+  const handleUpdateClick = () => {
+    navigate("/tourist-update");
+  };
+
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem("userToken"); // Example: remove token from localStorage
+    navigate("/login"); // Redirect to the login page
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/home/tourist/deletMyAccount/${touristId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        // Handle errors, such as when there are upcoming booked itineraries
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
+
+  const loyaltyImages = {
+    1: "https://readingbydesign.org/sites/default/files/badges/champ_level01.png",
+    2: "https://readingbydesign.org/sites/default/files/badges/champ_level02.png",
+    3: "https://readingbydesign.org/sites/default/files/badges/champ_level03.png",
+    // Add more levels as needed
+  };
+  const getLoyaltyImage = () => {
+    // Fallback image if level is undefined or no matching level found
+    return (
+      loyaltyImages[touristData.Loyalty_Level] ||
+      "https://readingbydesign.org/sites/default/files/badges/champ_level01.png"
+    );
+  };
+
+  const handleRedeemPoints = async () => {
+    if (touristData.Loyalty_Points <= 0) {
+      return;
+    }
+
+    try {
+      // Make the PUT request to redeem points
+      const response = await axios.put(
+        `http://localhost:8000/home/tourist/redeempoints/${touristId}`
+      );
+
+      // Update the state with the response data (wallet balance and remaining points)
+      // setTouristData((prevData) => ({
+      //   ...prevData,
+      //   wallet: response.data.wallet,
+      //   Loyalty_Points: response.data.loyaltyPointsRemaining,
+      // }));
+      setTouristData((prevData) => ({
+        ...prevData,
+        wallet: response.data.wallet, // Update touristData wallet
+        Loyalty_Points: response.data.loyaltyPointsRemaining, // Update touristData points
+      }));
+    } catch (error) {
+      console.error("Error redeeming points:", error);
+    }
+  };
+
   return (
-    <div id="itineraries">
-      <div className="back-button-container">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          Back
-        </button>
+    <div className="tourist-page">
+      {/* Navbar */}
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand
+            href="#"
+            style={{
+              transform: "translateX(-50px)",
+              paddingLeft: "0",
+              marginLeft: "0",
+            }}
+          >
+            <img src={img1} alt="Logo" />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ml-auto">
+              {/* Cart Icon */}
+              <Nav.Link href="#" onClick={() => navigate("/cart")}>
+                <i
+                  className="fas fa-shopping-cart"
+                  style={{ fontSize: "20px" }}
+                ></i>
+              </Nav.Link>
+
+              {/* Wishlist Icon */}
+              <Nav.Link href="#" onClick={() => navigate("/wishlist")}>
+                <i className="fas fa-heart" style={{ fontSize: "20px" }}></i>
+              </Nav.Link>
+
+              {/* Notification Bell Icon */}
+              <Nav.Link href="#" onClick={() => navigate("/notifications")}>
+                <i className="fas fa-bell" style={{ fontSize: "20px" }}></i>
+              </Nav.Link>
+
+              {/* Tourist Dropdown */}
+              <Nav.Link className="profile-nav">
+                <img
+                  src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg"
+                  alt="Profile"
+                  className="navbar-profile-image"
+                />
+              </Nav.Link>
+              <Nav.Link>
+                <span className="navbar-profile-name">
+                  {touristData.UserName}
+                </span>
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      <div className="tourist-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <div className="loyalty-section">
+            <div className="loyalty-container">
+              <img
+                src={getLoyaltyImage()}
+                alt="Loyalty Level"
+                className="loyalty-image"
+              />
+              <p className="wallet-text">
+                Loyalty Level: {touristData.Loyalty_Level}
+              </p>
+            </div>
+            <div className="wallet-details">
+              <p className="wallet-text">
+                Loyalty Points: {touristData.Loyalty_Points}
+              </p>
+              <p className="wallet-text">Wallet: $ {touristData.Wallet}</p>
+            </div>
+          </div>
+          <div className="button-container">
+            <button className="sidebar-button" onClick={handleRedeemPoints}>
+              <i className="fas fa-gift"></i> Redeem Points
+            </button>
+            <button className="sidebar-button" onClick={handleUpdateClick}>
+              <i className="fas fa-user-edit"></i> Update Profile
+            </button>
+            <button className="sidebar-button" onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <button className="sidebar-button" onClick={handleDeleteAccount}>
+              <i className="fas fa-trash-alt"></i> Delete Account
+            </button>
+          </div>
+        </div>
       </div>
+
       <h2 className="title">Upcoming Itineraries</h2>
 
       {/* Filter and Sort controls */}
