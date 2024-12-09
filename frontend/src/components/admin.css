@@ -13,7 +13,7 @@
   .navbar-profile-image {
     width: 40px; /* Adjust the size as needed */
     height: 40px; /* Adjust the size as needed */
-    border-radius: 50%; /* Make the image circular */
+    border-radius: 40%; /* Make the image circular */
     margin-right: 10px; /* Add some space between the image and the text */
     margin-left: 950px;
   }

@@ -219,6 +219,8 @@ app.post("/home/tourist/bookFlight", async (req, res) => {
       return res.status(400).json({ message: "Invalid payment method." });
     }
 
+    console.log(flight);
+
     // Step 3: Finalize flight booking
     console.log("Finalizing flight booking...");
     tourist.bookedFlights.push(flight);
