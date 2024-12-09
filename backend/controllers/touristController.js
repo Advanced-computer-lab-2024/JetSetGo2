@@ -12,6 +12,162 @@ const Notification = require("../models/Notification.js");
 const PreferenceTag = require("../models/preferanceTagsCRUD.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Ensure Stripe is initialized
+
+const bookTransportation = async (req, res) => {
+  const { touristId, transportationId } = req.params;
+  const { paymentMethod } = req.body;
+
+  try {
+    console.log("Booking Transportation:", { touristId, transportationId, paymentMethod });
+
+    // Check if touristId and transportationId are valid ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(touristId) || !mongoose.Types.ObjectId.isValid(transportationId)) {
+      console.error("Error: Invalid touristId or transportationId.");
+      return res.status(400).json({ error: "Invalid tourist or transportation ID." });
+    }
+
+    // Find the transportation
+    const transportation = await transportationModel.findById(transportationId);
+    if (!transportation) {
+      console.error("Error: Transportation not found.");
+      return res.status(404).json({ error: "Transportation not found." });
+    }
+    console.log("Transportation found:", transportation);
+
+    if (!transportation.isBookingOpen) {
+      console.error("Error: Booking is closed for this transportation.");
+      return res.status(400).json({ error: "Booking is closed for this transportation." });
+    }
+
+    if (transportation.seatsAvailable <= 0) {
+      console.error("Error: No available seats.");
+      return res.status(400).json({ error: "No available seats." });
+    }
+
+    // Find the tourist
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      console.error("Error: Tourist not found.");
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+    console.log("Tourist found:", tourist);
+
+    // Handle card payment
+    if (paymentMethod === "card") {
+      console.log("Initiating Stripe Payment...");
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: transportation.price * 100, // Convert price to cents
+        currency: "usd",
+        metadata: {
+          transportationId,
+          touristId,
+        },
+      });
+      console.log("Stripe Payment Initiated:", paymentIntent);
+
+      return res.status(200).json({
+        clientSecret: paymentIntent.client_secret,
+        message: "Payment initiated. Confirm payment on the frontend.",
+      });
+    } 
+    // Handle wallet payment
+    else if (paymentMethod === "wallet") {
+      if (tourist.Wallet < transportation.price) {
+        console.error("Error: Insufficient wallet balance.");
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+
+      console.log("Processing wallet payment...");
+      tourist.Wallet -= transportation.price;
+      transportation.seatsAvailable -= 1;
+
+      if (transportation.seatsAvailable === 0) {
+        transportation.isBookingOpen = false;
+      }
+
+      await transportation.save();
+      await tourist.save();
+
+      console.log("Wallet payment successful.");
+      return res.status(200).json({
+        message: "Transportation booked successfully using wallet.",
+        tourist,
+        transportation,
+      });
+    } 
+    // Handle invalid payment method
+    else {
+      console.error("Error: Invalid payment method.");
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+  } catch (error) {
+    console.error("Error during transportation booking:", error);
+    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+  }
+};
+const finalizeTransportationBooking = async (req, res) => {
+  const { transportationId } = req.params;
+  const { userId, paymentIntentId } = req.body;
+
+  try {
+    console.log("Finalizing booking for Transportation:", { transportationId, userId, paymentIntentId });
+
+    // Validate transportationId and userId
+    if (!mongoose.Types.ObjectId.isValid(transportationId) || !mongoose.Types.ObjectId.isValid(userId)) {
+      console.error("Error: Invalid transportationId or userId.");
+      return res.status(400).json({ error: "Invalid transportation or user ID." });
+    }
+
+    // Validate transportation existence
+    const transportation = await transportationModel.findById(transportationId);
+    if (!transportation) {
+      console.error("Error: Transportation not found.");
+      return res.status(404).json({ error: "Transportation not found." });
+    }
+    console.log("Transportation found:", transportation);
+
+    // Validate tourist existence
+    const tourist = await touristModel.findById(userId);
+    if (!tourist) {
+      console.error("Error: Tourist not found.");
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+    console.log("Tourist found:", tourist);
+
+    // Verify PaymentIntent status
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (!paymentIntent) {
+      console.error("Error: PaymentIntent not found.");
+      return res.status(400).json({ error: "PaymentIntent not found." });
+    }
+    console.log("Retrieved PaymentIntent:", paymentIntent);
+
+    if (paymentIntent.status !== "succeeded") {
+      console.error("Error: Payment not confirmed. Status:", paymentIntent.status);
+      return res.status(400).json({ error: `Payment not confirmed. Status: ${paymentIntent.status}` });
+    }
+
+    // Prevent duplicate finalization
+
+    // Finalize the booking
+    transportation.seatsAvailable -= 1;
+    if (transportation.seatsAvailable === 0) {
+      transportation.isBookingOpen = false;
+    }
+    await transportation.save();
+
+    tourist.bookedTransportations.push(transportationId);
+    await tourist.save();
+
+    console.log("Transportation booking finalized successfully.");
+    res.status(200).json({ message: "Transportation booking finalized successfully." });
+  } catch (error) {
+    console.error("Error finalizing transportation booking:", error);
+    res.status(500).json({ error: "Internal Server Error.", details: error.message });
+  }
+};
+
 
 const createTourist = async (req, res) => {
   // create a tourist after sign up
@@ -159,52 +315,7 @@ function calculateLoyaltyPoints(level, price) {
   return points;
 }
 
-const bookTransportation = async (req, res) => {
-  const { touristId, transportationId } = req.params;
 
-  try {
-    const transportation = await transportationModel.findById(transportationId);
-
-    if (!transportation) {
-      return res.status(404).json({ error: "Transportation not found" });
-    }
-
-    if (!transportation.isBookingOpen) {
-      return res
-        .status(400)
-        .json({ error: "Booking is closed for this transportation." });
-    }
-
-    if (transportation.seatsAvailable <= 0) {
-      return res.status(400).json({ error: "No available seats." });
-    }
-
-    const tourist = await touristModel.findById(touristId);
-
-    if (!tourist) {
-      return res.status(404).json({ error: "Tourist not found" });
-    }
-
-    // Decrement seat and close booking if seats reach 0
-    transportation.seatsAvailable -= 1;
-    if (transportation.seatsAvailable === 0) {
-      transportation.isBookingOpen = false; // Close booking when no seats are left
-    }
-    await transportation.save();
-
-    // Add the booked transportation to the tourist's bookings
-    tourist.bookedTransportations.push(transportation._id);
-    await tourist.save();
-
-    res.status(200).json({
-      message: "Transportation booked successfully",
-      transportation,
-      tourist,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 const buyProduct = async (req, res) => {
   const { touristId, productIds, addressId } = req.body;
@@ -225,7 +336,7 @@ const buyProduct = async (req, res) => {
       const product = await productModel.findById(productId);
 
       if (!product) {
-        return res.status(404).json({ error: `Product not found: ${productId}` });
+        return res.status(404).json(`{ error: Product not found: ${productId} }`);
       }
 
       // Update product stock, add purchase record, etc.
@@ -245,6 +356,7 @@ const buyProduct = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
 const buyProducts = async (req, res) => {
   const { touristId, addressId } = req.body;
 
@@ -253,7 +365,7 @@ const buyProducts = async (req, res) => {
   }
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("cart");
+    const tourist = await touristModel.findById(touristId).populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found." });
     }
@@ -265,22 +377,29 @@ const buyProducts = async (req, res) => {
 
     const processedProducts = [];
 
-    for (const product of cartItems) {
+    for (const cartItem of cartItems) {
+      const product = cartItem.product;
+      const quantity = cartItem.quantity;
+
       // Check stock availability
-      if (product.availableQuantity <= 0) {
-        return res
-          .status(400)
-          .json({ error: `Product '${product.description}' is out of stock.` });
+      if (product.availableQuantity < quantity) {
+        return res.status(400).json({
+          error: `Product '${product.description}' has insufficient stock. Available: ${product.availableQuantity}, Requested: ${quantity}`,
+        });
       }
 
       // Deduct stock and save product
-      product.availableQuantity -= 1;
+      product.availableQuantity -= quantity;
+      product.sales += quantity;
       await product.save();
 
-      // Add product to the purchase history
-      tourist.purchasedProducts.push(product._id);
+      // Add product and quantity to the purchase history
+      tourist.purchasedProducts.push({
+        product: product._id,
+        quantity,
+      });
 
-      processedProducts.push(product);
+      processedProducts.push({ product, quantity });
     }
 
     // Clear the cart after successful purchase
@@ -296,7 +415,6 @@ const buyProducts = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
-
 
 
 const getBookedTransportations = async (req, res) => {
@@ -363,9 +481,8 @@ const getPurchasedProducts = async (req, res) => {
 
     // Fetch and populate purchased products
     const populatedProducts = await Promise.all(
-      tourist.purchasedProducts.map(async (productId) => {
-        // Fetch the product by ID
-        const product = await productModel.findById(productId);
+      tourist.purchasedProducts.map(async (purchasedItem) => {
+        const product = await productModel.findById(purchasedItem.product);
 
         if (!product) {
           return null; // Skip if product not found
@@ -377,19 +494,22 @@ const getPurchasedProducts = async (req, res) => {
 
         // Attach seller name and role to the product
         return {
-          ...product.toObject(), // Convert Mongoose document to plain object
-          sellerDetails: seller
-            ? { name: seller.Name, role: "Seller" }
-            : admin
-            ? { name: admin.Username, role: "Admin" }
-            : null, // If no match found
+          product: {
+            ...product.toObject(), // Convert Mongoose document to plain object
+            sellerDetails: seller
+              ? { name: seller.Name, role: "Seller" }
+              : admin
+              ? { name: admin.Username, role: "Admin" }
+              : null, // If no match found
+          },
+          quantity: purchasedItem.quantity, // Include the quantity from purchasedProducts
         };
       })
     );
 
     // Filter out null values (e.g., products not found)
     const validProducts = populatedProducts.filter(
-      (product) => product !== null
+      (purchasedProduct) => purchasedProduct !== null
     );
 
     if (validProducts.length === 0) {
@@ -405,6 +525,7 @@ const getPurchasedProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const getTouristNationality = async (req, res) => {
   const { touristId } = req.params;
@@ -460,11 +581,11 @@ const redeemPointsToCash = async (req, res) => {
     // Save the updated tourist
     await tourist.save();
 
-    res.status(200).json({
-      message: `Successfully redeemed ${pointsToRedeem} points for ${cashEquivalent} EGP`,
+    res.status(200).json(`{
+      message: Successfully redeemed ${pointsToRedeem} points for ${cashEquivalent} EGP,
       wallet: tourist.Wallet,
       loyaltyPointsRemaining: tourist.Loyalty_Points,
-    });
+    }`);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -640,76 +761,110 @@ const addReview = async (req, res) => {
     return res.status(500).json({ error: error.message }); // Return error response
   }
 };
+
 const addToCart = async (req, res) => {
   const { touristId, productId } = req.params;
 
   try {
-      const tourist = await touristModel.findById(touristId);
-      if (!tourist) {
-          return res.status(404).json({ error: "Tourist not found" });
-      }
+    // Validate ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(touristId) || !mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "Invalid tourist ID or product ID" });
+    }
 
-      // Ensure `cart` is initialized
-      if (!Array.isArray(tourist.cart)) {
-          tourist.cart = [];
-      }
+    // Find the tourist
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
 
-      const product = await productModel.findById(productId);
-      if (!product) {
-          return res.status(404).json({ error: "Product not found" });
-      }
+    // Initialize `cart` if not already an array
+    if (!Array.isArray(tourist.cart)) {
+      tourist.cart = [];
+    }
 
-      // Check if product is out of stock
-      if (product.availableQuantity <= 0) {
-          return res.status(400).json({ error: `Product '${product.description}' is out of stock.` });
-      }
+    // Find the product
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
 
-      // Add to cart only if not already present
-      if (!tourist.cart.includes(productId)) {
-          tourist.cart.push(productId);
-          await tourist.save();
-          return res.status(200).json({ message: "Product added to cart", cart: tourist.cart });
-      } else {
-          return res.status(400).json({ message: "Product is already in the cart" });
-      }
+    // Check if the product is out of stock
+    if (product.availableQuantity <= 0) {
+      return res.status(400).json({ error: `Product '${product.description}' is out of stock.` });
+    }
+
+    // Check if the product already exists in the cart
+    const existingCartItem = tourist.cart.find(
+      (cartItem) => cartItem.product && cartItem.product.toString() === productId
+    );
+
+    if (existingCartItem) {
+      // If the product is already in the cart, increment the quantity
+      existingCartItem.quantity += 1;
+    } else {
+      // Otherwise, add the product with a default quantity of 1
+      tourist.cart.push({ product: product._id, quantity: 1 });
+    }
+
+    // Save the updated tourist document
+    await tourist.save();
+
+    return res.status(200).json({ message: "Product added to cart", cart: tourist.cart });
   } catch (error) {
-      console.error("Error adding to cart:", error);
-      res.status(500).json({ error: error.message });
+    console.error("Error adding to cart:", error);
+    res.status(500).json({ error: error.message });
   }
 };
-
-
 
 
 const getCart = async (req, res) => {
   const { touristId } = req.params;
 
   try {
-      const tourist = await touristModel.findById(touristId).populate("cart");
-      if (!tourist) {
-          return res.status(404).json({ error: "Tourist not found" });
-      }
-      res.status(200).json(tourist.cart);
+    // Find the tourist and populate the cart
+    const tourist = await touristModel.findById(touristId).populate("cart.product");
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
+
+    // Transform the cart for the response
+    const cartItems = tourist.cart.map((cartItem) => ({
+      product: cartItem.product,
+      quantity: cartItem.quantity,
+    }));
+
+    res.status(200).json(cartItems);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ error: error.message });
   }
 };
+
 const removeFromCart = async (req, res) => {
   const { touristId, productId } = req.params;
 
   try {
-      const tourist = await touristModel.findById(touristId);
-      if (!tourist) {
-          return res.status(404).json({ error: "Tourist not found" });
-      }
+    // Find the tourist
+    const tourist = await touristModel.findById(touristId);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
 
-      tourist.cart = tourist.cart.filter((item) => item.toString() !== productId);
-      await tourist.save();
-      res.status(200).json({ message: "Product removed from cart", cart: tourist.cart });
+    // Filter out the product from the cart
+    tourist.cart = tourist.cart.filter(
+      (item) => item.product.toString() !== productId
+    );
+
+    // Save the updated tourist document
+    await tourist.save();
+
+    res.status(200).json({ message: "Product removed from cart", cart: tourist.cart });
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    console.error("Error removing from cart:", error);
+    res.status(500).json({ error: error.message });
   }
 };
+
 const updateCartQuantity = async (req, res) => {
   const { touristId, productId, quantity } = req.body;
 
@@ -740,19 +895,14 @@ const updateCartQuantity = async (req, res) => {
     }
 
     // Ensure tourist.cart exists and is an array
-    if (!tourist.cart || !Array.isArray(tourist.cart)) {
+    if (!Array.isArray(tourist.cart)) {
       return res.status(400).json({ error: "Cart is not initialized or invalid." });
     }
-    if (!tourist.cart || tourist.cart.length === 0) {
-      return res.status(404).json({ error: "Cart is empty or not initialized" });
-    }
-    
 
     // Find the cart item
     const cartItem = tourist.cart.find(
-      (item) => item.toString() === productId // Compare directly if it's a reference
+      (item) => item.product.toString() === productId
     );
-    
 
     if (!cartItem) {
       return res.status(404).json({ error: "Item not found in cart" });
@@ -761,7 +911,7 @@ const updateCartQuantity = async (req, res) => {
     // Update the quantity
     cartItem.quantity = quantity;
 
-    // Save the updated tourist
+    // Save the updated tourist document
     await tourist.save();
 
     res.status(200).json({ message: "Cart quantity updated successfully", cart: tourist.cart });
@@ -770,6 +920,9 @@ const updateCartQuantity = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
 const addDeliveryAddress = async (req, res) => {
   const { touristId } = req.params;
   const { address, city, state, postalCode, country } = req.body;
@@ -790,6 +943,7 @@ const addDeliveryAddress = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const getTouristAddresses = async (req, res) => {
   const { userId } = req.params; // Get the user ID from the request parameters
 
@@ -809,10 +963,6 @@ const getTouristAddresses = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch addresses" });
   }
 };
-
-
-
-
 
 const addToWishlist = async (req, res) => {
   const { productId } = req.body;
@@ -958,6 +1108,7 @@ module.exports = {
   getWishlist,
   removeFromWishlist,
   buyProducts,
+  finalizeTransportationBooking,
   addPereferenceTags,
   getTouristPreferences
 };

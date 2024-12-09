@@ -289,7 +289,7 @@ const AdvertiserDetails = () => {
         }));
         //setImagePreview(reader.result);
         //console.log(imagePreview);
-        
+
       };
       reader.readAsDataURL(file); // Convert file to base64 URL
     }
@@ -314,7 +314,7 @@ const AdvertiserDetails = () => {
   const sidebarStyle = {
     width: "250px",
     padding: "20px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     borderRadius: "10px",
     color: "#fff",
   };
@@ -352,11 +352,11 @@ const AdvertiserDetails = () => {
       {/* Sidebar */}
       <div style={sidebarStyle}>
         <h3>Welcome</h3>
-        <img 
-                          src={`data:image/png;base64,${advertiser.logo}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
+        <img
+          src={`data:image/png;base64,${advertiser.logo}`}
+          alt="Product"
+          style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+        />
         <button
           onClick={() => setShowDetails(!showDetails)}
           style={buttonStyle}
@@ -385,6 +385,18 @@ const AdvertiserDetails = () => {
         <button onClick={() => navigate("/transportation")} style={buttonStyle}>
           Create Transportation
         </button>
+
+        <button
+          onClick={() =>
+            navigate("/TouristReport", {
+              state: { adverId },
+            })
+          }
+        >
+          View Tourist Report
+        </button>
+
+
         <h3 style={{ color: "#ff6348" }}>Explore</h3>
 
         <button
@@ -408,9 +420,9 @@ const AdvertiserDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
-        <button  onClick={handleLogout}>
-            Logout
-          </button> {/* Logout Button */}
+        <button onClick={handleLogout}>
+          Logout
+        </button> {/* Logout Button */}
         <button
           onClick={handleDeleteAccount}
           style={{
@@ -455,17 +467,17 @@ const AdvertiserDetails = () => {
               <strong>Services:</strong> {advertiser.Services}
             </p>
             <p>
-  <strong>Notifications:</strong>
-  {advertiser.Notifications && advertiser.Notifications.length > 0 ? (
-    <ul>
-      {advertiser.Notifications.map((notification, index) => (
-        <li key={index}>{notification}</li>
-      ))}
-    </ul>
-  ) : (
-    <p>No notifications</p>
-  )}
-</p>
+              <strong>Notifications:</strong>
+              {advertiser.Notifications && advertiser.Notifications.length > 0 ? (
+                <ul>
+                  {advertiser.Notifications.map((notification, index) => (
+                    <li key={index}>{notification}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No notifications</p>
+              )}
+            </p>
           </div>
         )}
 
@@ -558,11 +570,11 @@ const AdvertiserDetails = () => {
               <div>
                 <label>Upload New Logo:</label>
                 <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setAdvertiserFormData)}
-  required
-/>
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, setAdvertiserFormData)}
+                  required
+                />
               </div>
               <button type="submit">Update</button>
               <button
@@ -615,18 +627,18 @@ const AdvertiserDetails = () => {
                   {predefinedLocations.find(
                     (loc) => loc.name === activity.location
                   ) && (
-                    <iframe
-                      title={`Map for ${activity.location}`}
-                      src={generateMapSrc(
-                        predefinedLocations.find(
-                          (loc) => loc.name === activity.location
-                        ).coordinates
-                      )}
-                      width="300"
-                      height="200"
-                      style={{ border: "none" }}
-                    ></iframe>
-                  )}
+                      <iframe
+                        title={`Map for ${activity.location}`}
+                        src={generateMapSrc(
+                          predefinedLocations.find(
+                            (loc) => loc.name === activity.location
+                          ).coordinates
+                        )}
+                        width="300"
+                        height="200"
+                        style={{ border: "none" }}
+                      ></iframe>
+                    )}
                 </div>
               ))
             ) : (

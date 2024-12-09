@@ -67,6 +67,9 @@ import CartPage from './components/CartPage';
 import CheckoutPage from './components/CheckoutPage';
 import PaymentOptionsPage from "./components/PaymentOptionsPage";
 import MyOrders from "./components/MyOrders";
+import SalesReport from "./components/SalesReport";
+import TouristReport from "./components/TouristReport";
+import TourReport from "./components/TourReport";
 
 
 
@@ -131,6 +134,11 @@ function App() {
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
           <Route path="/file-complaint" element={<FileComplaint />} />
           <Route path="/ActivitiesAdmin" element={<ManageActivities />} />
+          <Route path="/Sales-Report" element={<SalesReport />} />
+          <Route path="/TouristReport" element={<TouristReport />} />
+          <Route path="/TourReport" element={<TourReport />} />
+
+          
           <Route
             path="/HistoricalPlacesAdmin"
             element={<ManageHistoricalPlaces />}

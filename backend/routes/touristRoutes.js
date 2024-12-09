@@ -26,6 +26,7 @@ const {
   addDeliveryAddress,
   getTouristAddresses,
   buyProducts,
+  finalizeTransportationBooking,
   addPereferenceTags,
   getTouristPreferences
 } = require("../controllers/touristController");
@@ -35,6 +36,7 @@ router.delete("/remove/:touristId/:productId", removeFromCart);
 router.put("/updateq", updateCartQuantity);
 router.post("/address/:touristId", addDeliveryAddress);
 router.get("/geta/:userId", getTouristAddresses);
+router.post("/transportation/finalizeBooking/:transportationId", finalizeTransportationBooking);
 
 
 

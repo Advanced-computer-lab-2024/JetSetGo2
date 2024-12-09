@@ -243,15 +243,13 @@ const ProductCRUD = () => {
       }}
     >
       {/* Sidebar */}
-      <div
-        style={{
-          width: "250px",
-          padding: "20px",
-          backgroundColor: "#2d3e50",
-          borderRadius: "10px",
-          color: "#fff",
-        }}
-      >
+      <div style={{
+        width: '250px',
+        padding: '20px',
+        //backgroundColor: '#2d3e50',
+        borderRadius: '10px',
+        color: '#fff',
+      }}>
         <h3>Welcome</h3>
         <div style={{ textAlign: "center", marginBottom: "10px" }}>
           <button

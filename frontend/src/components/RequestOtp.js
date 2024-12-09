@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import '../css/RequestOTP.css';
+
 const RequestOtp = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");

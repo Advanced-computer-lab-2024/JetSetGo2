@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const styles = {
   sidebar: {
     width: "250px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "20px",
     borderRadius: "10px",
     color: "#fff",

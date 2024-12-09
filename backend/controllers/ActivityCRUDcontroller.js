@@ -4,6 +4,102 @@ const Category = require("../models/CategoryCRUD");
 const Advertiser = require("../models/AdverMODEL"); // Assuming this is the model for advertiser
 const PrefTag = require("../models/preferanceTagsCRUD");
 const User = require("../models/Tourist.js");
+const Stripe = require("stripe");
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY); // Initialize Stripe with your secret key
+
+const bookactivity = async (req, res) => {
+  const { id } = req.params; // Extract the activity ID from the URL parameters
+  const { userId, paymentMethod } = req.body; // Extract the user ID and payment method
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid Activity ID." });
+  }
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required." });
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+  const activity = await Activity.findById(id);
+  if (activity.bookedUsers.includes(userId)) {
+    return res.status(400).json({ message: "You have already booked this tour." });
+  }
+
+  try {
+    
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found." });
+    }
+
+    if (paymentMethod === "card") {
+      // Create a PaymentIntent for the card payment
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: activity.price * 100, // Convert price to cents
+        currency: "usd", // Set currency
+        metadata: {
+          activityId: id, // Add activity ID to metadata
+          userId: userId, // Add user ID to metadata
+        },
+      });
+
+      return res.status(200).json({
+        clientSecret: paymentIntent.client_secret,
+        message: "Payment initiated. Confirm payment on the frontend.",
+      });
+    } else if (paymentMethod === "wallet") {
+   
+      // Check if the user has sufficient wallet balance
+      if (user.Wallet < activity.price) {
+        return res.status(400).json({
+          message: "Insufficient wallet balance. Please top up your wallet.",
+        });
+      }
+
+      // Deduct the activity price from the user's wallet
+      user.Wallet -= activity.price;
+      await user.save(); // Save the updated user balance
+
+      // Finalize the booking
+      await activity.incrementBookings(userId);
+
+      res.status(200).json({ message: "Booking successful using wallet." });
+    } else {
+      res.status(400).json({ message: "Invalid payment method." });
+    }
+   } catch (error) {
+    console.error("Error during booking:", error);
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+const finalizeActivityBooking = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+  try {
+    const activity = await Activity.findById(id);
+
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found." });
+    }
+
+    if (activity.bookedUsers.includes(userId)) {
+      return res.status(400).json({ message: "You have already booked this activity." });
+    }
+
+    await activity.incrementBookings(userId); // Add user to bookedUsers and increment bookings
+    user.Loyalty_Points += calculateLoyaltyPoints(user.Loyalty_Level, activity.price);
+    await user.save();
+    res.status(200).json({ message: "Booking finalized successfully." });
+  } catch (error) {
+    console.error("Error finalizing booking:", error.message);
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+};
 const adverModel = require('../models/AdverMODEL');
 const sendEmailFlag = require('../utils/sendEmailFlag');
 
@@ -217,74 +313,7 @@ function calculateLoyaltyPoints(level, price) {
   return points;
 }
 
-const bookactivity = async (req, res) => {
-  const { id } = req.params; // Extract the activity ID from the URL parameters
-  const userId = req.body.userId; // Extract the user ID from the request body
 
-  // Check if ID is a valid ObjectId
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid Activity ID." });
-  }
-
-  // Check if userId is provided
-  if (!userId) {
-    return res.status(400).json({ message: "User ID is required." });
-  }
-
-  try {
-    const activity = await Activity.findById(id); // Find the activity by its ID
-    if (!activity) {
-      return res.status(404).json({ message: "Activity not found." });
-    }
-
-    // Increment bookings if the user has not already booked
-    await activity.incrementBookings(userId);
-
-    // Retrieve the user from the database using the userId
-    const user = await User.findById(userId); // Assuming you have a User model
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Use the existing calculateLoyaltyPoints function
-    const loyaltyPoints = calculateLoyaltyPoints(
-      user.Loyalty_Level,
-      activity.price
-    );
-
-    // Add loyalty points to the user's account
-    user.Loyalty_Points = user.Loyalty_Points + loyaltyPoints;
-    user.Total_Loyalty_Points = user.Total_Loyalty_Points + loyaltyPoints;
-
-    if (user.Total_Loyalty_Points >= 500000) {
-      user.Loyalty_Level = 3;
-    } else if (user.Total_Loyalty_Points >= 100000) {
-      user.Loyalty_Level = 2;
-    } else {
-      user.Loyalty_Level = 1;
-    }
-    // Save the updated user record
-    await user.save();
-
-    res.status(200).json({
-      message: "Booking successful",
-      bookings: activity.bookings,
-      earnedPoints: loyaltyPoints, // Include the points earned in the response
-      totalLoyaltyPoints: user.Loyalty_Points, // Include total points in the response
-    });
-  } catch (error) {
-    console.error("Error during booking:", error); // Log error to console for debugging
-    if (error.message.includes("already booked")) {
-      return res
-        .status(400)
-        .json({ message: "You have already booked this activity." });
-    }
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message }); // Send the error message in response
-  }
-};
 
 const deleteAllActivities = async (req, res) => {
   try {
@@ -396,7 +425,55 @@ const flagActivity = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const getTouristReport = async (req, res) => {
+  const { advertiserId } = req.params; // Advertiser ID from request parameters
 
+  try {
+    console.log("Received Advertiser ID:", advertiserId); // Log the advertiserId for debugging
+
+    // Validate advertiserId format
+    if (!mongoose.Types.ObjectId.isValid(advertiserId)) {
+      console.log("Invalid Advertiser ID format.");
+      return res.status(400).json({ message: "Invalid advertiser ID." });
+    }
+
+    // Verify advertiser exists
+    const advertiserExists = await Advertiser.findById(advertiserId);
+    if (!advertiserExists) {
+      console.log("Advertiser not found.");
+      return res.status(404).json({ message: "Advertiser not found." });
+    }
+
+    // Fetch all activities for the advertiser
+    const activities = await Activity.find({ advertiser: advertiserId });
+
+    if (activities.length === 0) {
+      console.log("No activities found for this advertiser.");
+      return res.status(404).json({ message: "No activities found for this advertiser." });
+    }
+
+    // Calculate the total number of tourists
+    const totalTourists = activities.reduce((total, activity) => total + (activity.bookings || 0), 0);
+
+    // Prepare response details
+    const activityDetails = activities.map(({ _id, location, date, bookings }) => ({
+      activityId: _id,
+      location,
+      date,
+      bookings,
+    }));
+
+    // Send response
+    res.status(200).json({
+      advertiserId,
+      totalTourists,
+      activityDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching report:", error.message);
+    res.status(500).json({ message: "Error fetching report", error: error.message });
+  }
+};
 module.exports = {
   createActivity,
   getActivity,
@@ -411,4 +488,6 @@ module.exports = {
   cancelactivity,
   getBookedactivities,
   submitReview,
+  finalizeActivityBooking,
+  getTouristReport
 };

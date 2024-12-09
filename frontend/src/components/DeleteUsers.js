@@ -114,7 +114,7 @@ const TourGuideComponent = () => {
         margin: '10px',
         padding: '10px 20px',
         fontSize: '16px',
-        backgroundColor: '#2d3e50',
+        //backgroundColor: '#2d3e50',
         color: 'white',
         border: 'none',
         borderRadius: '6px',
@@ -131,7 +131,7 @@ const TourGuideComponent = () => {
     };
 
     const handleLeave = (e) => {
-        e.target.style.backgroundColor = '#2d3e50';
+        e.target.style.backgroundColor = '#ffffff';
         e.target.style.transform = 'scale(1)';
     };
 
@@ -262,7 +262,7 @@ const styles = {
     },
     sidebar: {
         width: '250px',
-        backgroundColor: '#2d3e50',
+        //backgroundColor: '#2d3e50',
         padding: '20px',
         borderRadius: '10px',
         color: '#fff',

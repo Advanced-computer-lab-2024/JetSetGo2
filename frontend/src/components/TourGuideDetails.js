@@ -11,7 +11,7 @@ const styles = {
   },
   sidebar: {
     width: "250px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "20px",
     borderRadius: "10px",
     color: "#fff",
@@ -61,7 +61,7 @@ const styles = {
   navbar: {
     display: "flex",
     justifyContent: "space-around",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "10px",
     borderRadius: "5px",
     marginBottom: "20px",
@@ -238,6 +238,15 @@ const TourGuidePage = () => {
           <button onClick={handleSchemaTourFrontPage} style={styles.button}>
             Create/View Itinerary
           </button>
+          <button
+          onClick={() =>
+            navigate("/TourReport", {
+              state: { userId },
+            })
+          }
+        >
+          View Tourist Report
+        </button>
           <button style={styles.button} onClick={handleLogout}>
             Logout
           </button> {/* Logout Button */}

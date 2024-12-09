@@ -237,10 +237,10 @@ const TouristHome = () => {
     3: "https://readingbydesign.org/sites/default/files/badges/champ_level03.png",
     // Add more levels as needed
   };
-const getLoyaltyImage = () => {
-// Fallback image if level is undefined or no matching level found
-return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/sites/default/files/badges/champ_level01.png";
-};
+  const getLoyaltyImage = () => {
+    // Fallback image if level is undefined or no matching level found
+    return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/sites/default/files/badges/champ_level01.png";
+  };
 
 
   return (
@@ -260,7 +260,7 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           <p style={styles.walletText}>Loyalty Points: {points}</p>
           <p style={styles.walletText}>Wallet: $ {Wallet}</p>{" "}
           {/* Display updated wallet */}
-          
+
           <img
             src={getLoyaltyImage()}
             alt="Loyalty Level"
@@ -300,19 +300,19 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
             My Museums
           </button>
           <button
-  onClick={() => navigate("/my-orders")}
-  style={{
-    padding: "10px 20px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginTop: "10px",
-  }}
->
-  My Orders
-</button>
+            onClick={() => navigate("/my-orders")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            My Orders
+          </button>
 
           <button
             onClick={handleDeleteAccount}
@@ -325,20 +325,20 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           >
             Delete Account
           </button>
-<button
-  onClick={() => navigate("/cart")}
-  style={{
-    backgroundColor: "#007bff",
-    color: "#fff",
-    padding: "10px 15px",
-    borderRadius: "5px",
-    border: "none",
-    cursor: "pointer",
-    marginTop: "10px",
-  }}
->
-  View My Cart
-</button>
+          <button
+            onClick={() => navigate("/cart")}
+            style={{
+              backgroundColor: "#007bff",
+              color: "#fff",
+              padding: "10px 15px",
+              borderRadius: "5px",
+              border: "none",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            View My Cart
+          </button>
 
           <button style={styles.button} onClick={handleLogout}>
             Logout
@@ -397,7 +397,7 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
           >
             Select Preferences
           </button>
-          
+
         </nav>
         {/* Booked Flights Section */}
         <div style={styles.bookedFlightsSection}>
@@ -419,7 +419,7 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
                     <strong>Date:</strong> {flight.date}
                   </p>
                   <p>
-                    <strong>Price:</strong> ${flight.price}
+                    <strong>Price:</strong> {flight.price.currency} {flight.price.total}
                   </p>
                 </li>
               ))}
@@ -520,9 +520,9 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
         <div style={styles.resultsContainer}>
           <h3 style={styles.resultsHeader}>Search Results:</h3>
           {searchResults.Museums.length > 0 ||
-          searchResults.HistoricalPlace.length > 0 ||
-          searchResults.activities.length > 0 ||
-          searchResults.itinaries.length > 0 ? (
+            searchResults.HistoricalPlace.length > 0 ||
+            searchResults.activities.length > 0 ||
+            searchResults.itinaries.length > 0 ? (
             <ul style={styles.resultsList}>
               {/* Museums */}
               {searchResults.Museums.map((museum, index) => (
@@ -608,7 +608,7 @@ const styles = {
   },
   sidebar: {
     width: "250px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "20px",
     borderRadius: "10px",
     color: "#fff",
@@ -672,7 +672,7 @@ const styles = {
   },
   searchButton: {
     padding: "10px 20px",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -681,7 +681,7 @@ const styles = {
   navbar: {
     display: "flex",
     justifyContent: "space-around",
-    backgroundColor: "#2d3e50",
+    //backgroundColor: "#2d3e50",
     padding: "10px",
     borderRadius: "5px",
     marginBottom: "20px",
@@ -691,7 +691,7 @@ const styles = {
     textDecoration: "none",
     padding: "10px 15px",
     borderRadius: "4px",
-    backgroundColor: "#2d3e50",
+    // backgroundColor: "#2d3e50",
     fontWeight: "bold",
     transition: "background-color 0.3s",
   },
