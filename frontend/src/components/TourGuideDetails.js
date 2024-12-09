@@ -6,6 +6,7 @@ import sidebarImage from './logoo444.JPG';
 import "../css/TourGuidePage.css"; // Import the CSS file
 import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
 import img1 from './logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
 const TourGuidePage = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const TourGuidePage = () => {
           setTourGuide(response.data);
           setFormData(response.data); // Populate form with fetched data
         } else {
-          setError("No Tour Guide ID found in local storage.");
+          alert("No Tour Guide ID found in local storage.");
         }
       } catch (err) {
         console.error("Error fetching tour guide:", err);
@@ -88,7 +89,7 @@ const TourGuidePage = () => {
 
       setTourGuide(response.data); // Update the local state with the updated tour guide data
       setIsEditing(false); // Exit the edit mode
-      setNotification("Tour guide details updated successfully!");
+      alert("Tour guide details updated successfully!");
     } catch (error) {
       console.error(
         "Error updating tour guide:",
@@ -97,6 +98,7 @@ const TourGuidePage = () => {
       setError("Error updating tour guide.");
     }
   };
+
   const handleImageUpload = (event, setData) => {
     const file = event.target.files[0];
     if (file) {
@@ -157,6 +159,7 @@ const TourGuidePage = () => {
     <div className="tour-guide-page">
       <Navbar className="navbar">
       <Container>
+        
         <Navbar.Brand href="#" className="navbar-brand">
           {/* Replace with your logo */}
           <img src={img1} alt="Logo" className="navbar-logo" />
@@ -186,13 +189,18 @@ const TourGuidePage = () => {
             alt="Product"
             className="profile-image"
           />
-          <p className="profile-name">{tourGuide.UserName}</p>
-          <button onClick={() => setIsEditing(true)} className="sidebar-button">
-            Edit
-          </button>
-          <button onClick={handleSchemaTourFrontPage} className="sidebar-button">
-            Create/View Itinerary
-          </button>
+         <p className="profile-name">
+  {tourGuide.UserName}
+  <FaPen
+    onClick={() => setIsEditing(true)}
+    className="edit-icon"
+    title="Edit Details"
+    size={13} // Adjust the size as needed (e.g., 16px)
+  />
+</p>
+
+          
+          
           <button className="sidebar-button" onClick={handleLogout}>
             Logout
           </button>
@@ -218,115 +226,145 @@ const TourGuidePage = () => {
   <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="tg">
     <Tab eventKey="details" title="Details">
     <div className="complaints-container">
-      {isEditing ? (
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>UserName:</label>
-            <input
-              name="UserName"
-              value={formData.UserName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Password:</label>
-            <input
-              name="Password"
-              value={formData.Password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Email:</label>
-            <input
-              name="Email"
-              value={formData.Email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Age:</label>
-            <input
-              name="Age"
-              value={formData.Age}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Languages Spoken:</label>
-            <input
-              name="LanguagesSpoken"
-              value={formData.LanguagesSpoken}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Mobile Number:</label>
-            <input
-              name="MobileNumber"
-              value={formData.MobileNumber}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Years of Experience:</label>
-            <input
-              name="YearsOfExperience"
-              value={formData.YearsOfExperience}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Previous Work:</label>
-            <input
-              name="PreviousWork"
-              value={formData.PreviousWork}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label>Upload Photo:</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleImageUpload(e, setFormData)}
-              required
-            />
-          </div>
-          <button type="submit" className="button">Update</button>
-          <button type="button" onClick={handleCancel} className="button">Cancel</button>
-        </form>
-      ) : (
-        <ul>
-          <li><strong>UserName:</strong> {tourGuide.UserName}</li>
-          <li><strong>Email:</strong> {tourGuide.Email}</li>
-          <li><strong>Age:</strong> {tourGuide.Age}</li>
-          <li><strong>Languages Spoken:</strong> {tourGuide.LanguagesSpoken}</li>
-          <li><strong>Mobile Number:</strong> {tourGuide.MobileNumber}</li>
-          <li><strong>Years of Experience:</strong> {tourGuide.YearsOfExperience}</li>
-          <li><strong>Previous Work:</strong> {tourGuide.PreviousWork}</li>
-          <li>
-            <strong>Notifications:</strong>
-            {tourGuide.Notifications && tourGuide.Notifications.length > 0 ? (
-              <ul>
-                {tourGuide.Notifications.map((notification, index) => (
-                  <li key={index}>{notification}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No notifications</p>
-            )}
-          </li>
-        </ul>
-      )}
-            </div>
+  {isEditing ? (
+    <Form onSubmit={handleSubmit} className="modern-form">
+      <Form.Group className="mb-3">
+        <Form.Label>UserName</Form.Label>
+        <Form.Control
+          type="text"
+          name="UserName"
+          value={formData.UserName}
+          onChange={handleChange}
+          placeholder="Enter your username"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Password</Form.Label>
+        <Form.Control
+          type="password"
+          name="Password"
+          value={formData.Password}
+          onChange={handleChange}
+          placeholder="Enter your password"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          name="Email"
+          value={formData.Email}
+          onChange={handleChange}
+          placeholder="Enter your email"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Age</Form.Label>
+        <Form.Control
+          type="number"
+          name="Age"
+          value={formData.Age}
+          onChange={handleChange}
+          placeholder="Enter your age"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Languages Spoken</Form.Label>
+        <Form.Control
+          type="text"
+          name="LanguagesSpoken"
+          value={formData.LanguagesSpoken}
+          onChange={handleChange}
+          placeholder="Enter the languages you speak"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Mobile Number</Form.Label>
+        <Form.Control
+          type="text"
+          name="MobileNumber"
+          value={formData.MobileNumber}
+          onChange={handleChange}
+          placeholder="Enter your mobile number"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Years of Experience</Form.Label>
+        <Form.Control
+          type="number"
+          name="YearsOfExperience"
+          value={formData.YearsOfExperience}
+          onChange={handleChange}
+          placeholder="Enter years of experience"
+          required
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Previous Work</Form.Label>
+        <Form.Control
+          type="text"
+          name="PreviousWork"
+          value={formData.PreviousWork}
+          onChange={handleChange}
+          placeholder="Enter your previous work experience"
+        />
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>Upload Photo</Form.Label>
+        <Form.Control
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleImageUpload(e, setFormData)}
+        />
+      </Form.Group>
+      
+      <div className="form-buttons">
+        <Button type="submit" className="reply-button">
+          Update
+        </Button>
+        <Button onClick={handleCancel} className="reply-button" >
+          Cancel
+        </Button>
+      </div>
+    </Form>
+  ) : (
+    <ul>
+      <li><strong>UserName:</strong> {tourGuide.UserName}</li>
+      <li><strong>Email:</strong> {tourGuide.Email}</li>
+      <li><strong>Age:</strong> {tourGuide.Age}</li>
+      <li><strong>Languages Spoken:</strong> {tourGuide.LanguagesSpoken}</li>
+      <li><strong>Mobile Number:</strong> {tourGuide.MobileNumber}</li>
+      <li><strong>Years of Experience:</strong> {tourGuide.YearsOfExperience}</li>
+      <li><strong>Previous Work:</strong> {tourGuide.PreviousWork}</li>
+      <li>
+        <strong>Notifications:</strong>
+        {tourGuide.Notifications && tourGuide.Notifications.length > 0 ? (
+          <ul>
+            {tourGuide.Notifications.map((notification, index) => (
+              <li key={index}>{notification}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No notifications</p>
+        )}
+      </li>
+    </ul>
+  )}
+</div>
 
     </Tab>
 
@@ -336,13 +374,7 @@ const TourGuidePage = () => {
 {/* Right Sidebar */}
 <div className="right-sidebar">
   <div className="sidebar-buttons">
-    <button className="box" onClick={() => navigate("/category")}>Categories</button>
-    <button className="box" onClick={() => navigate("/TagsManagement")}>Tags</button>
-    <button className="box" onClick={() => navigate("/product")}>Products</button>
-    <button className="box" onClick={() => navigate("/activitiesAdmin")}>Activities</button>
-    <button className="box" onClick={() => navigate("/ItinerariesAdmin")}>Itineraries</button>
-    <button className="box" onClick={() => navigate("/MuseumsAdmin")}>Museums</button>
-    <button className="box" onClick={() => navigate("/HistoricalPlacesAdmin")}>Historical Places</button>
+    <button className="box" onClick={() => navigate("/SchemaTourFront")}>Create Itinerary</button>
   </div>
 </div>
       

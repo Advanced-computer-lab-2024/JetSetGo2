@@ -319,3 +319,41 @@
     height: 50px;
     border-radius: 50%;
   }
+  .r-button {
+    background-color: #666278;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .reply-button {
+    background-color: #666278;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .reply-button:hover {
+    background-color: #6D4ECF;
+    color: #fff;
+    padding: 2px 50px;
+    width:70%;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'roboto', sans-serif;
+    flex-basis: 100%; /* Ensure the text takes up full width */
+
+  }
+  .r-button:hover {
+    background-color: #6D4ECF;
+    color: #fff;
+    padding: 2px 50px;
+    width:70%;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'roboto', sans-serif;
+    flex-basis: 100%; /* Ensure the text takes up full width */
+
+  }
