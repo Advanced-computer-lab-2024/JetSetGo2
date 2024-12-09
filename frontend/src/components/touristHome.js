@@ -262,6 +262,7 @@ const TouristHome = () => {
             }}
           >
             <img src={img1} alt="Logo" />
+            
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -516,6 +517,51 @@ const TouristHome = () => {
             <button className="box" onClick={() => navigate("/file-complaint")}>
               File a complain
             </button>
+            <button
+            onClick={() =>
+              navigate("/Select-Perefrence", {
+                state: { touristId: touristId },
+              })
+            }
+            className="box"
+          >
+            Select Preferences
+          </button>
+          <button className="box" onClick={() => navigate("/VacationGuide")}>
+              Vaction Guide
+            </button>
+            <button
+            onClick={() => navigate("/mi", { state: { touristId: touristId } })}
+            className="box"
+          >
+            My Itenaries
+          </button>
+          <button
+            onClick={() =>
+              navigate("/myactivity", { state: { touristId: touristId } })
+            }
+            className="box"
+          >
+            My Activities
+          </button>
+          <button
+            onClick={() =>
+              navigate("/MyUpcomingAct", { state: { touristId: touristId } })
+            }
+            className="box"
+          >
+           Upcoming activities
+          </button>
+          <button
+            onClick={() =>
+              navigate("/MyUpcomingIten", { state: { touristId: touristId } })
+            }
+            className="box"
+          >
+            Upcoming Itenaries
+          </button>
+
+
           </div>
         </div>
       </div>

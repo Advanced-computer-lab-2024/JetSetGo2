@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import "../App.css";
+import { useNavigate , Link} from "react-router-dom";
 import {
   getProducts,
   createProduct,
@@ -339,14 +340,7 @@ const ProductCRUD = () => {
               onChange={(e) => handleChange(e, setFormData)}
               required
             />
-            {/*<label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
-            <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-              name="seller" value={formData.seller} onChange={(e) => handleChange(e, setFormData)} required>
-              <option value="">Select a Seller</option>
-              {sellers.map(seller => (
-                <option key={seller._id} value={seller._id}>{seller.UserName}</option>
-              ))}
-            </select>*/}
+            
             <label style={{ display: "block", marginBottom: "10px" }}>
               Available Quantity:
             </label>
@@ -426,14 +420,7 @@ const ProductCRUD = () => {
                 onChange={(e) => handleChange(e, setEditData)}
                 required
               />
-              {/*<label style={{ display: 'block', marginBottom: '10px' }}>Seller:</label>
-              <select style={{ width: '100%', padding: '8px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
-                name="seller" value={editData.seller} onChange={(e) => handleChange(e, setEditData)} required>
-                <option value="">Select a Seller</option>
-                {sellers.map(seller => (
-                  <option key={seller._id} value={seller._id}>{seller.UserName}</option>
-                ))}
-              </select>*/}
+              
               <label style={{ display: "block", marginBottom: "10px" }}>
                 Available Quantity:
               </label>

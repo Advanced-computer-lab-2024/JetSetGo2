@@ -199,18 +199,7 @@ const Activities = () => {
           <img src={img1} alt="Logo" className="navbar-logo" />
         </Navbar.Brand>
         <Nav className="ml-auto">
-          <Link to="/Upcoming-activities" className="nav-link">
-            Activities
-          </Link>
-          <Link to="/Upcoming-itinerariestg" className="nav-link">
-            Itineraries
-          </Link>
-          <Link to="/all-historicalplaces" className="nav-link">
-            Historical Places
-          </Link>
-          <Link to="/all-museums" className="nav-link">
-            Museums
-          </Link>
+          
         </Nav>
       </Container>
     </Navbar>
@@ -221,12 +210,8 @@ const Activities = () => {
     <button className="sidebar-button" onClick={handleLogout}>
       Logout
     </button>
-    <button className="sidebar-button" onClick={handleRevenuePage} >
-            Revenue Rep
-          </button>
-    <button onClick={handleDeleteAccount} className="sidebar-button">
-      Delete Account
-    </button>
+    
+    
     <button className="sidebar-button" onClick={handleBackClick}>
       Back
     </button>
@@ -398,7 +383,6 @@ const Activities = () => {
     {/* Right Sidebar */}
 <div className="right-sidebar">
   <div className="sidebar-buttons">
-    <button className="box" onClick={() => navigate("/SchemaTourFront")}>Create Itinerary</button>
   </div>
 </div>
     </div>

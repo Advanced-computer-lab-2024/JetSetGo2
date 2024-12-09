@@ -140,7 +140,7 @@ const Activitiest = () => {
   const [clientSecret, setClientSecret] = useState("");
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [currentActivityId, setCurrentActivityId] = useState(null);
-
+  const [userPreferences, setUserPreferences] = useState([]); // New state for user preferences
   const navigate = useNavigate(); // Initialize useNavigate hook
   const location = useLocation(); // Use useLocation to access the state
   const touristId = location.state?.touristId || ""; // Extract touristId from the location state
@@ -148,6 +148,7 @@ const Activitiest = () => {
   useEffect(() => {
     fetchActivities();
     fetchCategories();
+    fetchUserPreferences();
     //fetchActivities1();
   }, []);
 
@@ -424,9 +425,29 @@ const handleRequestNotification = async (activityId) => {
     }
   };
 
+  const fetchUserPreferences = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/home/tourist/preferences/${touristId}`
+      );
+      setUserPreferences(response.data); // Store the full tag objects
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+    }
+  };
+
+
   const applyFilters = () => {
     let filtered = [...activities];
-
+  
+    if (userPreferences.length > 0) {
+      const preferenceIds = userPreferences.map((tag) => tag._id);
+    
+      filtered = filtered.filter((activity) =>
+        activity.tags && preferenceIds.includes(activity.tags._id || activity.tags)
+      );
+    }
+  
     // Apply date filter
     if (filters.date) {
       const filterDate = new Date(filters.date);
@@ -435,9 +456,29 @@ const handleRequestNotification = async (activityId) => {
           new Date(activity.date).toDateString() === filterDate.toDateString()
       );
     }
-
- 
-
+  
+    // Apply category filter
+    if (filters.category) {
+      filtered = filtered.filter(
+        (activity) => activity.category.name === filters.category
+      );
+    }
+  
+    // Apply price range filter
+    if (filters.minPrice || filters.maxPrice) {
+      const minPrice = parseFloat(filters.minPrice) || 0;
+      const maxPrice = parseFloat(filters.maxPrice) || Infinity;
+      filtered = filtered.filter(
+        (activity) => activity.price >= minPrice && activity.price <= maxPrice
+      );
+    }
+  
+    // Apply rating filter
+    if (filters.rating) {
+      const ratingLimit = parseFloat(filters.rating);
+      filtered = filtered.filter((activity) => activity.rating >= ratingLimit);
+    }
+  
     // Sort activities based on selected criteria (price or rating) and order
     filtered.sort((a, b) => {
       if (sortBy === "price") {
@@ -447,13 +488,12 @@ const handleRequestNotification = async (activityId) => {
       }
       return 0;
     });
-
+  
     setFilteredActivities(filtered);
   };
-
   useEffect(() => {
     applyFilters();
-  }, [activities, filters, sortOrder, sortBy]); // Add sortOrder and sortBy to the dependency array
+  }, [activities, filters, sortOrder, sortBy, userPreferences]); // Add sortOrder and sortBy to the dependency array
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;

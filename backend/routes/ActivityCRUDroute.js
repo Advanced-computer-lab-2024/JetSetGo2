@@ -3,7 +3,7 @@ const router = express.Router();
 const {createActivity,finalizeActivityBooking,getBookedactivities,getBookedActivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity, toggleActivation ,
     getBookedactivity ,
     requestNotification, 
-    getNotificationRequests} = require('../controllers/ActivityCRUDcontroller');
+    getNotificationRequests, getTouristReport} = require('../controllers/ActivityCRUDcontroller');
 
 // Define routes
 router.post("/add", createActivity);
@@ -28,6 +28,6 @@ router.get("/notificationRequests/:id", getNotificationRequests);
 router.patch("/toggleActivation/:id", toggleActivation); 
 
 router.post("/finalizeBooking/:id", finalizeActivityBooking); // Finalize booking after payment
-
+router.get("/report/:advertiserId", getTouristReport);
 
 module.exports = router;

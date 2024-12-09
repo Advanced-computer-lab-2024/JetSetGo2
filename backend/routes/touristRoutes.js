@@ -36,6 +36,8 @@ const {
   buyProducts,
   finalizeTransportationBooking,
   cancelOrder,
+  addPereferenceTags,
+  getTouristPreferences
 } = require("../controllers/touristController");
 // routes/touristRoutes.js
 router.delete("/:touristId/cancelOrder/:orderId", cancelOrder);
@@ -104,5 +106,8 @@ router.post("/bookmarkMuseum/:touristId/:museumId", toggleBookmarkMuseum);
 router.post("/:userId/wishlist/add", addToWishlist);
 router.get("/:userId/wishlist", getWishlist);
 router.post("/:userId/wishlist/remove", removeFromWishlist);
+router.post("/addPreferenceTags/:id", addPereferenceTags);
+router.get("/preferences/:id", getTouristPreferences);
+
 
 module.exports = router;

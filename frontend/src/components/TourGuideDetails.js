@@ -212,7 +212,18 @@ const TourGuidePage = () => {
           <button className="sidebar-button" onClick={handleRevenuePage} >
             Revenue Rep
           </button>
-          
+          <button  className="sidebar-button"
+          onClick={() =>
+            navigate("/TourReport", {
+              state: { userId },
+            })
+          }
+        >
+          View Tourist Report
+        </button>
+          <button className="sidebar-button" onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
           <button
             onClick={handleDeleteAccount}
             className="sidebar-button"

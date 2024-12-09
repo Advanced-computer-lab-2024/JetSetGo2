@@ -9,6 +9,7 @@ const { sendEmailToSeller } = require("../utils/prodoutstockmail"); // Import th
 const museumModel = require("../models/MuseumCRUD.js");
 const historicalModel = require("../models/HistoricalPlaceCRUD.js");
 const Notification = require("../models/Notification.js");
+const PreferenceTag = require("../models/preferanceTagsCRUD.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Ensure Stripe is initialized
@@ -492,6 +493,7 @@ const buyProducts = async (req, res) => {
       }
 
       product.availableQuantity -= quantity;
+      product.sales += quantity;
       await product.save();
 
       tourist.purchasedProducts.push({ product: product._id, quantity });
@@ -1419,6 +1421,57 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+const addPereferenceTags = async (req, res) => {
+  const { id } = req.params; // Tourist ID
+  const { tags } = req.body; // Array of tag IDs
+
+  // Validate tags input
+  if (!Array.isArray(tags)) {
+    return res.status(400).json({ error: "Tags must be an array of IDs." });
+  }
+
+  try {
+    // Validate if the tourist exists
+    const tourist = await touristModel.findById(id);
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+
+    // Validate if all tags exist
+    const validTags = await PreferenceTag.find({ _id: { $in: tags } });
+    if (validTags.length !== tags.length) {
+      return res.status(400).json({ error: "One or more tags are invalid." });
+    }
+
+    // Update preference tags
+    tourist.preferenceTags = tags;
+    await tourist.save();
+
+    res.status(200).json({ message: "Preference tags updated successfully.", tourist });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update preference tags." });
+  }
+};
+
+const getTouristPreferences = async (req, res) => {
+  const { id } = req.params; // Tourist ID
+
+  try {
+    // Find the tourist and populate the preferenceTags field
+    const tourist = await touristModel.findById(id).populate("preferenceTags");
+
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found." });
+    }
+
+    // Return the preference tags
+    res.status(200).json(tourist.preferenceTags);
+  } catch (error) {
+    console.error("Error fetching preference tags:", error);
+    res.status(500).json({ error: "Failed to retrieve preference tags." });
+  }
+};
 
 module.exports = {
   createTourist,
@@ -1457,4 +1510,6 @@ module.exports = {
   buyProducts,
   finalizeTransportationBooking,
   cancelOrder,
+  addPereferenceTags,
+  getTouristPreferences
 };

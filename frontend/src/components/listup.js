@@ -295,7 +295,7 @@ const AdvertiserDetails = () => {
         }));
         //setImagePreview(reader.result);
         //console.log(imagePreview);
-        
+
       };
       reader.readAsDataURL(file); // Convert file to base64 URL
     }

@@ -278,28 +278,53 @@ const options = {
       <div className="admin-container">
         {/* Sidebar */}
         <div className="sidebar">
-    <button className="sidebar-button" onClick={() => navigate("/adminCapabilities")}>
-      <i className="fas fa-tachometer-alt"></i> Dashboard
-    </button>
-    <button className="sidebar-button" onClick={() => navigate("/fetchdocuments")}>
-      <i className="fas fa-users"></i> View Users
-    </button>
-    <button className="sidebar-button" onClick={() => navigate("/AddAdmin")}>
-      <i className="fas fa-user-plus"></i> Add An Admin
-    </button>
-    <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
-      <i className="fas fa-user-cog"></i> Manage Users
-    </button>
-    <button className="sidebar-button" onClick={() => navigate("/AddTourismGovernor")}>
-      <i className="fas fa-user-tie"></i> Tourism Governer
-    </button>
-    <button className="sidebar-button" onClick={handleLogout}>
-      <i className="fas fa-sign-out-alt"></i> Logout
-    </button>
-    <div className="sidebar-image-container">
-      <img src={sidebarImage} alt="Sidebar Image" className="sidebar-image" />
-    </div>
-  </div>
+          <button
+            className="sidebar-button"
+            onClick={() => navigate("/adminCapabilities")}
+          >
+            <i className="fas fa-tachometer-alt"></i> Dashboard
+          </button>
+          <button
+            className="sidebar-button"
+            onClick={() => navigate("/fetchdocuments")}
+          >
+            <i className="fas fa-users"></i> View Users
+          </button>
+          <button
+            className="sidebar-button"
+            onClick={() => navigate("/AddAdmin")}
+          >
+            <i className="fas fa-user-plus"></i> Add An Admin
+          </button>
+          <button
+            className="sidebar-button"
+            onClick={() => navigate("/DeleteUsers")}
+          >
+            <i className="fas fa-user-cog"></i> Manage Users
+          </button>
+          <button
+            className="sidebar-button"
+            onClick={() => navigate("/AddTourismGoverner")}
+          >
+            <i className="fas fa-user-tie"></i> Tourism Governer
+          </button>
+          <button
+            className="sidebar-button"
+            onClick={() => navigate("/Sales-Report")}
+          >
+            <i className="fas fa-tachometer-alt"></i> Sales Report
+          </button>
+          <button className="sidebar-button" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i> Logout
+          </button>
+          <div className="sidebar-image-container">
+            <img
+              src={sidebarImage}
+              alt="Sidebar Image"
+              className="sidebar-image"
+            />
+          </div>
+        </div>
 
        {/* Main Content */}
 <div className="main-content">
