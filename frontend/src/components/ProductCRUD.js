@@ -294,20 +294,14 @@ const ProductCRUD = () => {
         )}
 
         {/* Create Product Form */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2>Create New Product</h2>
+        <section className="admin-form">
+          <p>Create New Product</p>
           <form onSubmit={handleCreateSubmit}>
             <label style={{ display: "block", marginBottom: "10px" }}>
               Description:
             </label>
             <input
-              style={{
-                width: "100%",
-                padding: "8px",
-                fontSize: "16px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-              }}
+              
               type="text"
               name="description"
               value={formData.description}
@@ -372,16 +366,7 @@ const ProductCRUD = () => {
             />
             <button
               type="submit"
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#28a745",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "16px",
-                marginTop: "10px",
-              }}
+             className="addadmin-button"
             >
               Create Product
             </button>
@@ -467,15 +452,7 @@ const ProductCRUD = () => {
                 required
               />
               <button
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#2d3e50",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  width: "100%",
-                }}
+                className="addadmin-button"
               >
                 Update Product
               </button>
@@ -483,16 +460,7 @@ const ProductCRUD = () => {
               <button
                 type="button"
                 onClick={handleCancel}
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#ff6348",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  marginTop: "10px",
-                  width: "100%",
-                }}
+                className="back-button"
               >
                 Cancel
               </button>
@@ -501,7 +469,7 @@ const ProductCRUD = () => {
         )}
 
         {/* Product List */}
-        <section style={{ padding: "20px" }}>
+        <section className="complaint-card">
           <h2>Product List</h2>
           <div
             style={{
@@ -648,41 +616,14 @@ const ProductCRUD = () => {
                   >
                     <button
                       onClick={() => handleEdit(product)}
-                      style={{
-                        padding: "8px 12px",
-                        backgroundColor: "#2d3e50",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                        transition: "background-color 0.2s",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#1b2838")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#2d3e50")
-                      }
+                      className="addadmin-button"
+                      
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product._id)}
-                      style={{
-                        padding: "8px 12px",
-                        backgroundColor: "#ff6348",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                        transition: "background-color 0.2s",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#e5533b")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#ff6348")
-                      }
+                      className="addadmin-button"
                     >
                       Delete
                     </button>

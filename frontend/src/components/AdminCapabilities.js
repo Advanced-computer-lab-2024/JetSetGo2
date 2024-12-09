@@ -22,7 +22,13 @@ const AdminCapabilities = () => {
   const [replyText, setReplyText] = useState({});
   const [totalUsers, setTotalUsers] = useState(0);  // State to hold total users count
   const [currentMonth, setCurrentMonth] = useState(null);
-  const [newUsersThisMonth, setNewUsersThisMonth] = useState(0); // State for new users this month
+  const [newUsersThisMonth, setNewUsersThisMonth] = useState({
+    adminCounts: [],
+    adverCounts: [],
+    touristCounts: [],
+    tourGuideCounts: [],
+    sellerCounts: []
+  });
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("desc");
   const [activeTab, setActiveTab] = useState("complaints");
@@ -32,31 +38,53 @@ const AdminCapabilities = () => {
     fetchUserStatistics();
   }, []);
 
-  const userData = {
-    labels: ['Total Users', `Users in Month ${currentMonth}`],
-    datasets: [
-      {
-        label: 'Number of Users',
-        data: [totalUsers, newUsersThisMonth],
-        backgroundColor: ['#4B0082', '#007BFF'],
-        borderColor: ['#4B0082', '#007BFF'],
-        borderWidth: 1,
-      },
-    ],
-  };
+  // Initialize an array to hold the total counts for each month
+const monthlyCounts = new Array(12).fill(0);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'User Statistics',
-      },
+// Helper function to add counts to the monthlyCounts array
+const addCounts = (counts) => {
+  counts.forEach(({ _id, count }) => {
+    monthlyCounts[_id - 1] += count; // _id is the month number (1-12), adjust for 0-based index
+  });
+};
+
+addCounts(newUsersThisMonth.adminCounts);
+addCounts(newUsersThisMonth.adverCounts);
+addCounts(newUsersThisMonth.touristCounts);
+addCounts(newUsersThisMonth.tourGuideCounts);
+addCounts(newUsersThisMonth.sellerCounts);
+
+// Prepare the data for the chart
+const userData = {
+  labels: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ],
+  datasets: [
+    {
+      label: 'Number of Users',
+      data: monthlyCounts,
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1
+    }
+  ]
+};
+
+// Options for the chart
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
     },
-  };
+    title: {
+      display: true,
+      text: 'User Statistics',
+    },
+  },
+};
+
 
   const fetchComplaints = async () => {
     try {
@@ -77,12 +105,11 @@ const AdminCapabilities = () => {
       const response = await axios.get("http://localhost:8000/admin/monthly-users");
 
       // Destructure the response to get currentMonth and totalAcceptedUsersThisMonth
-      const { currentMonth, totalAcceptedUsersThisMonth } = response.data;
+      const totalAcceptedUsersThisMonth = response.data;
 
       // Set the state with the current month and the total number of accepted users
-      setCurrentMonth(currentMonth);  // Store the current month (1-12)
       setNewUsersThisMonth(totalAcceptedUsersThisMonth);  // Store the total new users for the current month
-
+      console.log("New users this month:", totalAcceptedUsersThisMonth);
     } catch (error) {
       console.error("Error fetching user statistics:", error);
     }
@@ -310,9 +337,13 @@ const AdminCapabilities = () => {
     </Tab>
     <Tab eventKey="manage-users" title="User Statistics">
       <div>
-        <div>
-          <Bar data={userData} options={options} />
-        </div>
+      <div className="user-stats-container">
+  <h3 className="section-title">New Users Every Month</h3>
+  <p className="total-users">Total Users: {totalUsers}</p>
+  <div>
+    <Bar data={userData} options={options} />
+  </div>
+</div>
       </div>
     </Tab>
   </Tabs>

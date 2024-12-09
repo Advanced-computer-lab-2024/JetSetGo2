@@ -10,55 +10,53 @@ const getNewUsersByMonth = async (req, res) => {
   try {
     const { year } = req.query;
     const targetYear = year ? parseInt(year) : new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1; // Get the current month (1-based index)
 
-    // Helper function to get the number of users for a specific month
+    // Helper function to get the number of users for each month
     const getMonthlyCounts = async (model) => {
       return await model.aggregate([
         {
           $match: {
             createdAt: {
-              $gte: new Date(`${targetYear}-${currentMonth}-01T00:00:00.000Z`),
-              $lt: new Date(
-                `${targetYear}-${currentMonth + 1}-01T00:00:00.000Z`
-              ),
+              $gte: new Date(`${targetYear}-01-01T00:00:00.000Z`),
+              $lt: new Date(`${targetYear + 1}-01-01T00:00:00.000Z`),
             },
             Admin_Acceptance: true, // Add the condition for admin acceptance
           },
         },
         {
           $group: {
-            _id: null, // No need to group by month anymore, just get total count
+            _id: { $month: "$createdAt" },
             count: { $sum: 1 },
           },
+        },
+        {
+          $sort: { _id: 1 },
         },
       ]);
     };
 
-    // Fetch the counts for each user model (advertisers, tourists, tour guides, sellers)
-    const advertiserCounts = await getMonthlyCounts(adverModel);
-    const touristCounts = await getMonthlyCounts(touristModel);
-    const tourGuideCounts = await getMonthlyCounts(tourGuideModel);
-    const sellerCounts = await getMonthlyCounts(sellerModel);
+    // Get the counts for each user model
+    const [adminCounts, adverCounts, touristCounts, tourGuideCounts, sellerCounts] = await Promise.all([
+      getMonthlyCounts(adminModel),
+      getMonthlyCounts(adverModel),
+      getMonthlyCounts(touristModel),
+      getMonthlyCounts(tourGuideModel),
+      getMonthlyCounts(sellerModel),
+    ]);
 
-    // Calculate total users for the current month by summing counts from all models
-    const totalAcceptedUsersThisMonth =
-      (advertiserCounts[0]?.count || 0) +
-      (touristCounts[0]?.count || 0) +
-      (tourGuideCounts[0]?.count || 0) +
-      (sellerCounts[0]?.count || 0);
+    // Combine the counts into a single response
+    const response = {
+      adminCounts,
+      adverCounts,
+      touristCounts,
+      tourGuideCounts,
+      sellerCounts,
+    };
 
-    res.status(200).json({
-      year: targetYear,
-      currentMonth, // Return the current month number
-      totalAcceptedUsersThisMonth, // Return the total count of accepted users for the current month
-    });
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error fetching new users by month:", error);
-    res.status(500).json({
-      message: "Error fetching new users by month",
-      error: error.message,
-    });
+    res.status(500).json({ error: "Failed to fetch new users by month" });
   }
 };
 
