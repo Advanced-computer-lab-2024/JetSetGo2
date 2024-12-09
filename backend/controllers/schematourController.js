@@ -517,7 +517,9 @@ const cancelBooking = async (req, res) => {
     });
   } catch (error) {
     console.error("Error cancelling booking:", error);
-    res.status(500).json({ message: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", details: error.message });
   }
 };
 const submitReview = async (req, res) => {
@@ -575,7 +577,10 @@ const getBookedItineraries1 = async (req, res) => {
       return res.status(400).json({ message: "Invalid tour guide ID." });
     }
 
-    const itineraries = await Schema.find({ tourGuide: tourGuideId, bookings: { $gt: 0 } });
+    const itineraries = await Schema.find({
+      tourGuide: tourGuideId,
+      bookings: { $gt: 0 },
+    });
 
     if (!itineraries.length) {
       return res.status(404).json({ message: "No booked itineraries found." });
@@ -694,7 +699,8 @@ const getBookedItinerariesByTourGuide = async (req, res) => {
 
     // Calculate total revenue
     const totalRevenue = bookedItineraries.reduce((total, itinerary) => {
-      const itineraryRevenue = Math.min(...itinerary.TourPrice) * itinerary.bookings * 0.9;
+      const itineraryRevenue =
+        Math.min(...itinerary.TourPrice) * itinerary.bookings * 0.9;
       return total + itineraryRevenue;
     }, 0);
     console.log(itineraries);
@@ -708,12 +714,6 @@ const getBookedItinerariesByTourGuide = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-
-
-
-
-
-
 
 module.exports = {
   createGuide,
@@ -734,5 +734,5 @@ module.exports = {
   getNotificationRequests,
   requestNotification,
   finalizeBooking,
-  getBookedItinerariesByTourGuide
+  getBookedItinerariesByTourGuide,
 };

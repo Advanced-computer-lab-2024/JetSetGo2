@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "../css/Wishlist.css"; // Import the CSS file for styling
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -35,20 +36,35 @@ const Wishlist = () => {
   };
 
   return (
-    <div>
-      <h1>Your Wishlist</h1>
-      {message && <p>{message}</p>}
+    <div className="wishlist-container">
+      <h1 className="wishlist-title">Your Wishlist</h1>
+      {message && <p className="wishlist-message">{message}</p>}
       {wishlist.length > 0 ? (
-        <ul>
+        <div className="card-container">
           {wishlist.map((product) => (
-            <li key={product._id}>
-              <strong>{product.name}</strong> - ${product.price}
-              <button onClick={() => handleRemove(product._id)}>Remove</button>
-            </li>
+            <div key={product._id} className="product-card">
+              <img
+                src={product.pictures || "https://via.placeholder.com/150"}
+                alt={product.name}
+                className="product-image"
+              />
+              <div className="product-details">
+                <h3 className="product-title">{product.name}</h3>
+                <p className="product-price">${product.price}</p>
+                <div className="product-actions">
+                  <button
+                    className="action-button"
+                    onClick={() => handleRemove(product._id)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p>Your wishlist is empty.</p>
+        <p className="wishlist-empty">Your wishlist is empty.</p>
       )}
     </div>
   );

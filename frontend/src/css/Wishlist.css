@@ -1,0 +1,93 @@
+/* Wishlist Container */
+.wishlist-container {
+    padding: 20px;
+    background-color: #f7f8fa;
+    min-height: 100vh;
+  }
+  
+  /* Wishlist Title */
+  .wishlist-title {
+    font-size: 28px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Wishlist Message */
+  .wishlist-message {
+    text-align: center;
+    color: #28a745;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  /* Wishlist Empty Message */
+  .wishlist-empty {
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    margin-top: 50px;
+  }
+  
+  /* Wishlist Grid */
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  /* Wishlist Card */
+  .wishlist-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .wishlist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Wishlist Card Image */
+  .wishlist-card-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  /* Wishlist Card Content */
+  .wishlist-card-content {
+    padding: 15px;
+    text-align: center;
+  }
+  
+  /* Wishlist Card Title */
+  .wishlist-card-title {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  /* Wishlist Card Price */
+  .wishlist-card-price {
+    font-size: 18px;
+    color: #007bff;
+    margin-bottom: 15px;
+  }
+  
+  /* Wishlist Remove Button */
+  .wishlist-remove-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .wishlist-remove-button:hover {
+    background-color: #c82333;
+  }

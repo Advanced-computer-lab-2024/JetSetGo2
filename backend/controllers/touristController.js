@@ -11,7 +11,13 @@ const historicalModel = require("../models/HistoricalPlaceCRUD.js");
 const Notification = require("../models/Notification.js");
 const { default: mongoose } = require("mongoose");
 const { json } = require("express");
+const {
+  sendtransportationreciept,
+} = require("../utils/transportationreciept.js");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Ensure Stripe is initialized
+
+const senttransreciept =
+  require("../utils/transportationreciept.js").sendtransportationreciept;
 
 const bookTransportation = async (req, res) => {
   const { touristId, transportationId } = req.params;
@@ -76,6 +82,12 @@ const bookTransportation = async (req, res) => {
       });
       console.log("Stripe Payment Initiated:", paymentIntent);
 
+      sendtransportationreciept(
+        tourist.Email,
+        tourist.UserName,
+        transportation.price
+      );
+
       return res.status(200).json({
         clientSecret: paymentIntent.client_secret,
         message: "Payment initiated. Confirm payment on the frontend.",
@@ -98,6 +110,12 @@ const bookTransportation = async (req, res) => {
 
       await transportation.save();
       await tourist.save();
+
+      sendtransportationreciept(
+        tourist.Email,
+        tourist.UserName,
+        transportation.price
+      );
 
       console.log("Wallet payment successful.");
       return res.status(200).json({
@@ -393,7 +411,9 @@ const buyProducts = async (req, res) => {
   }
 
   try {
-    const tourist = await touristModel.findById(touristId).populate("cart.product");
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found." });
     }
@@ -407,14 +427,18 @@ const buyProducts = async (req, res) => {
     const totalPrice = cartItems.reduce((sum, item) => {
       const itemPrice = parseFloat(item.product.price) * item.quantity;
       if (isNaN(itemPrice)) {
-        throw new Error(`Invalid price for product: ${item.product.description}`);
+        throw new Error(
+          `Invalid price for product: ${item.product.description}`
+        );
       }
       return sum + itemPrice;
     }, 0);
 
     // Validate total price against Stripe's limit
     if (totalPrice > 999999.99) {
-      return res.status(400).json({ error: "Total amount exceeds the maximum limit of $999,999.99." });
+      return res.status(400).json({
+        error: "Total amount exceeds the maximum limit of $999,999.99.",
+      });
     }
 
     // Handle payment logic
@@ -436,7 +460,9 @@ const buyProducts = async (req, res) => {
       }
 
       console.log("Verifying payment...");
-      const verifiedPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      const verifiedPaymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntentId
+      );
 
       if (verifiedPaymentIntent.status !== "succeeded") {
         return res.status(400).json({
@@ -453,14 +479,19 @@ const buyProducts = async (req, res) => {
       tourist.Wallet -= totalPrice;
       console.log("Wallet payment processed.");
     } else if (paymentMethod === "cash") {
-      console.log("Cash payment selected. Order will be processed for cash on delivery.");
+      console.log(
+        "Cash payment selected. Order will be processed for cash on delivery."
+      );
     } else {
       return res.status(400).json({ error: "Invalid payment method." });
     }
 
     // Add loyalty points except for wallet payments
     if (paymentMethod !== "wallet") {
-      const loyaltyPoints = calculateLoyaltyPoints(tourist.Loyalty_Level, totalPrice);
+      const loyaltyPoints = calculateLoyaltyPoints(
+        tourist.Loyalty_Level,
+        totalPrice
+      );
 
       if (isNaN(loyaltyPoints) || loyaltyPoints < 0) {
         throw new Error("Invalid loyalty points calculated.");
@@ -494,6 +525,24 @@ const buyProducts = async (req, res) => {
       product.availableQuantity -= quantity;
       await product.save();
 
+      const seller =
+        (await SellerModel.findById(product.sellerId)) ||
+        (await AdminModel.findById(product.sellerId));
+
+      if (product.availableQuantity <= 0) {
+        // Assuming the seller's email is in the product's seller field
+        const sellerEmail = seller.Email; // Ensure this is populated or get the seller data
+        // Send email to the seller
+        sendEmailToSeller(sellerEmail, product.description);
+        const notificationMessage = `Your product "${product.description}" is out of stock.`;
+        await Notification.create({
+          receiverId: product.sellerId,
+          message: notificationMessage,
+        });
+        product.outOfStockNotified = true;
+        await product.save();
+      }
+
       tourist.purchasedProducts.push({ product: product._id, quantity });
       processedProducts.push({ product, quantity });
     }
@@ -510,10 +559,11 @@ const buyProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in buyProducts:", error);
-    res.status(500).json({ error: "Internal server error.", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error.", details: error.message });
   }
 };
-
 
 const getBookedTransportations = async (req, res) => {
   const { touristId } = req.params;
@@ -1389,7 +1439,9 @@ const cancelOrder = async (req, res) => {
     // Retrieve the product details to calculate the refund
     const product = await productModel.findById(order.product);
     if (!product) {
-      return res.status(404).json({ error: "Product not found for the order." });
+      return res
+        .status(404)
+        .json({ error: "Product not found for the order." });
     }
 
     // Calculate the refund amount
@@ -1418,7 +1470,6 @@ const cancelOrder = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
-
 
 module.exports = {
   createTourist,

@@ -10,8 +10,12 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const scheduleBirthdayEmails = require("./birthdayScheduler");
 
-
 const scheduleActivityNotificationss = require("./activiteSchedular.js");
+
+const sendflightreciept =
+  require("./utils/flightsreciept.js").sendflightreciept;
+
+const sendhotelreciept = require("./utils/hotelsreciept.js").sendhotelreciept;
 
 const itenarynotification = require("./notificationScheduler.js");
 const changeorderstatus = require("./changeorderstatus.js");
@@ -70,7 +74,7 @@ mongoose
     scheduleBirthdayEmails();
     itenarynotification();
     scheduleActivityNotificationss();
-    changeorderstatus();    
+    changeorderstatus();
     // Start server
     app.listen(port, () => {
       console.log(`Listening to requests on http://localhost:${port}`);
@@ -102,7 +106,7 @@ app.get("/api/protected", authMiddleware, (req, res) => {
 app.use("/itinerary", itineraryRoutes);
 app.use("/", touristRoutes);
 app.use("/api/itinerary", itineraryRoutes);
-app.use('/activity', activityRoutes); 
+app.use("/activity", activityRoutes);
 app.use("/api/seller", sellerRoutes); // Use seller routes
 app.use("/api", AdvertiserRoutes);
 function calculateLoyaltyPoints(level, price) {
@@ -229,9 +233,11 @@ app.post("/home/tourist/bookFlight", async (req, res) => {
 
     // Step 3: Finalize flight booking
     console.log("Finalizing flight booking...");
-    tourist.bookedFlights.push(flight);
+    // tourist.bookedFlights.push(flight);
 
     await tourist.save();
+
+    sendflightreciept(tourist.Email, tourist.UserName, flight.price.currency);
 
     console.log("Flight booking finalized successfully.", discountedPrice);
     res
@@ -398,6 +404,8 @@ app.post("/home/tourist/:touristId/bookHotel", async (req, res) => {
     tourist.bookedHotels.push(bookedData);
 
     await tourist.save();
+
+    sendhotelreciept(tourist.Email, tourist.UserName, hotelPrice);
 
     console.log("Hotel booking finalized successfully.");
     res.status(200).json({ message: "Hotel booked successfully." });
