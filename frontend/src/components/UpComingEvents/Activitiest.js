@@ -177,6 +177,8 @@ const Activitiest = () => {
       } else {
         // Use the message from the backend
         alert(message || "Activity booked successfully using wallet!");
+        alert(message);
+
         fetchActivities(); // Refresh activities
       }
     } catch (error) {

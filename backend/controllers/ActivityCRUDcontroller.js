@@ -400,14 +400,36 @@ const cancelactivity = async (req, res) => {
     }
 
     // Attempt to cancel the booking
+    const tourist = await User.findById(userId);
+    if (!tourist) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const refundAmount = parseFloat(activity.price);
+    if (isNaN(refundAmount)) {
+      return res.status(400).json({ message: "Invalid refund amount." });
+    }
+
+    console.log("Refund amount:", refundAmount);
+
+    tourist.Wallet += refundAmount;
+    console.log("Wallet updated. New balance:", tourist.Wallet);
     await activity.cancelBooking(userId);
 
+    // Remove the booking from the itinerary
+
+    // Save the updated itinerary and tourist
+    await activity.save();
+    await tourist.save();
+
     res.status(200).json({
-      message: "Booking canceled successfully",
-      bookings: activity.bookings,
+      message: "Booking canceled successfully. Refund processed.",
+      refundAmount,
+      walletBalance: tourist.Wallet,
+      updatedBookings: activity.bookings,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error cancelling booking:", error);
+    res.status(500).json({ message: "Internal server error", details: error.message });
   }
 };
 

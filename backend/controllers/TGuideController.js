@@ -144,7 +144,7 @@ const submitReview = async (req, res) => {
 
   try {
     // Find the tour guide by ID and add the review directly to the reviews array
-    const tourGuide = await Tour.findById(tourGuideId);
+    const tourGuide = await TourModel.findById(tourGuideId);
 
     if (!tourGuide) {
       return res.status(404).json({ message: "Tour guide not found" });
