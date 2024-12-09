@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import "../css/tourist.css";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Row,
+  Col,
+  Tab,
+  Tabs,
+  Dropdown,
+  Form,
+  Button,
+} from "react-bootstrap";
+import img1 from "./logoo4.JPG";
 
 const TouristHome = () => {
   const predefinedLocations = [
@@ -44,13 +58,6 @@ const TouristHome = () => {
   });
   const [searchMethod, setSearchMethod] = useState("name");
   const navigate = useNavigate();
-  const handleFlightSearchClick = () => {
-    navigate("/flight-search"); // Redirect to the Flight Search page
-  };
-
-  const handleHotelSearchClick = () => {
-    navigate("/hotelSearch"); // Redirect to the Flight Search page
-  };
 
   const touristId = localStorage.getItem("userId");
 
@@ -189,16 +196,13 @@ const TouristHome = () => {
     return location ? generateMapSrc(location.coordinates) : null;
   };
 
-  if (!touristData) {
-    return (
-      <div style={styles.container}>
-        <p style={styles.errorText}>Loading tourist data...</p>
-      </div>
-    );
-  }
-  const handleFileComplaintClick = () => {
-    navigate("/file-complaint", { state: { touristId } });
-  };
+  // if (!touristData) {
+  //   return (
+  //     <div style={styles.container}>
+  //       <p style={styles.errorText}>Loading tourist data...</p>
+  //     </div>
+  //   );
+  // }
   const handleLogout = () => {
     // Clear user session or token if needed
     localStorage.removeItem("userToken"); // Example: remove token from localStorage
@@ -237,511 +241,307 @@ const TouristHome = () => {
     3: "https://readingbydesign.org/sites/default/files/badges/champ_level03.png",
     // Add more levels as needed
   };
-const getLoyaltyImage = () => {
-// Fallback image if level is undefined or no matching level found
-return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/sites/default/files/badges/champ_level01.png";
-};
-
-
+  const getLoyaltyImage = () => {
+    // Fallback image if level is undefined or no matching level found
+    return (
+      loyaltyImages[touristData.Loyalty_Level] ||
+      "https://readingbydesign.org/sites/default/files/badges/champ_level01.png"
+    );
+  };
   return (
-    <div style={styles.container}>
-      {/* Tourist Profile Section */}
-      <div style={styles.sidebar}>
-        <div style={styles.profileContainer}>
-          <img
-            src="https://via.placeholder.com/80"
-            alt="Profile"
-            style={styles.profileImage}
-          />
-          <h2 style={styles.profileName}>{touristData.UserName}</h2>
-          <p style={styles.walletText}>
-            Loyalty Level: {touristData.Loyalty_Level}
-          </p>
-          <p style={styles.walletText}>Loyalty Points: {points}</p>
-          <p style={styles.walletText}>Wallet: $ {Wallet}</p>{" "}
-          {/* Display updated wallet */}
-          
-          <img
-            src={getLoyaltyImage()}
-            alt="Loyalty Level"
-            style={styles.loyaltyImage}
-          />
-          <button onClick={handleUpdateClick} style={styles.button}>
-            Update Profile
-          </button>
-          <button onClick={handleRedeemPoints} style={styles.redeemButton}>
-            Redeem All Points
-          </button>
-          {message && <p>{message}</p>}
-          <button
-            onClick={() => navigate("/mi", { state: { touristId: touristId } })}
-          >
-            My Itenaries
-          </button>
-          <button
-            onClick={() =>
-              navigate("/myactivity", { state: { touristId: touristId } })
-            }
-          >
-            My Activities
-          </button>
-          <button
-            onClick={() =>
-              navigate("/myhp", { state: { touristId: touristId } })
-            }
-          >
-            My HistoricalPlaces
-          </button>
-          <button
-            onClick={() =>
-              navigate("/mymp", { state: { touristId: touristId } })
-            }
-          >
-            My Museums
-          </button>
-          <button
-            onClick={() =>
-              navigate("/MyUpcomingAct", { state: { touristId: touristId } })
-            }
-          >
-            My Booked Upcoming activities
-          </button>
-          <button
-            onClick={() =>
-              navigate("/MyUpcomingIten", { state: { touristId: touristId } })
-            }
-          >
-            My Booked Upcoming Itenaries
-          </button>
-          <button
-  onClick={() => navigate("/my-orders")}
-  style={{
-    padding: "10px 20px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginTop: "10px",
-  }}
->
-  My Orders
-</button>
-
-          <button
-            onClick={handleDeleteAccount}
+    <div className="tourist-page">
+      {/* Navbar */}
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand
+            href="#"
             style={{
-              color: "red",
-              background: "lightgrey",
-              padding: "10px",
-              marginTop: "20px",
+              transform: "translateX(-50px)",
+              paddingLeft: "0",
+              marginLeft: "0",
             }}
           >
-            Delete Account
-          </button>
-<button
-  onClick={() => navigate("/cart")}
-  style={{
-    backgroundColor: "#007bff",
-    color: "#fff",
-    padding: "10px 15px",
-    borderRadius: "5px",
-    border: "none",
-    cursor: "pointer",
-    marginTop: "10px",
-  }}
->
-  View My Cart
-</button>
+            <img src={img1} alt="Logo" />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ml-auto">
+              {/* Cart Icon */}
+              <Nav.Link href="#" onClick={() => navigate("/cart")}>
+                <i
+                  className="fas fa-shopping-cart"
+                  style={{ fontSize: "20px" }}
+                ></i>
+              </Nav.Link>
 
-          <button style={styles.button} onClick={handleLogout}>
-            Logout
-          </button>{" "}
-          {/* Logout Button */}
+              {/* Wishlist Icon */}
+              <Nav.Link href="#" onClick={() => navigate("/wishlist")}>
+                <i className="fas fa-heart" style={{ fontSize: "20px" }}></i>
+              </Nav.Link>
+
+              {/* Notification Bell Icon */}
+              <Nav.Link href="#" onClick={() => navigate("/notifications")}>
+                <i className="fas fa-bell" style={{ fontSize: "20px" }}></i>
+              </Nav.Link>
+
+              {/* Tourist Dropdown */}
+              <Nav.Link className="profile-nav">
+                <img
+                  src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg"
+                  alt="Profile"
+                  className="navbar-profile-image"
+                />
+              </Nav.Link>
+              <Nav.Link>
+                <span className="navbar-profile-name">
+                  {touristData.UserName}
+                </span>
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      <div className="tourist-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <div className="loyalty-section">
+            <div className="loyalty-container">
+              <img
+                src={getLoyaltyImage()}
+                alt="Loyalty Level"
+                className="loyalty-image"
+              />
+              <p className="wallet-text">
+                Loyalty Level: {touristData.Loyalty_Level}
+              </p>
+            </div>
+            <div className="wallet-details">
+              <p className="wallet-text">Loyalty Points: {points}</p>
+              <p className="wallet-text">Wallet: $ {touristData.Wallet}</p>
+            </div>
+          </div>
+          <div className="button-container">
+            <button className="sidebar-button" onClick={handleRedeemPoints}>
+              <i className="fas fa-gift"></i> Redeem Points
+            </button>
+            <button className="sidebar-button" onClick={handleUpdateClick}>
+              <i className="fas fa-user-edit"></i> Update Profile
+            </button>
+            <button className="sidebar-button" onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <button className="sidebar-button" onClick={handleDeleteAccount}>
+              <i className="fas fa-trash-alt"></i> Delete Account
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="main-content">
+          <div className="search-bar-container">
+            <select
+              onChange={handleSearchMethodChange}
+              value={searchMethod}
+              className="search-dropdown"
+            >
+              <option value="name">Name</option>
+              <option value="category">Category</option>
+              <option value="tags">Tags</option>
+            </select>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleInputChange}
+              placeholder="Search..."
+              className="search-input"
+            />
+            <button onClick={handleSearch} className="search-button">
+              Search
+            </button>
+          </div>
+
+          {/* Tabs for navigation */}
+          <Tabs defaultActiveKey="overview" className="main-content-tabs">
+            <Tab eventKey="overview" title="My Booked Flights">
+              <div className="tab-content"></div>
+              {bookedFlights.length > 0 ? (
+                <ul className="booked-flights-list">
+                  {bookedFlights.map((flight, index) => (
+                    <li key={index} className="flight-item">
+                      <h4>Flight Details</h4>
+                      <p>
+                        <strong>Flight Number:</strong> {flight.id}
+                      </p>
+                      <p>
+                        <strong>Departure:</strong>{" "}
+                        {
+                          flight.itineraries?.[0].segments?.[0].departure
+                            .iataCode
+                        }
+                      </p>
+                      <p>
+                        <strong>Arrival:</strong>{" "}
+                        {flight.itineraries?.[0].segments?.[0].arrival.iataCode}
+                      </p>
+                      <p>
+                        <strong>Date:</strong>{" "}
+                        {flight.itineraries?.[0].segments?.[0].departure.at}
+                      </p>
+                      <p>
+                        <strong>Price:</strong> {flight.price.currency}{" "}
+                        {flight.price.total}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-flights-text">You have no booked flights.</p>
+              )}
+            </Tab>
+            <Tab eventKey="details" title="My Booked Hotels">
+              <div className="tab-content">
+                {bookedHotels.length > 0 ? (
+                  <ul className="booked-hotels-list">
+                    {bookedHotels.map((hotel, index) => (
+                      <li key={index} className="hotel-item">
+                        <p>
+                          <strong>Hotel Name:</strong> {hotel.hotelName}
+                        </p>
+                        <p>
+                          <strong>Check In Date:</strong>{" "}
+                          {hotel.offer.checkInDate}
+                        </p>
+                        <p>
+                          <strong>Check Out Date:</strong>{" "}
+                          {hotel.offer.checkOutDate}
+                        </p>
+                        <p>
+                          <strong>Guests:</strong> {hotel.offer.guests.adults}
+                        </p>
+                        <p>
+                          <strong>Price:</strong> {hotel.offer.price.currency}{" "}
+                          {hotel.offer.price.total}
+                        </p>
+                        <p>
+                          <strong>Room:</strong> {hotel.offer.room.type}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="no-hotels-text">You have no booked Hotels.</p>
+                )}
+              </div>
+            </Tab>
+            <Tab eventKey="settings" title="My Complains">
+              <div className="tab-content">
+                {complaints.length > 0 ? (
+                  <ul className="complaints-list">
+                    {complaints.map((complaint, index) => (
+                      <li key={index} className="complaint-item">
+                        <p>
+                          <strong>Title:</strong> {complaint.title}
+                        </p>
+                        <p>
+                          <strong>Body:</strong> {complaint.body}
+                        </p>
+                        <p>
+                          <strong>Date:</strong>{" "}
+                          {new Date(complaint.date).toLocaleDateString()}
+                        </p>
+                        <p>
+                          <strong>Status:</strong> {complaint.status}
+                        </p>
+                        {complaint.reply && (
+                          <p>
+                            <strong>Reply:</strong> {complaint.reply}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="no-complaints-text">No complaints found.</p>
+                )}
+              </div>
+            </Tab>
+          </Tabs>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="right-sidebar">
+          <div className="sidebar-buttons">
+            <button className="box" onClick={() => navigate("/flight-search")}>
+              Book Flight
+            </button>
+            <button className="box" onClick={() => navigate("/hotelSearch")}>
+              Book Hotel
+            </button>
+            <button
+              className="box"
+              onClick={() =>
+                navigate("/upcoming-itinerariest", {
+                  state: { touristId: touristId },
+                })
+              }
+            >
+              Itineraries
+            </button>
+            <button
+              className="box"
+              onClick={() =>
+                navigate("/upcoming-activitiest", {
+                  state: { touristId: touristId },
+                })
+              }
+            >
+              Activities
+            </button>
+            <button className="box" onClick={() => navigate("/museusemst")}>
+              Museums
+            </button>
+            <button className="box" onClick={() => navigate("/HPT")}>
+              Historical Places
+            </button>
+            <button
+              className="box"
+              onClick={() => navigate("/transportationBooking")}
+            >
+              Book Transport
+            </button>
+            <button className="box" onClick={() => navigate("/p")}>
+              Buy Products
+            </button>
+            <button className="box" onClick={() => navigate("/file-complaint")}>
+              File a complain
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={styles.mainContent}>
-        <h1 style={styles.header}>Welcome to Your Dashboard</h1>
-        <nav style={styles.navbar}>
-          <button onClick={() => navigate("/p")}>View Products</button>
-          <button onClick={handleFlightSearchClick}>Search Flights</button>
-          <button onClick={handleHotelSearchClick}>Search Hotels</button>
-          <button
-            onClick={() =>
-              navigate("/upcoming-activitiest", {
-                state: { touristId: touristId },
-              })
-            }
-            style={styles.navLink}
-          >
-            Activities
-          </button>
-          <button
-            onClick={() =>
-              navigate("/upcoming-itinerariest", {
-                state: { touristId: touristId },
-              })
-            }
-            style={styles.navLink}
-          >
-            Itineraries
-          </button>
-
-          <Link to="/HPT" style={styles.navLink}>
-            Historical Places
-          </Link>
-          <Link to="/museusemst" style={styles.navLink}>
-            Museums
-          </Link>
-          <Link to="/transportationBooking" style={styles.navLink}>
-            Book Transportation
-          </Link>
-          <button onClick={handleFileComplaintClick} style={styles.navLink}>
-            File a Complaint
-          </button>
-        </nav>
-        {/* Booked Flights Section */}
-        <div style={styles.bookedFlightsSection}>
-          <h3 style={styles.sectionHeader}>Your Booked Flights</h3>
-          {bookedFlights.length > 0 ? (
-            <ul style={styles.bookedFlightsList}>
-              {bookedFlights.map((flight, index) => (
-                <li key={index} style={styles.flightItem}>
-                  <p>
-                    <strong>Flight Number:</strong> {flight.flightNumber}
-                  </p>
-                  <p>
-                    <strong>Departure:</strong> {flight.departure}
-                  </p>
-                  <p>
-                    <strong>Arrival:</strong> {flight.arrival}
-                  </p>
-                  <p>
-                    <strong>Date:</strong> {flight.date}
-                  </p>
-                  <p>
-  <strong>Price:</strong> {flight.price.currency} {flight.price.total}
-</p>
-
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p style={styles.noFlightsText}>You have no booked flights.</p>
-          )}
-        </div>
-
-        <div style={styles.bookedHotelsSection}>
-          <h3 style={styles.sectionHeader}>Your Booked Hotels</h3>
-          {bookedHotels.length > 0 ? (
-            <ul style={styles.bookedHotelsList}>
-              {bookedHotels.map((hotel, index) => (
-                <li key={index} style={styles.flightItem}>
-                  <p>
-                    <strong>Hotel Name:</strong> {hotel.hotelName}
-                  </p>
-                  <p>
-                    <strong>Check In Date:</strong> {hotel.offer.checkInDate}
-                  </p>
-                  <p>
-                    <strong>Check Out Date:</strong> {hotel.offer.checkOutDate}
-                  </p>
-                  <p>
-                    <strong>Guests:</strong> {hotel.offer.guests.adults}
-                  </p>
-                  <p>
-                    <strong>price:</strong>
-                    {hotel.offer.price.currency} {hotel.offer.price.total}
-                  </p>
-                  <p>
-                    <strong>Room:</strong> {hotel.offer.room.type}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p style={styles.noFlightsText}>You have no booked Hotels.</p>
-          )}
-        </div>
-        <div style={styles.complaintsSection}>
-          <h3>Your Complaints</h3>
-          {complaints.length > 0 ? (
-            <ul style={styles.complaintsList}>
-              {complaints.map((complaint, index) => (
-                <li key={index} style={styles.complaintItem}>
-                  <p>
-                    <strong>Title:</strong> {complaint.title}
-                  </p>
-                  <p>
-                    <strong>Body:</strong> {complaint.body}
-                  </p>
-                  <p>
-                    <strong>Date:</strong>{" "}
-                    {new Date(complaint.date).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {complaint.status}
-                  </p>
-                  {complaint.reply && (
-                    <p>
-                      <strong>Reply:</strong> {complaint.reply}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No complaints found.</p>
-          )}
-        </div>
-
-        {/* Search Bar Section */}
-        <div style={styles.searchSection}>
-          <select
-            onChange={handleSearchMethodChange}
-            value={searchMethod}
-            style={styles.dropdown}
-          >
-            <option value="name">Name</option>
-            <option value="category">Category</option>
-            <option value="tags">Tags</option>
-          </select>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleInputChange}
-            placeholder="Search..."
-            style={styles.searchInput}
-          />
-          <button onClick={handleSearch} style={styles.searchButton}>
-            Search
-          </button>
-        </div>
-
-        {/* Search Results Section */}
-        <div style={styles.resultsContainer}>
-          <h3 style={styles.resultsHeader}>Search Results:</h3>
-          {searchResults.Museums.length > 0 ||
-          searchResults.HistoricalPlace.length > 0 ||
-          searchResults.activities.length > 0 ||
-          searchResults.itinaries.length > 0 ? (
-            <ul style={styles.resultsList}>
-              {/* Museums */}
-              {searchResults.Museums.map((museum, index) => (
-                <li key={index} style={styles.resultItem}>
-                  <h4>Name: {museum.tourismGovernerTags.name}</h4>
-                  <p>Description: {museum.description}</p>
-                  <p>Location: {museum.location}</p>
-                  <p>Opening Hours: {museum.openingHours}</p>
-                  <p>foreignerTicketPrice: ${museum.foreignerTicketPrice}</p>
-                  <p>nativeTicketPrice: ${museum.nativeTicketPrice}</p>
-                  <p>studentTicketPrice: ${museum.studentTicketPrice}</p>
-                  {findLocationMap(museum.location) && (
-                    <iframe
-                      title="Map"
-                      src={findLocationMap(museum.location)}
-                      style={styles.map}
-                    ></iframe>
-                  )}
-                </li>
-              ))}
-              {/* Historical Places */}
-              {searchResults.HistoricalPlace.map((place, index) => (
-                <li key={index} style={styles.resultItem}>
-                  <h4>Name: {place.tourismGovernerTags.name}</h4>
-                  <p>Description: {place.description}</p>
-                  <p>Location: {place.location}</p>
-                  <p>Opening Hours: {place.openingHours}</p>
-                  <p>foreignerTicketPrice: ${place.foreignerTicketPrice}</p>
-                  <p>nativeTicketPrice: ${place.nativeTicketPrice}</p>
-                  <p>studentTicketPrice: ${place.studentTicketPrice}</p>
-                  {findLocationMap(place.location) && (
-                    <iframe
-                      title="Map"
-                      src={findLocationMap(place.location)}
-                      style={styles.map}
-                    ></iframe>
-                  )}
-                </li>
-              ))}
-              {/* Activities */}
-              {searchResults.activities.map((activity, index) => (
-                <li key={index} style={styles.resultItem}>
-                  <h4>{activity.name}</h4>
-                  <p>Date: {activity.date}</p>
-                  <p>Time: {activity.time}</p>
-                  <p>Location: {activity.location}</p>
-                  <p>Price: ${activity.price}</p>
-                  <p>Special Discount: ${activity.specialDiscount}</p>
-                  <p>Booking Open: {activity.isBookingOpen ? "Yes" : "No"}</p>
-                  {findLocationMap(activity.location) && (
-                    <iframe
-                      title="Map"
-                      src={findLocationMap(activity.location)}
-                      style={styles.map}
-                    ></iframe>
-                  )}
-                </li>
-              ))}
-              {/* Itineraries */}
-              {searchResults.itinaries.map((itinerary, index) => (
-                <li key={index} style={styles.resultItem}>
-                  <h4>{itinerary.name}</h4>
-                  <p>{itinerary.activities.date}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p style={styles.noResultsText}>No results found.</p>
-          )}
-        </div>
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: support@touristplatform.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Explore Lane</p>
+              <p>Adventure City, ExploreWorld 12345</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );
 };
-
-// Improved styles for the modern look
-const styles = {
-  container: {
-    display: "flex",
-    minHeight: "100vh",
-    backgroundColor: "#f7f8fa",
-    padding: "20px",
-  },
-  sidebar: {
-    width: "250px",
-    //backgroundColor: "#2d3e50",
-    padding: "20px",
-    borderRadius: "10px",
-    color: "#fff",
-  },
-  profileContainer: {
-    textAlign: "center",
-  },
-  profileImage: {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    marginBottom: "15px",
-    border: "3px solid #fff",
-  },
-  profileName: {
-    fontSize: "22px",
-    fontWeight: "bold",
-  },
-  walletText: {
-    fontSize: "18px",
-    margin: "10px 0",
-  },
-  button: {
-    backgroundColor: "#ff6348",
-    color: "#fff",
-    padding: "10px 15px",
-    borderRadius: "5px",
-    border: "none",
-    cursor: "pointer",
-    marginTop: "10px",
-  },
-  mainContent: {
-    flex: 1,
-    marginLeft: "30px",
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-  },
-  header: {
-    fontSize: "28px",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  searchSection: {
-    display: "flex",
-    alignItems: "center",
-    marginBottom: "30px",
-  },
-  searchInput: {
-    flex: 1,
-    padding: "10px",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-    marginRight: "10px",
-  },
-  dropdown: {
-    padding: "10px",
-    borderRadius: "4px",
-    marginRight: "10px",
-  },
-  searchButton: {
-    padding: "10px 20px",
-    //backgroundColor: "#2d3e50",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-around",
-    //backgroundColor: "#2d3e50",
-    padding: "10px",
-    borderRadius: "5px",
-    marginBottom: "20px",
-  },
-  navLink: {
-    color: "#fff",
-    textDecoration: "none",
-    padding: "10px 15px",
-    borderRadius: "4px",
-   // backgroundColor: "#2d3e50",
-    fontWeight: "bold",
-    transition: "background-color 0.3s",
-  },
-  resultsContainer: {
-    marginTop: "20px",
-  },
-  resultsHeader: {
-    fontSize: "22px",
-    marginBottom: "15px",
-    color: "#333",
-  },
-  resultsList: {
-    listStyleType: "none",
-    paddingLeft: "0",
-  },
-  resultItem: {
-    padding: "15px",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-    marginBottom: "10px",
-    backgroundColor: "#f9f9f9",
-  },
-  map: {
-    width: "100%",
-    height: "250px",
-    border: "none",
-    borderRadius: "10px",
-    marginTop: "10px",
-  },
-  noResultsText: {
-    fontSize: "18px",
-    color: "#999",
-  },
-  complaintsSection: {
-    marginTop: "20px",
-  },
-  complaintsList: {
-    listStyleType: "none",
-    padding: 0,
-  },
-  complaintItem: {
-    padding: "10px",
-    margin: "10px 0",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-  },
-};
-
 export default TouristHome;
