@@ -1,5 +1,5 @@
     const express = require('express');
-    const { createGuide, readGuide, finalizeBooking,readGuideID,getBookedItineraries,submitReview,cancelBooking, updateGuide, deleteGuide,bookTour, flagItinerary,toggleActivation,toggleActivation1,getIteneraries,getItineraryById,requestNotification,
+    const { createGuide, readGuide, finalizeBooking,readGuideID,getBookedItineraries1,getBookedItinerariesByTourGuide,getBookedItineraries,submitReview,cancelBooking, updateGuide, deleteGuide,bookTour, flagItinerary,toggleActivation,toggleActivation1,getIteneraries,getItineraryById,requestNotification,
         getNotificationRequests,} = require('../controllers/schematourController');
 
 const router = express.Router();
@@ -19,6 +19,8 @@ const router = express.Router();
     router.get('/getBookedItineraries', getBookedItineraries);
     router.post("/requestNotification/:id", requestNotification);
     router.get("/notificationRequests/:id", getNotificationRequests);
+    router.get('/bookedItineraries/:tourGuideId', getBookedItineraries1);
+   // router.get("/bookedItineraries/:tourGuideId", getBookedItinerariesByTourGuide);
 
     router.post('/finalizeBooking/:id', finalizeBooking);
 

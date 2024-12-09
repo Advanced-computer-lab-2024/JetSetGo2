@@ -11,6 +11,7 @@ const {
   acceptAdver,
   rejectAdver,
   reqAccountToBeDeleted,
+  getAdvertiserRevenue
 } = require("../controllers/AdverCONT");
 
 router.get("/", (req, res) => {
@@ -22,6 +23,8 @@ router.put("/updateadver/:id", upload.single("logoFile"), updateAdver);
 router.get("/getTourist/:id", getAdverById);
 router.get("/get", getAdvertiser);
 router.delete("/delete/:id", deleteAdver);
+router.get("/advertiser/revenue/:advertiserId", getAdvertiserRevenue);
+
 router.put("/acceptAdver/:id", acceptAdver);
 router.put("/rejectAdver/:id", rejectAdver);
 router.delete("/deletMyAccount/:id", reqAccountToBeDeleted);

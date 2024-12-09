@@ -206,6 +206,7 @@ const unarchiveProduct = async (req, res) => {
   }
 };
 
+
 // Exporting the controller functions
 module.exports = {
   createProduct,

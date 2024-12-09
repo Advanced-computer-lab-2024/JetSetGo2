@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
 const reviewSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   rating: { type: Number, min: 1, max: 5 },
   comment: { type: String },
 });
+
 const TGuidechema = new Schema(
   {
     UserName: {
@@ -63,8 +65,14 @@ const TGuidechema = new Schema(
     },
     reviews: [reviewSchema], // Add reviews for the tour guide
     Admin_Acceptance: { type: Boolean, default: null },
+    sales: { // New 'sales' attribute
+      type: Number,
+      default: 0, // Default value for sales
+      required: false,
+    },
   },
   { timestamps: true }
 );
+
 const Tour = mongoose.model("Tour", TGuidechema);
 module.exports = Tour;

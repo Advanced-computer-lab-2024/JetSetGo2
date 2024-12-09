@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createActivity,finalizeActivityBooking,getBookedactivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity, toggleActivation ,
+const {createActivity,finalizeActivityBooking,getBookedactivities,getBookedActivities,bookactivity,submitReview,getActivity,updateActivity,deleteActivity, deleteAllActivities, readAdverActivites,cancelactivity , getActivityById, flagActivity, toggleActivation ,
     getBookedactivity ,
     requestNotification, 
     getNotificationRequests} = require('../controllers/ActivityCRUDcontroller');
@@ -21,6 +21,8 @@ router.post('/submitReview/:activityId',submitReview);
 router.get('/getBookedItineraries', getBookedactivity);
 // Backend Route
 router.post('/requestNotification/:activityId', requestNotification);
+router.get('/bookedActivities/:advertiserId', getBookedActivities);
+
 
 router.get("/notificationRequests/:id", getNotificationRequests);
 router.patch("/toggleActivation/:id", toggleActivation); 

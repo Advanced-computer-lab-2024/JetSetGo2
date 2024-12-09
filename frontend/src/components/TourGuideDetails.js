@@ -144,8 +144,13 @@ const TourGuidePage = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("userToken"); // Example: remove token from localStorage
-    navigate("/login"); // Redirect to the login page
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
+
+  const handleRevenuePage = () => {
+    navigate("/revenue");
   };
 
   const handleCancel = () => {
@@ -204,6 +209,12 @@ const TourGuidePage = () => {
           <button className="sidebar-button" onClick={handleLogout}>
             Logout
           </button>
+          <button onClick={handleRevenuePage} style={styles.button}>
+            Revenue Rep
+          </button>
+          <button style={styles.button} onClick={handleLogout}>
+            Logout
+          </button> {/* Logout Button */}
           <button
             onClick={handleDeleteAccount}
             className="sidebar-button"

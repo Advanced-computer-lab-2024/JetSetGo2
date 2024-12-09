@@ -31,6 +31,10 @@ const transportationSchema = new Schema(
       type: Number,
       required: true,
     },
+    MaxseatsAvailable: {
+      type: Number,
+      required: false,
+    },
     driverName: {
       type: String,
       required: true,

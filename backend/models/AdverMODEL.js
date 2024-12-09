@@ -61,6 +61,11 @@ const advertiserSchema = new Schema(
       type: Boolean,
       required: false,
     },
+    sales: { // New 'sales' attribute
+      type: Number,
+      default: 0, // Default value for sales
+      required: false,
+    },
     Admin_Acceptance: { type: Boolean, default: null },
   },
   { timestamps: true }
