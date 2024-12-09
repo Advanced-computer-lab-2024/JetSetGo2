@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import './CartPage.css';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [message, setMessage] = useState("");
   const API_URL = "http://localhost:8000";
   const navigate = useNavigate();
+  useEffect(() => {
+    document.body.classList.add("login-body");
+    return () => {
+      document.body.classList.remove("login-body");
+    };
+  }, []);
 
   useEffect(() => {
     fetchCart();
@@ -98,13 +105,13 @@ const CartPage = () => {
   };
 
   return (
-    <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#f7f8fa" }}>
-      <h2>My Cart</h2>
-      {message && <p>{message}</p>}
+    <div className="cart-container">
+      <h2 className="cart-title">My Cart</h2>
+      {message && <p className="message">{message}</p>}
       {cartItems.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className="cart-table">
           <thead>
             <tr>
               <th>Picture</th>
@@ -122,12 +129,7 @@ const CartPage = () => {
                   <img
                     src={`data:image/png;base64,${item.product.pictures}`}
                     alt="Product"
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      objectFit: "cover",
-                      borderRadius: "5px",
-                    }}
+                    className="cart-table-img"
                   />
                 </td>
                 <td>{item.product.description}</td>
@@ -140,27 +142,14 @@ const CartPage = () => {
                     onChange={(e) =>
                       handleUpdateQuantity(item.product._id, parseInt(e.target.value, 10))
                     }
-                    style={{
-                      width: "60px",
-                      padding: "5px",
-                      textAlign: "center",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                    }}
+                    className="cart-quantity-input"
                   />
                 </td>
                 <td>${(item.product.price * item.quantity).toFixed(2)}</td>
                 <td>
                   <button
                     onClick={() => handleRemoveItem(item.product._id)}
-                    style={{
-                      padding: "5px 10px",
-                      backgroundColor: "#dc3545",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "5px",
-                      cursor: "pointer",
-                    }}
+                    className="reply-button"
                   >
                     Remove
                   </button>
@@ -173,35 +162,19 @@ const CartPage = () => {
       {cartItems.length > 0 && (
         <button
           onClick={handleCheckout}
-          style={{
-            padding: "10px 20px",
-            marginTop: "20px",
-            backgroundColor: "#28a745",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
+          className="reply-button"
         >
-          Proceed to Checkout
+          Proceed
         </button>
       )}
       <button
         onClick={() => navigate(-1)}
-        style={{
-          padding: "10px 20px",
-          marginTop: "20px",
-          backgroundColor: "#ff6348",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
+        className="reply-button"
+         // Using inline style for different color
       >
         Back
       </button>
     </div>
   );
 };
-
 export default CartPage;

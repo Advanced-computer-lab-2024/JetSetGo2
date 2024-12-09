@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../App.css"; // Assuming you still want to keep this for other styles
 import { useNavigate } from "react-router-dom";
 import { getProducts, buyProduct } from "../services/ProductService"; // Ensure you have this service function defined
 import axios from "axios";
@@ -174,7 +173,7 @@ const ProductListp = () => {
     }
   };
 
-  
+
 
   const handleBooking = async (productId) => {
     const userId = localStorage.getItem("userId"); // Fetch tourist ID from localStorage
