@@ -562,4 +562,11 @@
     color: #333; /* Dark gray for readability */
     text-align: center; /* Center aligns the title */
   }
+  .total-revenue1 {
+    margin-top: 20px; /* Adds space above the title */
+    font-size: 1rem; /* Makes the font size smaller */
+    font-weight: bold; /* Keeps the font bold */
+    color: white; /* Dark gray for readability */
+    text-align: center; /* Center aligns the title */
+  }
     

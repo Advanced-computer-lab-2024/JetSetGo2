@@ -1,0 +1,72 @@
+.file-complaint-container {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 2rem;
+    background-color: #2a2737;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  .file-complaint-header {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #fefefe;
+  }
+  
+  .file-complaint-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .file-complaint-input,
+  .file-complaint-textarea {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.25rem;
+    border: 1px solid #8b5cf6;
+    border-radius: 8px;
+    background-color: #4a4a5e;
+    color: #fefefe;
+  }
+  
+  .file-complaint-textarea {
+    resize: vertical;
+    min-height: 150px;
+  }
+  
+  .file-complaint-submit-button {
+    padding: 1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: #8b5cf6;
+    color: #fefefe;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .file-complaint-submit-button:hover {
+    background-color: #6241cb;
+    transform: translateY(-2px);
+  }
+  
+  .back-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #8b5cf6;
+    background-color: #2a2737;
+    border: 1px solid #8b5cf6;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .back-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
