@@ -478,6 +478,8 @@ const SchemaTourFront = () => {
                     onChange={handleChange}
                     required
                   >
+
+                    
                     <option value="">Select an activity</option>
                     {activities.map((activity) => (
                       <option key={activity._id} value={activity._id}>
