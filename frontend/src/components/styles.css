@@ -27,12 +27,12 @@
   width: 250px; /* Increase width to accommodate longer text */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 10px 0; /* Add padding for spacing */
-  position: absolute;
+  position: left;
   top: 100%;
-  left: 0;
   max-height: 300px; /* Max height for the dropdown to avoid overflowing */
   overflow-y: auto; /* Enable scrolling if the content exceeds max-height */
   z-index: 1000; /* Ensure the dropdown is above other content */
+  margin-left: -100px;
 }
 
 .navbar-nav .dropdown-item {

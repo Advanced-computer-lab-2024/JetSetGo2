@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
+import './ChangePassword.css';
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  useEffect(() => {
+    document.body.classList.add("login-body");
+    return () => {
+      document.body.classList.remove("login-body");
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,22 +36,25 @@ const ChangePassword = () => {
   };
 
   return (
-    <div>
-      <h2>Change Password</h2>
-      <form onSubmit={handleSubmit}>
-        <label>New Password:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter new password"
-          required
-        />
-        <button type="submit">Change Password</button>
-      </form>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
+    <div className="change-password-container">
+    <h2 className="change-password-title">Change Password</h2>
+    <form className="change-password-form" onSubmit={handleSubmit}>
+      <input
+        type="password"
+        className="change-password-input"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter new password"
+        required
+      />
+      <button className="reply-button" type="submit">
+        Change Password
+      </button>
+    </form>
+    {message && <p className="success-message">{message}</p>}
+    {error && <p className="error-message">{error}</p>}
+  </div>
+  
   );
 };
 
