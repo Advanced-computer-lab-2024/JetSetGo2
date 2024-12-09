@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate ,Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import sidebarImage from './logoo444.JPG';
-import "../css/TourGuidePage.css"; // Import the CSS file
+import "./TourGuidePage.css"; // Import the CSS file
 import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
 import img1 from './logoo4.JPG';
 import { FaPen } from "react-icons/fa"; 
@@ -479,7 +479,7 @@ const SchemaTourFront = () => {
                     required
                   >
 
-                    
+
                     <option value="">Select an activity</option>
                     {activities.map((activity) => (
                       <option key={activity._id} value={activity._id}>

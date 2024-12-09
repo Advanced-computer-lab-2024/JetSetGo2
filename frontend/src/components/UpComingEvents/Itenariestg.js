@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,Link} from "react-router-dom";
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from '../logoo444.JPG';
+import "../TourGuidePage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from '../logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
 // Service method to fetch itineraries
 const getItineraries = async () => {
