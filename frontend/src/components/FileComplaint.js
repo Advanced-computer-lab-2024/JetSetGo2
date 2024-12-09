@@ -5,7 +5,7 @@ import "./FileComplaint.css";
 
 const FileComplaint = () => {
   const location = useLocation();
-  const touristId = location.state?.touristId;
+  const touristId = localStorage.getItem("userId");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [date, setDate] = useState("");

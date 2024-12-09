@@ -1,0 +1,267 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+   .navbar {
+    
+      margin-bottom: 15px;
+      background-color: #2a2737;
+      border-radius: 20px; /* Adjust the radius as needed */
+    }
+  
+    .navbar-profile-image {
+      width: 40px; /* Adjust the size as needed */
+      height: 40px; /* Adjust the size as needed */
+      border-radius: 50%; /* Make the image circular */
+      margin-right: 10px; /* Add some space between the image and the text */
+      margin-left: 950px;
+    }
+    
+    .main-content-nav {
+      margin-bottom: 20px;
+    }
+    
+    .main-content-nav .nav-link {
+      color: #2a2737;
+      font-weight: bold;
+      font-family: 'Roboto', sans-serif;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+    
+    .main-content-nav .nav-link.active {
+      color: #4B0082; /* Dark purple color */
+    }
+    
+    .main-content-nav .nav-link:hover {
+      color: #3a0066; /* Darker shade of purple */
+    }
+    
+    .navbar .navbar-nav {
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    
+    .navbar-nav .nav-link {
+      color: #fefefe !important;
+      font-weight: bold; /* Make the font thicker */
+      font-family: 'Roboto', sans-serif; /* Change the font family */
+      text-transform: uppercase;
+      font-weight: 400;
+      padding: 0 10px;
+      line-height: 60px;
+      letter-spacing: .5px;
+      display: block;
+      transition: color .25s ease, background-color .25s ease;
+      font-size: 20px; /* Adjust the font size as needed */
+    }
+    
+    .navbar-nav .nav-link.selected {
+      color: white !important;
+    }
+    
+    .navbar-brand img {
+      height: 70px; /* Adjust the height as needed */
+      width: 180px;
+    }
+    
+    .admin-container {
+      display: flex;
+      flex: 1;
+      margin-top: 30px; /* Add margin to account for the fixed navbar height */
+    }
+    
+    .sidebar {
+      width: 260px;
+      padding: 20px;
+      background-color: #2a2737;
+      border-radius: 10px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center align the contents */
+    }
+    
+    .profile-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .profile-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid #fff;
+    }
+    
+    .profile-name {
+      font-size: 22px;
+      font-weight: bold;
+    }
+    
+    .sidebar-button {
+      background: #2a2737; /* Radial gradient background */
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+      text-align: left; /* Center align the button text */
+      font-size: 16px;
+      font-family: 'Roboto', sans-serif;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      display: flex;
+      align-items: center; 
+      white-space: nowrap; /* Prevent text from wrapping */
+    }
+  
+    .sidebar-button i {
+      margin-right: 10px; /* Add space between the icon and text */
+      min-width: 20px; /* Ensure the icon has a minimum width */
+      text-align: center; /* Center align the icon */
+    }
+    
+    .sidebar-button:hover {
+      background-color: #666278;
+      transform: scale(0.9); /* Add a slight zoom effect on hover */
+      color: #2a2737;
+    }
+  
+    .sidebar-image-container {
+      margin-top: auto; /* Push the image to the bottom of the sidebar */
+      text-align: center;
+    }
+    
+    .sidebar-image {
+      width: 70%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+  
+  /* Apply styles to the OTP request page */
+  .request-otp-body {
+    font-family: 'Arial', sans-serif;
+    background-color: #666278; /* Primary Background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .request-otp-container {
+    display: flex;
+    width: 800px;
+    max-width: 100%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  
+  /* Remove the Left Section entirely */
+  .request-otp-container {
+    flex-direction: column;
+  }
+  
+  /* Right Section (Now takes the full width) */
+  .request-otp-right {
+    width: 100%;
+    background-color: #2a2737; /* Secondary Background */
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #FFFFFF; /* Text color */
+  }
+  
+  .request-otp-right h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Form Styles */
+  .request-otp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Consistent spacing between form elements */
+  }
+  
+  .request-otp-form .request-otp-form-group input {
+    width: 100%;
+    height: 50px;
+    padding: 0 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #4A4A5E; /* Input background */
+    color: #FFFFFF; /* Input text color */
+    outline: none;
+    transition: background-color 0.3s ease, border 0.3s ease;
+  }
+  
+  .request-otp-form .request-otp-form-group input::placeholder {
+    color: #696975;
+  }
+  
+  .request-otp-form .request-otp-form-group input:focus {
+    border: 1px solid #8B5CF6; /* Focus accent color */
+    background-color: #3B3B4F; /* Darker background on focus */
+  }
+  
+  /* Button */
+  .request-otp-form button {
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #8B5CF6; /* Accent Color */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .request-otp-form button:hover {
+    background-color: #6D4ECF; /* Button Hover */
+  }
+  
+  /* Message Styling */
+  .request-otp-right p {
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  
+  .request-otp-right p[style*="color: green"] {
+    color: #00FF00; /* Success Message */
+  }
+  
+  .request-otp-right p[style*="color: red"] {
+    color: #FF4D4D; /* Error Message */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .request-otp-container {
+      width: 90%;
+    }
+  
+    .request-otp-right {
+      padding: 20px;
+    }
+  }
+  .checkout-body {
+    font-family: 'Arial', sans-serif;
+    background-color: #666278; /* Primary Background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}

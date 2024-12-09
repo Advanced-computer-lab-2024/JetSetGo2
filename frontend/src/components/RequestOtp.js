@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+// RequestOtp.js
+import React, { useEffect,useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./request-otp.css"; // Import the new CSS file
 
 const RequestOtp = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate(); // Hook to navigate between routes
+  useEffect(() => {
+    document.body.classList.add("login-body");
+    return () => {
+      document.body.classList.remove("login-body");
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,21 +47,34 @@ const RequestOtp = () => {
   };
 
   return (
-    <div>
-      <h2>Forgot Password? Request OTP</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Email Address:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-          required
-        />
-        <button type="submit">Send OTP</button>
-      </form>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="request-otp-body">
+      <div className="request-otp-container">
+        {/* Left Section */}
+        <div className="request-otp-left">
+          <button className="reply-button" onClick={() => navigate("/")}>
+            Back
+          </button>
+        </div>
+        
+        {/* Right Section */}
+        <div className="request-otp-right">
+          <h2>Forgot Password? Request OTP</h2>
+          <form className="request-otp-form" onSubmit={handleSubmit}>
+            <div className="request-otp-form-group">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <button type="submit">Send OTP</button>
+          </form>
+          {message && <p style={{ color: "green" }}>{message}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+        </div>
+      </div>
     </div>
   );
 };

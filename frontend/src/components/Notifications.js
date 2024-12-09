@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
+import './notifications.css'; // Importing the CSS file
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState("");
-  const userId = localStorage.getItem("userId"); // Get the user ID from local storage
+  const userId = localStorage.getItem("userId");
+  const navigate = useNavigate(); // Hook to navigate between routes
 
+  useEffect(() => {
+    document.body.classList.add("login-body");
+    return () => {
+      document.body.classList.remove("login-body");
+    };
+  }, []);
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/notifications/${userId}`
+         ` http://localhost:8000/notifications/${userId}`
         );
         setNotifications(response.data);
       } catch (err) {
@@ -18,6 +28,7 @@ const Notifications = () => {
         console.error("Error fetching notifications:", err);
       }
     };
+    
 
     fetchNotifications();
   }, [userId]);
@@ -40,38 +51,23 @@ const Notifications = () => {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#333" }}>
-        Notifications
-      </h2>
-      {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-      <ul style={{ listStyleType: "none", padding: 0 }}>
+    <div className="notifications-container">
+      <button className="reply-button" onClick={() => navigate(-1)}>
+            Back
+          </button>
+  <h1 className="notification-title">Notification</h1>
+  {error && <p className="error-message">{error}</p>}
+      <ul className="notification-list">
         {notifications.map((notification) => (
           <li
             key={notification._id}
-            style={{
-              padding: "15px",
-              border: "1px solid #ccc",
-              marginBottom: "10px",
-              borderRadius: "5px",
-              backgroundColor: notification.read ? "#f8f9fa" : "#dff0d8",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+            className={`notification-item ${notification.read ? "read" : "unread"}`}
           >
             <span style={{ flex: 1 }}>{notification.message}</span>
             {!notification.read && (
               <button
                 onClick={() => handleMarkAsRead(notification._id)}
-                style={{
-                  padding: "5px 10px",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
+                className="mark-read-button"
               >
                 Mark as Read
               </button>

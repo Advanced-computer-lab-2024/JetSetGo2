@@ -1,0 +1,164 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+  
+/* Checkout Container */
+.checkout-container {
+    padding: 30px; /* Increased padding for a larger feel */
+    max-width: 1200px; /* Increased width */
+    margin: 0 auto;
+    background-color: #2a2737; /* Dark Background */
+    border-radius: 20px;
+    color: #FFFFFF; /* White Text */
+    font-family: 'Roboto', sans-serif;
+}
+  
+.checkout-body {
+    font-family: 'Arial', sans-serif;
+    background-color: #666278; /* Primary Background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+  
+/* Title Styling */
+.checkout-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5rem; /* Larger font size for title */
+    font-weight: bold;
+}
+  
+/* Form Styling */
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased gap for spacing */
+}
+  
+.checkout-input {
+    padding: 20px; /* Increased padding */
+    border-radius: 12px; /* Slightly larger radius */
+    border: none;
+    background-color: #4A4A5E; /* Input Background */
+    color: #FFFFFF;
+    outline: none;
+    font-size: 1.2rem; /* Larger font size */
+    transition: background-color 0.3s ease, border 0.3s ease;
+}
+  
+.checkout-input::placeholder {
+    color: #CCC;
+    font-size: 1.1rem; /* Slightly larger placeholder font */
+}
+  
+.checkout-input:focus {
+    border: 2px solid #8B5CF6; /* Thicker focus border */
+    background-color: #3B3B4F;
+}
+  
+/* Button Styling */
+.checkout-button {
+    padding: 15px;
+    background-color: #8B5CF6; /* Accent Color */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.5rem; /* Larger button text */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+  
+.checkout-button:hover {
+    background-color: #6D4ECF;
+    transform: scale(1.08); /* Slightly larger hover effect */
+}
+  
+/* Title for Address Section */
+.address-section-title {
+    margin-top: 40px; /* Adjusted spacing */
+    font-size: 2rem; /* Larger font size */
+    font-weight: bold;
+    text-align: left;
+}
+  
+/* Address List Styling */
+.address-list {
+    list-style-type: none;
+    padding: 0;
+}
+  
+.address-item {
+    padding: 20px; /* Increased padding */
+    margin-bottom: 15px; /* Increased margin */
+    border-radius: 15px; /* Rounded corners */
+    background-color: #4A4A5E;
+    color: #FFFFFF;
+    font-size: 1.2rem; /* Larger text size */
+    transition: background-color 0.3s ease;
+}
+  
+.address-item.selected {
+    background-color: #8B5CF6;
+}
+  
+.address-item:hover {
+    background-color: #6D4ECF;
+}
+  
+/* Payment Button */
+.payment-button {
+    padding: 18px; /* Increased padding */
+    margin-top: 30px;
+    background-color: #007bff;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.5rem; /* Larger button text */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+  
+.payment-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.08);
+}
+  
+/* Error Message */
+.error-message {
+    color: #FF4D4D; /* Red */
+    text-align: center;
+    font-size: 1.2rem; /* Larger error text */
+    margin-bottom: 20px;
+}
+  
+/* Responsive Design */
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 20px;
+    }
+  
+    .checkout-title {
+        font-size: 2rem;
+    }
+  
+    .checkout-input {
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+  
+    .checkout-button,
+    .payment-button {
+        padding: 12px;
+        font-size: 1.3rem;
+    }
+  
+    .address-item {
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+}
