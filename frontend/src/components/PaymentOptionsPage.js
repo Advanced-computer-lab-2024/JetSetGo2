@@ -1,6 +1,72 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+// Initialize Stripe
+const stripePromise = loadStripe("pk_test_51QQBfPKbaBifWGn14vu2SZhspEMUJn56AZy9Kcmrq3v8XQv0LDF3rLapvsR6XhA7tZ3YS6vXgk0xgoivUwm03ACZ00NI0XGIMx");
+
+const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements || !clientSecret) {
+      alert("Stripe is not ready. Please try again.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const cardElement = elements.getElement(CardElement);
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: { name: "Customer Name" },
+        },
+      });
+
+      if (error) {
+        console.error("Payment error:", error);
+        alert("Payment failed. Please try again.");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        alert("Payment successful!");
+        onPaymentSuccess(paymentIntent.id);
+      }
+    } catch (err) {
+      console.error("Error during payment confirmation:", err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: "16px",
+              color: "#424770",
+              "::placeholder": { color: "#aab7c4" },
+            },
+            invalid: { color: "#9e2146" },
+          },
+          hidePostalCode: true,
+        }}
+      />
+      <button type="submit" disabled={!stripe || isProcessing}>
+        {isProcessing ? "Processing..." : "Pay"}
+      </button>
+    </form>
+  );
+};
 
 const PaymentOptionsPage = () => {
   const location = useLocation();
@@ -8,7 +74,10 @@ const PaymentOptionsPage = () => {
   const { addressId } = location.state; // Address ID passed from the previous page
   const [showPopup, setShowPopup] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [clientSecret, setClientSecret] = useState("");
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState(null);
   const API_URL = "http://localhost:8000";
 
   useEffect(() => {
@@ -30,50 +99,105 @@ const PaymentOptionsPage = () => {
       setMessage("Failed to load cart items.");
     }
   };
+  const handlePayment = async (method) => {
+    setPaymentMethod(method); // Set the payment method for further processing
 
-  const handlePayment = (method) => {
     if (method === "cash") {
-      setShowPopup(true); // Show confirmation popup for cash on delivery
+        setShowPopup(true); // Show confirmation popup for cash on delivery
+    } else if (method === "wallet") {
+        await handlePurchase(); // Process wallet payment
+    } else if (method === "card") {
+        await initiateCardPayment(); // Prepare Stripe payment
+    }
+};
+const initiateCardPayment = async () => {
+  const touristId = localStorage.getItem("userId");
+  console.log("Initiating payment...");
+  console.log("Tourist ID:", touristId);
+  console.log("Address ID:", addressId);
+
+  try {
+    const payload = {
+      touristId,
+      addressId,
+      paymentMethod: "card",
+    };
+    console.log("Payload being sent:", payload);
+
+    const response = await axios.post(`${API_URL}/home/tourist/buyProducts`, payload);
+    console.log("Response from server:", response.data);
+
+    const { clientSecret } = response.data;
+
+    if (clientSecret) {
+      setClientSecret(clientSecret);
+      setIsPaymentModalOpen(true);
     } else {
-      console.log(`Selected payment method: ${method}, Address ID: ${addressId}`);
-      // Handle other payment methods (e.g., wallet, credit card)
+      alert("Error initiating card payment. Please try again.");
     }
-  };
+  } catch (error) {
+    console.error("Error initiating card payment:", error.response || error);
+    alert(error.response?.data?.error || "Error initiating card payment. Please try again.");
+  }
+};
 
-  const confirmOrder = async () => {
-    const touristId = localStorage.getItem("userId"); // Get tourist ID from local storage
+const handlePurchase = async (paymentIntentId = null) => {
+  const touristId = localStorage.getItem("userId");
 
-    if (!touristId) {
-      alert("User ID is missing. Please log in.");
+  if (!touristId || !addressId) {
+      alert("Tourist ID or Address ID is missing.");
       return;
-    }
+  }
 
-    // Map cartItems to the new schema format
-    const cartData = cartItems.map((item) => ({
-      product: item.product._id, // Assuming `product` contains the populated product details
-      quantity: item.quantity, // Quantity of the product in the cart
-    }));
-
-    if (cartData.length === 0) {
-      alert("Cart is empty. Please add items to your cart.");
-      return;
-    }
-
-    try {
-      // Send cart data, tourist ID, and address ID to the backend
+  try {
       const response = await axios.post(`${API_URL}/home/tourist/buyProducts`, {
-        touristId,
-        addressId,
-        cart: cartData, // Pass cart data
+          touristId,
+          addressId,
+          paymentMethod,
+          paymentIntentId: paymentIntentId || null, // Only for card payments
       });
 
-      alert("Order confirmed! Your products are on the way.");
-      setShowPopup(false); // Close the popup
-      navigate("/my-orders"); // Redirect to "My Orders" page
-    } catch (error) {
-      console.error("Error confirming order:", error);
-      alert("Failed to confirm order. Please try again.");
-    }
+      if (paymentMethod === "wallet") {
+        try {
+          const response = await axios.post(`${API_URL}/home/tourist/buyProducts`, {
+            touristId,
+            addressId,
+            paymentMethod,
+          });
+      
+          if (response.data.message) {
+            alert(response.data.message); // Show success message from backend
+            navigate("/my-orders"); // Redirect to orders page
+          }
+        } catch (error) {
+          console.error("Error completing wallet payment:", error);
+      
+          // Show error message from backend if available
+          const errorMessage = error.response?.data?.error || "Error completing purchase. Please try again.";
+          alert(errorMessage);
+        }
+      
+      
+      } else if (paymentMethod === "cash") {
+          alert("Order placed successfully! Pay cash on delivery.");
+          navigate("/my-orders"); // Redirect to orders page
+
+      }
+  } catch (error) {
+      console.error("Error completing purchase:", error);
+      alert("Error completing purchase. Please try again.");
+  }
+};
+
+const handlePaymentSuccess = async (paymentIntentId) => {
+    setIsPaymentModalOpen(false);
+    await handlePurchase(paymentIntentId); // Finalize the card payment
+    navigate("/my-orders"); // Redirect to orders page
+};
+
+  const confirmOrder = async () => {
+    await handlePurchase();
+    setShowPopup(false);
   };
 
   return (
@@ -95,7 +219,7 @@ const PaymentOptionsPage = () => {
         Pay with Wallet
       </button>
       <button
-        onClick={() => handlePayment("credit_card")}
+        onClick={() => handlePayment("card")}
         style={{
           padding: "10px 20px",
           marginTop: "20px",
@@ -122,6 +246,12 @@ const PaymentOptionsPage = () => {
       >
         Cash on Delivery
       </button>
+
+      {isPaymentModalOpen && (
+        <Elements stripe={stripePromise}>
+          <PaymentForm clientSecret={clientSecret} onPaymentSuccess={handlePaymentSuccess} />
+        </Elements>
+      )}
 
       {/* Popup Modal */}
       {showPopup && (

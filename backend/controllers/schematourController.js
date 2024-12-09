@@ -480,44 +480,38 @@ const cancelBooking = async (req, res) => {
     }
 
     // Attempt to cancel the booking
+    const tourist = await User.findById(userId);
+    if (!tourist) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const refundAmount = parseFloat(schema.TourPrice);
+    if (isNaN(refundAmount)) {
+      return res.status(400).json({ message: "Invalid refund amount." });
+    }
+
+    console.log("Refund amount:", refundAmount);
+
+    tourist.Wallet += refundAmount;
+    console.log("Wallet updated. New balance:", tourist.Wallet);
     await schema.cancelBooking(userId);
 
-    // // Retrieve the user from the database using the userId
-    // const user = await User.findById(userId); // Assuming you have a User model
+    // Remove the booking from the itinerary
 
-    // if (!user) {
-    //   return res.status(404).json({ message: "User not found" });
-    // }
-
-    // // Use the existing calculateLoyaltyPoints function
-    // const loyaltyPoints = calculateLoyaltyPoints(
-    //   user.Loyalty_Level,
-    //   schema.TourPrice
-    // );
-
-    // // Add loyalty points to the user's account
-    // user.Loyalty_Points = user.Loyalty_Points - loyaltyPoints;
-    // user.Total_Loyalty_Points = user.Total_Loyalty_Points - loyaltyPoints;
-
-    // if (user.Total_Loyalty_Points >= 500000) {
-    //   user.Loyalty_Level = 3;
-    // } else if (user.Total_Loyalty_Points >= 100000) {
-    //   user.Loyalty_Level = 2;
-    // } else {
-    //   user.Loyalty_Level = 1;
-    // }
-    // // Save the updated user record
-    // await user.save();
+    // Save the updated itinerary and tourist
+    await schema.save();
+    await tourist.save();
 
     res.status(200).json({
-      message: "Booking canceled successfully",
-      bookings: schema.bookings,
+      message: "Booking canceled successfully. Refund processed.",
+      refundAmount,
+      walletBalance: tourist.Wallet,
+      updatedBookings: schema.bookings,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error cancelling booking:", error);
+    res.status(500).json({ message: "Internal server error", details: error.message });
   }
 };
-
 const submitReview = async (req, res) => {
   const { userId, rating, comment } = req.body;
   const { itineraryId } = req.params;

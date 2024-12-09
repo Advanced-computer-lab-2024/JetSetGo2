@@ -25,10 +25,7 @@ const scheduleAllOrdersStatusUpdate = async () => {
 
         const oneMinuteFromNow = moment().add(1, "minute").toDate(); // Time to change to "Shipped"
 
-        console.log(
-          `Order status for product ${order.product._id} scheduled to change to "Shipped" at ${oneMinuteFromNow}`
-        );
-
+    
         // Schedule the status update to "Shipped"
         schedule.scheduleJob(oneMinuteFromNow, async () => {
           try {
@@ -46,9 +43,7 @@ const scheduleAllOrdersStatusUpdate = async () => {
             if (updatedOrder) {
               updatedOrder.status = "Shipped";
               await refreshedTourist.save();
-              console.log(
-                `Order status for product ${order.product._id} updated to "Shipped".`
-              );
+      
             } else {
               console.error(
                 `Order for product ${order.product._id} not found in refreshed data.`

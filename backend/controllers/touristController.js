@@ -386,64 +386,134 @@ const buyProduct = async (req, res) => {
 };
 
 const buyProducts = async (req, res) => {
-  const { touristId, addressId } = req.body;
+  const { touristId, addressId, paymentMethod, paymentIntentId } = req.body;
 
-  if (!touristId || !addressId) {
+  if (!touristId || !addressId || !paymentMethod) {
     return res.status(400).json({ error: "Required data is missing." });
   }
 
   try {
-    const tourist = await touristModel
-      .findById(touristId)
-      .populate("cart.product");
+    const tourist = await touristModel.findById(touristId).populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found." });
     }
 
-    const cartItems = tourist.cart; // Get the items in the cart
+    const cartItems = tourist.cart;
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ error: "Cart is empty." });
     }
 
-    const processedProducts = [];
+    // Calculate total price
+    const totalPrice = cartItems.reduce((sum, item) => {
+      const itemPrice = parseFloat(item.product.price) * item.quantity;
+      if (isNaN(itemPrice)) {
+        throw new Error(`Invalid price for product: ${item.product.description}`);
+      }
+      return sum + itemPrice;
+    }, 0);
 
+    // Validate total price against Stripe's limit
+    if (totalPrice > 999999.99) {
+      return res.status(400).json({ error: "Total amount exceeds the maximum limit of $999,999.99." });
+    }
+
+    // Handle payment logic
+    if (paymentMethod === "card") {
+      if (!paymentIntentId) {
+        console.log("Initiating Stripe payment...");
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(totalPrice * 100), // Convert to cents
+          currency: "usd",
+          metadata: { touristId, addressId },
+        });
+
+        console.log("Payment Intent Created:", paymentIntent);
+
+        return res.status(200).json({
+          clientSecret: paymentIntent.client_secret,
+          message: "Payment initiated. Confirm payment on the frontend.",
+        });
+      }
+
+      console.log("Verifying payment...");
+      const verifiedPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      if (verifiedPaymentIntent.status !== "succeeded") {
+        return res.status(400).json({
+          message: `Payment not confirmed. Status: ${verifiedPaymentIntent.status}`,
+        });
+      }
+
+      console.log("Payment confirmed:", verifiedPaymentIntent);
+    } else if (paymentMethod === "wallet") {
+      if (tourist.Wallet < totalPrice) {
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+
+      tourist.Wallet -= totalPrice;
+      console.log("Wallet payment processed.");
+    } else if (paymentMethod === "cash") {
+      console.log("Cash payment selected. Order will be processed for cash on delivery.");
+    } else {
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+
+    // Add loyalty points except for wallet payments
+    if (paymentMethod !== "wallet") {
+      const loyaltyPoints = calculateLoyaltyPoints(tourist.Loyalty_Level, totalPrice);
+
+      if (isNaN(loyaltyPoints) || loyaltyPoints < 0) {
+        throw new Error("Invalid loyalty points calculated.");
+      }
+
+      tourist.Loyalty_Points += loyaltyPoints;
+      tourist.Total_Loyalty_Points += loyaltyPoints;
+
+      // Update loyalty level
+      if (tourist.Total_Loyalty_Points >= 500000) {
+        tourist.Loyalty_Level = 3;
+      } else if (tourist.Total_Loyalty_Points >= 100000) {
+        tourist.Loyalty_Level = 2;
+      } else {
+        tourist.Loyalty_Level = 1;
+      }
+    }
+
+    // Process products after successful payment
+    const processedProducts = [];
     for (const cartItem of cartItems) {
       const product = cartItem.product;
       const quantity = cartItem.quantity;
 
-      // Check stock availability
       if (product.availableQuantity < quantity) {
         return res.status(400).json({
           error: `Product '${product.description}' has insufficient stock. Available: ${product.availableQuantity}, Requested: ${quantity}`,
         });
       }
 
-      // Deduct stock and save product
       product.availableQuantity -= quantity;
       await product.save();
 
-      // Add product and quantity to the purchase history
-      tourist.purchasedProducts.push({
-        product: product._id,
-        quantity,
-      });
-
+      tourist.purchasedProducts.push({ product: product._id, quantity });
       processedProducts.push({ product, quantity });
     }
 
-    // Clear the cart after successful purchase
     tourist.cart = [];
     await tourist.save();
 
     res.status(200).json({
-      message: "Products purchased successfully.",
+      message:
+        paymentMethod === "cash"
+          ? "Order placed successfully! Pay cash on delivery."
+          : "Products purchased successfully.",
       processedProducts,
     });
   } catch (error) {
     console.error("Error in buyProducts:", error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: "Internal server error.", details: error.message });
   }
 };
+
 
 const getBookedTransportations = async (req, res) => {
   const { touristId } = req.params;
@@ -1316,16 +1386,39 @@ const cancelOrder = async (req, res) => {
 
     console.log("Order found:", order);
 
-    // Remove order and save
+    // Retrieve the product details to calculate the refund
+    const product = await productModel.findById(order.product);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found for the order." });
+    }
+
+    // Calculate the refund amount
+    const refundAmount = product.price * order.quantity;
+
+    console.log("Refund amount:", refundAmount);
+
+    // Refund the amount to the user's wallet
+    tourist.Wallet += refundAmount;
+
+    console.log("Wallet updated. New balance:", tourist.Wallet);
+
+    // Remove order from the purchased products
     tourist.purchasedProducts.remove(order);
+
+    // Save the updated tourist
     await tourist.save();
 
-    res.status(200).json({ message: "Order cancelled successfully." });
+    res.status(200).json({
+      message: "Order cancelled successfully. Refund processed.",
+      refundAmount,
+      walletBalance: tourist.Wallet,
+    });
   } catch (error) {
     console.error("Error cancelling order:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
 
 module.exports = {
   createTourist,
