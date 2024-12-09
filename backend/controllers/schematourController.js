@@ -537,6 +537,27 @@ const getBookedItineraries = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const getBookedItineraries1 = async (req, res) => {
+  const { tourGuideId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(tourGuideId)) {
+      return res.status(400).json({ message: "Invalid tour guide ID." });
+    }
+
+    const itineraries = await Schema.find({ tourGuide: tourGuideId, bookings: { $gt: 0 } });
+
+    if (!itineraries.length) {
+      return res.status(404).json({ message: "No booked itineraries found." });
+    }
+
+    res.status(200).json(itineraries);
+  } catch (error) {
+    console.error("Error fetching booked itineraries:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 const requestNotification = async (req, res) => {
   const { id } = req.params; // Itinerary ID
   const { userId } = req.body; // Tourist ID
@@ -628,7 +649,32 @@ const getNotificationRequests = async (req, res) => {
   }
 };
 
+const getBookedItinerariesByTourGuide = async (req, res) => {
+  const { tourGuideId } = req.params;
 
+  try {
+    // Fetch itineraries created by the tour guide that have bookings
+    const bookedItineraries = await Schema.find({
+      tourGuide: tourGuideId,
+      bookings: { $gt: 0 }, // Only fetch itineraries with bookings
+    });
+
+    // Calculate total revenue
+    const totalRevenue = bookedItineraries.reduce((total, itinerary) => {
+      const itineraryRevenue = Math.min(...itinerary.TourPrice) * itinerary.bookings * 0.9;
+      return total + itineraryRevenue;
+    }, 0);
+    console.log(itineraries);
+
+    res.status(200).json({
+      bookedItineraries,
+      totalRevenue,
+    });
+  } catch (error) {
+    console.error("Error fetching booked itineraries:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
 
 
 
@@ -651,8 +697,10 @@ module.exports = {
   cancelBooking,
   submitReview,
   getBookedItineraries,
+  getBookedItineraries1,
   getIteneraries,
   getNotificationRequests,
   requestNotification,
-  finalizeBooking
+  finalizeBooking,
+  getBookedItinerariesByTourGuide
 };

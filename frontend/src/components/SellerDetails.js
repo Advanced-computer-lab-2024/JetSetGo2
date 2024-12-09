@@ -463,6 +463,9 @@ const SellerDetails = () => {
         <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
           Museums
         </button>
+        <button onClick={() => navigate("/SellerRevenue")} style={buttonStyle}>
+  View Revenue
+</button>
         <button onClick={handleLogout}>
             Logout
           </button> {/* Logout Button */}

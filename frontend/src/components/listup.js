@@ -385,6 +385,9 @@ const AdvertiserDetails = () => {
         <button onClick={() => navigate("/transportation")} style={buttonStyle}>
           Create Transportation
         </button>
+        <button onClick={() => navigate("/AdvertiserSales")} style={buttonStyle}>
+          Revenue Reporte
+        </button>
         <h3 style={{ color: "#ff6348" }}>Explore</h3>
 
         <button

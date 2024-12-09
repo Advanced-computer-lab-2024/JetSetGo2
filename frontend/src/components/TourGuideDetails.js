@@ -214,6 +214,10 @@ const TourGuidePage = () => {
     navigate('/login'); // Redirect to the login page
   };
 
+  const handleRevenuePage = () => {
+    navigate("/revenue");
+  };
+
   const handleCancel = () => {
     setIsEditing(false); // Exit edit mode without saving changes
   };
@@ -237,6 +241,9 @@ const TourGuidePage = () => {
           </button>
           <button onClick={handleSchemaTourFrontPage} style={styles.button}>
             Create/View Itinerary
+          </button>
+          <button onClick={handleRevenuePage} style={styles.button}>
+            Revenue Rep
           </button>
           <button style={styles.button} onClick={handleLogout}>
             Logout

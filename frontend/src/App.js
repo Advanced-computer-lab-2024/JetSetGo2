@@ -17,8 +17,10 @@ import CategoryCRUD from "./components/CategoryCRUD";
 import ProductCRUD from "./components/ProductCRUD";
 import CreateTag from "./components/CreateTag";
 import AdvertiserForm from "./components/Create";
+import AdvertiserRevenuePage from "./components/ADSales";
 import Mai from "./components/MYM";
 import AdvertiserManagement from "./components/listup";
+import SellerRevenue from "./components/SellerSales";
 import CreateSeller from "./components/CreateSeller";
 import SellerDetails from "./components/SellerDetails";
 import UpcomingEvents from "./components/UpComingEvents/upComingEvents";
@@ -46,6 +48,7 @@ import ProductListp from "./components/p";
 import DeleteUsers from "./components/DeleteUsers";
 import AdminCapabilities from "./components/AdminCapabilities";
 import TourismGovernorPage from "./components/TourismGovernorPage";
+import TourGuideRevenuePage from "./components/TGSales";
 import Login from "./components/login";
 import HPdetails from "./components/HPDetails";
 import MDetails from "./components/MDetails";
@@ -107,6 +110,7 @@ function App() {
           <Route path="/CreateTag" element={<CreateTag />} />
           <Route path="/myhp" element={<MYHPT />} />
           <Route path="/mymp" element={<Mai />} />
+          <Route path="/revenue" element={<TourGuideRevenuePage />} />
           <Route path="/CreateSeller" element={<CreateSeller />} />
           <Route path="/seller-details" element={<SellerDetails />} />
           <Route path="/UpcomingEvents" element={<UpcomingEvents />} />
@@ -114,6 +118,8 @@ function App() {
           <Route path="/Upcoming-activitiest" element={<Activitiest />} />
           <Route path="/activities/:id" element={<ActivityDetails />} />
           <Route path="/mi" element={<ItinerariesPage />} />
+          <Route path="/SellerRevenue" element={<SellerRevenue />} />
+          <Route path="/AdvertiserSales" element={<AdvertiserRevenuePage />} />
           <Route path="/myactivity" element={<MyActivities />} />
           <Route path="/HPT" element={<HPT />} />
           <Route path="/all-historicalplaces" element={<HistoricalPlaces />} />

@@ -191,6 +191,36 @@ const reqAccountToBeDeleted = async (req, res) => {
   }
 };
 
+
+
+const getSellerRevenue = async (req, res) => {
+  const { sellerId } = req.params;
+
+  try {
+    // Fetch products by this seller
+    const products = await ProductModel.find({ sellerId });
+
+    if (!products.length) {
+      return res.status(404).json({ message: "No products found for this seller." });
+    }
+
+    // Calculate total revenue
+    const totalRevenue = products.reduce((sum, product) => {
+      return sum + product.price * product.salesCount;
+    }, 0);
+
+    res.status(200).json({
+      products,
+      totalRevenue,
+    });
+  } catch (error) {
+    console.error("Error fetching seller revenue:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
+
 module.exports = {
   readSeller,
   updateSeller,
@@ -200,4 +230,5 @@ module.exports = {
   acceptSeller,
   reqAccountToBeDeleted,
   rejectSeller,
+  getSellerRevenue
 };

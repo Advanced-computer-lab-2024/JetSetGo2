@@ -214,7 +214,39 @@ const reqAccountToBeDeleted = async (req, res) => {
     res.status(500).json({ message: "Error fetching itineraries", error });
   }
 };
+const getAdvertiserRevenue = async (req, res) => {
+  const { advertiserId } = req.params;
 
+  try {
+    // Fetch activities and transportations created by this advertiser
+    const activities = await activityModel.find({ advertiser: advertiserId }).populate("category" ).populate("date") ;
+    const transportations = await TransportaionModel.find({ advertiser: advertiserId }).populate("MaxseatsAvailable");
+
+    // Calculate activity revenue
+    const activityRevenue = activities.reduce((sum, activity) => {
+      return sum + activity.bookings * activity.price * 0.9; // 10% platform fee
+    }, 0);
+
+    // Calculate transportation revenue
+    const transportationRevenue = transportations.reduce((sum, transportation) => {
+      return sum +  transportation.price * 0.9; // 10% platform fee
+    }, 0);
+
+    // Total revenue
+    const totalRevenue = activityRevenue + transportationRevenue;
+
+    res.status(200).json({
+      activities,
+      transportations,
+      activityRevenue,
+      transportationRevenue,
+      totalRevenue,
+    });
+  } catch (error) {
+    console.error("Error fetching advertiser revenue:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
 // Export the router
 module.exports = {
   getAdver,
@@ -225,4 +257,5 @@ module.exports = {
   acceptAdver,
   reqAccountToBeDeleted,
   rejectAdver,
+  getAdvertiserRevenue
 };

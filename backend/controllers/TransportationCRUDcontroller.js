@@ -14,6 +14,8 @@ const createTransportation = async (req, res) => {
     const transportationData = {
       ...req.body,
       advertiser: req.body.advertiser, // Add advertiser to the transportation
+      
+  MaxSeatsAvailable: req.body.seatsAvailable, // Assign directly
     };
 
     // Check if the date has passed

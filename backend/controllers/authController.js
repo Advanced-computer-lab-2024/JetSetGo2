@@ -16,7 +16,7 @@ const loginUser = async (req, res) => {
 
     // If not found in Seller, search in Adver
     if (!user) {
-      user = await AdverModel.findOne({ email: Email });
+      user = await AdverModel.findOne({ Email });
       AccountType = "Advertiser";
     }
 

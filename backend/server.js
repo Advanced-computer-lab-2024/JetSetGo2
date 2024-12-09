@@ -9,6 +9,10 @@ const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 const scheduleBirthdayEmails = require("./birthdayScheduler");
+
+
+const scheduleActivityNotificationss = require("./activiteSchedular.js");
+
 const itenarynotification = require("./notificationScheduler.js");
 const changeorderstatus = require("./changeorderstatus.js");
 const cron = require("node-cron");
@@ -65,6 +69,7 @@ mongoose
     // Start the birthday scheduler
     scheduleBirthdayEmails();
     itenarynotification();
+    scheduleActivityNotificationss();
     changeorderstatus();    
     // Start server
     app.listen(port, () => {
@@ -96,8 +101,10 @@ app.get("/api/protected", authMiddleware, (req, res) => {
 });
 app.use("/itinerary", itineraryRoutes);
 app.use("/", touristRoutes);
-
+app.use("/api/itinerary", itineraryRoutes);
 app.use('/activity', activityRoutes); 
+app.use("/api/seller", sellerRoutes); // Use seller routes
+app.use("/api", AdvertiserRoutes);
 function calculateLoyaltyPoints(level, price) {
   let points = 0;
 

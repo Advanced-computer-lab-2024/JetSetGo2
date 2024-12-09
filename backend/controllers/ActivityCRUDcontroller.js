@@ -562,6 +562,25 @@ const getNotificationRequests = async (req, res) => {
   }
 };
 
+const getBookedActivities = async (req, res) => {
+  try {
+    const { advertiserId } = req.params;
+
+    // Find activities created by this advertiser with bookings
+    const activities = await Activity.find({ advertiser: advertiserId, bookings: { $gt: 0 } });
+
+    if (!activities.length) {
+      return res.status(404).json({ message: "No booked activities found for this advertiser." });
+    }
+
+    res.status(200).json(activities);
+  } catch (error) {
+    console.error("Error fetching booked activities:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
 
 module.exports = {
   createActivity,
@@ -575,6 +594,7 @@ module.exports = {
   getActivityById,
   flagActivity,
   cancelactivity,
+  getBookedActivities,
   getBookedactivities,
   submitReview,
   toggleActivation ,
