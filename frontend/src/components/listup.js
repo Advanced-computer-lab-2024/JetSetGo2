@@ -355,7 +355,12 @@ const AdvertiserDetails = () => {
           <button onClick={() => { fetchAdverActivities(); setShowActivities(!showActivities); }} className="sidebar-button">
             {showActivities ? "Hide Activities" : "View Activities"}
           </button>
-         
+          <button className="sidebar-button" onClick={() => navigate("/TouristReport", {
+              state: { adverId },
+            })
+          }>Tourist Report</button>
+
+        
           <button onClick={handleLogout} className="sidebar-button">
             Logout
           </button>
@@ -363,7 +368,7 @@ const AdvertiserDetails = () => {
             Delete Account
           </button>
       
-  
+          
         {/* Right Sidebar */}
 
         <div className="advertiser-sidebar-image-container">

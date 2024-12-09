@@ -8,7 +8,12 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from '../logoo444.JPG';
+import "../TourGuidePage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from '../logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -119,13 +124,24 @@ const handleBookmarkToggle = async (museumId) => {
 
     if (response.status === 200) {
       console.log("Bookmark toggled:", response.data);
-      fetchMuseums(); // Refresh museums to reflect bookmark status
+
+      // Update local state immediately
+      setBookmarkedMuseums((prevBookmarks) => {
+        if (prevBookmarks.includes(museumId)) {
+          // Remove from bookmarks
+          return prevBookmarks.filter((id) => id !== museumId);
+        } else {
+          // Add to bookmarks
+          return [...prevBookmarks, museumId];
+        }
+      });
     }
   } catch (error) {
     console.error("Error toggling bookmark:", error);
     alert("Failed to toggle bookmark. Please try again.");
   }
 };
+
 
 const viewBookmarkedMuseums = async () => {
   if (!touristId) {
@@ -153,7 +169,6 @@ const viewBookmarkedMuseums = async () => {
     alert("Failed to fetch bookmarked museums. Please try again.");
   }
 };
-
 
 const viewAllMuseums = () => {
   setFilteredMuseums(museums);
@@ -249,192 +264,198 @@ const viewAllMuseums = () => {
   };
 
   return (
-    <div id="museums" style={styles.museumsContainer}>
-      <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-        <button onClick={viewAllMuseums}>View All Museums</button>
-        <button onClick={viewBookmarkedMuseums}>View Bookmarked Museums</button>
-        
-        
-      </div>
-      
-      <style>{`
-        .museum-card {
-          background: white;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 15px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          width: 300px;
-          margin-bottom: 20px;
-        }
-        .museum-card h3 {
-          color: #333;
-        }
-        .museum-cards {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-around;
-          gap: 20px;
-        }
-        .museum-image img {
-          width: 100%;
-          height: auto;
-        }
-        .filter-container {
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        .filter-container select {
-          padding: 5px;
-          border-radius: 5px;
-          border: 1px solid #ccc;
-        }
-        .error {
-          color: red;
-          text-align: center;
-        }
-      `}</style>
-
-      <h2
-        style={{
-          color: "#FF4500",
-          fontSize: "24px",
-          textAlign: "center",
-          marginBottom: "20px",
-        }}
-      >
-        Museums
-      </h2>
-      <div className="filter-container">
-        <label htmlFor="currencySelect">Choose Currency:</label>
-        <select
-          id="currencySelect"
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="EGP">EGP</option>
-        </select>
-      </div>
-      {error && <p className="error">{error}</p>}
-
-      {/* Filter by Tag */}
-      <div className="filter-container">
-        <label htmlFor="tagFilter">Filter by Tourism Governor Tag:</label>
-        <select
-          id="tagFilter"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-        >
-          <option value="">All Tags</option>
-          {museums
-  .map((place) => place.tourismGovernerTags?.type || "Unknown") // Provide fallback value
-  .filter(
-    (value, index, self) => value && self.indexOf(value) === index
-  ) // Remove duplicates
-  .map((tag) => (
-    <option key={tag} value={tag}>
-      {tag}
-    </option>
-  ))}
-
-            
-        </select>
-      </div>
-
-      {filteredMuseums.length > 0 ? (
-  <div className="museum-cards">
-    {filteredMuseums.map((place) => {
-      // Extract latitude and longitude from the location string
-      const locationCoords = place.location.split(",");
-      const latitude = locationCoords[0];
-      const longitude = locationCoords[1];
-      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
-
-      return (
-        <div key={place._id} className="museum-card">
-          <h3>{place.tourismGovernerTags?.name || "Unnamed"}</h3>
-
-          <p>
-            <strong>Description:</strong> {place.description}
-          </p>
-          <p>
-            <strong>Location:</strong> {place.location}
-          </p>
-          <p>
-            <strong>Opening Hours:</strong> {place.openingHours}
-          </p>
-          <p>
-          <p>
-                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
-                  </p>
-          <p style={styles.cardText}>
-           {place.ticketPrice}
-          </p>          </p>
-          <div className="museum-image">
-            <img
-              src={place.pictures}
-              alt={`Picture of ${place.description}`}
-            />
-          </div>
-          <p>
-            <strong>Tourism Governor Tags:</strong>{" "}
-            {place.tourismGovernerTags?.type || "None"}
-          </p>
-          {/* Map iframe */}
-          {mapSrc && (
-            <iframe
-              title={`Map for ${place.location}`}
-              src={mapSrc}
-              width="300"
-              height="200"
-              style={{ border: "none" }}
-            ></iframe>
-          )}
-          {bookedHP.includes(place._id) ? (
-                    <button onClick={() => handleCancelBooking(place._id)}>Cancel Booking</button>
-                  ) : (
-                    <button onClick={() => handleBookTour(place._id)}>Book Now</button>
-                  )}
-                  
-          <button onClick={() => handleCopybylink(place)}>Share via copy Link</button>
-          <button onClick={() => handleShare(place)}>Share via mail </button>
-          <button
-              onClick={() => handleBookmarkToggle(place._id)}
-              style={{
-                Color: bookmarkedMuseums.includes(place._id)
-                  ? "gold"
-                  : "white",
-              }}
-            >
-              {bookmarkedMuseums.includes(place._id)
-                ? "Unbookmark"
-                : "Bookmark"}
+    <div id="museums" className="tour-guide-page">
+      {/* Navbar */}
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand href="#" className="navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+          <Nav className="ml-auto"></Nav>
+        </Container>
+      </Navbar>
+  
+      <div className="admin-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <div className="profile-container">
+            <button className="sidebar-button" onClick={() => navigate(-1)}>
+              Back
             </button>
-            
+            <button className="sidebar-button" onClick={viewAllMuseums}>
+              View All Museums
+            </button>
+            <button className="sidebar-button" onClick={viewBookmarkedMuseums}>
+              View Bookmarked Museums
+            </button>
+          </div>
+          <div className="sidebar-image-container">
+            <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+          </div>
         </div>
-      );
-    })}
-  </div>
-) : (
-  <p>No Museums available.</p>
-)}
-
+  
+        {/* Main Content */}
+        <div className="main-content">
+          <Tabs defaultActiveKey="museums" className="tg">
+            <Tab eventKey="museums" title="Museums">
+              <div className="museums-container">
+                {error && <p className="error-message">{error}</p>}
+  
+                {/* Filters */}
+                <div className="filters-container">
+                  <div className="filter-group">
+                    <Form.Label className="filter-label">Choose Currency:</Form.Label>
+                    <Form.Select
+                      id="currencySelect"
+                      value={selectedCurrency}
+                      onChange={(e) => setSelectedCurrency(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="EUR">EUR</option>
+                      <option value="USD">USD</option>
+                      <option value="EGP">EGP</option>
+                    </Form.Select>
+                  </div>
+  
+                  <div className="filter-group">
+                    <Form.Label className="filter-label">Filter by Tourism Governor Tag:</Form.Label>
+                    <Form.Select
+                      id="tagFilter"
+                      value={selectedTag}
+                      onChange={(e) => setSelectedTag(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="">All Tags</option>
+                      {museums
+                        .map((place) => place.tourismGovernerTags?.type || "Unknown")
+                        .filter(
+                          (value, index, self) => value && self.indexOf(value) === index
+                        )
+                        .map((tag) => (
+                          <option key={tag} value={tag}>
+                            {tag}
+                          </option>
+                        ))}
+                    </Form.Select>
+                  </div>
+                </div>
+  
+                {/* Museum Cards */}
+                {filteredMuseums.length > 0 ? (
+                  <div className="museum-cards">
+                    {filteredMuseums.map((place) => {
+                      const locationCoords = place.location.split(",");
+                      const latitude = locationCoords[0];
+                      const longitude = locationCoords[1];
+                      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  
+                      return (
+                        <div key={place._id} className="museum-card">
+                          <div className="museum-card-header">
+                            <h3 className="museum-title">
+                              {place.tourismGovernerTags?.name || "Unnamed"}
+                            </h3>
+                            <p className="museum-location">{place.location}</p>
+                          </div>
+  
+                          <div className="museum-card-body">
+                            <p className="museum-description">{place.description}</p>
+                            <div className="ticket-prices">
+                              <p>
+                                <strong>Foreigner:</strong>{" "}
+                                {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
+                              </p>
+                              <p>
+                                <strong>Student:</strong>{" "}
+                                {convertPrice(place.studentTicketPrice)} {selectedCurrency}
+                              </p>
+                              <p>
+                                <strong>Native:</strong>{" "}
+                                {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
+                              </p>
+                            </div>
+                          </div>
+  
+                          <div className="museum-card-image">
+                            <img
+                              src={place.pictures}
+                              alt={`Picture of ${place.description}`}
+                            />
+                          </div>
+  
+                          <div className="museum-card-buttons">
+                            {mapSrc && (
+                              <iframe
+                                title={`Map for ${place.location}`}
+                                src={mapSrc}
+                                className="museum-map"
+                              ></iframe>
+                            )}
+                        
+                            <button
+                              className="card-button share-button"
+                              onClick={() => handleCopybylink(place)}
+                            >
+                              Share via Copy Link
+                            </button>
+                            <button
+                              className="card-button share-button"
+                              onClick={() => handleShare(place)}
+                            >
+                              Share via Mail
+                            </button>
+                            <button
+  onClick={() => handleBookmarkToggle(place._id)}
+  style={{
+    backgroundColor: bookmarkedMuseums.includes(place._id) ? "gold" : "gray",
+    color: bookmarkedMuseums.includes(place._id) ? "black" : "white",
+  }}
+>
+  {bookmarkedMuseums.includes(place._id) ? "Unbookmark" : "Bookmark"}
+</button>
+    </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="no-data-message">No Museums available.</p>
+                )}
+              </div>
+            </Tab>
+          </Tabs>
+        </div>
+  
+        {/* Right Sidebar */}
+        <div className="right-sidebar">
+          <div className="sidebar-buttons"></div>
+        </div>
+      </div>
+  
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </div>
   );
+  
 };
 
 const styles = {
