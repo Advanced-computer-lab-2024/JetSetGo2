@@ -242,7 +242,7 @@ useEffect(() => {
             { label: 'Manage Historical Places', path: '/HistoricalPlacesAdmin' },
             { label: 'Manage Museums', path: '/MuseumsAdmin' },
             { label: 'Fetch Documents', path: '/fetchdocuments' },
-            
+            { label: 'Generate Sales Report', path: '/Sales-Report' },
           ].map((button) => (
             <button
               key={button.path}
