@@ -408,7 +408,7 @@ return loyaltyImages[touristData.Loyalty_Level] || "https://readingbydesign.org/
                     <strong>Date:</strong> {flight.date}
                   </p>
                   <p>
-                    <strong>Price:</strong> ${flight.price}
+                  <strong>Price:</strong> {flight.price.currency} {flight.price.total}
                   </p>
                 </li>
               ))}

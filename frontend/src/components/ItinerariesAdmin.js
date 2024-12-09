@@ -165,6 +165,7 @@ const ItinerariesAdmin = () => {
             <button className="box" onClick={() => navigate("/HistoricalPlacesAdmin")}>Historical Places</button>
           </div>
         </div>
+        
       </div>
 
       {/* Footer */}

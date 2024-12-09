@@ -68,6 +68,7 @@ const Museums = () => {
       const nonFlaggedMuseums = data.filter(place => !place.flagged);
       setMuseums(nonFlaggedMuseums);
       setFilteredMuseums(nonFlaggedMuseums);
+      console.log("Museums:", nonFlaggedMuseums);
     } catch (error) {
       console.error("Error fetching Museums:", error);
       setError("Failed to load Museums.");
@@ -177,7 +178,7 @@ const Museums = () => {
 
             return (
               <div key={place._id} className="museum-card">
-                <h3>{place.tourismGovernerTags.name}</h3>
+                <h3>{place.tourismGovernerTags?.name}</h3>
                 <p><strong>Description:</strong> {place.description}</p>
                 <p><strong>Location:</strong> {place.location}</p>
                 <p><strong>Opening Hours:</strong> {place.openingHours}</p>
@@ -193,7 +194,7 @@ const Museums = () => {
                 <div className="museum-image">
                   <img src={place.pictures} alt={`Picture of ${place.description}`} />
                 </div>
-                <p><strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags.type}</p>
+                <p><strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags?.type}</p>
                 {mapSrc && (
                   <iframe
                     title={`Map for ${place.location}`}

@@ -349,7 +349,7 @@ const flagHistoricalPlace = async (req, res) => {
     // Send email to the specified email address
     const recipientEmail = "marwanallam8@gmail.com";
     const subject = "A historical place has been flagged";
-    const text = `Dear User, the historical place with ID ${id} has been flagged.`;
+    const text = `Dear User, the Historical with the following description has been flagged: ${updatedHistoricalPlace.description}`;
 
     await sendEmailFlag(recipientEmail, subject, text);
 
