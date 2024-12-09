@@ -47,7 +47,13 @@ const AdminCapabilities = () => {
   const [replyText, setReplyText] = useState({});
   const [totalUsers, setTotalUsers] = useState(0); // State to hold total users count
   const [currentMonth, setCurrentMonth] = useState(null);
-  const [newUsersThisMonth, setNewUsersThisMonth] = useState(0); // State for new users this month
+  const [newUsersThisMonth, setNewUsersThisMonth] = useState({
+    adminCounts: [],
+    adverCounts: [],
+    touristCounts: [],
+    tourGuideCounts: [],
+    sellerCounts: []
+  });
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("desc");
   const [activeTab, setActiveTab] = useState("complaints");
@@ -57,31 +63,53 @@ const AdminCapabilities = () => {
     fetchUserStatistics();
   }, []);
 
-  const userData = {
-    labels: ["Total Users", `Users in Month ${currentMonth}`],
-    datasets: [
-      {
-        label: "Number of Users",
-        data: [totalUsers, newUsersThisMonth],
-        backgroundColor: ["#4B0082", "#007BFF"],
-        borderColor: ["#4B0082", "#007BFF"],
-        borderWidth: 1,
-      },
-    ],
-  };
+  // Initialize an array to hold the total counts for each month
+const monthlyCounts = new Array(12).fill(0);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "User Statistics",
-      },
+// Helper function to add counts to the monthlyCounts array
+const addCounts = (counts) => {
+  counts.forEach(({ _id, count }) => {
+    monthlyCounts[_id - 1] += count; // _id is the month number (1-12), adjust for 0-based index
+  });
+};
+
+addCounts(newUsersThisMonth.adminCounts);
+addCounts(newUsersThisMonth.adverCounts);
+addCounts(newUsersThisMonth.touristCounts);
+addCounts(newUsersThisMonth.tourGuideCounts);
+addCounts(newUsersThisMonth.sellerCounts);
+
+// Prepare the data for the chart
+const userData = {
+  labels: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ],
+  datasets: [
+    {
+      label: 'Number of Users',
+      data: monthlyCounts,
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1
+    }
+  ]
+};
+
+// Options for the chart
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
     },
-  };
+    title: {
+      display: true,
+      text: 'User Statistics',
+    },
+  },
+};
+
 
   const fetchComplaints = async () => {
     try {
@@ -106,11 +134,11 @@ const AdminCapabilities = () => {
       );
 
       // Destructure the response to get currentMonth and totalAcceptedUsersThisMonth
-      const { currentMonth, totalAcceptedUsersThisMonth } = response.data;
+      const totalAcceptedUsersThisMonth = response.data;
 
       // Set the state with the current month and the total number of accepted users
-      setCurrentMonth(currentMonth); // Store the current month (1-12)
-      setNewUsersThisMonth(totalAcceptedUsersThisMonth); // Store the total new users for the current month
+      setNewUsersThisMonth(totalAcceptedUsersThisMonth);  // Store the total new users for the current month
+      console.log("New users this month:", totalAcceptedUsersThisMonth);
     } catch (error) {
       console.error("Error fetching user statistics:", error);
     }
@@ -305,76 +333,55 @@ const AdminCapabilities = () => {
           <option value="resolved">Resolved</option>
         </select>
 
-                <label>Sort by Date: </label>
-                <button
-                  className="sort-button"
-                  onClick={() =>
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                  }
-                >
-                  {sortOrder === "asc" ? "Oldest First" : "Newest First"}
-                </button>
-              </div>
-              <div className="complaints-container">
-                {filteredAndSortedComplaints.map((complaint) => (
-                  <div key={complaint._id} className="complaint-card">
-                    <div className="complaint-header">
-                      <img
-                        src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
-                        alt="User"
-                        className="complaint-profile-image"
-                      />
-                      <div>
-                        <h3>{complaint.title}</h3>
-                        <p>{new Date(complaint.date).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    <p>{complaint.body}</p>
-                    <div className="action-buttons">
-                      {complaint.status === "pending" && (
-                        <button
-                          className="resolve-button"
-                          onClick={() => handleResolveComplaint(complaint._id)}
-                        >
-                          Resolve
-                        </button>
-                      )}
-                      <div className="reply-section">
-                        <input
-                          type="text"
-                          placeholder="Reply here..."
-                          value={replyText[complaint._id] || ""}
-                          onChange={(e) =>
-                            handleReplyChange(complaint._id, e.target.value)
-                          }
-                          className="reply-input"
-                        />
-                        <button
-                          className="reply-button"
-                          onClick={() => handleReplySubmit(complaint._id)}
-                        >
-                          Send Reply
-                        </button>
-                        {complaint.reply && (
-                          <p className="reply-text">
-                            Admin Reply: {complaint.reply}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Tab>
-            <Tab eventKey="manage-users" title="User Statistics">
+        <label>Sort by Date: </label>
+        <button className='sort-button' onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+          {sortOrder === "asc" ? "Oldest First" : "Newest First"}
+        </button>
+      </div>
+      <div className="complaints-container">
+        {filteredAndSortedComplaints.map((complaint) => (
+          <div key={complaint._id} className="complaint-card">
+            <div className="complaint-header">
+              <img src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png" alt="User" className="complaint-profile-image" />
               <div>
-                <div>
-                  <Bar data={userData} options={options} />
-                </div>
+                <h3>{complaint.title}</h3>
+                <p>{new Date(complaint.date).toLocaleDateString()}</p>
               </div>
-            </Tab>
-          </Tabs>
-        </div>
+            </div>
+            <p>{complaint.body}</p>
+            <div className="action-buttons">
+              {complaint.status === "pending" && (
+                <button className="resolve-button" onClick={() => handleResolveComplaint(complaint._id)}>Resolve</button>
+              )}
+              <div className="reply-section">
+                <input
+                  type="text"
+                  placeholder="Reply here..."
+                  value={replyText[complaint._id] || ""}
+                  onChange={(e) => handleReplyChange(complaint._id, e.target.value)}
+                  className="reply-input"
+                />
+                <button className="reply-button" onClick={() => handleReplySubmit(complaint._id)}>Send Reply</button>
+                {complaint.reply && <p className="reply-text">Admin Reply: {complaint.reply}</p>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Tab>
+    <Tab eventKey="manage-users" title="User Statistics">
+      <div>
+      <div className="user-stats-container">
+  <h3 className="section-title">New Users Every Month</h3>
+  <p className="total-users">Total Users: {totalUsers}</p>
+  <div>
+    <Bar data={userData} options={options} />
+  </div>
+</div>
+      </div>
+    </Tab>
+  </Tabs>
+</div>
 
         {/* Right Sidebar */}
         {/* Right Sidebar */}
