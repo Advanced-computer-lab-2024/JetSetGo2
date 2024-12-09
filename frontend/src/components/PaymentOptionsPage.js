@@ -201,48 +201,23 @@ const handlePaymentSuccess = async (paymentIntentId) => {
   };
 
   return (
-    <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#f7f8fa" }}>
+    <div >
       <h2>Payment Options</h2>
-      <p>Selected Address ID: {addressId}</p>
-      <button
+      <button  className="reply-button"
         onClick={() => handlePayment("wallet")}
-        style={{
-          padding: "10px 20px",
-          marginTop: "20px",
-          backgroundColor: "#28a745",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
+        
       >
         Pay with Wallet
       </button>
-      <button
+      <button className="reply-button"
         onClick={() => handlePayment("card")}
-        style={{
-          padding: "10px 20px",
-          marginTop: "20px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
+       
       >
         Pay with Credit Card
       </button>
-      <button
+      <button className="reply-button"
         onClick={() => handlePayment("cash")}
-        style={{
-          padding: "10px 20px",
-          marginTop: "20px",
-          backgroundColor: "#ffc107",
-          color: "#000",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
+        
       >
         Cash on Delivery
       </button>
