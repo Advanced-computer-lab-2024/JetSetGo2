@@ -174,6 +174,8 @@ const ProductListp = () => {
     }
   };
 
+  
+
   const handleBooking = async (productId) => {
     const userId = localStorage.getItem("userId"); // Fetch tourist ID from localStorage
     if (!userId) {
