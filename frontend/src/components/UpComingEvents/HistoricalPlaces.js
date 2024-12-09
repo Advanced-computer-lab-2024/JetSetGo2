@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
 import { getHistoricalPlace } from "../../services/HistoricalPlaceService"; // Update this path as needed
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from '../logoo444.JPG';
+import "../TourGuidePage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from '../logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -92,6 +98,7 @@ const HistoricalPlaces = () => {
   };
 
   return (
+    
     <div id="historical-places" style={styles.container}>
       <h2 style={styles.heading}>Historical Places</h2>
       {error && <p className="error">{error}</p>}

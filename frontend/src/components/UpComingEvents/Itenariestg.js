@@ -8,6 +8,11 @@ import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } f
 import img1 from '../logoo4.JPG';
 import { FaPen } from "react-icons/fa"; 
 
+
+
+
+
+
 // Service method to fetch itineraries
 const getItineraries = async () => {
   try {
@@ -37,9 +42,16 @@ const toggleItineraryActivation = async (id) => {
 };
 
 const Itinerariestg = () => {
+  const userId = localStorage.getItem("userId"); // Retrieve the Tour Guide ID from local storage
+
   const [itineraries, setItineraries] = useState([]);
   const [filteredItineraries, setFilteredItineraries] = useState([]); // To store filtered itineraries
   const [error, setError] = useState(null);
+  const [tourGuide, setTourGuide] = useState(null);
+const [isEditing, setIsEditing] = useState(false);
+const [activeTab, setActiveTab] = useState("Details");
+
+
 
   const [sortOrder, setSortOrder] = useState("");
   const [sortRating, setSortRating] = useState("");
@@ -68,6 +80,41 @@ const Itinerariestg = () => {
     } catch (error) {
       console.error("Error fetching itineraries:", error);
       setError("Failed to load itineraries.");
+    }
+  };
+  const handleRevenuePage = () => {
+    navigate("/revenue");
+  };
+  const handleBackClick = () => {
+    navigate(-1); // Navigate back
+  };
+  const handleLogout = () => {
+    // Clear user session or token if needed
+    localStorage.removeItem('userToken'); // Example: remove token from localStorage
+    navigate('/login'); // Redirect to the login page
+  };
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/TourGuide/deletMyAccount/${userId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
     }
   };
 
@@ -218,121 +265,157 @@ const handleToggleActivation = async (id) => {
 
   return (
     <div className="tour-guide-page">
+       <Navbar className="navbar">
+      <Container>
+        
+        <Navbar.Brand href="#" className="navbar-brand">
+          {/* Replace with your logo */}
+          <img src={img1} alt="Logo" className="navbar-logo" />
+        </Navbar.Brand>
+        <Nav className="ml-auto">
+          <Link to="/Upcoming-activities" className="nav-link">
+            Activities
+          </Link>
+          <Link to="/Upcoming-itinerariestg" className="nav-link">
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" className="nav-link">
+            Historical Places
+          </Link>
+          <Link to="/all-museums" className="nav-link">
+            Museums
+          </Link>
+        </Nav>
+      </Container>
+    </Navbar>
+    <div className="admin-container">
+    <div className="sidebar">
+  <div className="profile-container">
+    
+    <button className="sidebar-button" onClick={handleLogout}>
+      Logout
+    </button>
+    <button className="sidebar-button" onClick={handleRevenuePage} >
+            Revenue Rep
+          </button>
+    <button onClick={handleDeleteAccount} className="sidebar-button">
+      Delete Account
+    </button>
+    <button className="sidebar-button" onClick={handleBackClick}>
+      Back
+    </button>
+  </div>
+  <div className="sidebar-image-container">
+    <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+  </div>
+</div>
+<div className="main-content">
 
-    <div id="itineraries">
-      <div className="back-button-container">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          Back
-        </button>
-      </div>
-      <h2 className="title">Upcoming Itineraries</h2>
+
+<Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="tg">
+  {/* View Itineraries Tab */}
+  <Tab eventKey="viewItineraries" title="View Itineraries">
+    <div className="itineraries-container">
 
       {/* Filter and Sort controls */}
-      <div className="sort-container">
-        <label htmlFor="filterTag">Filter by Tag:</label>
-        <input
-          type="text"
-          id="filterTag"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-          placeholder="Enter tag"
-        />
+      <div className="filters-container">
+        <Form.Group className="mb-3">
+          <Form.Label>Filter by Tag</Form.Label>
+          <Form.Control
+            type="text"
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+            placeholder="Enter tag"
+          />
+        </Form.Group>
 
-        <label htmlFor="filterPrice">Filter by Max Price:</label>
-        <input
-          type="number"
-          id="filterPrice"
-          value={selectedPrice}
-          onChange={(e) => setSelectedPrice(e.target.value)}
-          placeholder="Enter max price"
-        />
+        <Form.Group className="mb-3">
+          <Form.Label>Filter by Max Price</Form.Label>
+          <Form.Control
+            type="number"
+            value={selectedPrice}
+            onChange={(e) => setSelectedPrice(e.target.value)}
+            placeholder="Enter max price"
+          />
+        </Form.Group>
 
-        <label htmlFor="filterDate">Filter by Date:</label>
-        <input
-          type="date"
-          id="filterDate"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-      </div>
+        <Form.Group className="mb-3">
+          <Form.Label>Filter by Date</Form.Label>
+          <Form.Control
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        </Form.Group>
 
-      {/* Sort by Price */}
-      <div className="sort-container">
-        <label htmlFor="sortPrice">Sort by Price:</label>
-        <select id="sortPrice" value={sortOrder} onChange={handleSortChange}>
-          <option value="">Select</option>
-          <option value="asc">Lowest to Highest</option>
-          <option value="desc">Highest to Lowest</option>
-        </select>
+        <Form.Group className="mb-3">
+          <Form.Label>Sort by Price</Form.Label>
+          <Form.Select value={sortOrder} onChange={handleSortChange}>
+            <option value="">Select</option>
+            <option value="asc">Lowest to Highest</option>
+            <option value="desc">Highest to Lowest</option>
+          </Form.Select>
+        </Form.Group>
 
-        {/* Sort by Rating */}
-        <label htmlFor="sortRating">Sort by Rating:</label>
-        <select
-          id="sortRating"
-          value={sortRating}
-          onChange={handleSortRatingChange}
-        >
-          <option value="">Select</option>
-          <option value="asc">Lowest to Highest</option>
-          <option value="desc">Highest to Lowest</option>
-        </select>
+        <Form.Group className="mb-3">
+          <Form.Label>Sort by Rating</Form.Label>
+          <Form.Select value={sortRating} onChange={handleSortRatingChange}>
+            <option value="">Select</option>
+            <option value="asc">Lowest to Highest</option>
+            <option value="desc">Highest to Lowest</option>
+          </Form.Select>
+        </Form.Group>
       </div>
 
       {/* Display itineraries */}
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error-message">{error}</p>}
 
       {filteredItineraries.length > 0 ? (
         <ul className="itinerary-list">
           {filteredItineraries.map((itinerary) => (
-            <li key={itinerary._id} className="itinerary-item">
-              <h3>{itinerary.name}</h3>
-              <p>
-                <strong>Tour Price:</strong> ${itinerary.TourPrice.join(", ")}
-              </p>
-              <p>
-                <strong>Duration of Activities:</strong>{" "}
-                {itinerary.durationActivity.join(", ")} hours
-              </p>
-              <p>
-                <strong>Available Dates:</strong>{" "}
-                {itinerary.availableDates
-                  .map((date) => new Date(date).toLocaleDateString())
-                  .join(", ")}
-              </p>
-              <p>
-                <strong>Activities:</strong>{" "}
-                {itinerary.activities
-                  .map(
-                    (activity) =>
-                      `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price}`
-                  )
-                  .join(", ")}
-              </p>
-              <p>
-                <strong>Tags:</strong>{" "}
-                {Array.isArray(itinerary.Tags)
-                  ? itinerary.Tags.map((tag) => tag.name).join(", ")
-                  : itinerary.Tags.name}
-              </p>
-              <p>
-                <strong>Languages:</strong>{" "}
-                {itinerary.tourLanguage.join(", ")}
-              </p>
-              <p>
-                <strong>Number of Bookings:</strong> {itinerary.bookings}
-              </p>
-              <p>
-                <strong>Status:</strong>{" "}
-                {itinerary.isActive ? "Active" : "Deactivated"}
-              </p>
+            <li key={itinerary._id} className="itinerary-card">
+              <div className="itinerary-details">
+                <h3 className="itinerary-title">{itinerary.name}</h3>
+                <p>
+                  <strong>Tour Price:</strong> ${itinerary.TourPrice.join(", ")}
+                </p>
+                <p>
+                  <strong>Duration of Activities:</strong> {itinerary.durationActivity.join(", ")} hours
+                </p>
+                <p>
+                  <strong>Available Dates:</strong>{" "}
+                  {itinerary.availableDates.map((date) => new Date(date).toLocaleDateString()).join(", ")}
+                </p>
+                <p>
+                  <strong>Activities:</strong>{" "}
+                  {itinerary.activities.map(
+                    (activity) => `${activity.date} - ${activity.time} - ${activity.location} - ${activity.price}`
+                  ).join(", ")}
+                </p>
+                <p>
+                  <strong>Tags:</strong>{" "}
+                  {Array.isArray(itinerary.Tags) ? itinerary.Tags.map((tag) => tag.name).join(", ") : itinerary.Tags.name}
+                </p>
+                <p>
+                  <strong>Languages:</strong> {itinerary.tourLanguage.join(", ")}
+                </p>
+                <p>
+                  <strong>Number of Bookings:</strong> {itinerary.bookings}
+                </p>
+                <p>
+                  <strong>Status:</strong> {itinerary.isActive ? "Active" : "Deactivated"}
+                </p>
+              </div>
 
               {/* Toggle activation button */}
-              <button
-                onClick={() => handleToggleActivation(itinerary._id)}
-                className={itinerary.isActive ? "deactivate-btn" : "activate-btn"}
-              >
-                {itinerary.isActive ? "Deactivate" : "Activate"}
-              </button>
+              <div className="itinerary-actions">
+                <Button 
+                  onClick={() => handleToggleActivation(itinerary._id)}
+
+                  className={`${itinerary.isActive ? "deactivate-btn" : "activate-btn"} reply-button`}                >
+                  {itinerary.isActive ? "Deactivate" : "Activate"}
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -340,6 +423,40 @@ const handleToggleActivation = async (id) => {
         <p>No itineraries available.</p>
       )}
     </div>
+  </Tab>
+</Tabs>
+</div>
+{/* Right Sidebar */}
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    <button className="box" onClick={() => navigate("/SchemaTourFront")}>Create Itinerary</button>
+  </div>
+</div>
+
+
+    </div>
+    {/* Footer */}
+    <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+
     </div>
   );
 };

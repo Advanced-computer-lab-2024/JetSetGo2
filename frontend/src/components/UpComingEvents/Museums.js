@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getMuseum } from "../../services/MuseumService"; // Update this path as needed
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate ,Link} from "react-router-dom"; // Import useNavigate
+import 'bootstrap/dist/css/bootstrap.min.css';
+import sidebarImage from '../logoo444.JPG';
+import "../TourGuidePage.css"; // Import the CSS file
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from '../logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
 
 const predefinedLocations = [
   {
@@ -39,6 +45,10 @@ const Museums = () => {
   const [selectedTag, setSelectedTag] = useState(""); // For storing selected tag
   const [filteredMuseums, setFilteredMuseums] = useState([]); // For storing filtered museums based on selected tag
   const [selectedCurrency, setSelectedCurrency] = useState("EGP"); // Default currency
+  const userId = localStorage.getItem("userId"); // Retrieve the userId
+  const [activeTab, setActiveTab] = useState("Details");
+
+
 
   // Fetch museums when the component mounts
   useEffect(() => {
@@ -68,6 +78,7 @@ const Museums = () => {
       const nonFlaggedMuseums = data.filter(place => !place.flagged);
       setMuseums(nonFlaggedMuseums);
       setFilteredMuseums(nonFlaggedMuseums);
+      console.log("Museums:", nonFlaggedMuseums);
     } catch (error) {
       console.error("Error fetching Museums:", error);
       setError("Failed to load Museums.");
@@ -82,125 +93,180 @@ const Museums = () => {
   const convertPrice = (price) => {
     return (price * currencyRates[selectedCurrency]).toFixed(2);
   };
+  const handleLogout = () => {
+    localStorage.removeItem("userToken"); // Example: remove token from localStorage
+    navigate("/login"); // Redirect to the login page
+  };
+  const handleRevenuePage = () => {
+    navigate("/revenue");
+  };
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/TourGuide/deletMyAccount/${userId}`
+        );
+
+        if (response.status === 200) {
+          alert(response.data.message); // Display success message
+          navigate("/login"); // Redirect to homepage or login after deletion
+        }
+      } catch (error) {
+        if (error.response && error.response.data.message) {
+          alert(error.response.data.message); // Display error message from backend
+        } else {
+          alert("An error occurred while deleting the account.");
+        }
+      }
+    }
+  };
+  const handleBackClick = () => {
+    navigate(-1); // Navigate back
+  };
 
   return (
-    <div id="museums" style={styles.museumsContainer}>
-      <div className="back-button-container">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          Back
-        </button>
+
+    <div id="museums" className="tour-guide-page">
+      <Navbar className="navbar">
+      <Container>
+        
+        <Navbar.Brand href="#" className="navbar-brand">
+          {/* Replace with your logo */}
+          <img src={img1} alt="Logo" className="navbar-logo" />
+        </Navbar.Brand>
+        <Nav className="ml-auto">
+          <Link to="/Upcoming-activities" className="nav-link">
+            Activities
+          </Link>
+          <Link to="/Upcoming-itinerariestg" className="nav-link">
+            Itineraries
+          </Link>
+          <Link to="/all-historicalplaces" className="nav-link">
+            Historical Places
+          </Link>
+          <Link to="/all-museums" className="nav-link">
+            Museums
+          </Link>
+        </Nav>
+      </Container>
+    </Navbar>
+    <div className="admin-container">
+    <div className="sidebar">
+  <div className="profile-container">
+    
+    <button className="sidebar-button" onClick={handleLogout}>
+      Logout
+    </button>
+    <button className="sidebar-button" onClick={handleRevenuePage} >
+            Revenue Rep
+          </button>
+    <button onClick={handleDeleteAccount} className="sidebar-button">
+      Delete Account
+    </button>
+    <button className="sidebar-button" onClick={handleBackClick}>
+      Back
+    </button>
+  </div>
+  <div className="sidebar-image-container">
+    <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
+  </div>
+</div>
+<div className="main-content">
+
+<Tabs activeKey={activeTab} onSelect={(tab) => setActiveTab(tab)} className="tg">
+  {/* Museums Tab */}
+  <Tab eventKey="museums" title="Museums">
+    <div className="museums-container">
+      {error && <p className="error-message">{error}</p>}
+
+      {/* Filters */}
+      <div className="filters-container">
+        <div className="filter-group">
+          <Form.Label className="filter-label">Choose Currency:</Form.Label>
+          <Form.Select
+            id="currencySelect"
+            value={selectedCurrency}
+            onChange={(e) => setSelectedCurrency(e.target.value)}
+            className="filter-select"
+          >
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="EGP">EGP</option>
+          </Form.Select>
+        </div>
+
+        <div className="filter-group">
+          <Form.Label className="filter-label">Filter by Tourism Governor Tag:</Form.Label>
+          <Form.Select
+            id="tagFilter"
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">All Tags</option>
+            {museums
+              .map((place) => place.tourismGovernerTags?.type)
+              .filter((value, index, self) => value && self.indexOf(value) === index)
+              .map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+          </Form.Select>
+        </div>
       </div>
-      <style>{`
-        .museum-card {
-          background: white;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 15px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          width: 300px;
-          margin-bottom: 20px;
-        }
-        .museum-card h3 {
-          color: #333;
-        }
-        .museum-cards {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-around;
-          gap: 20px;
-        }
-        .museum-image img {
-          width: 100%;
-          height: auto;
-        }
-        .filter-container {
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        .filter-container select {
-          padding: 5px;
-          border-radius: 5px;
-          border: 1px solid #ccc;
-        }
-        .error {
-          color: red;
-          text-align: center;
-        }
-      `}</style>
 
-      <h2 style={styles.header}>Museums</h2>
-      {error && <p className="error">{error}</p>}
-
-      {/* Currency Selection */}
-      <div className="filter-container">
-        <label htmlFor="currencySelect">Choose Currency:</label>
-        <select
-          id="currencySelect"
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="EGP">EGP</option>
-        </select>
-      </div>
-
-      {/* Filter by Tag */}
-      <div className="filter-container">
-        <label htmlFor="tagFilter">Filter by Tourism Governor Tag:</label>
-        <select
-          id="tagFilter"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-        >
-          <option value="">All Tags</option>
-          {museums
-            .map((place) => place.tourismGovernerTags?.type)
-            .filter((value, index, self) => value && self.indexOf(value) === index)
-            .map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
-        </select>
-      </div>
-
+      {/* Museum Cards */}
       {filteredMuseums.length > 0 ? (
-        <div className="museum-cards">
+        <div className="museum-cards-grid">
           {filteredMuseums.map((place) => {
-            const locationData = predefinedLocations.find(
-              (location) => location.name === place.location
-            );
-            const mapSrc = locationData
-              ? generateMapSrc(locationData.coordinates)
-              : null;
+            const locationCoords = place.location.split(",");
+            const latitude = locationCoords[0];
+            const longitude = locationCoords[1];
+            const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
             return (
               <div key={place._id} className="museum-card">
-                <h3>{place.tourismGovernerTags.name}</h3>
-                <p><strong>Description:</strong> {place.description}</p>
-                <p><strong>Location:</strong> {place.location}</p>
-                <p><strong>Opening Hours:</strong> {place.openingHours}</p>
-                <p>
-                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
-                </p>
-                <div className="museum-image">
+                <div className="museum-card-header">
+                  <h3 className="museum-title">{place.tourismGovernerTags?.name || "Unnamed"}</h3>
+                  <p className="museum-location">{place.location}</p>
+                </div>
+
+                <div className="museum-card-body">
+                  <p className="museum-description">{place.description}</p>
+                  <div className="ticket-prices">
+                    <p>
+                      <strong>Foreigner:</strong> {convertPrice(place.foreignerTicketPrice)}{" "}
+                      {selectedCurrency}
+                    </p>
+                    <p>
+                      <strong>Student:</strong> {convertPrice(place.studentTicketPrice)}{" "}
+                      {selectedCurrency}
+                    </p>
+                    <p>
+                      <strong>Native:</strong> {convertPrice(place.nativeTicketPrice)}{" "}
+                      {selectedCurrency}
+                    </p>
+                  </div>
+                  <div className="museum-tags">
+                    <strong>Tags:</strong>{" "}
+                    {place.tourismGovernerTags?.type || "None"}
+                  </div>
+                </div>
+
+                <div className="museum-card-image">
                   <img src={place.pictures} alt={`Picture of ${place.description}`} />
                 </div>
-                <p><strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags.type}</p>
+
                 {mapSrc && (
                   <iframe
                     title={`Map for ${place.location}`}
                     src={mapSrc}
-                    width="300"
-                    height="200"
-                    style={{ border: "none" }}
+                    className="museum-map"
                   ></iframe>
                 )}
               </div>
@@ -208,23 +274,51 @@ const Museums = () => {
           })}
         </div>
       ) : (
-        <p>No Museums available.</p>
+        <p className="no-data-message">No Museums available.</p>
       )}
     </div>
+  </Tab>
+</Tabs>
+
+
+</div>
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    <button className="box" onClick={() => navigate("/SchemaTourFront")}>Create Itinerary</button>
+  </div>
+</div>
+
+
+    </div>
+    
+    
+
+<div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+
+    </div>
+
   );
 };
 
-const styles = {
-  museumsContainer: {
-    padding: "20px",
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    color: "#FF4500",
-    fontSize: "24px",
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-};
+
 
 export default Museums;

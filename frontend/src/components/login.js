@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +14,12 @@ const Login = () => {
 
   const navigate = useNavigate();
   
-
+ useEffect(() => {
+    document.body.classList.add("login-body");
+    return () => {
+      document.body.classList.remove("login-body");
+    };
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -148,11 +153,20 @@ return (
       <a href="/request-otp" className="ForgotPassword">
           Forgot password?
         </a>
+        {/* Back to Website Button */}
+<button
+  className="back-to-website-btn"
+  onClick={() => window.location.href = '/'} // Redirect to HomePage
+>
+   Home 
+</button>
+ {/* Error & Success Messages */}
+ {errorMessage && <div className="ErrorMessage">{errorMessage}</div>}
+    {successMessage && <div className="SuccessMessage">{successMessage}</div>}
     </form>
 
-    {/* Error & Success Messages */}
-    {errorMessage && <div className="ErrorMessage">{errorMessage}</div>}
-    {successMessage && <div className="SuccessMessage">{successMessage}</div>}
+
+   
   </div>
 </div>
 
