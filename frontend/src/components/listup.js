@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate,Link } from "react-router-dom";
 import axios from "axios";
 import {
   getActivity,
@@ -11,6 +11,12 @@ import {
   getActivityById,
   getTags,
 } from "../services/ActivityService";
+import "../AdvertiserDetails.css"; // Import the updated styles
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import img1 from './logoo4.JPG';
+import { FaPen } from "react-icons/fa"; 
+import sidebarImage from './logoo444.JPG';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const predefinedLocations = [
   {
@@ -304,342 +310,329 @@ const AdvertiserDetails = () => {
   if (!advertiser) return <div>Loading...</div>;
 
   // Styles
-  const containerStyle = {
-    display: "flex",
-    minHeight: "100vh",
-    backgroundColor: "#f7f8fa",
-    padding: "20px",
-  };
-
-  const sidebarStyle = {
-    width: "250px",
-    padding: "20px",
-    //backgroundColor: "#2d3e50",
-    borderRadius: "10px",
-    color: "#fff",
-  };
-
-  const mainContentStyle = {
-    flex: 1,
-    marginLeft: "30px",
-    padding: "20px",
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-  };
-
-  const buttonStyle = {
-    padding: "10px 20px",
-    backgroundColor: "#ff6348",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginBottom: "10px",
-    width: "100%",
-    fontSize: "16px",
-  };
-  const profileImage = {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    marginBottom: "15px",
-    border: "3px solid #fff",
-  };
-
   return (
-    <div style={containerStyle}>
-      {/* Sidebar */}
-      <div style={sidebarStyle}>
-        <h3>Welcome</h3>
-        <img 
-                          src={`data:image/png;base64,${advertiser.logo}`} 
-                          alt="Product" 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                        />
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          style={buttonStyle}
-        >
-          {showDetails ? "Hide Details" : "View Details"}
-        </button>
-        <button
-          onClick={() => setIsEditingAdvertiser(!isEditingAdvertiser)}
-          style={buttonStyle}
-        >
-          {isEditingAdvertiser
-            ? "Cancel Update Advertiser"
-            : "Update Advertiser"}
-        </button>
-        <button
-          onClick={() =>
-            fetchAdverActivities() && setShowActivities(!showActivities)
-          }
-          style={buttonStyle}
-        >
-          {showActivities ? "Hide Activities" : "View Activities"}
-        </button>
-        <button onClick={() => navigate("/activities")} style={buttonStyle}>
-          Create Activities
-        </button>
-        <button onClick={() => navigate("/transportation")} style={buttonStyle}>
-          Create Transportation
-        </button>
-        <button onClick={() => navigate("/AdvertiserSales")} style={buttonStyle}>
-          Revenue Reporte
-        </button>
-        <h3 style={{ color: "#ff6348" }}>Explore</h3>
-
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/Upcoming-activities")}
-        >
-          View Upcoming Activities
-        </button>
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/Upcoming-itineraries")}
-        >
-          View Itineraries
-        </button>
-        <button
-          style={buttonStyle}
-          onClick={() => navigate("/all-historicalplaces")}
-        >
-          Historical Places
-        </button>
-        <button style={buttonStyle} onClick={() => navigate("/all-museums")}>
-          Museums
-        </button>
-        <button  onClick={handleLogout}>
+    <div className="advertiser-page">
+      {/* Navbar */}
+      <Navbar className="advertiser-navbar">
+        <Container>
+          <Navbar.Brand href="#" className="advertiser-navbar-brand">
+            <img src={img1} alt="Logo" className="navbar-logo" />
+          </Navbar.Brand>
+          <Nav className="ml-auto">
+            <Link to="/Upcoming-activities" className="nav-link">
+              Activities
+            </Link>
+            <Link to="/Upcoming-itineraries" className="nav-link">
+              Itineraries
+            </Link>
+            <Link to="/all-historicalplaces" className="nav-link">
+              Historical Places
+            </Link>
+            <Link to="/all-museums" className="nav-link">
+              Museums
+            </Link>
+          </Nav>
+        </Container>
+      </Navbar>
+  
+      <div className="advertiser-container">
+        {/* Left Sidebar */}
+        <div className="advertiser-sidebar">
+          <h3 className="sidebar-heading">Welcome</h3>
+          {advertiser.logo && (
+            <img
+              src={`data:image/png;base64,${advertiser.logo}`}
+              alt="Advertiser Logo"
+              className="advertiser-profile-image"
+            />
+          )}
+          <button onClick={() => setShowDetails(!showDetails)} className="sidebar-button">
+            {showDetails ? "Hide Details" : "View Details"}
+          </button>
+          <button onClick={() => setIsEditingAdvertiser(!isEditingAdvertiser)} className="sidebar-button">
+            {isEditingAdvertiser ? "Cancel Update Advertiser" : "Update Advertiser"}
+          </button>
+          <button onClick={() => { fetchAdverActivities(); setShowActivities(!showActivities); }} className="sidebar-button">
+            {showActivities ? "Hide Activities" : "View Activities"}
+          </button>
+         
+          <button onClick={handleLogout} className="sidebar-button">
             Logout
-          </button> {/* Logout Button */}
-        <button
-          onClick={handleDeleteAccount}
-          style={{
-            color: "red",
-            background: "lightgrey",
-            padding: "10px",
-            marginTop: "20px",
-          }}
-        >
-          Delete Account
-        </button>
+          </button>
+          <button onClick={handleDeleteAccount} className="sidebar-button">
+            Delete Account
+          </button>
+      
+  
+        {/* Right Sidebar */}
+
+        <div className="advertiser-sidebar-image-container">
+          <img src={sidebarImage} alt="Advertiser Sidebar" className="advertiser-sidebar-image" />
+        </div>
+  </div>
+
+        {/* Main Content */}
+        <div className="advertiser-main-content">
+  
+          {showDetails && (
+  <div className="details-card-modern">
+    <h3 className="details-heading-modern">Advertiser Details</h3>
+    <div className="details-content-modern">
+      <div className="details-row-modern">
+        <strong>UserName:</strong>
+        <span>{advertiser.UserName}</span>
       </div>
-
-      {/* Main Content */}
-      <div style={mainContentStyle}>
-        {showDetails && (
-          <div>
-            <h3>Advertiser Details</h3>
-            <p>
-              <strong>UserName:</strong> {advertiser.UserName}
-            </p>
-
-            <p>
-              <strong>Link:</strong> {advertiser.Link}
-            </p>
-            <p>
-              <strong>Hotline:</strong> {advertiser.Hotline}
-            </p>
-            <p>
-              <strong>Email:</strong> {advertiser.Email}
-            </p>
-            <p>
-              <strong>Profile:</strong> {advertiser.Profile}
-            </p>
-            <p>
-              <strong>Location:</strong> {advertiser.Loc}
-            </p>
-            <p>
-              <strong>Company Description:</strong> {advertiser.CompanyDes}
-            </p>
-            <p>
-              <strong>Services:</strong> {advertiser.Services}
-            </p>
-            <p>
-  <strong>Notifications:</strong>
-  {advertiser.Notifications && advertiser.Notifications.length > 0 ? (
-    <ul>
-      {advertiser.Notifications.map((notification, index) => (
-        <li key={index}>{notification}</li>
-      ))}
-    </ul>
-  ) : (
-    <p>No notifications</p>
-  )}
-</p>
-          </div>
-        )}
-
-        {isEditingAdvertiser && (
-          <div>
-            <h3>Update Advertiser</h3>
-            <form onSubmit={handleAdvertiserSubmit}>
-              <div>
-                <label>UserName:</label>
-                <input
-                  name="UserName"
-                  value={advertiserFormData.UserName}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Password:</label>
-                <input
-                  name="Password"
-                  value={advertiserFormData.Password}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <label>Link:</label>
-                <input
-                  name="Link"
-                  value={advertiserFormData.Link}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Hotline:</label>
-                <input
-                  name="Hotline"
-                  value={advertiserFormData.Hotline}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Email:</label>
-                <input
-                  name="Eail"
-                  value={advertiserFormData.Email}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Profile:</label>
-                <input
-                  name="Profile"
-                  value={advertiserFormData.Profile}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Location:</label>
-                <input
-                  name="Loc"
-                  value={advertiserFormData.Loc}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Company Description:</label>
-                <textarea
-                  name="CompanyDes"
-                  value={advertiserFormData.CompanyDes}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Services:</label>
-                <textarea
-                  name="Services"
-                  value={advertiserFormData.Services}
-                  onChange={handleAdvertiserChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Upload New Logo:</label>
-                <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => handleImageUpload(e, setAdvertiserFormData)}
-  required
-/>
-              </div>
-              <button type="submit">Update</button>
-              <button
-                type="button"
-                onClick={() => setIsEditingAdvertiser(false)}
-              >
-                Cancel
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* Display Activities Section */}
-        {showActivities && (
-          <div>
-            <h3>Activities</h3>
-            {activities.length > 0 ? (
-              activities.map((activity) => (
-                <div key={activity._id}>
-                  <h4>
-                    {categories.find((cat) => cat._id === activity.category)
-                      ?.name || "Unknown Category"}
-                  </h4>
-                  <p>
-                    <strong>Date:</strong>{" "}
-                    {new Date(activity.date).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {activity.time}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {activity.location}
-                  </p>
-                  <p>
-                    <strong>Price:</strong> ${activity.price}
-                  </p>
-                  <p>
-                    <strong>Tags:</strong>{" "}
-                    {tags.find((t) => t._id === activity.tags)?.name ||
-                      "Unknown Tag"}
-                  </p>
-                  <p>
-                    <strong>Special Discount:</strong>{" "}
-                    {activity.specialDiscount}%
-                  </p>
-                  <p>
-                    <strong>Booking Open:</strong>{" "}
-                    {activity.isBookingOpen ? "Yes" : "No"}
-                  </p>
-                  {predefinedLocations.find(
-                    (loc) => loc.name === activity.location
-                  ) && (
-                    <iframe
-                      title={`Map for ${activity.location}`}
-                      src={generateMapSrc(
-                        predefinedLocations.find(
-                          (loc) => loc.name === activity.location
-                        ).coordinates
-                      )}
-                      width="300"
-                      height="200"
-                      style={{ border: "none" }}
-                    ></iframe>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>No activities found for this advertiser.</p>
-            )}
-          </div>
+      <div className="details-row-modern">
+        <strong>Link:</strong>
+        <a href={advertiser.Link} target="_blank" rel="noopener noreferrer">
+          {advertiser.Link}
+        </a>
+      </div>
+      <div className="details-row-modern">
+        <strong>Hotline:</strong>
+        <span>{advertiser.Hotline}</span>
+      </div>
+      <div className="details-row-modern">
+        <strong>Email:</strong>
+        <a href={`mailto:${advertiser.Email}`}>{advertiser.Email}</a>
+      </div>
+      <div className="details-row-modern">
+        <strong>Profile:</strong>
+        <span>{advertiser.Profile}</span>
+      </div>
+      <div className="details-row-modern">
+        <strong>Location:</strong>
+        <span>{advertiser.Loc}</span>
+      </div>
+      <div className="details-row-modern">
+        <strong>Company Description:</strong>
+        <span>{advertiser.CompanyDes}</span>
+      </div>
+      <div className="details-row-modern">
+        <strong>Services:</strong>
+        <span>{advertiser.Services}</span>
+      </div>
+      <div className="details-row-modern">
+        <strong>Notifications:</strong>
+        {advertiser.Notifications && advertiser.Notifications.length > 0 ? (
+          <ul className="notifications-list-modern">
+            {advertiser.Notifications.map((notification, index) => (
+              <li key={index}>{notification}</li>
+            ))}
+          </ul>
+        ) : (
+          <span>No notifications</span>
         )}
       </div>
     </div>
-  );
-};
+  </div>
+)}
 
+
+{isEditingAdvertiser && (
+  <div className="edit-section-modern">
+    <h3 className="section-heading-modern">Update Advertiser</h3>
+    <form onSubmit={handleAdvertiserSubmit} className="modern-form">
+      <div className="form-row">
+        <label>UserName:</label>
+        <input
+          type="text"
+          name="UserName"
+          value={advertiserFormData.UserName}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Password:</label>
+        <input
+          type="password"
+          name="Password"
+          value={advertiserFormData.Password}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Link:</label>
+        <input
+          type="url"
+          name="Link"
+          value={advertiserFormData.Link}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Hotline:</label>
+        <input
+          type="tel"
+          name="Hotline"
+          value={advertiserFormData.Hotline}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Email:</label>
+        <input
+          type="email"
+          name="Email"
+          value={advertiserFormData.Email}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Profile:</label>
+        <input
+          type="text"
+          name="Profile"
+          value={advertiserFormData.Profile}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Location:</label>
+        <input
+          type="text"
+          name="Loc"
+          value={advertiserFormData.Loc}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Company Description:</label>
+        <textarea
+          name="CompanyDes"
+          value={advertiserFormData.CompanyDes}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Services:</label>
+        <textarea
+          name="Services"
+          value={advertiserFormData.Services}
+          onChange={handleAdvertiserChange}
+          required
+        />
+      </div>
+      <div className="form-row">
+        <label>Upload New Logo:</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleImageUpload(e)}
+          required
+        />
+      </div>
+      <div className="form-actions">
+        <button type="submit" className="reply-button">
+          Update
+        </button>
+        <button
+          type="button"
+          className="reply-button"
+          onClick={() => setIsEditingAdvertiser(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+)}
+
+{showActivities && (
+  <div className="activities-section-modern">
+    <h3 className="section-heading-modern">Activities</h3>
+    {activities.length > 0 ? (
+      activities.map((activity) => (
+        <div key={activity._id} className="activity-card-modern">
+       
+          <div className="activity-details">
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(activity.date).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Time:</strong> {activity.time}
+            </p>
+            <p>
+              <strong>Location:</strong> {activity.location}
+            </p>
+            <p>
+              <strong>Price:</strong> ${activity.price}
+            </p>
+            <p>
+              <strong>Tags:</strong>{" "}
+              {tags.find((t) => t._id === activity.tags)?.name || "Unknown Tag"}
+            </p>
+            <p>
+              <strong>Special Discount:</strong>{" "}
+              {activity.specialDiscount || 0}%
+            </p>
+            <p>
+              <strong>Booking Open:</strong>{" "}
+              {activity.isBookingOpen ? "Yes" : "No"}
+            </p>
+          </div>
+          {predefinedLocations.some((loc) => loc.name === activity.location) && (
+            <iframe
+              title={`Map for ${activity.location}`}
+              src={generateMapSrc(
+                predefinedLocations.find(
+                  (loc) => loc.name === activity.location
+                ).coordinates
+              )}
+              className="activity-map-modern"
+            ></iframe>
+          )}
+        </div>
+      ))
+    ) : (
+      <p className="no-activities-message">No activities found for this advertiser.</p>
+    )}
+  </div>
+)}
+
+        </div>
+        <div className="advertiser-right-sidebar">
+  <div className="sidebar-buttons">
+  <button onClick={() => navigate("/activities")} className="box">
+            Create Activities
+          </button>
+          <button onClick={() => navigate("/transportation")} className="box">
+            Create Transportation
+          </button>  </div>
+</div>
+      </div>
+  
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+    </div>
+  );
+}  
 export default AdvertiserDetails;
