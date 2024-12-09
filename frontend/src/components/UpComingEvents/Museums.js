@@ -167,50 +167,66 @@ const Museums = () => {
       </div>
 
       {filteredMuseums.length > 0 ? (
-        <div className="museum-cards">
-          {filteredMuseums.map((place) => {
-            const locationData = predefinedLocations.find(
-              (location) => location.name === place.location
-            );
-            const mapSrc = locationData
-              ? generateMapSrc(locationData.coordinates)
-              : null;
+  <div className="museum-cards">
+    {filteredMuseums.map((place) => {
+      // Extract latitude and longitude from the location string
+      const locationCoords = place.location.split(",");
+      const latitude = locationCoords[0];
+      const longitude = locationCoords[1];
+      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
-            return (
-              <div key={place._id} className="museum-card">
-                <h3>{place.tourismGovernerTags?.name}</h3>
-                <p><strong>Description:</strong> {place.description}</p>
-                <p><strong>Location:</strong> {place.location}</p>
-                <p><strong>Opening Hours:</strong> {place.openingHours}</p>
-                <p>
-                  <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)} {selectedCurrency}
-                </p>
-                <p>
-                  <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)} {selectedCurrency}
-                </p>
-                <div className="museum-image">
-                  <img src={place.pictures} alt={`Picture of ${place.description}`} />
-                </div>
-                <p><strong>Tourism Governor Tags:</strong> {place.tourismGovernerTags?.type}</p>
-                {mapSrc && (
-                  <iframe
-                    title={`Map for ${place.location}`}
-                    src={mapSrc}
-                    width="300"
-                    height="200"
-                    style={{ border: "none" }}
-                  ></iframe>
-                )}
-              </div>
-            );
-          })}
+      return (
+        <div key={place._id} className="museum-card">
+          <h3>{place.tourismGovernerTags?.name || "Unnamed"}</h3>
+
+          <p>
+            <strong>Description:</strong> {place.description}
+          </p>
+          <p>
+            <strong>Location:</strong> {place.location}
+          </p>
+          <p>
+            <strong>Opening Hours:</strong> {place.openingHours}
+          </p>
+          <p>
+            <strong>Foreigner Ticket Price:</strong> {convertPrice(place.foreignerTicketPrice)}{" "}
+            {selectedCurrency}
+          </p>
+          <p>
+            <strong>Student Ticket Price:</strong> {convertPrice(place.studentTicketPrice)}{" "}
+            {selectedCurrency}
+          </p>
+          <p>
+            <strong>Native Ticket Price:</strong> {convertPrice(place.nativeTicketPrice)}{" "}
+            {selectedCurrency}
+          </p>
+          <div className="museum-image">
+            <img src={place.pictures} alt={`Picture of ${place.description}`} />
+          </div>
+          <p>
+            <strong>Tourism Governor Tags:</strong>{" "}
+            {place.tourismGovernerTags?.type || "None"}
+          </p>
+          {/* Map iframe */}
+          {mapSrc && (
+            <iframe
+              title={`Map for ${place.location}`}
+              src={mapSrc}
+              width="300"
+              height="200"
+              style={{ border: "none" }}
+            ></iframe>
+          )}
+          {/* Action Buttons */}
+          
         </div>
-      ) : (
-        <p>No Museums available.</p>
-      )}
+      );
+    })}
+  </div>
+) : (
+  <p>No Museums available.</p>
+)}
+
     </div>
   );
 };
