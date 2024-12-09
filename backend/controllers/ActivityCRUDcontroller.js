@@ -627,6 +627,64 @@ const getBookedActivities = async (req, res) => {
 };
 
 
+const getTouristReport = async (req, res) => {
+  const { advertiserId } = req.params; // Advertiser ID from request parameters
+  const { month } = req.query; // Get the month from the query parameters
+
+  try {
+    console.log("Received Advertiser ID:", advertiserId); // Log the advertiserId for debugging
+
+    // Validate advertiserId format
+    if (!mongoose.Types.ObjectId.isValid(advertiserId)) {
+      console.log("Invalid Advertiser ID format.");
+      return res.status(400).json({ message: "Invalid advertiser ID." });
+    }
+
+    // Verify advertiser exists
+    const advertiserExists = await Advertiser.findById(advertiserId);
+    if (!advertiserExists) {
+      console.log("Advertiser not found.");
+      return res.status(404).json({ message: "Advertiser not found." });
+    }
+
+    // Fetch all activities for the advertiser
+    let activities = await Activity.find({ advertiser: advertiserId });
+
+    if (activities.length === 0) {
+      console.log("No activities found for this advertiser.");
+      return res.status(404).json({ message: "No activities found for this advertiser." });
+    }
+
+    // If a month is provided, filter activities by that month
+    if (month) {
+      activities = activities.filter((activity) => {
+        const activityMonth = new Date(activity.date).getMonth() + 1; // Convert date to Month (1-12)
+        return activityMonth === parseInt(month); // Compare with selected month
+      });
+    }
+
+    // Calculate the total number of tourists (total bookings)
+    const totalTourists = activities.reduce((total, activity) => total + (activity.bookings || 0), 0);
+
+    // Prepare activity details for the response
+    const activityDetails = activities.map(({ _id, location, date, bookings }) => ({
+      activityId: _id,
+      location,
+      date,
+      bookings,
+    }));
+
+    // Send response with the total number of tourists and activity details
+    res.status(200).json({
+      advertiserId,
+      totalTourists,
+      activityDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching report:", error.message);
+    res.status(500).json({ message: "Error fetching report", error: error.message });
+  }
+};
 
 module.exports = {
   createActivity,
@@ -648,5 +706,6 @@ module.exports = {
   requestNotification, 
   getNotificationRequests,
 
-  finalizeActivityBooking
+  finalizeActivityBooking,
+  getTouristReport
 };

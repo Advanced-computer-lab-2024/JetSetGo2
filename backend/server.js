@@ -53,6 +53,8 @@ const otpRoutes = require("./routes/otpRoutes.js");
 const promoCodeRoutes = require("./routes/promoCodeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes.js");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const SalesReportRoutes = require("./routes/SalesReportRoute.js");
+
 
 const app = express();
 app.use(express.json());
@@ -261,6 +263,8 @@ app.use("/complaint", complaintRoutes);
 app.use("/otp", otpRoutes);
 app.use("/promo", promoCodeRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/SalesReport", SalesReportRoutes);
+
 
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

@@ -700,10 +700,66 @@ const getBookedItinerariesByTourGuide = async (req, res) => {
 
 
 
+const getItineraryTouristReport = async (req, res) => {
+  const { tourGuideId } = req.params; // Get the Tour Guide ID from request parameters
+  const { month } = req.query; // Get the month from query parameters (1 for January, 12 for December)
 
+  try {
+    console.log("Received tour Guide ID:", tourGuideId); // Log the tourGuideId for debugging
 
+    // Validate tourGuideId format
+    if (!mongoose.Types.ObjectId.isValid(tourGuideId)) {
+      console.log("Invalid tourGuide ID format.");
+      return res.status(400).json({ message: "Invalid tourGuide ID." });
+    }
 
+    // Verify Tour Guide exists
+    const tgExists = await TourGuide.findById(tourGuideId);
+    if (!tgExists) {
+      console.log("Tour Guide not found.");
+      return res.status(404).json({ message: "Tour Guide not found." });
+    }
 
+    // Fetch all itineraries related to the specific tour guide
+    let itineraries = await Schema.find({ tourGuide: tourGuideId });
+
+    if (itineraries.length === 0) {
+      console.log("No itineraries found for this tour guide.");
+      return res.status(404).json({ message: "No itineraries found for this tour guide." });
+    }
+
+    // If month is provided, filter itineraries by the month of availableDates
+    if (month) {
+      itineraries = itineraries.filter((itinerary) => {
+        return itinerary.availableDates.some((date) => {
+          const itineraryMonth = new Date(date).getMonth() + 1; // Get month (0-based, so +1)
+          return itineraryMonth === parseInt(month);
+        });
+      });
+    }
+
+    // Calculate the total number of tourists across all itineraries
+    const totalTourists = itineraries.reduce((total, itinerary) => total + itinerary.bookedUsers.length, 0);
+
+    // Prepare the itinerary details for the response
+    const itineraryDetails = itineraries.map(({ _id, name, bookings, bookedUsers }) => ({
+      itineraryId: _id,
+      name,
+      bookings,
+      totalBookings: bookedUsers.length, // Count the number of booked users for each itinerary
+    }));
+
+    // Send the response with the total number of tourists and itinerary details
+    res.status(200).json({
+      tourGuideId,
+      totalTourists,
+      itineraryDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching report:", error.message);
+    res.status(500).json({ message: "Error fetching itinerary tourist report", error: error.message });
+  }
+};
 module.exports = {
   
   createGuide,
@@ -724,5 +780,6 @@ module.exports = {
   getNotificationRequests,
   requestNotification,
   finalizeBooking,
-  getBookedItinerariesByTourGuide
+  getBookedItinerariesByTourGuide,
+  getItineraryTouristReport
 };

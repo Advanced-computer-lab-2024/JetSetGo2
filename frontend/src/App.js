@@ -72,10 +72,14 @@ import CartPage from './components/CartPage';
 import CheckoutPage from './components/CheckoutPage';
 import PaymentOptionsPage from "./components/PaymentOptionsPage";
 import MyOrders from "./components/MyOrders";
-
+import SalesReport from "./components/SalesReport";
+import TouristReport from "./components/TouristReport";
+import TourReport from "./components/TourReport";
+import VacationGuide from "./components/VacationGuide";
 
 
 import Notifications from "./components/Notifications";
+import Perefrences from "./components/Perefrences";
 
 function App() {
   return (
@@ -138,6 +142,11 @@ function App() {
           <Route path="/adminCapabilities" element={<AdminCapabilities />} />
           <Route path="/file-complaint" element={<FileComplaint />} />
           <Route path="/ActivitiesAdmin" element={<ManageActivities />} />
+          <Route path="/Sales-Report" element={<SalesReport />} />
+          <Route path="/TouristReport" element={<TouristReport />} />
+          <Route path="/TourReport" element={<TourReport />} />
+
+          
           <Route
             path="/HistoricalPlacesAdmin"
             element={<ManageHistoricalPlaces />}
@@ -173,11 +182,12 @@ function App() {
           <Route path="/MyUpcomingIten" element={< ItinerariesPagee />} />
 
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/Select-Perefrence" element={<Perefrences />} />
+          <Route path="/VacationGuide" element={<VacationGuide />} />
+
         </Routes>
       </div>
     </Router>
-
-    
   );
 }
 

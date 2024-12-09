@@ -94,6 +94,7 @@ const TouristSchema = new Schema(
         ref: "Product",
       },
     ], // Array of product IDs
+    
     cart: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
@@ -114,17 +115,25 @@ const TouristSchema = new Schema(
           default: "Pending",
         }, // Order status
       },
-    ],
-
-    deliveryAddresses: [
-      {
-        address: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String },
-        postalCode: { type: String, required: true },
-        country: { type: String, required: true },
-      },
-    ],
+  ],
+  
+  preferenceTags: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PreferenceTag",
+      default: [],
+    },
+  ],
+  deliveryAddresses: [
+    {
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
+    
+  ],
   },
   { timestamps: true }
 );

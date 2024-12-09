@@ -39,22 +39,32 @@ const RequestOtp = () => {
   };
 
   return (
-    <div>
-      <h2>Forgot Password? Request OTP</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Email Address:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-          required
-        />
-        <button type="submit">Send OTP</button>
-      </form>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
+    <>
+      <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+      />
+      <div className="container">
+        <h2>
+          Forgot Password?
+          <br />
+          Request OTP
+        </h2>
+        <form onSubmit={handleSubmit} className="form-container">
+          <label>Email Address:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            required
+          />
+          <button type="submit">Send OTP</button>
+        </form>
+        {message && <p className="message">{message}</p>}
+        {error && <p className="error">{error}</p>}
+      </div>
+    </>
   );
 };
 
