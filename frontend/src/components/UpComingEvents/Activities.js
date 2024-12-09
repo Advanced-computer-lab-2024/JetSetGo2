@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import '../UpComingEvents/Activities.css';
 import { getActivity, getCategories } from "../../services/ActivityService";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import { useNavigate, useLocation} from "react-router-dom"; // Import useNavigate
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import img1 from './logoo4.JPG';
+import sidebarImage from './logoo444.JPG';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Fix marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -34,7 +42,9 @@ const predefinedLocations = [
   },
 ];
 
+
 const Activities = () => {
+  const [activeTab, setActiveTab] = useState("filter");
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -51,7 +61,12 @@ const Activities = () => {
     maxPrice: "",
     rating: "",
   });
-
+  useEffect(() => {
+    document.body.classList.add("Activities-body");
+    return () => {
+      document.body.classList.remove("Activities-body");
+    };
+  }, []);
   const navigate = useNavigate(); // Initialize useNavigate hook
 
   useEffect(() => {
@@ -147,218 +162,246 @@ const Activities = () => {
 
   return (
     <div id="activities">
-      <div className="back-button-container">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-      </div>
-      <section className="filter-section">
-        <h2>Filter Activities</h2>
-        <div className="filter-inputs">
-          <div>
-            <label>Date:</label>
-            <input
-              type="date"
-              name="date"
-              value={filters.date}
-              onChange={handleFilterChange}
-            />
-          </div>
-          <div>
-            <label>Category:</label>
-            <select
-              name="category"
-              value={filters.category}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="price-range">
-            <label>Price Range:</label>
-            <input
-              type="number"
-              name="minPrice"
-              value={filters.minPrice}
-              onChange={handleFilterChange}
-              placeholder="Min Price"
-            />
-            <span> - </span>
-            <input
-              type="number"
-              name="maxPrice"
-              value={filters.maxPrice}
-              onChange={handleFilterChange}
-              placeholder="Max Price"
-            />
-          </div>
-          <div>
-            <label>Min Rating:</label>
-            <input
-              type="number"
-              name="rating"
-              value={filters.rating}
-              onChange={handleFilterChange}
-              placeholder="Min Rating"
-            />
-          </div>
-          <div>
-            <label>Sort by:</label>
-            <select value={sortBy} onChange={handleSortByChange}>
-              <option value="price">Price</option>
-              <option value="rating">Rating</option>
-            </select>
-          </div>
-          <div>
-            <label>Sort Order:</label>
-            <select value={sortOrder} onChange={handleSortChange}>
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
+      {/* Navbar */}
+      <Navbar className="navbar1">
+        <Container>
+          
+
+          <Navbar.Brand href="#">
+            <img src={img1} alt="Logo" />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="navbar-nav" />
+          <Navbar.Collapse id="navbar-nav">
+            <Nav className="ms-auto">
+              <img
+                src="/path-to-profile-image"
+                alt="Profile"
+                className="navbar1-profile-image"
+                
+              />
+              
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+  
+      {/* Sidebar and Main Content */}
+      <div className="Activity-container">
+        {/* Sidebar */}
+        <div className="sidebar">
+          <button className="sidebar-button" onClick={() => navigate("/adminCapabilities")}>
+          <i className="fas fa-sign-out-alt"></i> Logout
+          </button>
+          <button className="sidebar-button" onClick={() => navigate("/fetchdocuments")}>
+          <i className="fas fa-chart-line"></i> Revenue Rep
+          </button>
+          <button className="sidebar-button" onClick={() => navigate("/AddAdmin")}>
+          <i className="fas fa-user-times"></i> Delete Account
+          </button>
+          <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
+          <i className="fas fa-arrow-left"></i> Back
+          </button>
+          
+          <div className="sidebar-image-container">
+            <img src={sidebarImage} alt="Sidebar" className="sidebar-image" />
           </div>
         </div>
-      </section>
-
-      <section className="activity-list">
-  <h2>Upcoming Activities</h2>
-  {filteredActivities.length > 0 ? (
-    <ul>
-      {filteredActivities.map((activity) => {
-        // Extract latitude and longitude from the location string
-        const locationCoords = activity.location.split(",");
-        const latitude = locationCoords[0];
-        const longitude = locationCoords[1];
-        const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
-
-        return (
-          <li
-            key={activity._id}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: '#f9f9f9',
-              padding: '20px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              marginBottom: '20px',
-            }}
-          >
-            {/* Activity details */}
-            <div style={{ flex: 1, paddingRight: '20px' }}>
-              <h3 style={{ margin: '0 0 10px', fontSize: '1.5em', color: '#333' }}>
-                Category: {activity.category.name}
-              </h3>
-              <p>
-                <strong>Date:</strong> {new Date(activity.date).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Time:</strong> {activity.time}
-              </p>
-              <p>
-                <strong>Location:</strong> {activity.location}
-              </p>
-              <p>
-                <strong>Price:</strong> ${activity.price}
-              </p>
-              <p>
-                <strong>Tags:</strong> {activity.tags ? activity.tags.name : "No Tags"}
-              </p>
-              <p>
-                <strong>Special Discount:</strong> {activity.specialDiscount}%
-              </p>
-              <p>
-                <strong>Booking Open:</strong> {activity.isBookingOpen ? "Yes" : "No"}
-              </p>
-              <p>
-                <strong>Bookings:</strong> {activity.bookings}
-              </p>
-              <p>
-                <strong>Rating:</strong> {activity.rating}
-              </p>
-              {/* Add a "Book Now" button */}
+  
+        {/* Main Content */}
+        <div className="main-content">
+         
+          
+  
+          {/* Tabs for switching views */}
+          <div className="tabs">
+            <button
+              className={`tab-button ${activeTab === "filter" ? "active" : ""}`}
+              onClick={() => setActiveTab("filter")}
+            >
+              Filter Activities
+            </button>
+            <button
+              className={`tab-button ${activeTab === "upcoming" ? "active" : ""}`}
+              onClick={() => setActiveTab("upcoming")}
+            >
+              Upcoming Activities
+            </button>
+          </div>
+  
+          {/* Content based on active tab */}
+          {activeTab === "filter" && (
+            <section className="filter-section">
               
-            </div>
-
-            {/* Map iframe */}
-            <iframe
-              src={mapSrc}
-              width="300"
-              height="200"
-              style={{ border: 'none' }}
-              title={`Map of ${activity.location}`}
-            ></iframe>
-          </li>
-        );
-      })}
-    </ul>
-  ) : (
-    <p>No upcoming activities available.</p>
-  )}
-</section>
-      <style>{`
-        #activities {
-          max-width: 1200px;
-          margin: auto;
-          padding: 20px;
-          background-color: #f9f9f9;
-          border-radius: 8px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .filter-section, .activity-list {
-          margin-bottom: 20px;
-        }
-        .filter-section h2, .activity-list h2 {
-          font-size: 24px;
-          margin-bottom: 10px;
-        }
-        .filter-inputs {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-        }
-        .filter-inputs div {
-          flex: 1;
-          min-width: 200px;
-        }
-        .activity-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 20px;
-        }
-        .activity-card {
-          padding: 20px;
-          background-color: #fff;
-          border-radius: 8px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .back-button-container {
-          display: flex;
-          justify-content: flex-start;
-        }
-        .back-button {
-          padding: 10px 20px;
-          background-color: #3498db;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 16px;
-        }
-        .back-button:hover {
-          background-color: #2980b9;
-        }
-      `}</style>
+              <div className="filter-inputs">
+                <div>
+                  <label>Date:</label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={filters.date}
+                    onChange={handleFilterChange}
+                  />
+                </div>
+                <div>
+                  <label>Category:</label>
+                  <select
+                    name="category"
+                    value={filters.category}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="price-range">
+                  <label>Price Range:</label>
+                  <input
+                    type="number"
+                    name="minPrice"
+                    value={filters.minPrice}
+                    onChange={handleFilterChange}
+                    placeholder="Min Price"
+                  />
+                  <span> - </span>
+                  <input
+                    type="number"
+                    name="maxPrice"
+                    value={filters.maxPrice}
+                    onChange={handleFilterChange}
+                    placeholder="Max Price"
+                  />
+                </div>
+                <div>
+                  <label>Min Rating:</label>
+                  <input
+                    type="number"
+                    name="rating"
+                    value={filters.rating}
+                    onChange={handleFilterChange}
+                    placeholder="Min Rating"
+                  />
+                </div>
+                <div>
+                  <label>Sort by:</label>
+                  <select value={sortBy} onChange={handleSortByChange}>
+                    <option value="price">Price</option>
+                    <option value="rating">Rating</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Sort Order:</label>
+                  <select value={sortOrder} onChange={handleSortChange}>
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+          )}
+  
+          {activeTab === "upcoming" && (
+            <section className="activity-list">
+              
+              <div className="activity-grid">
+                {filteredActivities.length > 0 ? (
+                  <ul>
+                    {filteredActivities.map((activity) => {
+                      const locationCoords = activity.location.split(",");
+                      const latitude = locationCoords[0];
+                      const longitude = locationCoords[1];
+                      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  
+                      return (
+                        <li className="activity-card" key={activity._id}>
+                          <div className="activity-card-header">
+                            <h3>Category: {activity.category.name}</h3>
+                          </div>
+                          <p>
+                            <strong>Date:</strong>{" "}
+                            {new Date(activity.date).toLocaleDateString()}
+                          </p>
+                          <p>
+                        <strong>Time:</strong> {activity.time}
+                      </p>
+                      <p>
+                        <strong>Location:</strong> {activity.location}
+                      </p>
+                      <p>
+                        <strong>Price:</strong> ${activity.price}
+                      </p>
+                      <p>
+                        <strong>Tags:</strong> {activity.tags ? activity.tags.name : "No Tags"}
+                      </p>
+                      <p>
+                        <strong>Special Discount:</strong> {activity.specialDiscount}%
+                      </p>
+                      <p>
+                        <strong>Booking Open:</strong> {activity.isBookingOpen ? "Yes" : "No"}
+                      </p>
+                      <p>
+                        <strong>Bookings:</strong> {activity.bookings}
+                      </p>
+                      <p>
+                        <strong>Rating:</strong> {activity.rating}
+                      </p>
+                          <iframe
+                            src={mapSrc}
+                            width="300"
+                            height="200"
+                            style={{ border: "none" }}
+                            title={`Map of ${activity.location}`}
+                          ></iframe>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p>No upcoming activities available.</p>
+                )}
+              </div>
+            </section>
+          )}
+        </div>
+  
+        {/* Right Sidebar */}
+        <div className="right-sidebar">
+          <div className="sidebar-buttons">
+            <button className="box" onClick={() => navigate("/category")}>
+              Create Activity
+            </button>
+           
+          </div>
+        </div>
+      </div>
+  
+      {/* Footer */}
+      <div className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Contact Us</h5>
+              <p>Email: contact@jetsetgo.com</p>
+              <p>Phone: +123 456 7890</p>
+            </Col>
+            <Col md={4}>
+              <h5>Address</h5>
+              <p>123 Travel Road</p>
+              <p>Adventure City, World 45678</p>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <p>Facebook | Twitter | Instagram</p>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </div>
   );
-};
+
+}
 
 export default Activities;

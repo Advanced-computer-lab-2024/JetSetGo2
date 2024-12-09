@@ -311,11 +311,11 @@ const AdminCapabilities = () => {
       </div>
     </Tab>
   </Tabs>
-</div>
+ </div>
 
         {/* Right Sidebar */}
         {/* Right Sidebar */}
-<div className="right-sidebar">
+ <div className="right-sidebar">
   <div className="sidebar-buttons">
     <button className="box" onClick={() => navigate("/category")}>Categories</button>
     <button className="box" onClick={() => navigate("/TagsManagement")}>Tags</button>
