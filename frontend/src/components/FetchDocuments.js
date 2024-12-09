@@ -245,6 +245,12 @@ const OthersListPage = () => {
     <button className="sidebar-button" onClick={() => navigate("/AddTourismGovernor")}>
       <i className="fas fa-user-tie"></i> Tourism Governer
     </button>
+    <button
+            className="sidebar-button"
+            onClick={() => navigate("/Sales-Report")}
+          >
+            <i className="fas fa-tachometer-alt"></i> Sales Report
+          </button>
     <button className="sidebar-button" onClick={() => navigate("/login")}>
       <i className="fas fa-sign-out-alt"></i> Logout
     </button>

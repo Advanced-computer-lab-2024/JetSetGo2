@@ -252,7 +252,7 @@ const ProductCRUD = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ml-auto">
-              
+            
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -261,7 +261,13 @@ const ProductCRUD = () => {
 
         {/* Sidebar */}
         <div className="sidebar">
-          
+        <button 
+      onClick={() => navigate(-1)} 
+      className="sidebar-button"
+    
+    >
+      Back
+    </button>
           <div className="sidebar-image-container">
             <img src={sidebarImage} alt="Sidebar Image" className="sidebar-image" />
           </div>
