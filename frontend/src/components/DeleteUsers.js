@@ -5,6 +5,12 @@ import { deleteTourGuide } from '../services/TGuideService';
 import { deleteAdver } from '../services/AdverService';
 import { deleteSeller } from '../services/SellerService';
 import { deleteTourist } from '../services/TouristService';
+import { Navbar, Nav, Container, Row, Col, Dropdown, Form, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './admin.css';
+import img1 from './logoo4.JPG';
+import sidebarImage from './logoo444.JPG';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const TourGuideComponent = () => {
     const navigate = useNavigate();
@@ -19,6 +25,7 @@ const TourGuideComponent = () => {
             const response = await fetch('http://localhost:8000/TourGuide/get');
             const data = await response.json();
             setTourGuides(data);
+            console.log("Tour Guides:", data);
         } catch (error) {
             console.error("Error fetching Tour Guides:", error);
             setMessage('Error fetching Tour Guide list.');
@@ -30,6 +37,7 @@ const TourGuideComponent = () => {
             const response = await fetch('http://localhost:8000/home/adver/get');
             const data = await response.json();
             setAdvertisers(data);
+            console.log("Advertisers:", data);
         } catch (error) {
             console.error("Error fetching Advertisers:", error);
             setMessage('Error fetching Advertiser list.');
@@ -41,6 +49,7 @@ const TourGuideComponent = () => {
             const response = await fetch('http://localhost:8000/Seller/get');
             const data = await response.json();
             setSellers(data);
+            console.log("Sellers:", data);
         } catch (error) {
             console.error("Error fetching Sellers:", error);
             setMessage('Error fetching Seller list.');
@@ -52,6 +61,7 @@ const TourGuideComponent = () => {
             const response = await fetch('http://localhost:8000/home/tourist/get');
             const data = await response.json();
             setTourists(data);
+            console.log("Tourists:", data);
         } catch (error) {
             console.error("Error fetching Tourists:", error);
             setMessage('Error fetching Tourist list.');
@@ -90,6 +100,12 @@ const TourGuideComponent = () => {
             console.error("Error deleting Seller:", error);
         }
     };
+
+    const handleLogout = () => {
+        // Clear user session or token if needed
+        localStorage.removeItem('userToken'); // Example: remove token from localStorage
+        navigate('/login'); // Redirect to the login page
+      };
 
     const handleDeleteTourist = async (id) => {
         try {
@@ -136,123 +152,201 @@ const TourGuideComponent = () => {
     };
 
     return (
-        <div style={styles.container}>
-            {/* Sidebar with Profile and Admin Buttons */}
-            <div style={styles.sidebar}>
-                <div style={styles.profileContainer}>
-                    <img
-                        src="https://i.pngimg.me/thumb/f/720/c3f2c592f9.jpg"
-                        alt="Profile"
-                        style={styles.profileImage}
-                    />
-                    <h2 style={styles.profileName}>Admin</h2>
-                    <p>Admin</p>
-                    <button onClick={() => navigate('/adminCapabilities')} style={styles.button}>
-                        Admin Home
-                    </button>
-                </div>
+        <div className="admin-page">
+  {/* Navbar */}
+  <Navbar className="navbar">
+    <Container>
+      <Navbar.Brand href="#">
+        <img src={img1} alt="Logo" />
+      </Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="ml-auto">
+          <Dropdown alignRight>
+            <Dropdown.Toggle className="drop">
+              <img src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg" alt="Profile" className="navbar-profile-image" />
+              Admin
+            </Dropdown.Toggle>
 
-                <div style={{ marginTop: '20px' }}>
-                    {[
-                        { label: 'Manage Categories', path: '/category' },
-                        { label: 'Manage Tags', path: '/TagsManagement' },
-                        { label: 'Manage Products', path: '/product' },
-                        { label: 'View Product List', path: '/productList' },
-                        { label: 'Delete Users', path: '/DeleteUsers' },
-                        { label: 'Add a Tourism Governor', path: '/AddTourismGovernor' },
-                        { label: 'Add an Admin', path: '/AddAdmin' },
-                    ].map((button) => (
-                        <button
-                            key={button.path}
-                            style={buttonStyle}
-                            onClick={() => navigate(button.path)}
-                            onMouseEnter={handleHover}
-                            onMouseLeave={handleLeave}
-                        >
-                            {button.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            <Dropdown.Menu>
+            <Dropdown.Item onClick={() => navigate("/notifications")}>Notifications</Dropdown.Item>
 
-            {/* Main Content */}
-            <div style={styles.mainContent}>
-                <h2 style={styles.header}>Manage Tour Guides, Advertisers, Sellers, and Tourists</h2>
-                {message && <p style={styles.message}>{message}</p>}
+              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Nav>
+      </Navbar.Collapse>
+    </Container>
+  </Navbar>
 
-                {/* Tour Guide Box */}
-                <div style={styles.userBox}>
-                    <h3 style={styles.listTitle}>Tour Guide List</h3>
-                    <ul style={styles.userList}>
-                        {tourGuides.map((guide) => (
-                            <li key={guide._id} style={styles.listItem}>
-                                <span>{guide.Name}</span>
-                                <button
-                                    style={styles.listButton}
-                                    onClick={() => handleDeleteTourGuide(guide._id)}
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+  <div className="admin-container">
+    {/* Sidebar */}
+    <div className="sidebar">
+      <button className="sidebar-button" onClick={() => navigate("/adminCapabilities")}>
+        <i className="fas fa-tachometer-alt"></i> Dashboard
+      </button>
+      <button className="sidebar-button" onClick={() => navigate("/fetchdocuments")}>
+        <i className="fas fa-users"></i> View Users
+      </button>
+      <button className="sidebar-button" onClick={() => navigate("/AddAdmin")}>
+        <i className="fas fa-user-plus"></i> Add An Admin
+      </button>
+      <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
+        <i className="fas fa-user-cog"></i> Manage Users
+      </button>
+      <button className="sidebar-button" onClick={() => navigate("/AddTourismGovernor")}>
+        <i className="fas fa-user-tie"></i> Tourism Governer
+      </button>
+      <button className="sidebar-button" onClick={handleLogout}>
+        <i className="fas fa-sign-out-alt"></i> Logout
+      </button>
+      <div className="sidebar-image-container">
+        <img src={sidebarImage} alt="Sidebar Image" className="sidebar-image" />
+      </div>
+    </div>
 
-                {/* Advertiser Box */}
-                <div style={styles.userBox}>
-                    <h3 style={styles.listTitle}>Advertiser List</h3>
-                    <ul style={styles.userList}>
-                        {advertisers.map((adver) => (
-                            <li key={adver._id} style={styles.listItem}>
-                                <span>{adver.Name}</span>
-                                <button
-                                    style={styles.listButton}
-                                    onClick={() => handleDeleteAdver(adver._id)}
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+    {/* Main Content */}
+    <div className="main-content">
+      <h2 className="section-title">Manage All Users</h2>
+      {message && <div className="alert alert-success">{message}</div>}
 
-                {/* Seller Box */}
-                <div style={styles.userBox}>
-                    <h3 style={styles.listTitle}>Seller List</h3>
-                    <ul style={styles.userList}>
-                        {sellers.map((seller) => (
-                            <li key={seller._id} style={styles.listItem}>
-                                <span>{seller.Name}</span>
-                                <button
-                                    style={styles.listButton}
-                                    onClick={() => handleDeleteSeller(seller._id)}
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Tourist Box */}
-                <div style={styles.userBox}>
-                    <h3 style={styles.listTitle}>Tourist List</h3>
-                    <ul style={styles.userList}>
-                        {tourists.map((tourist) => (
-                            <li key={tourist._id} style={styles.listItem}>
-                                <span>{tourist.UserName}</span>
-                                <button
-                                    style={styles.listButton}
-                                    onClick={() => handleDeleteTourist(tourist._id)}
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
+      {/* Tour Guide Box */}
+<div className="user-box">
+  <h3 className="list-title">Tour Guide List</h3>
+  <ul className="user-list">
+    {tourGuides.map((guide) => (
+      <li key={guide._id} className="list-item">
+        <div className="user-info">
+          <img
+            src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+            alt="Profile"
+            className="profile-image"
+          />
+          <span>{guide.UserName}</span>
         </div>
+        <button
+          className="list-button"
+          onClick={() => handleDeleteTourGuide(guide._id)}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
+      {/* Advertiser Box */}
+<div className="user-box">
+  <h3 className="list-title">Advertiser List</h3>
+  <ul className="user-list">
+    {advertisers.map((adver) => (
+      <li key={adver._id} className="list-item">
+        <div className="user-info">
+          <img
+            src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+            alt="Profile"
+            className="profile-image"
+          />
+          <span>{adver.UserName}</span>
+        </div>
+        <button
+          className="list-button"
+          onClick={() => handleDeleteAdver(adver._id)}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
+     {/* Seller Box */}
+<div className="user-box">
+  <h3 className="list-title">Seller List</h3>
+  <ul className="user-list">
+    {sellers.map((seller) => (
+      <li key={seller._id} className="list-item">
+        <div className="user-info">
+          <img
+            src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+            alt="Profile"
+            className="profile-image"
+          />
+          <span>{seller.UserName}</span>
+        </div>
+        <button
+          className="list-button"
+          onClick={() => handleDeleteSeller(seller._id)}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
+      {/* Tourist Box */}
+      <div className="user-box">
+  <h3 className="list-title">Tourist List</h3>
+  <ul className="user-list">
+    {tourists.map((tourist) => (
+      <li key={tourist._id} className="list-item">
+        <div className="user-info">
+          <img
+            src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+            alt="Profile"
+            className="profile-image"
+          />
+          <span>{tourist.UserName}</span>
+        </div>
+        <button
+          className="list-button"
+          onClick={() => handleDeleteTourist(tourist._id)}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+    </div>
+
+    {/* Right Sidebar */}
+    <div className="right-sidebar">
+      <div className="sidebar-buttons">
+        <button className="box" onClick={() => navigate("/category")}>Categories</button>
+        <button className="box" onClick={() => navigate("/TagsManagement")}>Tags</button>
+        <button className="box" onClick={() => navigate("/product")}>Products</button>
+        <button className="box" onClick={() => navigate("/activitiesAdmin")}>Activities</button>
+        <button className="box" onClick={() => navigate("/ItinerariesAdmin")}>Itineraries</button>
+        <button className="box" onClick={() => navigate("/MuseumsAdmin")}>Museums</button>
+        <button className="box" onClick={() => navigate("/HistoricalPlacesAdmin")}>Historical Places</button>
+      </div>
+    </div>
+  </div>
+
+  {/* Footer */}
+  <div className="footer">
+    <Container>
+      <Row>
+        <Col md={4}>
+          <h5>Contact Us</h5>
+          <p>Email: contact@jetsetgo.com</p>
+          <p>Phone: +123 456 7890</p>
+        </Col>
+        <Col md={4}>
+          <h5>Address</h5>
+          <p>123 Travel Road</p>
+          <p>Adventure City, World 45678</p>
+        </Col>
+        <Col md={4}>
+          <h5>Follow Us</h5>
+          <p>Facebook | Twitter | Instagram</p>
+        </Col>
+      </Row>
+    </Container>
+  </div>
+</div>
     );
 }
 

@@ -125,7 +125,8 @@ const AdminCapabilities = () => {
     }
   };
 
-  const handlePasswordChange = async () => {
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
     const adminId = localStorage.getItem("userId");
     console.log("Admin ID:", adminId); // Log adminId to ensure it's not null or undefined
 
@@ -142,6 +143,8 @@ const AdminCapabilities = () => {
         }
       );
       alert("Password updated successfully");
+      setPasswordChanged(true);
+      setShowPasswordChange(false);
     } catch (error) {
       console.error("Error updating password:", error);
       alert("Failed to update password");
@@ -226,23 +229,19 @@ const AdminCapabilities = () => {
               <Nav.Link href="#" className={`home-link ${location.pathname === '/' ? 'selected' : ''}`} onClick={() => navigate("/")}>Home</Nav.Link>
             </Nav>*/}
             <Nav className="ml-auto">
-              <Dropdown>
-                <Dropdown.Toggle className="drop" id="dropdown-basic">
-                  <img
-                    src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg"
-                    alt="Profile"
-                    className="navbar-profile-image"
-                  />
-                  Admin
-                </Dropdown.Toggle>
+            <Dropdown alignRight>
+  <Dropdown.Toggle className="drop">
+    <img src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg" alt="Profile" className="navbar-profile-image" />
+    Admin
+  </Dropdown.Toggle>
 
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => setShowPasswordChange(true)}>
-                    Change Password
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
+  <Dropdown.Menu>
+  <Dropdown.Item onClick={() => navigate("/notifications")}>Notifications</Dropdown.Item>
+
+    <Dropdown.Item onClick={() => setShowPasswordChange(true)}>Change Password</Dropdown.Item>
+    <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+  </Dropdown.Menu>
+</Dropdown>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -251,86 +250,60 @@ const AdminCapabilities = () => {
       <div className="admin-container">
         {/* Sidebar */}
         <div className="sidebar">
-          <button
-            className="sidebar-button"
-            onClick={() => navigate("/adminCapabilities")}
-          >
-            <i className="fas fa-tachometer-alt"></i> Dashboard
-          </button>
-          <button
-            className="sidebar-button"
-            onClick={() => navigate("/fetchdocuments")}
-          >
-            <i className="fas fa-users"></i> View Users
-          </button>
-          <button
-            className="sidebar-button"
-            onClick={() => navigate("/AddAdmin")}
-          >
-            <i className="fas fa-user-plus"></i> Add An Admin
-          </button>
-          <button
-            className="sidebar-button"
-            onClick={() => navigate("/DeleteUsers")}
-          >
-            <i className="fas fa-user-cog"></i> Manage Users
-          </button>
-          <button
-            className="sidebar-button"
-            onClick={() => navigate("/AddTourismGoverner")}
-          >
-            <i className="fas fa-user-tie"></i> Tourism Governer
-          </button>
-          <button className="sidebar-button" onClick={handleLogout}>
-            <i className="fas fa-sign-out-alt"></i> Logout
-          </button>
-          <div className="sidebar-image-container">
-            <img
-              src={sidebarImage}
-              alt="Sidebar Image"
-              className="sidebar-image"
-            />
-          </div>
-        </div>
+    <button className="sidebar-button" onClick={() => navigate("/adminCapabilities")}>
+      <i className="fas fa-tachometer-alt"></i> Dashboard
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/fetchdocuments")}>
+      <i className="fas fa-users"></i> View Users
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/AddAdmin")}>
+      <i className="fas fa-user-plus"></i> Add An Admin
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
+      <i className="fas fa-user-cog"></i> Manage Users
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/AddTourismGovernor")}>
+      <i className="fas fa-user-tie"></i> Tourism Governer
+    </button>
+    <button className="sidebar-button" onClick={handleLogout}>
+      <i className="fas fa-sign-out-alt"></i> Logout
+    </button>
+    <div className="sidebar-image-container">
+      <img src={sidebarImage} alt="Sidebar Image" className="sidebar-image" />
+    </div>
+  </div>
 
-        {/* Main Content */}
-        <div className="main-content">
-          {showPasswordChange && (
-            <div className="password-change-container">
-              <h2>Change Password</h2>
-              <Form onSubmit={handlePasswordChange}>
-                <Form.Group controlId="formNewPassword">
-                  <Form.Label>New Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                  />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                  Submit
-                </Button>
-              </Form>
-              {passwordChanged && <p>Password changed successfully!</p>}
-            </div>
-          )}
-          <Tabs
-            activeKey={activeTab}
-            onSelect={(k) => setActiveTab(k)}
-            className="admin-tabs"
-          >
-            <Tab eventKey="complaints" title="Complaints">
-              <div className="filter-sort-container">
-                <label>Filter by Status: </label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="all">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="resolved">Resolved</option>
-                </select>
+       {/* Main Content */}
+<div className="main-content">
+{showPasswordChange && (
+  <div className="password-change-container">
+    <h2>Change Password</h2>
+    <Form onSubmit={handlePasswordChange}>
+      <Form.Group controlId="formNewPassword">
+        <Form.Label>New Password</Form.Label>
+        <Form.Control
+          type="password"
+          placeholder="Enter new password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+      </Form.Group>
+      <Button variant="primary" type="submit">
+        Submit
+      </Button>
+    </Form>
+    {passwordChanged && <p className="success-message">Password changed successfully!</p>}
+  </div>
+)}
+  <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="admin-tabs">
+    <Tab eventKey="complaints" title="Complaints">
+      <div className="filter-sort-container">
+        <label>Filter by Status: </label>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="resolved">Resolved</option>
+        </select>
 
                 <label>Sort by Date: </label>
                 <button

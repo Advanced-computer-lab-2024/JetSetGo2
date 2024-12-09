@@ -79,6 +79,7 @@ const Museums = () => {
       setMuseums(nonFlaggedMuseums);
       setFilteredMuseums(nonFlaggedMuseums);
       console.log("Museums:", nonFlaggedMuseums);
+      console.log("Museums:", nonFlaggedMuseums);
     } catch (error) {
       console.error("Error fetching Museums:", error);
       setError("Failed to load Museums.");
@@ -222,12 +223,13 @@ const Museums = () => {
 
       {/* Museum Cards */}
       {filteredMuseums.length > 0 ? (
-        <div className="museum-cards-grid">
-          {filteredMuseums.map((place) => {
-            const locationCoords = place.location.split(",");
-            const latitude = locationCoords[0];
-            const longitude = locationCoords[1];
-            const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
+  <div className="museum-cards">
+    {filteredMuseums.map((place) => {
+      // Extract latitude and longitude from the location string
+      const locationCoords = place.location.split(",");
+      const latitude = locationCoords[0];
+      const longitude = locationCoords[1];
+      const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude},${latitude},${longitude},${latitude}&layer=mapnik&marker=${latitude},${longitude}`;
 
             return (
               <div key={place._id} className="museum-card">

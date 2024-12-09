@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Navbar, Nav, Container, Row, Col, Tab, Tabs ,Dropdown, Form, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './admin.css';
+import img1 from './logoo4.JPG';
+import sidebarImage from './logoo444.JPG';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
 const OthersListPage = () => {
@@ -190,86 +198,155 @@ const OthersListPage = () => {
     if (!users.length) return null;
 
     return (
-      <div style={styles.sectionContainer}>
-         <button className="back-button" onClick={() => navigate(-1)}>
-          Back
-        </button>
-        <h2 style={styles.sectionTitle}>{title}</h2>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>ID Document</th>
-              <th>Taxation Registry Card</th>
-              <th>Actions</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.UserName || "N/A"}</td>
-                <td>{user.Email || "N/A"}</td>
-                <td>
-                  {user.IDDocument ? (
-                    <a
-                    href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View ID Document
-                  </a>
-                  
-                  ) : (
-                    "No document"
-                  )}
-                </td>
-                
-                <td>
-                  {user.TaxationRegistryCard ? (
-                    <a
-                      href={`http://localhost:8000/uploads/documents/${user.TaxationRegistryCard}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View Taxation Registry Card
-                    </a>
-                  ) : (
-                    "No taxation registry card"
-                  )}
-                </td>
-                <td>
-  {user.Admin_Acceptance === null && (
-    <>
-      <button
-        onClick={() => handleAcceptSeller(user._id)}
-        style={styles.acceptButton}
-      >
-        Accept
-      </button>
-      <button
-        onClick={() => handleRejectSeller(user._id)}
-        style={styles.rejectButton}
-      >
-        Reject
-      </button>
-    </>
-  )}
-</td>
+      <div className="admin-page">
+        {/* Navbar */}
+      <Navbar className="navbar">
+        <Container>
+          <Navbar.Brand href="#">
+            <img src={img1} alt="Logo" />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            {/*<Nav className="me-auto">
+              <Nav.Link href="#" className={`home-link ${location.pathname === '/' ? 'selected' : ''}`} onClick={() => navigate("/")}>Home</Nav.Link>
+            </Nav>*/}
+            <Nav className="ml-auto">
+            <Dropdown alignRight>
+  <Dropdown.Toggle className="drop">
+    <img src="https://static.vecteezy.com/system/resources/previews/007/522/917/non_2x/boss-administrator-businessman-avatar-profile-icon-illustration-vector.jpg" alt="Profile" className="navbar-profile-image" />
+    Admin
+  </Dropdown.Toggle>
 
-<td>
-  {user.Admin_Acceptance === null
-    ? "Not Reviewed Yet"
-    : user.Admin_Acceptance
-    ? "Accepted"
-    : "Rejected"}
-</td>
+  <Dropdown.Menu>
+  <Dropdown.Item onClick={() => navigate("/notifications")}>Notifications</Dropdown.Item>
 
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <Dropdown.Item onClick={() => navigate("/login")}>Logout</Dropdown.Item>
+  </Dropdown.Menu>
+</Dropdown>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      <div className="admin-container">
+
+      <div className="sidebar">
+    <button className="sidebar-button" onClick={() => navigate("/adminCapabilities")}>
+      <i className="fas fa-tachometer-alt"></i> Dashboard
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/fetchdocuments")}>
+      <i className="fas fa-users"></i> View Users
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/AddAdmin")}>
+      <i className="fas fa-user-plus"></i> Add An Admin
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/DeleteUsers")}>
+      <i className="fas fa-user-cog"></i> Manage Users
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/AddTourismGovernor")}>
+      <i className="fas fa-user-tie"></i> Tourism Governer
+    </button>
+    <button className="sidebar-button" onClick={() => navigate("/login")}>
+      <i className="fas fa-sign-out-alt"></i> Logout
+    </button>
+    
+  </div>
+
+  <div className="main-content">
+  <h2 className="section-title">{title}</h2>
+  <table className="styled-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>ID Document</th>
+        <th>Taxation Registry Card</th>
+        <th>Actions</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {users.map((user) => (
+        <tr key={user._id}>
+          <td>
+            <div className="user-info">
+              <img
+                src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+                alt="Profile"
+                className="profile-image"
+              />
+              {user.UserName || "N/A"}
+            </div>
+          </td>
+          <td>{user.Email || "N/A"}</td>
+          <td>
+            {user.IDDocument ? (
+              <a
+                href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View ID Document
+              </a>
+            ) : (
+              "No document"
+            )}
+          </td>
+          <td>
+            {user.TaxationRegistryCard ? (
+              <a
+                href={`http://localhost:8000/uploads/documents/${user.TaxationRegistryCard}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Taxation Registry Card
+              </a>
+            ) : (
+              "No taxation registry card"
+            )}
+          </td>
+          <td>
+            {user.Admin_Acceptance === null && (
+              <>
+                <button
+                  onClick={() => handleAcceptSeller(user._id)}
+                  className="accept-button"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleRejectSeller(user._id)}
+                  className="reject-button"
+                >
+                  Reject
+                </button>
+              </>
+            )}
+          </td>
+          <td>
+            {user.Admin_Acceptance === null
+              ? "Not Reviewed Yet"
+              : user.Admin_Acceptance
+              ? "Accepted"
+              : "Rejected"}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    <button className="box" onClick={() => navigate("/category")}>Categories</button>
+    <button className="box" onClick={() => navigate("/TagsManagement")}>Tags</button>
+    <button className="box" onClick={() => navigate("/product")}>Products</button>
+    <button className="box" onClick={() => navigate("/activitiesAdmin")}>Activities</button>
+    <button className="box" onClick={() => navigate("/ItinerariesAdmin")}>Itineraries</button>
+    <button className="box" onClick={() => navigate("/MuseumsAdmin")}>Museums</button>
+    <button className="box" onClick={() => navigate("/HistoricalPlacesAdmin")}>Historical Places</button>
+  </div>
+</div>
+      </div>
+
       </div>
     );
   };
@@ -278,172 +355,218 @@ const OthersListPage = () => {
     if (!users.length) return null;
 
     return (
-      
-      <div style={styles.sectionContainer}>
-       
-        <h2 style={styles.sectionTitle}>Tour Guides</h2>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>ID Document</th>
-              <th>Certificates</th>
-              <th>Actions</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.UserName || "N/A"}</td>
-                <td>{user.Email || "N/A"}</td>
-                <td>
-                  {user.IDDocument ? (
-                    <a
-                      href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View ID Document
-                    </a>
-                  ) : (
-                    "No document"
-                  )}
-                </td>
-                <td>
-                  {user.Certificates ? (
-                    <a
-                      href={`http://localhost:8000/uploads/documents/${user.Certificates}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View Certificates
-                    </a>
-                  ) : (
-                    "No certificates"
-                  )}
-                </td>
-                <td>
-  {user.Admin_Acceptance === null && (
-    <>
-      <button
-        onClick={() => handleAcceptTourGuide(user._id)}
-        style={styles.acceptButton}
-      >
-        Accept
-      </button>
-      <button
-        onClick={() => handleRejectTourGuide(user._id)}
-        style={styles.rejectButton}
-      >
-        Reject
-      </button>
-    </>
-  )}
-</td>
+      <div className="admin-page">
+        
+        <div className="admin-container">
+          {/* Sidebar */}
+          <div className="sidebar">
+            
+            <div className="sidebar-image-container">
+              <img src={sidebarImage} alt="Sidebar Image" className="sidebar-image" />
+            </div>
+          </div>
 
-
-<td>
-  {user.Admin_Acceptance === null
-    ? "Not Reviewed Yet"
-    : user.Admin_Acceptance
-    ? "Accepted"
-    : "Rejected"}
-</td>
-
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          {/* Main Content */}
+          <div className="main-content">
+  <h2 className="section-title">Tour Guides</h2>
+  <table className="styled-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>ID Document</th>
+        <th>Certificates</th>
+        <th>Actions</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {users.map((user) => (
+        <tr key={user._id}>
+          <td>
+            <div className="user-info">
+              <img
+                src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+                alt="Profile"
+                className="profile-image"
+              />
+              {user.UserName || "N/A"}
+            </div>
+          </td>
+          <td>{user.Email || "N/A"}</td>
+          <td>
+            {user.IDDocument ? (
+              <a
+                href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View ID Document
+              </a>
+            ) : (
+              "No document"
+            )}
+          </td>
+          <td>
+            {user.Certificates ? (
+              <a
+                href={`http://localhost:8000/uploads/documents/${user.Certificates}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Certificates
+              </a>
+            ) : (
+              "No certificates"
+            )}
+          </td>
+          <td>
+            {user.Admin_Acceptance === null && (
+              <>
+                <button
+                  onClick={() => handleAcceptTourGuide(user._id)}
+                  className="accept-button"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleRejectTourGuide(user._id)}
+                  className="reject-button"
+                >
+                  Reject
+                </button>
+              </>
+            )}
+          </td>
+          <td>
+            {user.Admin_Acceptance === null
+              ? "Not Reviewed Yet"
+              : user.Admin_Acceptance
+              ? "Accepted"
+              : "Rejected"}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    </div>
+</div>
+        </div>
       </div>
     );
   };
+
 
   const renderAdverTable = (users, title, handleAccept, handleReject) => {
     if (!users.length) return null;
 
     return (
-      <div style={styles.sectionContainer}>
-        <h2 style={styles.sectionTitle}>{title}</h2>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>ID Document</th>
-              <th>Taxation Registry Card</th>
-              <th>Actions</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.UserName || "N/A"}</td>
-                <td>{user.Email || "N/A"}</td>
-                <td>
-                  {user.IDDocument ? (
-                    <a
-                    href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View ID Document
-                  </a>
-                  
-                  ) : (
-                    "No document"
-                  )}
-                </td>
-                
-                <td>
-                  {user.TaxationRegistryCard ? (
-                    <a
-                      href={`http://localhost:8000/uploads/documents/${user.TaxationRegistryCard}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View Taxation Registry Card
-                    </a>
-                  ) : (
-                    "No taxation registry card"
-                  )}
-                </td>
-                <td>
-  {user.Admin_Acceptance === null && (
-    <>
-      <button
-        onClick={() => handleAcceptAdver(user._id)}
-        style={styles.acceptButton}
-      >
-        Accept
-      </button>
-      <button
-        onClick={() => handleRejectAdver(user._id)}
-        style={styles.rejectButton}
-      >
-        Reject
-      </button>
-    </>
-  )}
-</td>
+      <div className="admin-page">
 
-<td>
-  {user.Admin_Acceptance === null
-    ? "Not Reviewed Yet"
-    : user.Admin_Acceptance
-    ? "Accepted"
-    : "Rejected"}
-</td>
+        <div className="admin-container">
+          {/* Sidebar */}
+          <div className="sidebar">
+            
+          </div>
 
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          {/* Main Content */}
+          <div className="main-content">
+  
+  <h2 className="section-title">{title}</h2>
+  <table className="styled-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>ID Document</th>
+        <th>Taxation Registry Card</th>
+        <th>Actions</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {users.map((user) => (
+        <tr key={user._id}>
+          <td>
+            <div className="user-info">
+              <img
+                src="https://png.pngtree.com/png-clipart/20220911/original/pngtree-male-company-employee-avatar-icon-wearing-a-necktie-png-image_8537621.png"
+                alt="Profile"
+                className="profile-image"
+              />
+              {user.UserName || "N/A"}
+            </div>
+          </td>
+          <td>{user.Email || "N/A"}</td>
+          <td>
+            {user.IDDocument ? (
+              <a
+                href={`http://localhost:8000/uploads/documents/${user.IDDocument}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View ID Document
+              </a>
+            ) : (
+              "No document"
+            )}
+          </td>
+          <td>
+            {user.TaxationRegistryCard ? (
+              <a
+                href={`http://localhost:8000/uploads/documents/${user.TaxationRegistryCard}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Taxation Registry Card
+              </a>
+            ) : (
+              "No taxation registry card"
+            )}
+          </td>
+          <td>
+            {user.Admin_Acceptance === null && (
+              <>
+                <button
+                  onClick={() => handleAcceptAdver(user._id)}
+                  className="accept-button"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleRejectAdver(user._id)}
+                  className="reject-button"
+                >
+                  Reject
+                </button>
+              </>
+            )}
+          </td>
+          <td>
+            {user.Admin_Acceptance === null
+              ? "Not Reviewed Yet"
+              : user.Admin_Acceptance
+              ? "Accepted"
+              : "Rejected"}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<div className="right-sidebar">
+  <div className="sidebar-buttons">
+    
+  </div>
+</div>
+        </div>
       </div>
     );
-  };
+};
+
 
   const renderContent = () => {
     if (loading) {
@@ -474,21 +597,14 @@ const OthersListPage = () => {
   };
 
   return (
-    <div style={styles.pageContainer}>
-      <h1 style={styles.pageTitle}>All Users</h1>
+    <div >
       {renderContent()}
     </div>
   );
 };
 
 const styles = {
-  pageContainer: {
-    padding: "20px",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#f4f4f9",
-  },
+  
   pageTitle: {
     textAlign: "center",
     fontSize: "2.5rem",

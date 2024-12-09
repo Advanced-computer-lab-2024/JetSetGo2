@@ -99,6 +99,8 @@ const authMiddleware = (req, res, next) => {
 app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({ message: "Welcome to the protected route!", userId: req.userId });
 });
+
+
 app.use("/itinerary", itineraryRoutes);
 app.use("/", touristRoutes);
 app.use("/api/itinerary", itineraryRoutes);
