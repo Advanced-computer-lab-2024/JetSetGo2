@@ -108,12 +108,15 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 ### View Tourguide Itineraries
 ![image](https://github.com/user-attachments/assets/8c7b40f4-03dc-4bbe-a432-484342c8c2dc)
 
-## Tech/Framework used
-- *Frontend*: React 
-- *Backend*: Node.js, Express, MongoDB
-- *Authentication*: JWT
-- *Payment Gateway*: Stripe
-- *Maps*: openstreetmap api
+## Tech/Framework used  
+JetSetGo2 is powered by a modern tech stack to ensure scalability, performance, and a seamless user experience:
+
+- **Frontend**: React.js, Redux, Axios, Tailwind CSS
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB
+- **Authentication**: JSON Web Tokens (JWT)
+- **Payment Integration**: Stripe API
+- **API Integration**: Amadeus API for flight and hotel booking
 
 
 ## Features 
