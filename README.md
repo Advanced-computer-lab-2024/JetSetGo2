@@ -9,16 +9,16 @@ JetSetGo2 is your ultimate travel companion, created to transform the way you pl
 JetSetGo2 is currently under active development and is not yet recommended for production environments. While the core features are operational, a few exciting enhancements are still in progress:    
 
   
-• **Loyalty Level and Badge Updates**:  
-This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.  
+- **Loyalty Level and Badge Updates**:  
+	- This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.  
 
   
-•**Promo Code Creation by Admin**:  
-The groundwork for this feature is ready, but a missing navigation button is temporarily keeping this functionality out of reach. Stay tuned for its debut!  
+- **Promo Code Creation by Admin**:  
+	- The groundwork for this feature is ready, but a missing navigation button is temporarily keeping this functionality out of reach. Stay tuned for its debut!  
 
   
-•**UI/UX Enhancements**:  
-The visual experience is evolving, and our team is dedicated to delivering a polished, intuitive interface in upcoming updates.  
+- **UI/UX Enhancements**:  
+	- The visual experience is evolving, and our team is dedicated to delivering a polished, intuitive interface in upcoming updates.  
 
   
 •**Performance and Scalability Optimizations**:  
@@ -31,8 +31,8 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 - Style Guidelines:  
 	- We follow the StandardJS code style guidelines for JavaScript, ensuring a widely recognized and reliable convention.  
 	- In the backend, a blank line is always left between methods and routes, fostering better readability and logical organization.
-- Why It Matters:
-Adopting a consistent code style reduces errors, enhances teamwork, and ensures that anyone can easily navigate the project without confusion. JetSetGo2’s code is written not just for the present but for future scalability and collaboration.
+- Why It Matters:  
+	- Adopting a consistent code style reduces errors, enhances teamwork, and ensures that anyone can easily navigate the project without confusion. JetSetGo2’s code is written not just for the present but for future scalability and collaboration.
 ## Screenshots
 ![image](https://github.com/user-attachments/assets/7308cf9c-1722-4a75-a26f-fcbe2b1b039e)
 
