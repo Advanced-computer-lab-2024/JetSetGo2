@@ -117,6 +117,7 @@ JetSetGo2 is powered by a modern **MERN stack** to ensure scalability, performan
 - **Authentication**: JSON Web Tokens (JWT)
 - **Payment Integration**: Stripe API
 - **API Integration**: Amadeus API for flight and hotel booking
+- **Mapping Service**: OpenStreetMap for interactive maps and location-based services
 
 ## Features
 
