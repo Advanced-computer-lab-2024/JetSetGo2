@@ -7,6 +7,8 @@ JetSetGo2 is your ultimate travel companion, created to transform the way you pl
 
 ## Build Status
 JetSetGo2 is currently under active development and is not yet recommended for production environments. While the core features are operational, a few exciting enhancements are still in progress:    
+
+  
 • **Loyalty Level and Badge Updates**:  
 This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.  
 •**Promo Code Creation by Admin**:  
