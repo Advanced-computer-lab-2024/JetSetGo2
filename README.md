@@ -500,6 +500,15 @@ JetSetGo2 is an open-source project, and we welcome contributions to improve the
    ```bash
    git checkout -b feature-name
    ```
+3. Make your changes and commit them:
+  
+   ```bash
+   git commit -m "Add feature: [Feature Name]"
+   ```
+5. Push your changes to your forked repository:
+   ```bash
+   git push origin feature-name
+   ```
 
 
 ## Credits
