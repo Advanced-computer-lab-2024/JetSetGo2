@@ -127,9 +127,62 @@ JetSetGo2 delivers a comprehensive suite of features designed to revolutionize t
 - **User Authentication**: Secure registration and login system for multiple user roles, including tourists, tour guides, and advertisers.
 - **Password Recovery**: Easily recover passwords using OTP verification for hassle-free account access.
 - **Role-Based Access**: Distinct functionalities tailored for tourists, tour guides, advertisers, and tourism governance entities.
-- **Secure Payments**: Stripe API integration for easy and secure payments.
 - **Guest Access**: Limited functionalities for non-registered users, allowing exploration of the platform.
 - **User Profiles**: Manage personal details, travel history, and preferences for a tailored experience.
+- **Upload Document**s: Upload required documents during the registration process for tour guides, advertisers, or sellers.
+
+
+#### Travel Planning
+
+- **Trip Planning Tools**: Create and organize personalized itineraries and activities for a seamless travel experience.
+- **Activity Management**: Schedule, view, and manage activities during trips with an intuitive interface.
+- **Interactive Maps**: Visualize destinations and travel plans with integrated map support.
+- **Promotions and Discounts**: Personalized promo codes and offers to enhance user engagement.
+- **Loyalty Rewards**: Earn points for frequent travel activities and redeem them for discounts.
+- **Currency Selection**: Choose the currency in which you want to view prices.
+
+
+#### Search and Discovery
+
+- **Search and Filter**: Advanced options to find destinations, services, and reviews quickly.
+- **Reviews and Recommendations**: Access and contribute reviews for destinations and services.
+- **Social Integration**: Share trips, reviews, and recommendations with other users.
+- **Bookmark Events**: Save events to view later and request notifications when bookings open.
+
+#### Admin and Governance Tools
+
+- **Admin Management**: Comprehensive admin tools for monitoring platform activity, managing users, and enforcing compliance.
+- **Promotional Tools**: Options for advertisers to promote services and destinations effectively.
+- **Third-Party Integration**: Seamless API integration for travel-related services, such as flight and hotel booking.
+- **Activity and Itinerary Management**: Create, read, update, or delete activities and itineraries, along with necessary details.
+
+#### User Experience
+
+- **Responsive Design**: Fully optimized for both mobile and desktop devices.
+- **Notifications**: Timely alerts for upcoming trips, activities, bookings, and payment receipts.
+- **Feedback Collection**: Built-in mechanism to gather user feedback for continuous improvement.
+- **Loyalty Badges**: Earn badges based on activity and engagement levels.
+
+#### Data Security and Insights
+
+- **Secure Data Management**: Robust security for personal and sensitive user data.
+- **Booking History**: View and manage past trip and service bookings with ease.
+- **Sales Reports**: Generate reports on sales, revenue, and tourist attendance for events or itineraries.
+- **Complaints and Resolutions**: File, view, and manage complaints with status tracking and admin replies.
+
+#### Shopping and Products
+
+- **Product Management**: View available products, add them to wishlists or carts, and complete purchases.
+- **Product Ratings and Reviews**: Rate and review products after purchase.
+- **Payment Options**: Pay using a wallet, credit card (via Stripe), or cash on delivery.
+- **Order History**: View current and past orders, including statuses and cancellations.
+
+#### Payment Features
+
+- **Payment Options**: Pay for activities, itineraries, or products using a wallet, credit card (via Stripe), or cash on delivery(for products).
+- **Payment Receipts**: Receive detailed payment receipts via email for all transactions.
+- **Wallet Integration**: View wallet balance updates after payments or cancellations.
+- **Loyalty Points**: Redeem loyalty points to add cash to your wallet.
 
 ## Code Examples
 ```javascript
