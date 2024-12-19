@@ -314,6 +314,9 @@ const loginUser = async (req, res) => {
   }
 };
 ```
+This functionality allows users (tourists, tour guides, advertisers, etc.) to securely log in to the platform by entering their credentials. The authentication token is stored locally to enable seamless access to protected routes and features.
+
+
 
 ## Installation
 To install and run JetSetGo2 , please follow these steps:
