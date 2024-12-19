@@ -118,33 +118,18 @@ JetSetGo2 is powered by a modern **MERN stack** to ensure scalability, performan
 - **Payment Integration**: Stripe API
 - **API Integration**: Amadeus API for flight and hotel booking
 
+## Features
 
-## Features 
--**User Authentication**: Secure registration and login system for multiple user roles, including tourists, tour guides, and advertisers.
--**Password Recovery**: Recover passwords with OTP verification for seamless account access.
--**Profile Customization**: Users can update personal details and preferences for a tailored experience.
--**Role-Based Access**: Distinct functionalities for tourists, tour guides, advertisers, and tourism governance entities.
--**Trip Planning**: Comprehensive tools for planning trips, including itinerary creation and activity organization.
--**Activity Management**: Schedule and manage activities during trips with intuitive options.
--**Search and Filter**: Advanced search options for destinations, services, and reviews.
--**Responsive Design**: Fully responsive platform for optimal use on both mobile and desktop devices.
--**User Profiles**: Manage user profiles with travel histories and preferences.
--**Reviews and Recommendations**: Access and contribute to reviews and recommendations for destinations and services.
--**Social Integration**: Share trips, reviews, and recommendations with other users.
--**Feedback Collection**: Built-in feedback mechanism for continuous improvement and user satisfaction.
--**Notifications**: Timely alerts for upcoming trips, activities, and important updates.
--**Secure Data Management**: Robust security for personal and sensitive user data.
--**Third-Party Integration**: API integration for additional travel-related services.
--**Age Validation**: Automated validation for age-restricted services.
--**Guest Access**: Limited functionalities for non-registered users to explore the platform.
--**Booking History**: View and manage past trip and service bookings.
--**Multi-User Support**: Handle multiple user roles with distinct dashboards and permissions.
--**Admin Management**: Comprehensive admin tools for monitoring platform activity and enforcing compliance.
--**Promotional Tools**: Options for advertisers to promote services and destinations effectively.
--**interactive Maps**: Visualize destinations and travel plans with integrated map support.
--**Multi-Language Support**: Enhanced accessibility with support for multiple languages.
--**Promotions and Discounts**: Receive personalized promo codes and offers for enhanced engagement.
--**Loyalty Rewards**: Earn points for frequent travel activities and redeem them for discounts.
+JetSetGo2 delivers a comprehensive suite of features designed to revolutionize travel planning and management. Here’s what our platform offers:
+
+###Core Features
+
+- **User Authentication**: Secure registration and login system for multiple user roles, including tourists, tour guides, and advertisers.
+- **Password Recovery**: Easily recover passwords using OTP verification for hassle-free account access.
+- **Role-Based Access**: Distinct functionalities tailored for tourists, tour guides, advertisers, and tourism governance entities.
+- **Secure Payments**: Stripe API integration for easy and secure payments.
+- **Guest Access**: Limited functionalities for non-registered users, allowing exploration of the platform.
+- **User Profiles**: Manage personal details, travel history, and preferences for a tailored experience.
 
 ## Code Examples
 ```javascript
