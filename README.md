@@ -111,7 +111,7 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 ## Tech/Framework used  
 JetSetGo2 is powered by a modern tech stack to ensure scalability, performance, and a seamless user experience:
 
-- **Frontend**: React.js, Redux, Axios, Tailwind CSS
+- **Frontend**: React.js, Axios, Bootstrap CSS
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB
 - **Authentication**: JSON Web Tokens (JWT)
