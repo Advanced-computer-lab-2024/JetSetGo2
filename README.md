@@ -320,30 +320,51 @@ This functionality allows users (tourists, tour guides, advertisers, etc.) to se
 
 
 ## Installation
-To install and run JetSetGo2 , please follow these steps:
+
+Follow these steps to set up JetSetGo2 locally:
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB
+- Git
+
+### Steps
+
 1. **Clone Our Repository**:
 ```sh
 git clone https://github.com/Advanced-computer-lab-2024/JetSetGo2.git
 ```
 2. **Install dependencies**:
+In the first terminal
+```sh
+cd backend 
+npm install
+```
+Another terminal
 ```sh
 cd frontend
-npm install
-cd backend 
 npm install
 ```
 3. **Set environment variables**:
 Create a `.env` file in the root directory and add the necessary environment variables:
 ```env
-DATABASE_URL=your_database_url
-JWT_SECRET=your_jwt_secret
+MONGO_URI = "mongodb+srv://marwanallam8:012345678910@cluster0.ew4lb.mongodb.net/"
+JWT_SECRET = 123@abc$in4
+EMAIL_USER = marwanallam163@gmail.com
+EMAIL_PASSWORD = himy vxuv rfvz znqw
+STRIPE_SECRET_KEY=sk_test_51QQBfPKbaBifWGn1fXWxcx0EP2pM8w3mbIuiCioPXVwWwaaLneXESzR68ZJkabcYsNAo9my2oXr20RuWu96jiXQX00sOLXsAlz
+Webhook_secret_key = whsec_395bd0204bc24e6ff41dad457b0bf0ca6f1961c497f09b6197045c434bae761a
 ```
 4. **Run the application**:
+In the first terminal
+```sh
+cd backend
+nodemon server.js
+```
+In the second terminal
 ```sh
 cd frontend
 npm start
-cd backend
-nodemon server.js
 ```
 
 ## How to Use?
