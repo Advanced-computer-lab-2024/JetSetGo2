@@ -6,7 +6,11 @@ JetSetGo2 is a web-based platform designed to simplify and enhance the process o
 JetSetGo2 is your ultimate travel companion, created to transform the way you plan trips. It eliminates the hassle of manual planning and introduces a seamless, all-in-one platform that empowers you to manage every aspect of your journey effortlessly. Whether it’s personalized itineraries, smart budgeting, or real-time updates, JetSetGo2 ensures your travel experience is stress-free and unforgettable.
 
 ## Build Status
-The current build of JetSetGo2 is functional but may have known issues. These are documented to help users avoid confusion and allow developers to quickly contribute fixes.
+JetSetGo2 is currently under active development and is not yet recommended for production environments. While the core features are operational, a few exciting enhancements are still in progress:
+	•	Loyalty Level and Badge Updates: This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.
+	•	Promo Code Creation by Admin: The groundwork for this feature is ready, but a missing navigation button is temporarily keeping this functionality out of reach. Stay tuned for its debut!
+	•	UI/UX Enhancements: The visual experience is evolving, and our team is dedicated to delivering a polished, intuitive interface in upcoming updates.
+	•	Performance and Scalability Optimizations: Efforts are ongoing to ensure JetSetGo2 is faster, smoother, and capable of handling a growing user base.
 ## Code Style
 We follow the StandardJS code style guidelines for JavaScript.
 ## Screenshots
