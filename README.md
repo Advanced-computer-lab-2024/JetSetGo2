@@ -39,11 +39,26 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 ### Home
 ![image](https://github.com/user-attachments/assets/7308cf9c-1722-4a75-a26f-fcbe2b1b039e)
 
+### Tourist SignUP
+![image](https://github.com/user-attachments/assets/a4b13445-27cd-457e-9ec2-fafcfe4295d2)
+
 ### Login
 ![image](https://github.com/user-attachments/assets/3c7f6cb0-9bf7-4fde-b621-222dfe62ee5e)
 
-### Tourist SignUP
-![image](https://github.com/user-attachments/assets/a4b13445-27cd-457e-9ec2-fafcfe4295d2)
+### Tourist HomePage
+![image](https://github.com/user-attachments/assets/42783e29-e41b-42c3-9a25-2b52958e37af)
+
+### BuyProducts By Tourist
+![image](https://github.com/user-attachments/assets/69a4a9e0-6f03-43d4-b2b9-0eb9ae35ebbe)
+
+### Tourist Wishlist
+![image](https://github.com/user-attachments/assets/0dce0b64-e620-4caa-b0b9-72887613aaaf)
+
+### Tourist Step - by - Step Guide 
+![image](https://github.com/user-attachments/assets/89403021-f8f9-4280-b62d-7bdbbeb6f03a)
+
+### Select Prefrences by Tourist
+![image](https://github.com/user-attachments/assets/c12f2e3e-4fcf-4078-9658-b2c39a6b321f)
 
 ### Admin Complains
 ![image](https://github.com/user-attachments/assets/f50e681d-5d4b-4b0d-9c13-865d13f900bc)
@@ -72,8 +87,26 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 ### Add a New Product
 ![image](https://github.com/user-attachments/assets/205e8641-d6e7-48eb-ae41-0e2247ae4489)
 
+### Create Activity
+![image](https://github.com/user-attachments/assets/ca8e5e0f-294f-4788-8fb2-ae00b0261a9c)
 
+### View Seller Activities
+![image](https://github.com/user-attachments/assets/1d0fdfc9-aa65-42d8-8635-17ca1d36d964)
 
+### Tourguide HomePage
+![image](https://github.com/user-attachments/assets/d9c1a3db-6bdb-465f-b4e5-851b65f0b2f8)
+
+### Tourist Reports
+![image](https://github.com/user-attachments/assets/b3b3fbf4-4146-43f8-b2c1-6627cca92f44)
+
+### Calculate Revenue 
+![image](https://github.com/user-attachments/assets/14a0b57e-4f04-42db-a0fe-fd0149d0318d)
+
+### Create an Itinerary 
+![image](https://github.com/user-attachments/assets/e0986238-d5f3-49fc-9f74-c9b9ed0a729e)
+
+### View Tourguide Itineraries
+![image](https://github.com/user-attachments/assets/8c7b40f4-03dc-4bbe-a432-484342c8c2dc)
 
 ## Tech/Framework used
 - *Frontend*: React 
