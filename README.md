@@ -36,10 +36,43 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 
 
 ## Screenshots
-### Login Page
+### Home
 ![image](https://github.com/user-attachments/assets/7308cf9c-1722-4a75-a26f-fcbe2b1b039e)
 
+### Login
+![image](https://github.com/user-attachments/assets/3c7f6cb0-9bf7-4fde-b621-222dfe62ee5e)
+
+### Tourist SignUP
+![image](https://github.com/user-attachments/assets/a4b13445-27cd-457e-9ec2-fafcfe4295d2)
+
+### Admin Complains
+![image](https://github.com/user-attachments/assets/f50e681d-5d4b-4b0d-9c13-865d13f900bc)
+
+### Admin User Statistics
 ![image](https://github.com/user-attachments/assets/be5f7e07-52e8-445c-93fa-1539bc386b42)
+
+### Accept Users By Admin
+![image](https://github.com/user-attachments/assets/2702e6bd-217c-478b-8f0e-d3cfdac3ae95)
+
+### Generate Sales Report By Admin
+![image](https://github.com/user-attachments/assets/f0fe78f6-bea0-4969-863d-99664e2c6262)
+
+### Itenararies Shown By Admin
+![image](https://github.com/user-attachments/assets/795f9344-c071-4147-b9e6-286865c283e9)
+
+### Manage tags By Admin
+![image](https://github.com/user-attachments/assets/2333e3e3-c4db-4ebe-b351-34727c5ed530)
+
+### Seller Home Page
+![image](https://github.com/user-attachments/assets/301bc4a1-8526-4338-abb0-431f2b7999b0)
+
+### Manage Seller Products
+![image](https://github.com/user-attachments/assets/94d01056-11ee-4758-b438-fb276cc6165a)
+
+### Add a New Product
+![image](https://github.com/user-attachments/assets/205e8641-d6e7-48eb-ae41-0e2247ae4489)
+
+
 
 
 ## Tech/Framework used
