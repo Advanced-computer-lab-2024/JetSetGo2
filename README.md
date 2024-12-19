@@ -373,6 +373,11 @@ npm start
 
 JetSetGo2 provides a comprehensive API for managing users, activities, itineraries, and more. Below is a list of available endpoints with their descriptions:
 
+####Base URL
+
+All endpoints are prefixed with the following base URL:
+`http://localhost:8000`
+
 ### Authentication
 - **POST `/api/auth/register`**: Registers a new user.
 - **POST `/api/auth/login`**: Logs in an existing user and returns a token.
