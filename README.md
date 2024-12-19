@@ -373,42 +373,37 @@ npm start
 
 JetSetGo2 provides a comprehensive API for managing users, activities, itineraries, and more. Below is a list of available endpoints with their descriptions:
 
-#### Base URL
-
-All endpoints are prefixed with the following base URL:
-`http://localhost:8000`
-
 ### tourist
-- **POST `{{base_url}}/home/tourist/addTourist`**: Registers a new Toruist.
-- **PUT `{{base_url}}/home/tourist/updateTourist/:id`**: Update tourist profile.
-- **GET `{{base_url}}/home/tourist/getTourist`**: fetch all toursit.
-- **GET `{{base_url}}/home/tourist/getTourist/:id`**: get tourist by id.
-- **DELETE `{{base_url}}/home/tourist/delete/:id`**: delete tourist by id.
-- **POST `{{base_url}}/home/tourist/bookTransportation/:touristId/:transportationId`**: tourist book transportation.
-- **GET `{{base_url}}/home/tourist/getBookedTransportations/:touristId`**: get tourist booked transportation.
-- **POST `{{base_url}}/home/tourist/buyProduct/:touristId/:productId`**: tourist buy product.
+- **POST `/home/tourist/addTourist`**: Registers a new Toruist.
+- **PUT `/home/tourist/updateTourist/:id`**: Update tourist profile.
+- **GET `/home/tourist/getTourist`**: fetch all toursit.
+- **GET `/home/tourist/getTourist/:id`**: get tourist by id.
+- **DELETE `/home/tourist/delete/:id`**: delete tourist by id.
+- **POST `/home/tourist/bookTransportation/:touristId/:transportationId`**: tourist book transportation.
+- **GET `/home/tourist/getBookedTransportations/:touristId`**: get tourist booked transportation.
+- **POST `/home/tourist/buyProduct/:touristId/:productId`**: tourist buy product.
 
 ### Seller
-- **GET `{{base_url}}/Seller/readSeller/:id`**: get exact seller with id.
-- **PUT `{{base_url}}/Seller/acceptSeller/:id`**: accept this seller on the system.
-- **PUT `{{base_url}}/Seller/rejectSeller/:id`**: reject this seller on the system.
-- **DELETE `{{base_url}}/Seller//deletMyAccount/:id`**: accept this seller on the system.
+- **GET `/Seller/readSeller/:id`**: get exact seller with id.
+- **PUT `/Seller/acceptSeller/:id`**: accept this seller on the system.
+- **PUT `/Seller/rejectSeller/:id`**: reject this seller on the system.
+- **DELETE `/Seller//deletMyAccount/:id`**: accept this seller on the system.
 
 ### Promotions
-- **GET `{{base_url}}/promo/get`**: Fetches all available promo codes.
-- **POST `{{base_url}}/promo/create`**: Creates a new promo code.
+- **GET `/promo/get`**: Fetches all available promo codes.
+- **POST `/promo/create`**: Creates a new promo code.
 
-- ### OTP
-- **POST `{{base_url}}/otp/send-otp`**: send email otp
-- **POST `{{base_url}}/otp/verify-otp`**: verify otp
+### OTP
+- **POST `/otp/send-otp`**: send email otp
+- **POST `/otp/verify-otp`**: verify otp
 
 ### Products
-- **POST `{{base_url}}/product/get`**: Fetches all available products.
-- **GET `{{base_url}}/product/add`**: Add product.
-- **PUT `{{base_url}}/product/update/:id`**: update specicific product.
-- **DELETE `{{base_url}}/product//delete/:id`**: delete specific product.
-- **PATCH `{{base_url}}/product/archive/:id`**: urchive product.
-- **PATCH `{{base_url}}/product/unarchive/:id`**: unarchive product.
+- **POST `/product/get`**: Fetches all available products.
+- **GET `/product/add`**: Add product.
+- **PUT `/product/update/:id`**: update specicific product.
+- **DELETE `/product//delete/:id`**: delete specific product.
+- **PATCH `/product/archive/:id`**: urchive product.
+- **PATCH `/product/unarchive/:id`**: unarchive product.
 
 ---
 
