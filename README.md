@@ -249,7 +249,9 @@ const createTourist = async (req, res) => {
   }
 };
 ```
+This component allows a user (tourist) to create an account by entering details like username, email, password, and more. The form data is sent to a backend API for processing, and the user is redirected to a login page upon successful signup.  
 
+  
 ### User Authentication 
 ```javascript
 const loginUser = async (req, res) => {
@@ -313,9 +315,6 @@ const loginUser = async (req, res) => {
 };
 ```
 
- 
-
- This component allows a user (tourist) to create an account by entering details like username, email, password, and more. The form data is sent to a backend API for processing, and the user is redirected to a login page upon successful signup.
 ## Installation
 To install and run JetSetGo2 , please follow these steps:
 1. **Clone Our Repository**:
