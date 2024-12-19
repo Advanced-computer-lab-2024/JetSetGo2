@@ -434,6 +434,20 @@ JetSetGo2 is a versatile platform designed for multiple user roles, including to
 5. **Ratings and Reviews**:
    - Rate and review activities, tour guides, or itineraries you’ve experienced.
 
+### Tour Guides  
+1. **Registration**:
+   - Sign up as a tour guide by providing personal details and uploading necessary documents for verification.
+2. **Profile Management**:
+   - Update your profile with experience details and past work.
+3. **Create and Manage Itineraries:**:
+   - Add new itineraries with detailed descriptions, activities, and pricing.
+   - Activate or deactivate itineraries and view feedback from tourists.
+4. **Personalized Experience**:
+   - Save events to bookmarks and set notifications for when bookings open.
+   -  Manage your wallet, loyalty points, and rewards from your profile.
+5. **Engage with Tourists**:
+   - Respond to reviews and ratings for your itineraries.
+
 
 ## Contribute
 We encourage and value contributions to JetSetGo2. To get involved, please follow these steps:
