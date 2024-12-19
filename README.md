@@ -53,7 +53,6 @@ We follow the StandardJS code style guidelines for JavaScript.
 
 ## Code Examples
 ```javascript
-```
 const createTourist = async (req, res) => {
   // create a tourist after sign up
   const {
@@ -114,6 +113,8 @@ const createTourist = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+```
+
  
 
  This component allows a user (tourist) to create an account by entering details like username, email, password, and more. The form data is sent to a backend API for processing, and the user is redirected to a login page upon successful signup.
