@@ -122,7 +122,7 @@ JetSetGo2 is powered by a modern **MERN stack** to ensure scalability, performan
 
 JetSetGo2 delivers a comprehensive suite of features designed to revolutionize travel planning and management. Here’s what our platform offers:
 
-### Core Features
+#### Core Features
 
 - **User Authentication**: Secure registration and login system for multiple user roles, including tourists, tour guides, and advertisers.
 - **Password Recovery**: Easily recover passwords using OTP verification for hassle-free account access.
