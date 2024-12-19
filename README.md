@@ -485,10 +485,20 @@ JetSetGo2 is a versatile platform designed for multiple user roles, including to
 
 JetSetGo2 is an open-source project, and we welcome contributions to improve the platform. Whether you want to report a bug, suggest a feature, or enhance existing functionality, here’s how you can contribute:
 
-### Reporting Issues
-1. Check the [Issues](#) section to see if the issue is already reported.
-2. If not, open a new issue with a clear title and description.
-3. Include steps to reproduce the issue if applicable.
+## Report Issues
+
+JetSetGo2 encourages users and contributors to report bugs, suggest new features, or provide feedback. Follow these steps to report an issue:
+
+1. Go to the [Issues Tab](https://github.com/yourusername/yourrepository/issues).
+2. Click on **New Issue**.
+3. Provide a clear and descriptive title.
+4. Add detailed information about the issue, including:
+   - Steps to reproduce (if it’s a bug).
+   - Expected vs. actual behavior.
+   - Screenshots or logs, if applicable.
+5. Submit the issue, and our team will review it promptly.
+
+We appreciate your contributions to improving JetSetGo2!
 
 ### Suggesting Features
 1. Open an issue titled “Feature Request: [Feature Name]”.
