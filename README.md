@@ -26,12 +26,12 @@ Efforts are ongoing to ensure JetSetGo2 is faster, smoother, and capable of hand
 
 ## Code Style
 JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and collaboration across the development process:  
-	•	Tools Used:  
->		-	Prettier: Enforces automatic code formatting, making our code clean, readable, and uniform across the project.  
-	•	Style Guidelines:  
->		- We follow the StandardJS code style guidelines for JavaScript, ensuring a widely recognized and reliable convention.  
->		-	In the backend, a blank line is always left between methods and routes, fostering better readability and logical organization.
-	•	Why It Matters:
+• Tools Used:  
+>	- Prettier: Enforces automatic code formatting, making our code clean, readable, and uniform across the project. 
+• Style Guidelines:  
+>	- We follow the StandardJS code style guidelines for JavaScript, ensuring a widely recognized and reliable convention.  
+>	- In the backend, a blank line is always left between methods and routes, fostering better readability and logical organization.
+• Why It Matters:
 Adopting a consistent code style reduces errors, enhances teamwork, and ensures that anyone can easily navigate the project without confusion. JetSetGo2’s code is written not just for the present but for future scalability and collaboration.
 ## Screenshots
 ![image](https://github.com/user-attachments/assets/7308cf9c-1722-4a75-a26f-fcbe2b1b039e)
