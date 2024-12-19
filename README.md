@@ -408,8 +408,8 @@ JetSetGo2 includes robust testing to ensure all functionalities work as expected
 - **DELETE http://localhost:8000/TourGuide/deletMyAccount/6730f7a49c4ed702d6174c25** : Deletes the account of the tour guide with the specified ID (6730f7a49c4ed702d6174c25).
 
 #### Notifications
-- **GET http://localhost:8000/notifications/675abfc06b3edc76222c816a**: Fetches notifications for the user with the specified ID (675abfc06b3edc76222c816a).
-- **PATCH http://localhost:8000/notifications/read/675adf4066c80c785d721c54**: Marks the notification with the specified ID (675adf4066c80c785d721c54) as read.
+- **GET http://localhost:8000/notifications/675abfc06b3edc76222c816a** : Fetches notifications for the user with the specified ID (675abfc06b3edc76222c816a).
+- **PATCH http://localhost:8000/notifications/read/675adf4066c80c785d721c54** : Marks the notification with the specified ID (675adf4066c80c785d721c54) as read.
 
 #### Admin
 - **GET http://localhost:8000/admin/total-users** : Fetches the total number of registered users on the platform.
@@ -439,7 +439,7 @@ JetSetGo2 is a versatile platform designed for multiple user roles, including to
    - Sign up as a tour guide by providing personal details and uploading necessary documents for verification.
 2. **Profile Management**:
    - Update your profile with experience details and past work.
-3. **Create and Manage Itineraries:**:
+3. **Create and Manage Itineraries**:
    - Add new itineraries with detailed descriptions, activities, and pricing.
    - Activate or deactivate itineraries and view feedback from tourists.
 4. **Personalized Experience**:
@@ -447,6 +447,38 @@ JetSetGo2 is a versatile platform designed for multiple user roles, including to
    -  Manage your wallet, loyalty points, and rewards from your profile.
 5. **Engage with Tourists**:
    - Respond to reviews and ratings for your itineraries.
+
+### Advertisers  
+1. **Registration**:
+   - Register your company by providing details such as a website link, company profile, and uploaded documents.
+2. **Promote Activities**:
+   - Create and manage promotional events or activities.
+   - View insights and reports on the performance of your campaigns.
+3. **Admin Features**:
+   - Use tools to track the success of promotions and adjust pricing or availability as needed.
+
+### Sellers  
+1. **Registration**:
+   - Sign up as a seller with your company name, description, and required documentation.
+2. **Manage Products**:
+   - Add, update, or archive products in the in-app gift shop.
+   - Monitor sales performance and available stock.
+3. **Engage with Customers**:
+   - Respond to reviews and ratings for your products.
+  
+### Admins  
+1. **Manage Users**:
+   - Approve or reject registrations for tourists, tour guides, advertisers, and sellers based on uploaded documents.
+   - Delete accounts upon request or due to policy violations.
+2. **Oversee Platform Activities**:
+   - Manage promo codes, notifications, and flagged content.
+   - View user and sales reports for all activities.
+  
+
+### For All Users  
+- Access real-time notifications for bookings, updates, and reminders.
+- Use interactive maps to explore itineraries and locations.
+- Enjoy a fully responsive design, accessible on both desktop and mobile devices.
 
 
 ## Contribute
