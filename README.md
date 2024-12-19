@@ -415,23 +415,14 @@ JetSetGo2 includes robust testing to ensure all functionalities work as expected
 - **GET http://localhost:8000/admin/total-users** : Fetches the total number of registered users on the platform.
 - **GET http://localhost:8000/admin/monthly-users** : Fetches the number of new users registered each month.
 
-## How to Use?
-1.*Register*: Create an account by signing up with your email, username, and password.
-2.*Login*: Access your account securely with your registered credentials.
-3.*Recover Password*: Use the "Forgot Password" feature to reset your password via OTP sent to your email.
-4.*Create Profile*: Update personal information and preferences to personalize your experience.
-5.*Plan Trip*: Add destinations, activities, and schedules to your travel itinerary.
-6*Search and Filter*: Use advanced search and filter options to find recommendations and services.
-7.*Book Services*: Book flights, hotels, and activities directly through the platform.
-8.*Manage Bookings*: View and manage your past bookings in the "Booking History" section.
-9.*Write Reviews*: Provide feedback by writing reviews for destinations and services.
-10.*Receive Notifications*: Get alerts for upcoming activities, booking confirmations, and special offers.
-11.*Share Travel Plans*: Share your itineraries and experiences on social media platforms.
-12.*Use Admin Dashboard*: Admin users can manage platform activity, including user monitoring and content compliance.
-13.*View Interactive Maps*: Visualize travel routes and destinations with integrated maps.
-14.*Access Customer Support*: Reach out for assistance with any queries or technical issues.
-15.*Use Multi-Language Support*: Set your preferred language for an enhanced experience.
-16.*Access Offline*: View your travel itineraries and information even when you are offline.
+## How to Use
+
+JetSetGo2 is a versatile platform designed for multiple user roles, including tourists, tour guides, advertisers, and sellers. Below is a guide on how each user type can interact with the platform.
+
+### Tourists  
+1. **Registration**:
+   - Sign up with your email, username, password, and personal details like nationality and date of birth.
+
 
 ## Contribute
 We encourage and value contributions to JetSetGo2. To get involved, please follow these steps:
