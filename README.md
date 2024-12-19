@@ -482,13 +482,24 @@ JetSetGo2 is a versatile platform designed for multiple user roles, including to
 
 
 ## Contribute
-We encourage and value contributions to JetSetGo2. To get involved, please follow these steps:
-1.Fork the repository to your own account.
-2.Create a new branch (git checkout -b feature-branch).
-3.Implement your changes.
-4.Commit the changes (git commit -m 'Add new feature').
-5.Push the changes to your branch (git push origin feature-branch).
-6.Submit a pull request for review.
+
+JetSetGo2 is an open-source project, and we welcome contributions to improve the platform. Whether you want to report a bug, suggest a feature, or enhance existing functionality, here’s how you can contribute:
+
+### Reporting Issues
+1. Check the [Issues](#) section to see if the issue is already reported.
+2. If not, open a new issue with a clear title and description.
+3. Include steps to reproduce the issue if applicable.
+
+### Suggesting Features
+1. Open an issue titled “Feature Request: [Feature Name]”.
+2. Clearly explain your idea and how it can benefit users.
+
+### Submitting Code
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix:
+   ```bash
+   git checkout -b feature-name
+   ```
 
 
 ## Credits
