@@ -369,6 +369,46 @@ cd frontend
 npm start
 ```
 
+## API References
+
+JetSetGo2 provides a comprehensive API for managing users, activities, itineraries, and more. Below is a list of available endpoints with their descriptions:
+
+### Authentication
+- **POST `/api/auth/register`**: Registers a new user.
+- **POST `/api/auth/login`**: Logs in an existing user and returns a token.
+
+### Promotions
+- **GET `/promo/get`**: Fetches all available promo codes.
+- **POST `/promo/create`**: Creates a new promo code.
+
+### Products
+- **GET `/product/get`**: Fetches all available products.
+
+### Itineraries
+- **GET `/itinerary/getIteneraries`**: Fetches all available itineraries.
+- **GET `/itinerary/getIten/{id}`**: Fetches details of a specific itinerary by its ID.
+
+### Notifications
+- **GET `/notifications/{userId}`**: Fetches notifications for a user.
+- **PATCH `/notifications/read/{notificationId}`**: Marks a notification as read.
+
+### Admin
+- **GET `/admin/total-users`**: Fetches the total number of users.
+- **GET `/admin/monthly-users`**: Fetches the number of new users registered monthly.
+
+### Sellers
+- **GET `/Seller/get`**: Fetches all registered sellers.
+
+### Tour Guides
+- **GET `/TourGuide/get`**: Fetches all registered tour guides.
+- **DELETE `/TourGuide/deletMyAccount/{id}`**: Deletes a tour guide account by ID.
+
+### Advertisers
+- **GET `/home/adver/get`**: Fetches all registered advertisers.
+- **DELETE `/home/adver/deletMyAccount/{id}`**: Deletes an advertiser account by ID.
+
+---
+
 ## Tests
 
 JetSetGo2 includes robust testing to ensure all functionalities work as expected.
