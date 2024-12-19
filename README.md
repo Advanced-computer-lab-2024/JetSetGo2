@@ -377,7 +377,43 @@ JetSetGo2 includes robust testing to ensure all functionalities work as expected
 - **Postman**: For manual API testing.
 
 #### Promotions
-- **GET http://localhost:8000/promo/get**: Fetches a list of all available promo codes.
+- **GET http://localhost:8000/promo/get** : Fetches a list of all available promo codes.
+- **POST http://localhost:8000/promo/create** : Creates a new promo code with specified details.
+
+#### Products
+- **GET http://localhost:8000/product/get** : Fetches a list of all available products.
+
+#### OTP
+- **POST http://localhost:8000/otp/send-otp** : Sends an OTP to the user’s email for verification purposes.
+
+#### Tourists
+- **GET http://localhost:8000/home/tourist/getTourist** : Fetches the details of a all tourists.
+
+#### Sellers
+- **GET http://localhost:8000/Seller/get** : Fetches a list of all registered sellers.
+
+#### Advertisers
+- **GET http://localhost:8000/home/adver/get** : Fetches a list of all registered advertisers.
+- **DELETE http://localhost:8000/home/adver/deletMyAccount/6732179d63fd1193bedb7fb6** : Deletes the account of the advertiser with the specified ID (6732179d63fd1193bedb7fb6).
+
+#### Activities
+- **GET http://localhost:8000/activity/get** : Fetches a list of all available activities.
+
+#### Itineraries
+- **GET http://localhost:8000/itinerary/getIteneraries** : Fetches a list of all available itineraries.
+- **GET http://localhost:8000/itinerary/getIten/6730f7fa9c4ed702d6174c4b** : Fetches the details of the itinerary with the specified ID (6730f7fa9c4ed702d6174c4b).
+
+#### Tour Guides
+- **GET http://localhost:8000/TourGuide/get** : Fetches a list of all registered tour guides.
+- **DELETE http://localhost:8000/TourGuide/deletMyAccount/6730f7a49c4ed702d6174c25** : Deletes the account of the tour guide with the specified ID (6730f7a49c4ed702d6174c25).
+
+#### Notifications
+- **GET http://localhost:8000/notifications/675abfc06b3edc76222c816a**: Fetches notifications for the user with the specified ID (675abfc06b3edc76222c816a).
+- **PATCH http://localhost:8000/notifications/read/675adf4066c80c785d721c54**: Marks the notification with the specified ID (675adf4066c80c785d721c54) as read.
+
+#### Admin
+- **GET http://localhost:8000/admin/total-users** : Fetches the total number of registered users on the platform.
+- **GET http://localhost:8000/admin/monthly-users** : Fetches the number of new users registered each month.
 
 ## How to Use?
 1.*Register*: Create an account by signing up with your email, username, and password.
