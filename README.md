@@ -7,18 +7,22 @@ JetSetGo2 is your ultimate travel companion, created to transform the way you pl
 
 ## Build Status
 JetSetGo2 is currently under active development and is not yet recommended for production environments. While the core features are operational, a few exciting enhancements are still in progress:    
-		• **Loyalty Level and Badge Updates**: This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.  
-	•**Promo Code Creation by Admin**: The groundwork for this feature is ready, but a missing navigation button is temporarily keeping this functionality out of reach. Stay tuned for its debut!  
-	•**UI/UX Enhancements**: The visual experience is evolving, and our team is dedicated to delivering a polished, intuitive interface in upcoming updates.  
-	•**Performance and Scalability Optimizations**: Efforts are ongoing to ensure JetSetGo2 is faster, smoother, and capable of handling a growing user base.
+• **Loyalty Level and Badge Updates**:  
+This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.  
+•**Promo Code Creation by Admin**:  
+The groundwork for this feature is ready, but a missing navigation button is temporarily keeping this functionality out of reach. Stay tuned for its debut!  
+•**UI/UX Enhancements**:  
+The visual experience is evolving, and our team is dedicated to delivering a polished, intuitive interface in upcoming updates.  
+•**Performance and Scalability Optimizations**:  
+Efforts are ongoing to ensure JetSetGo2 is faster, smoother, and capable of handling a growing user base.
+
 ## Code Style
 We follow the StandardJS code style guidelines for JavaScript.
+
 ## Screenshots
 ![image](https://github.com/user-attachments/assets/7308cf9c-1722-4a75-a26f-fcbe2b1b039e)
 
 ![image](https://github.com/user-attachments/assets/be5f7e07-52e8-445c-93fa-1539bc386b42)
-
-
 
 
 ## Tech/Framework used
