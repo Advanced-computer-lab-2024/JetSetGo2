@@ -369,6 +369,13 @@ cd frontend
 npm start
 ```
 
+## Tests
+
+JetSetGo2 includes robust testing to ensure all functionalities work as expected.
+
+### Tools Used
+- **Postman**: For manual API testing.
+
 ## How to Use?
 1.*Register*: Create an account by signing up with your email, username, and password.
 2.*Login*: Access your account securely with your registered credentials.
