@@ -11,10 +11,16 @@ JetSetGo2 is currently under active development and is not yet recommended for p
   
 • **Loyalty Level and Badge Updates**:  
 This feature, designed to reward our users, is still in the works and will be a game-changer once implemented.  
+
+  
 •**Promo Code Creation by Admin**:  
 The groundwork for this feature is ready, but a missing navigation button is temporarily keeping this functionality out of reach. Stay tuned for its debut!  
+
+  
 •**UI/UX Enhancements**:  
 The visual experience is evolving, and our team is dedicated to delivering a polished, intuitive interface in upcoming updates.  
+
+  
 •**Performance and Scalability Optimizations**:  
 Efforts are ongoing to ensure JetSetGo2 is faster, smoother, and capable of handling a growing user base.
 
