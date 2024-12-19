@@ -526,7 +526,7 @@ We appreciate your contributions to improving JetSetGo2!
 JetSetGo2 was developed with the contributions of talented individuals and the use of various tools and resources. We’d like to acknowledge the following:
 
 ### Development Team
-- **Marwan Allam**: Developer and Contributor
+- **Marwan Allam**: Scrum Master, Developer and Contributor
 - **Mahmoud Omran**: Developer and Contributor
 - **Omar bakr**: Developer and Contributor
 - **Ahmed eltabbakh**: Developer and Contributor
@@ -553,7 +553,8 @@ JetSetGo2 was developed with the contributions of talented individuals and the u
 
 ---
 ## License
-This project is distributed under the MIT License.
+
+JetSetGo2 is licensed under the **Apache 2.0 License**. You are free to use, modify, and distribute this project under the terms of this license.
 
 ## contact
 For any questions, feedback, or assistance, please reach out to us at 
