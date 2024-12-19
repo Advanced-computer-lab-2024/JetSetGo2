@@ -334,7 +334,8 @@ Follow these steps to set up JetSetGo2 locally:
 ```sh
 git clone https://github.com/Advanced-computer-lab-2024/JetSetGo2.git
 ```
-2. **Install dependencies**:  
+2. **Install dependencies**:
+  
 In the first terminal
 ```sh
 cd backend 
@@ -355,7 +356,8 @@ EMAIL_PASSWORD = himy vxuv rfvz znqw
 STRIPE_SECRET_KEY= sk_test_51QQBfPKbaBifWGn1fXWxcx0EP2pM8w3mbIuiCioPXVwWwaaLneXESzR68ZJkabcYsNAo9my2oXr20RuWu96jiXQX00sOLXsAlz
 Webhook_secret_key = whsec_395bd0204bc24e6ff41dad457b0bf0ca6f1961c497f09b6197045c434bae761a
 ```
-4. **Run the application**:  
+4. **Run the application**:
+  
 In the first terminal
 ```sh
 cd backend
