@@ -522,14 +522,36 @@ We appreciate your contributions to improving JetSetGo2!
 
 
 ## Credits
-We would like to express our gratitude to the following resources and individuals for their valuable contributions and inspiration:
-MongoDB
-Node.js
-Stripe
-Google Maps API
-StandardJS
-React
 
+JetSetGo2 was developed with the contributions of talented individuals and the use of various tools and resources. We’d like to acknowledge the following:
+
+### Development Team
+- **Marwan Allam**: Developer and Contributor
+- **Mahmoud Omran**: Developer and Contributor
+- **Omar bakr**: Developer and Contributor
+- **Ahmed eltabbakh**: Developer and Contributor
+- **Omar Tayel**: Developer and Contributor
+- **Omar elhossary**: Developer and Contributor
+- **Mario Sameh**: Developer and Contributor
+- **Youssef ahmed**: Developer and Contributor
+- **Mostafa Tarek**: Developer and Contributor
+- **Mayar Mohamed**: Developer and Contributor
+
+### Tools and Technologies
+- **React.js**: Frontend development
+- **Node.js**: Backend development
+- **Express.js**: Web server framework
+- **MongoDB**: Database management
+- **Bootstrap CSS**: Frontend styling
+- **OpenStreetMap**: Maps integration
+- **Stripe API**: Payment processing
+- **Amadeus API**: Travel booking services
+
+### Resources
+- [Postman](https://www.postman.com/): For API testing
+- [GitHub](https://github.com/): For version control and collaboration
+
+---
 ## License
 This project is distributed under the MIT License.
 
