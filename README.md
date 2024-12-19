@@ -109,7 +109,7 @@ JetSetGo2 adheres to robust coding standards to ensure clarity, consistency, and
 ![image](https://github.com/user-attachments/assets/8c7b40f4-03dc-4bbe-a432-484342c8c2dc)
 
 ## Tech/Framework used  
-JetSetGo2 is powered by a modern tech stack to ensure scalability, performance, and a seamless user experience:
+JetSetGo2 is powered by a modern MERN stack to ensure scalability, performance, and a seamless user experience:
 
 - **Frontend**: React.js, Axios, Bootstrap CSS
 - **Backend**: Node.js, Express.js
