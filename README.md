@@ -422,6 +422,17 @@ JetSetGo2 is a versatile platform designed for multiple user roles, including to
 ### Tourists  
 1. **Registration**:
    - Sign up with your email, username, password, and personal details like nationality and date of birth.
+2. **Search and Explore**:
+   - Use the search bar to find itineraries, activities, and historical places.
+   - Apply filters (e.g., budget, date, ratings) and sort results to match your preferences.
+3. **Booking**:
+- Book itineraries, activities, and events directly through the app.
+- Use the integrated payment system (wallet, credit card, or Stripe) to complete transactions.
+4.**Personalized Experience**:
+- Save events to bookmarks and set notifications for when bookings open.
+- Manage your wallet, loyalty points, and rewards from your profile.
+5.**Ratings and Reviews**:
+- Rate and review activities, tour guides, or itineraries you’ve experienced.
 
 
 ## Contribute
