@@ -489,7 +489,7 @@ JetSetGo2 is an open-source project, and we welcome contributions to improve the
 
 JetSetGo2 encourages users and contributors to report bugs, suggest new features, or provide feedback. Follow these steps to report an issue:
 
-1. Go to the [Issues Tab](https://github.com/yourusername/yourrepository/issues).
+1. Go to the [Issues Tab](https://github.com/Advanced-computer-lab-2024/JetSetGo2/issues).
 2. Click on **New Issue**.
 3. Provide a clear and descriptive title.
 4. Add detailed information about the issue, including:
